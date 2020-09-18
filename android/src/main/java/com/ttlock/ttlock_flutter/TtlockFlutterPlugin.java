@@ -25,7 +25,6 @@ import com.ttlock.bl.sdk.callback.CreateCustomPasscodeCallback;
 import com.ttlock.bl.sdk.callback.DeleteFingerprintCallback;
 import com.ttlock.bl.sdk.callback.DeleteICCardCallback;
 import com.ttlock.bl.sdk.callback.DeletePasscodeCallback;
-import com.ttlock.bl.sdk.callback.GetAdminPasscodeCallback;
 import com.ttlock.bl.sdk.callback.GetAutoLockingPeriodCallback;
 import com.ttlock.bl.sdk.callback.GetBatteryLevelCallback;
 import com.ttlock.bl.sdk.callback.GetLockConfigCallback;
@@ -47,13 +46,13 @@ import com.ttlock.bl.sdk.callback.SetLockConfigCallback;
 import com.ttlock.bl.sdk.callback.SetLockTimeCallback;
 import com.ttlock.bl.sdk.callback.SetPassageModeCallback;
 import com.ttlock.bl.sdk.callback.SetRemoteUnlockSwitchCallback;
-import com.ttlock.bl.sdk.constant.TTLockConfigType;
 import com.ttlock.bl.sdk.entity.ControlLockResult;
 import com.ttlock.bl.sdk.entity.CyclicConfig;
 import com.ttlock.bl.sdk.entity.LockError;
 import com.ttlock.bl.sdk.entity.LockVersion;
 import com.ttlock.bl.sdk.entity.PassageModeConfig;
 import com.ttlock.bl.sdk.entity.PassageModeType;
+import com.ttlock.bl.sdk.entity.TTLockConfigType;
 import com.ttlock.bl.sdk.entity.ValidityInfo;
 import com.ttlock.bl.sdk.gateway.api.GatewayClient;
 import com.ttlock.bl.sdk.gateway.callback.ConnectCallback;
@@ -136,7 +135,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     channel.setMethodCallHandler(this);
     eventChannel = new EventChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), Constant.EVENT_CHANNEL_NAME);
     eventChannel.setStreamHandler(this);
-    LogUtil.setDBG(true);
+//    LogUtil.setDBG(true);
   }
 
   @Override
@@ -542,7 +541,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void controlLock() {
-    TTLockClient.getDefault().controlLock(ttlockModel.getControlActionValue(), ttlockModel.lockData, ttlockModel.lockMac, new ControlLockCallback(){
+    TTLockClient.getDefault().controlLock(ttlockModel.getControlActionValue(), ttlockModel.lockData,  new ControlLockCallback(){
 
       @Override
       public void onControlLockSuccess(ControlLockResult controlLockResult) {
@@ -565,7 +564,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void resetLock() {
-    TTLockClient.getDefault().resetLock(ttlockModel.lockData, ttlockModel.lockMac, new ResetLockCallback() {
+    TTLockClient.getDefault().resetLock(ttlockModel.lockData,  new ResetLockCallback() {
       @Override
       public void onResetLockSuccess() {
         removeCommandTimeOutRunable();
@@ -583,7 +582,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void getLockTime() {
-    TTLockClient.getDefault().getLockTime(ttlockModel.lockData, ttlockModel.lockMac, new GetLockTimeCallback() {
+    TTLockClient.getDefault().getLockTime(ttlockModel.lockData,  new GetLockTimeCallback() {
 
       @Override
       public void onGetLockTimeSuccess(long lockTimestamp) {
@@ -603,7 +602,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void setLockTime() {
-    TTLockClient.getDefault().setLockTime(ttlockModel.lockTime, ttlockModel.lockData, ttlockModel.lockMac, new SetLockTimeCallback() {
+    TTLockClient.getDefault().setLockTime(ttlockModel.lockTime, ttlockModel.lockData,  new SetLockTimeCallback() {
       @Override
       public void onSetTimeSuccess() {
         removeCommandTimeOutRunable();
@@ -626,7 +625,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
     commandTimeOutCheck(4 * COMMAND_TIME_OUT);
 
-    TTLockClient.getDefault().getOperationLog(ttlockModel.logType, ttlockModel.lockData, ttlockModel.lockMac, new GetOperationLogCallback() {
+    TTLockClient.getDefault().getOperationLog(ttlockModel.logType, ttlockModel.lockData,  new GetOperationLogCallback() {
       @Override
       public void onGetLogSuccess(String log) {
         removeCommandTimeOutRunable();
@@ -645,7 +644,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void getSwitchStatus() {
-    TTLockClient.getDefault().getLockStatus(ttlockModel.lockData, ttlockModel.lockMac, new GetLockStatusCallback() {
+    TTLockClient.getDefault().getLockStatus(ttlockModel.lockData,  new GetLockStatusCallback() {
       @Override
       public void onGetLockStatusSuccess(int status) {
         removeCommandTimeOutRunable();
@@ -664,11 +663,11 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void setAdminPasscode() {
-    TTLockClient.getDefault().modifyAdminPasscode(ttlockModel.adminPasscode, ttlockModel.lockData, ttlockModel.lockMac, new ModifyAdminPasscodeCallback() {
+    TTLockClient.getDefault().modifyAdminPasscode(ttlockModel.adminPasscode, ttlockModel.lockData,  new ModifyAdminPasscodeCallback() {
       @Override
-      public void onModifyAdminPasscodeSuccess(String passcode) {
+      public void onModifyAdminPasscodeSuccess(String lockData) {
         removeCommandTimeOutRunable();
-        ttlockModel.adminPasscode = passcode;
+        ttlockModel.lockData = lockData;
         successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
         doNextCommandAction();
       }
@@ -683,26 +682,26 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void getAdminPasscode() {
-    TTLockClient.getDefault().getAdminPasscode(ttlockModel.lockData, ttlockModel.lockMac, new GetAdminPasscodeCallback() {
-      @Override
-      public void onGetAdminPasscodeSuccess(String passcode) {
-        removeCommandTimeOutRunable();
-        ttlockModel.adminPasscode = passcode;
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
-      }
-
-      @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
-      }
-    });
+//    TTLockClient.getDefault().getAdminPasscode(ttlockModel.lockData,  new GetAdminPasscodeCallback() {
+//      @Override
+//      public void onGetAdminPasscodeSuccess(String passcode) {
+//        removeCommandTimeOutRunable();
+//        ttlockModel.adminPasscode = passcode;
+//        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
+//        doNextCommandAction();
+//      }
+//
+//      @Override
+//      public void onFail(LockError error) {
+//        removeCommandTimeOutRunable();
+//        errorCallbackCommand(commandQue.poll(), error);
+//        clearCommand();
+//      }
+//    });
   }
 
   public void setCustomPasscode() {
-    TTLockClient.getDefault().createCustomPasscode(ttlockModel.passcode, ttlockModel.startDate, ttlockModel.endDate, ttlockModel.lockData, ttlockModel.lockMac, new CreateCustomPasscodeCallback() {
+    TTLockClient.getDefault().createCustomPasscode(ttlockModel.passcode, ttlockModel.startDate, ttlockModel.endDate, ttlockModel.lockData,  new CreateCustomPasscodeCallback() {
       @Override
       public void onCreateCustomPasscodeSuccess(String passcode) {
         removeCommandTimeOutRunable();
@@ -721,7 +720,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void modifyPasscode() {
-    TTLockClient.getDefault().modifyPasscode(ttlockModel.passcodeOrigin, ttlockModel.passcodeNew, ttlockModel.startDate, ttlockModel.endDate, ttlockModel.lockData, ttlockModel.lockMac, new ModifyPasscodeCallback() {
+    TTLockClient.getDefault().modifyPasscode(ttlockModel.passcodeOrigin, ttlockModel.passcodeNew, ttlockModel.startDate, ttlockModel.endDate, ttlockModel.lockData,  new ModifyPasscodeCallback() {
       @Override
       public void onModifyPasscodeSuccess() {
         removeCommandTimeOutRunable();
@@ -739,7 +738,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void deletePasscode() {
-    TTLockClient.getDefault().deletePasscode(ttlockModel.passcode, ttlockModel.lockData, ttlockModel.lockMac, new DeletePasscodeCallback() {
+    TTLockClient.getDefault().deletePasscode(ttlockModel.passcode, ttlockModel.lockData,  new DeletePasscodeCallback() {
       @Override
       public void onDeletePasscodeSuccess() {
         removeCommandTimeOutRunable();
@@ -758,7 +757,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
 
   public void resetPasscodes() {
-    TTLockClient.getDefault().resetPasscode(ttlockModel.lockData, ttlockModel.lockMac, new ResetPasscodeCallback() {
+    TTLockClient.getDefault().resetPasscode(ttlockModel.lockData,  new ResetPasscodeCallback() {
       @Override
       public void onResetPasscodeSuccess(String lockData) {
         removeCommandTimeOutRunable();
@@ -788,7 +787,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       validityInfo.setCyclicConfigs(GsonUtil.toObject(ttlockModel.cycleJsonList, new TypeToken<List<CyclicConfig>>(){}));
       ttlockModel.cycleJsonList = null;//clear data
     }
-    TTLockClient.getDefault().addICCard(validityInfo, ttlockModel.lockData, ttlockModel.lockMac, new AddICCardCallback() {
+    TTLockClient.getDefault().addICCard(validityInfo, ttlockModel.lockData,  new AddICCardCallback() {
       @Override
       public void onEnterAddMode() {
         removeCommandTimeOutRunable();
@@ -822,7 +821,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       validityInfo.setCyclicConfigs(GsonUtil.toObject(ttlockModel.cycleJsonList, new TypeToken<List<CyclicConfig>>(){}));
       ttlockModel.cycleJsonList = null;//clear data
     }
-    TTLockClient.getDefault().modifyICCardValidityPeriod(validityInfo, ttlockModel.cardNumber, ttlockModel.lockData, ttlockModel.lockMac, new ModifyICCardPeriodCallback() {
+    TTLockClient.getDefault().modifyICCardValidityPeriod(validityInfo, ttlockModel.cardNumber, ttlockModel.lockData,  new ModifyICCardPeriodCallback() {
       @Override
       public void onModifyICCardPeriodSuccess() {
         removeCommandTimeOutRunable();
@@ -840,7 +839,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void deleteICCard() {
-    TTLockClient.getDefault().deleteICCard(ttlockModel.cardNumber, ttlockModel.lockData, ttlockModel.lockMac, new DeleteICCardCallback() {
+    TTLockClient.getDefault().deleteICCard(ttlockModel.cardNumber, ttlockModel.lockData,  new DeleteICCardCallback() {
       @Override
       public void onDeleteICCardSuccess() {
         removeCommandTimeOutRunable();
@@ -858,7 +857,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void clearICCard() {
-    TTLockClient.getDefault().clearAllICCard(ttlockModel.lockData, ttlockModel.lockMac, new ClearAllICCardCallback() {
+    TTLockClient.getDefault().clearAllICCard(ttlockModel.lockData,  new ClearAllICCardCallback() {
       @Override
       public void onClearAllICCardSuccess() {
         successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
@@ -885,7 +884,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       validityInfo.setCyclicConfigs(GsonUtil.toObject(ttlockModel.cycleJsonList, new TypeToken<List<CyclicConfig>>(){}));
       ttlockModel.cycleJsonList = null;//clear data
     }
-    TTLockClient.getDefault().addFingerprint(validityInfo, ttlockModel.lockData, ttlockModel.lockMac, new AddFingerprintCallback() {
+    TTLockClient.getDefault().addFingerprint(validityInfo, ttlockModel.lockData, new AddFingerprintCallback() {
       @Override
       public void onEnterAddMode(int totalCount) {
         removeCommandTimeOutRunable();
@@ -944,7 +943,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void deleteFingerPrint() {
-    TTLockClient.getDefault().deleteFingerprint(ttlockModel.fingerprintNumber, ttlockModel.lockData, ttlockModel.lockMac, new DeleteFingerprintCallback() {
+    TTLockClient.getDefault().deleteFingerprint(ttlockModel.fingerprintNumber, ttlockModel.lockData, new DeleteFingerprintCallback() {
       @Override
       public void onDeleteFingerprintSuccess() {
         removeCommandTimeOutRunable();
@@ -962,7 +961,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void clearFingerPrint() {
-    TTLockClient.getDefault().clearAllICCard(ttlockModel.lockData, ttlockModel.lockMac, new ClearAllICCardCallback() {
+    TTLockClient.getDefault().clearAllICCard(ttlockModel.lockData, new ClearAllICCardCallback() {
       @Override
       public void onClearAllICCardSuccess() {
         removeCommandTimeOutRunable();
@@ -980,7 +979,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void getBattery() {
-    TTLockClient.getDefault().getBatteryLevel(ttlockModel.lockData, ttlockModel.lockMac, new GetBatteryLevelCallback() {
+    TTLockClient.getDefault().getBatteryLevel(ttlockModel.lockData, new GetBatteryLevelCallback() {
       @Override
       public void onGetBatteryLevelSuccess(int electricQuantity) {
         removeCommandTimeOutRunable();
@@ -999,7 +998,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void setAutoLockTime() {
-    TTLockClient.getDefault().setAutomaticLockingPeriod(ttlockModel.currentTime, ttlockModel.lockData, ttlockModel.lockMac, new SetAutoLockingPeriodCallback() {
+    TTLockClient.getDefault().setAutomaticLockingPeriod(ttlockModel.currentTime, ttlockModel.lockData, new SetAutoLockingPeriodCallback() {
       @Override
       public void onSetAutoLockingPeriodSuccess() {
         removeCommandTimeOutRunable();
@@ -1037,7 +1036,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void setRemoteUnlockSwitch() {
-    TTLockClient.getDefault().setRemoteUnlockSwitchState(ttlockModel.isOn, ttlockModel.lockData, ttlockModel.lockMac, new SetRemoteUnlockSwitchCallback() {
+    TTLockClient.getDefault().setRemoteUnlockSwitchState(ttlockModel.isOn, ttlockModel.lockData, new SetRemoteUnlockSwitchCallback() {
       @Override
       public void onSetRemoteUnlockSwitchSuccess(String lockData) {
         removeCommandTimeOutRunable();
@@ -1056,7 +1055,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void getRemoteUnlockSwitch() {
-    TTLockClient.getDefault().getRemoteUnlockSwitchState(ttlockModel.lockData, ttlockModel.lockMac, new GetRemoteUnlockStateCallback() {
+    TTLockClient.getDefault().getRemoteUnlockSwitchState(ttlockModel.lockData, new GetRemoteUnlockStateCallback() {
       @Override
       public void onGetRemoteUnlockSwitchStateSuccess(boolean enabled) {
         removeCommandTimeOutRunable();
@@ -1087,7 +1086,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 //    passageModeConfig.setStartDate(ttlockModel.startDate);
 //    passageModeConfig.setEndDate(ttlockModel.endDate);
 
-    TTLockClient.getDefault().setPassageMode(passageModeConfig, ttlockModel.lockData, ttlockModel.lockMac, new SetPassageModeCallback() {
+    TTLockClient.getDefault().setPassageMode(passageModeConfig, ttlockModel.lockData, new SetPassageModeCallback() {
       @Override
       public void onSetPassageModeSuccess() {
         removeCommandTimeOutRunable();
@@ -1105,7 +1104,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void clearPassageMode() {
-    TTLockClient.getDefault().clearPassageMode(ttlockModel.lockData, ttlockModel.lockMac, new ClearPassageModeCallback() {
+    TTLockClient.getDefault().clearPassageMode(ttlockModel.lockData, new ClearPassageModeCallback() {
       @Override
       public void onClearPassageModeSuccess() {
         removeCommandTimeOutRunable();
@@ -1181,7 +1180,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void resetEKey() {
-    TTLockClient.getDefault().resetEkey(ttlockModel.lockData, ttlockModel.lockMac, new ResetKeyCallback() {
+    TTLockClient.getDefault().resetEkey(ttlockModel.lockData, new ResetKeyCallback() {
       @Override
       public void onResetKeySuccess(String lockData) {
         removeCommandTimeOutRunable();
