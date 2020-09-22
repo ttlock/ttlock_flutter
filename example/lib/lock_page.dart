@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ttlock_flutter/ttlock.dart';
+import 'package:ttlock_premise_flutter/ttlock.dart';
 import 'package:bmprogresshud/progresshud.dart';
 
 class LockPage extends StatefulWidget {
@@ -118,6 +118,7 @@ class _LockPageState extends State<LockPage> {
   void dispose() {
     //You need to reset lock, otherwise the lock will can't be initialized again
     TTLock.resetLock(lockData, () {}, (errorCode, errorMsg) {});
+    ProgressHud.of(_context).dismiss();
     super.dispose();
   }
 
@@ -186,8 +187,8 @@ class _LockPageState extends State<LockPage> {
         break;
 
       case Command.modifyAdminPasscode:
-        TTLock.modifyAdminPasscode('1234', lockData, () {
-          _showSuccessAndDismiss("Success");
+        TTLock.modifyAdminPasscode('1234', lockData, (lockData) {
+          _showSuccessAndDismiss("Success\n ");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });

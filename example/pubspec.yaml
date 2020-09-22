@@ -14,7 +14,7 @@ dependencies:
 
   bmprogresshud: ^0.0.8
   
-  ttlock_flutter:
+  ttlock_premise_flutter:
     # When depending on this package from a real application you should use:
     #   ttlock_flutter: ^x.y.z
     # See https://dart.dev/tools/pub/dependencies#version-constraints

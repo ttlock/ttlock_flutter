@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'gateway_page.dart';
-import 'package:ttlock_flutter/ttgateway.dart';
+import 'package:ttlock_premise_flutter/ttgateway.dart';
 import 'package:bmprogresshud/progresshud.dart';
 
 class WifiPage extends StatefulWidget {

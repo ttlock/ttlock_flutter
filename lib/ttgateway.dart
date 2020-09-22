@@ -1,4 +1,4 @@
-import 'package:ttlock_flutter/ttlock.dart';
+import 'package:ttlock_premise_flutter/ttlock.dart';
 
 class TTGateway {
   static const String COMMAND_START_SCAN_GATEWAY = "startScanGateway";

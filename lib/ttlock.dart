@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'dart:convert' as convert;
 
-import 'package:ttlock_flutter/ttgateway.dart';
+import 'package:ttlock_premise_flutter/ttgateway.dart';
 
 class TTLock {
   static MethodChannel _commandChannel =
@@ -401,7 +401,7 @@ class TTLock {
  * lockData The lock data string used to operate lock
  */
   static void modifyAdminPasscode(String adminPasscode, String lockData,
-      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+      TTLockDataCallback callback, TTFailedCallback failedCallback) {
     Map map = Map();
     map[TTResponse.adminPasscode] = adminPasscode;
     map[TTResponse.lockData] = lockData;
@@ -667,6 +667,7 @@ class TTLock {
         break;
 
       case COMMAND_RESET_PASSCODE:
+      case COMMAND_MODIFY_ADMIN_PASSCODE:
         TTLockDataCallback lockDataCallback = callBack;
         lockDataCallback(data[TTResponse.lockData]);
         break;
@@ -1001,7 +1002,7 @@ typedef TTBluetoothScanStateCallback = void Function(bool isScanning);
 typedef TTLockDataCallback = void Function(String lockData);
 typedef TTControlLockCallback = void Function(
     int lockTime, int electricQuantity, int uniqueId);
-typedef TTGetAdminPasscodeCallback = void Function(String adminPasscode);
+// typedef TTGetAdminPasscodeCallback = void Function(String adminPasscode);
 typedef TTGetLockElectricQuantityCallback = void Function(int electricQuantity);
 typedef TTGetLockOperateRecordCallback = void Function(String records);
 typedef TTGetLockSpecialValueCallback = void Function(int specialValue);

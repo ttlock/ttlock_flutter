@@ -10,9 +10,10 @@
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:label="ttlock_flutter_example"
+        tools:replace="android:label"
         android:icon="@mipmap/ic_launcher">
         <activity
-            android:name="com.ttlock.ttlock_flutter_example.MainActivity"
+            android:name=".MainActivity"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
