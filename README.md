@@ -34,8 +34,12 @@ public void onRequestPermissionsResult(int requestCode, String[] permissions, in
         }
     }
 ```
-
- 
+5. if you use premise sdk, you need config lib repository in build.gradle file.like this:
+repositories {
+        flatDir {
+            dirs 'libs', '..\\..\\..\\android\\libs'
+        }
+    }
 
 ##### Ussage
 ```
