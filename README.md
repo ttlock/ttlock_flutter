@@ -8,7 +8,7 @@ ttlock-developers-email-list@googlegroups.com
 ##### Config
 
 iOS: 
-1. In Xcode `project` ➜ `info` ➜ `Custom iOS Target Projectes`. Add Key`Privacy - Bluetooth Peripheral Usage Description` value `your description for bluetooth` 
+1. In Xcode `project` ➜ `info` ➜ `Custom iOS Target Projectes`. Add key`Privacy - Bluetooth Peripheral Usage Description` value `your description for bluetooth` 
 
 Android:
 AndroidManifest.xml configuration:
