@@ -5,24 +5,23 @@ ttlock-developers-email-list@googlegroups.com
 ### ttlock_flutter
 
 
-
 ##### Config
 
 iOS: 
-1. In XCode,Add Key`Privacy - Bluetooth Peripheral Usage Description` Value `your description for bluetooth` to your project's `info` ➜ `Custom iOS Target Projectes`
+1. In Xcode `project` ➜ `info` ➜ `Custom iOS Target Projectes`. Add Key`Privacy - Bluetooth Peripheral Usage Description` value `your description for bluetooth` 
 
 Android:
 AndroidManifest.xml configuration:
-1. add 'xmlns:tools="http://schemas.android.com/tools"' to <manifest> element
-2. add 'tools:replace="android:label"' to <application> element
-3. additional permissions:
+1. Add 'xmlns:tools="http://schemas.android.com/tools"' to <manifest> element
+2. Add 'tools:replace="android:label"' to <application> element
+3. Additional permissions:
 ```  
 <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 <uses-permission android:name="android.permission.BLUETOOTH" />
 <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 ```
-4. in MainActivity extends FlutterActivity, you need add permissions result to ttlock plugin.
+4. In MainActivity extends FlutterActivity, you need add permissions result to ttlock plugin.
 add below code:
 
 ```
@@ -34,8 +33,16 @@ public void onRequestPermissionsResult(int requestCode, String[] permissions, in
         }
     }
 ```
+5.If you use premise sdk, you need config lib repository in build.gradle file.like this:
 
- 
+```
+repositories {
+        flatDir {
+            dirs 'libs', '..\\..\\..\\android\\libs'
+        }
+    }
+```
+
 
 ##### Ussage
 ```
@@ -92,6 +99,8 @@ void unlockAndGetLogAndSetTime() {
     }
 });
 ```
+
+
 
 
 
