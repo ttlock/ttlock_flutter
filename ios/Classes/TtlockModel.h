@@ -89,6 +89,23 @@
 @property (nonatomic, strong) NSString *adminPasscode;
 @property (nonatomic, strong) NSString *erasePasscode;
 
+@property (nonatomic, strong) NSString *floors;
+
+@property (nonatomic, strong) NSNumber *elevatorWorkActiveType;
+
+@property (nonatomic, strong) NSNumber *savePowerType;
+
+@property (nonatomic, strong) NSArray<NSNumber *> *nbAwakeModes;
+
+@property (nonatomic, strong) NSArray<NSDictionary *> *nbAwakeTimeList;
+
+@property (nonatomic, strong) NSString *hotelData;
+@property (nonatomic, strong) NSNumber *building;
+@property (nonatomic, strong) NSNumber *floor;
+
+@property (nonatomic, strong) NSString *sector;
+
+
 
 + (TtlockModel *)modelWithDict:(NSDictionary *)dict;
 - (NSDictionary *)toDictionary;

@@ -62,6 +62,7 @@ class _ScanPageState extends State<ScanPage> {
         return LockPage(
           title: scanModel.lockName,
           lockData: lockData,
+          lockMac: scanModel.lockMac,
         );
       }));
     }, (errorCode, errorMsg) {
