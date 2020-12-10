@@ -932,7 +932,7 @@ class TTLock {
 
   static void _errorCallback(
       String command, int errorCode, String errorMessage) {
-    if (errorCode == TTLockError.lockIsBusy.index) {
+    if (errorCode == TTLockError.sdkIsBusy.index) {
       errorMessage =
           "The TTLock SDK can only communicate with one lock at a time";
     }
@@ -1174,7 +1174,7 @@ enum TTLockError {
   bluetoothOff,
   bluetoothConnectTimeount,
   bluetoothDisconnection,
-  lockIsBusy,
+  sdkIsBusy,
   invalidLockData,
   invalidParameter,
 }
