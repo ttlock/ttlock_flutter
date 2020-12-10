@@ -49,10 +49,10 @@ enum Command {
   setElevatorWorkMode,
   setPowerSaverWorkMode,
   setPowerSaverControlable,
-  setNBAwakeModes,
-  getNBAwakeModes,
-  setNBAwakeTimes,
-  getNBAwakeTimes,
+  setNbAwakeModes,
+  getNbAwakeModes,
+  setNbAwakeTimes,
+  getNbAwakeTimes,
   setDoorSensorSwitch,
   getDoorSensorSwitch,
   getDoorSensorState,
@@ -108,10 +108,10 @@ class _LockPageState extends State<LockPage> {
     {"Set Elevator Work Mode": Command.setElevatorWorkMode},
     {"Set Power Saver Work Mode": Command.setPowerSaverWorkMode},
     {"Set Power Saver Controlable": Command.setPowerSaverControlable},
-    {"Set Nb Awake Modes": Command.setNBAwakeModes},
-    {"Get Nb Awake Modes": Command.getNBAwakeModes},
-    {"Set Nb Awake Times": Command.setNBAwakeTimes},
-    {"Get Nb Awake Times": Command.getNBAwakeTimes},
+    {"Set Nb Awake Modes": Command.setNbAwakeModes},
+    {"Get Nb Awake Modes": Command.getNbAwakeModes},
+    {"Set Nb Awake Times": Command.setNbAwakeTimes},
+    {"Get Nb Awake Times": Command.getNbAwakeTimes},
     {"Set Door Sensor Switch": Command.setDoorSensorSwitch},
     {"Get Door Sensor Switch": Command.getDoorSensorSwitch},
     {"Get Door Sensor State": Command.getDoorSensorState},
@@ -448,7 +448,7 @@ class _LockPageState extends State<LockPage> {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
         break;
-      case Command.setNBAwakeModes:
+      case Command.setNbAwakeModes:
         TTLock.setNbAwakeModes(
             [TTNbAwakeMode.fingerprint, TTNbAwakeMode.card], lockData, () {
           _showSuccessAndDismiss("Success");
@@ -456,26 +456,26 @@ class _LockPageState extends State<LockPage> {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
         break;
-      case Command.getNBAwakeModes:
+      case Command.getNbAwakeModes:
         TTLock.getNbAwakeModes(lockData, (List<TTNbAwakeMode> list) {
           _showSuccessAndDismiss(list.toString());
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
         break;
-      case Command.setNBAwakeTimes:
+      case Command.setNbAwakeTimes:
         List list = new List();
         TTNbAwakeTimeModel nbAwakeTimeModel = new TTNbAwakeTimeModel();
         nbAwakeTimeModel.minutes = 100;
         nbAwakeTimeModel.type = TTNbAwakeTimeType.point;
         list.add(nbAwakeTimeModel);
-        TTLock.setNBAwakeTimes(list, lockData, () {
+        TTLock.setNbAwakeTimes(list, lockData, () {
           _showSuccessAndDismiss("Success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
         break;
-      case Command.getNBAwakeTimes:
+      case Command.getNbAwakeTimes:
         TTLock.getNBAwakeTimes(lockData, (list) {
           _showSuccessAndDismiss(list.toString());
         }, (errorCode, errorMsg) {

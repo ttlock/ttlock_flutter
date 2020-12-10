@@ -1,7 +1,7 @@
 class Config {
-  //ttlock uid,  https://open.sciener.com/doc/api/v3/user/getUid
+  //ttlock uid,  https://api.ttlock.com/v3/user/getUid
   static int ttlockUid = 0;
-  //ttlock login password
+  //ttlock login password （ Please do not encrypt the password ）
   static String ttlockLoginPassword = '';
   // custom gateway name
   static String gatewayName = 'My gateway 1';

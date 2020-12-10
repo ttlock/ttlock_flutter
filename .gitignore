@@ -1,2 +1,4 @@
 
 .DS_Store
+.packages
+.dart_tool/package_config.json

@@ -669,7 +669,7 @@ class TTLock {
         fail: failedCallback);
   }
 
-  static void setNBAwakeTimes(List<TTNbAwakeTimeModel> times, String lockData,
+  static void setNbAwakeTimes(List<TTNbAwakeTimeModel> times, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     List list = new List();
     times.forEach((element) {
