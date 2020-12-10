@@ -1177,7 +1177,7 @@ enum TTLockError {
   sdkIsBusy, //35
   invalidLockData,
   invalidParameter,
-  lockIsBusy
+  lockIsBusy //38
 }
 
 enum TTElevatorWorkActivateType { allFloors, specificFloors }
