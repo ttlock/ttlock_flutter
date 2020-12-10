@@ -1138,45 +1138,46 @@ enum TTLockConfig {
 }
 
 enum TTLockError {
-  reseted,
-  crcError,
+  reseted, //0
+  crcError, //1
   noPermisstion,
   wrongAdminCode,
   noStorageSpace,
-  inSettingMode,
+  inSettingMode, //5
   noAdmin,
   notInSettingMode,
   wrongDynamicCode,
   noPower,
-  resetPasscode,
+  resetPasscode, //10
   unpdatePasscodeIndex,
   invalidLockFlagPos,
   ekeyExpired,
   passcodeLengthInvalid,
-  samePasscodes,
+  samePasscodes, //15
   ekeyInactive,
   aesKey,
   fail,
   passcodeExist,
-  passcodeNotExist,
+  passcodeNotExist, //20
   lackOfStorageSpaceWhenAddingPasscodes,
   invalidParaLength,
   cardNotExist,
   fingerprintDuplication,
-  fingerprintNotExist,
+  fingerprintNotExist, //25
   invalidCommand,
   inFreezeMode,
   invalidClientPara,
   lockIsLocked,
-  recordNotExist,
+  recordNotExist, //30
 
   notSupportModifyPasscode,
   bluetoothOff,
   bluetoothConnectTimeount,
   bluetoothDisconnection,
-  sdkIsBusy,
+  sdkIsBusy, //35
   invalidLockData,
   invalidParameter,
+  lockIsBusy
 }
 
 enum TTElevatorWorkActivateType { allFloors, specificFloors }
