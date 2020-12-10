@@ -644,7 +644,8 @@ class TTLock {
   static void setPowerSaverControlable(String lockMac, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     Map map = Map();
-    map["lockMac"] = lockMac;
+
+    map[TTResponse.lockMac] = lockMac;
     map[TTResponse.lockData] = lockData;
     invoke(command_SET_POWSER_SAVER_CONTROLABLE, map, callback,
         fail: failedCallback);
@@ -931,6 +932,11 @@ class TTLock {
 
   static void _errorCallback(
       String command, int errorCode, String errorMessage) {
+    if (errorCode == TTLockError.lockIsBusy.index) {
+      errorMessage =
+          "The TTLock SDK can only communicate with one lock at a time";
+    }
+
     if (command == TTGateway.COMMAND_GET_SURROUND_WIFI ||
         command == TTGateway.COMMAND_INIT_GATEWAY) {
       TTGatewayFailedCallback failedCallback = _failCallbackMap[command];
