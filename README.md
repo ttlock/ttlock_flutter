@@ -40,6 +40,7 @@ public void onRequestPermissionsResult(int requestCode, String[] permissions, in
 ```
     buildTypes {
         release {
+            minifyEnabled false
             shrinkResources false
         }
     }
