@@ -43,6 +43,7 @@ repositories {
     }
     buildTypes {
         release {
+            minifyEnabled false
             shrinkResources false
         }
     }
