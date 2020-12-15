@@ -103,7 +103,7 @@ class TTLock {
 
   // ignore: slash_for_doc_comments
 /**
-   * Current iPhone/iPoad Bluetooth state
+   * Current Phone/Pad Bluetooth state
    */
   static void getBluetoothState(TTBluetoothStateCallback stateCallback) {
     invoke(COMMAND_GET_BLUETOOTH_STATE, null, stateCallback);
@@ -112,7 +112,7 @@ class TTLock {
 // ignore: slash_for_doc_comments
 /**
  * Initialize the lock
- * map {"lockMac": xxx, "lockVersion": xxx, "isInited": bool}
+ * map {"lockMac": string, "lockVersion": string, "isInited": bool}
  */
   static void initLock(
       Map map, TTLockDataCallback callback, TTFailedCallback failedCallback) {
@@ -1138,45 +1138,46 @@ enum TTLockConfig {
 }
 
 enum TTLockError {
-  reseted,
-  crcError,
+  reseted, //0
+  crcError, //1
   noPermisstion,
   wrongAdminCode,
   noStorageSpace,
-  inSettingMode,
+  inSettingMode, //5
   noAdmin,
   notInSettingMode,
   wrongDynamicCode,
   noPower,
-  resetPasscode,
+  resetPasscode, //10
   unpdatePasscodeIndex,
   invalidLockFlagPos,
   ekeyExpired,
   passcodeLengthInvalid,
-  samePasscodes,
+  samePasscodes, //15
   ekeyInactive,
   aesKey,
   fail,
   passcodeExist,
-  passcodeNotExist,
+  passcodeNotExist, //20
   lackOfStorageSpaceWhenAddingPasscodes,
   invalidParaLength,
   cardNotExist,
   fingerprintDuplication,
-  fingerprintNotExist,
+  fingerprintNotExist, //25
   invalidCommand,
   inFreezeMode,
   invalidClientPara,
   lockIsLocked,
-  recordNotExist,
+  recordNotExist, //30
 
   notSupportModifyPasscode,
   bluetoothOff,
   bluetoothConnectTimeount,
   bluetoothDisconnection,
-  sdkIsBusy,
+  sdkIsBusy, //35
   invalidLockData,
   invalidParameter,
+  lockIsBusy //38
 }
 
 enum TTElevatorWorkActivateType { allFloors, specificFloors }
