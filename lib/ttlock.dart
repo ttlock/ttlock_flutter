@@ -566,23 +566,23 @@ class TTLock {
  * type 
  * weekly Any number 1-7, 1 means Monday，2 means  Tuesday ,...,7 means Sunday, such as [1,3,6,7]. If type == TTPassageModeTypeMonthly, the weekly should be set null
  * monthly Any number from 1 to 31, such as @[@1,@13,@26,@31]. If type == TTPassageModeTypeWeekly, the monthly should be set null
- * startDate The time（millisecond） when it becomes valid
- * endDate The time（millisecond） when it is expired
+ * startTime  The time when it becomes valid (minutes from 0 clock)
+ * endTime The time when it is expired (minutes from 0 clock)
  * lockData The lock data string used to operate lock
  */
   static void addPassageMode(
       TTPassageModeType type,
       List<int> weekly,
       List<int> monthly,
-      int startDate,
-      int endDate,
+      int startTime,
+      int endTime,
       String lockData,
       TTSuccessCallback callback,
       TTFailedCallback failedCallback) {
     Map map = Map();
     map[TTResponse.passageModeType] = type.index;
-    map[TTResponse.startDate] = startDate;
-    map[TTResponse.endDate] = endDate;
+    map[TTResponse.startDate] = startTime;
+    map[TTResponse.endDate] = endTime;
     map[TTResponse.lockData] = lockData;
     if (type == TTPassageModeType.weekly) {
       map[TTResponse.weekly] = weekly;
@@ -1086,8 +1086,11 @@ class TTLockScanModel {
 }
 
 class TTCycleModel {
+  // weekDay  1-7,1 means Monday，2 means  Tuesday ,...,7 means Sunday
   int weekDay;
+  //startTime The time when it becomes valid (minutes from 0 clock)
   int startTime;
+  //endTime  The time when it is expired (minutes from 0 clock)
   int endTime;
 
   /// jsonDecode(jsonStr) 方法中会调用实体类的这个方法。如果实体类中没有这个方法，会报错。

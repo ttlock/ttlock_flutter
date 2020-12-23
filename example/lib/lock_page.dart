@@ -395,8 +395,12 @@ class _LockPageState extends State<LockPage> {
         break;
 
       case Command.addPassageMode:
-        TTLock.addPassageMode(
-            TTPassageModeType.weekly, [1, 2], null, 0, 23 * 60, lockData, () {
+        int startTime = 8 * 60; //8:00 am
+        int endTime = 17 * 60; //17:00 pm
+        List<int> weekly = [1, 2]; // [Monday，Tuesday]
+
+        TTLock.addPassageMode(TTPassageModeType.weekly, weekly, null, startTime,
+            endTime, lockData, () {
           _showSuccessAndDismiss("Success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);

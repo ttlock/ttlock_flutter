@@ -32,12 +32,12 @@ class _GatewayPageState extends State<GatewayPage> {
   void _initGateway(String wifi, String wifiPassword) {
     FocusScope.of(_context).requestFocus(FocusNode());
 
-    Map map = Map();
-    map["wifi"] = wifi;
-    map["wifiPassword"] = wifiPassword;
-    map["gatewayName"] = Config.gatewayName;
-    map["ttlockUid"] = Config.ttlockUid;
-    map["ttlockLoginPassword"] = Config.ttlockLoginPassword;
+    Map paramMap = Map();
+    paramMap["wifi"] = wifi;
+    paramMap["wifiPassword"] = wifiPassword;
+    paramMap["gatewayName"] = Config.gatewayName;
+    paramMap["ttlockUid"] = Config.ttlockUid;
+    paramMap["ttlockLoginPassword"] = Config.ttlockLoginPassword;
 
     if (Config.ttlockUid == 0) {
       String errorDesc =
@@ -48,7 +48,7 @@ class _GatewayPageState extends State<GatewayPage> {
     }
 
     _showLoading();
-    TTGateway.init(map, (map) {
+    TTGateway.init(paramMap, (map) {
       print(map);
       _showAndDismiss(ProgressHudType.success, 'Init Gateway Success');
     }, (errorCode, errorMsg) {
