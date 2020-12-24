@@ -39,7 +39,8 @@ class _GatewayPageState extends State<GatewayPage> {
     paramMap["ttlockUid"] = Config.ttlockUid;
     paramMap["ttlockLoginPassword"] = Config.ttlockLoginPassword;
 
-    if (Config.ttlockUid == 0) {
+    // test account.  ttlockUid = 17498, ttlockLoginPassword = "1111111"
+    if (Config.ttlockUid == 17498) {
       String errorDesc =
           "Please config ttlockUid and ttlockLoginPassword. Reference documentation ‘https://open.sciener.com/doc/api/v3/user/getUid’";
       _showAndDismiss(ProgressHudType.error, errorDesc);
