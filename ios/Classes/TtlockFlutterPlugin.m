@@ -555,16 +555,19 @@ typedef NS_ENUM(NSInteger, ResultState) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
     }else if ([command isEqualToString:command_set_power_saver_work_mode]) {
-//      lockModel.savePowerType
-        
-        //TODO
-        
+        TTPowerSaverWorkMode mode = lockModel.savePowerType.intValue;
+        [TTLock setPowerSaverWorkMode:mode lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
     }else if ([command isEqualToString:command_set_power_saver_controlable]) {
-        
-        //TODO
-        
+        [TTLock setPowerSaverControlableLockWithLockMac:lockModel.lockMac lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
     }else if ([command isEqualToString:command_set_nb_awake_modes]) {
-        
         [TTLock setNBAwakeModes:lockModel.nbAwakeModes lockData:lockModel.lockData success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTError errorCode, NSString *errorMsg) {
@@ -596,7 +599,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
     }else if ([command isEqualToString:command_set_door_sensor_switch]) {
-        [TTLock setDoorSensorLockingSwitchOn:lockModel.isOn lockData:lockModel.lockData success:^{
+        [TTLock setDoorSensorLockingSwitchOn:lockModel.isOn.boolValue lockData:lockModel.lockData success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];

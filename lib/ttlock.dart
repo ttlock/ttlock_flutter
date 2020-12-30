@@ -57,26 +57,26 @@ class TTLock {
 
   static const String COMMAND_ACTIVE_ELEVATOR_FLOORS = "activateElevatorFloors";
 
-  static const String command_SET_ELEVATOR_CONTROLABLE_FLOORS =
+  static const String COMMAND_SET_ELEVATOR_CONTROLABLE_FLOORS =
       "setElevatorControlableFloors";
-  static const String command_SET_ELEVATOR_WORK_MODE = "setElevatorWorkMode";
+  static const String COMMAND_SET_ELEVATOR_WORK_MODE = "setElevatorWorkMode";
 
-  static const String command_SET_POWSER_SAVER_WORK_MODE =
+  static const String COMMAND_SET_POWSER_SAVER_WORK_MODE =
       "setPowerSaverWorkMode";
-  static const String command_SET_POWSER_SAVER_CONTROLABLE =
+  static const String COMMAND_SET_POWSER_SAVER_CONTROLABLE =
       "setPowerSaverControlable";
 
-  static const String command_SET_NB_AWAKE_MODES = "setNBAwakeModes";
-  static const String command_GET_NB_AWAKE_MODES = "getNBAwakeModes";
-  static const String command_SET_NB_AWAKE_TIMES = "setNBAwakeTimes";
-  static const String command_GET_NB_AWAKE_TIMES = "getNBAwakeTimes";
+  static const String COMMAND_SET_NB_AWAKE_MODES = "setNBAwakeModes";
+  static const String COMMAND_GET_NB_AWAKE_MODES = "getNBAwakeModes";
+  static const String COMMAND_SET_NB_AWAKE_TIMES = "setNBAwakeTimes";
+  static const String COMMAND_GET_NB_AWAKE_TIMES = "getNBAwakeTimes";
 
-  static const String command_SET_DOOR_SENSOR_SWITCH = "setDoorSensorSwitch";
-  static const String command_GET_DOOR_SENSOR_SWITCH = "getDoorSensorSwitch";
-  static const String command_GET_DOOR_SENSOR_STATE = "getDoorSensorState";
+  static const String COMMAND_SET_DOOR_SENSOR_SWITCH = "setDoorSensorSwitch";
+  static const String COMMAND_GET_DOOR_SENSOR_SWITCH = "getDoorSensorSwitch";
+  static const String COMMAND_GET_DOOR_SENSOR_STATE = "getDoorSensorState";
 
-  static const String command_SET_HOTLE_CARD_SECTOR = "setHotelCardSector";
-  static const String command_SET_HOTLE_INOF = "setHotelInfo";
+  static const String COMMAND_SET_HOTLE_CARD_SECTOR = "setHotelCardSector";
+  static const String COMMAND_SET_HOTLE_INOF = "setHotelInfo";
 
   static Map _callbackMap = Map();
   static Map _failCallbackMap = Map();
@@ -617,7 +617,7 @@ class TTLock {
     Map map = Map();
     map["floors"] = floors;
     map[TTResponse.lockData] = lockData;
-    invoke(command_SET_ELEVATOR_CONTROLABLE_FLOORS, map, callback,
+    invoke(COMMAND_SET_ELEVATOR_CONTROLABLE_FLOORS, map, callback,
         fail: failedCallback);
   }
 
@@ -629,7 +629,7 @@ class TTLock {
     Map map = Map();
     map["elevatorWorkActiveType"] = type.index;
     map[TTResponse.lockData] = lockData;
-    invoke(command_SET_ELEVATOR_WORK_MODE, map, callback, fail: failedCallback);
+    invoke(COMMAND_SET_ELEVATOR_WORK_MODE, map, callback, fail: failedCallback);
   }
 
   static void setPowerSaverWorkMode(TTPowerSaverWorkType type, String lockData,
@@ -637,7 +637,7 @@ class TTLock {
     Map map = Map();
     map["savePowerType"] = type;
     map[TTResponse.lockData] = lockData;
-    invoke(command_SET_POWSER_SAVER_WORK_MODE, map, callback,
+    invoke(COMMAND_SET_POWSER_SAVER_WORK_MODE, map, callback,
         fail: failedCallback);
   }
 
@@ -647,7 +647,7 @@ class TTLock {
 
     map[TTResponse.lockMac] = lockMac;
     map[TTResponse.lockData] = lockData;
-    invoke(command_SET_POWSER_SAVER_CONTROLABLE, map, callback,
+    invoke(COMMAND_SET_POWSER_SAVER_CONTROLABLE, map, callback,
         fail: failedCallback);
   }
 
@@ -661,12 +661,12 @@ class TTLock {
     Map map = Map();
     map[TTResponse.nbAwakeModes] = list;
     map[TTResponse.lockData] = lockData;
-    invoke(command_SET_NB_AWAKE_MODES, map, callback, fail: failedCallback);
+    invoke(COMMAND_SET_NB_AWAKE_MODES, map, callback, fail: failedCallback);
   }
 
   static void getNbAwakeModes(String lockData,
       TTGetNbAwakeModesCallback callback, TTFailedCallback failedCallback) {
-    invoke(command_GET_NB_AWAKE_MODES, lockData, callback,
+    invoke(COMMAND_GET_NB_AWAKE_MODES, lockData, callback,
         fail: failedCallback);
   }
 
@@ -683,12 +683,12 @@ class TTLock {
     Map map = Map();
     map[TTResponse.nbAwakeTimeList] = list;
     map[TTResponse.lockData] = lockData;
-    invoke(command_SET_NB_AWAKE_TIMES, map, callback, fail: failedCallback);
+    invoke(COMMAND_SET_NB_AWAKE_TIMES, map, callback, fail: failedCallback);
   }
 
   static void getNBAwakeTimes(String lockData,
       TTGetNbAwakeTimesCallback callback, TTFailedCallback failedCallback) {
-    invoke(command_GET_NB_AWAKE_TIMES, lockData, callback,
+    invoke(COMMAND_GET_NB_AWAKE_TIMES, lockData, callback,
         fail: failedCallback);
   }
 
@@ -697,12 +697,12 @@ class TTLock {
     Map map = Map();
     map[TTResponse.isOn] = isOn;
     map[TTResponse.lockData] = lockData;
-    invoke(command_SET_DOOR_SENSOR_SWITCH, map, callback, fail: failedCallback);
+    invoke(COMMAND_SET_DOOR_SENSOR_SWITCH, map, callback, fail: failedCallback);
   }
 
   static void getDoorSensorLockingSwitchState(String lockData,
       TTGetSwitchStateCallback callback, TTFailedCallback failedCallback) {
-    invoke(command_GET_DOOR_SENSOR_SWITCH, lockData, callback,
+    invoke(COMMAND_GET_DOOR_SENSOR_SWITCH, lockData, callback,
         fail: failedCallback);
   }
 
@@ -718,7 +718,7 @@ class TTLock {
     map[TTResponse.building] = building;
     map[TTResponse.floor] = floor;
     map[TTResponse.lockData] = lockData;
-    invoke(command_SET_HOTLE_INOF, map, callback, fail: failedCallback);
+    invoke(COMMAND_SET_HOTLE_INOF, map, callback, fail: failedCallback);
   }
 
   static void setHotelCardSector(String sector, String lockData,
@@ -726,12 +726,12 @@ class TTLock {
     Map map = Map();
     map[TTResponse.sector] = sector;
     map[TTResponse.lockData] = lockData;
-    invoke(command_SET_HOTLE_CARD_SECTOR, map, callback, fail: failedCallback);
+    invoke(COMMAND_SET_HOTLE_CARD_SECTOR, map, callback, fail: failedCallback);
   }
 
   static void getDoorSensorState(String lockData,
       TTGetSwitchStateCallback callback, TTFailedCallback failedCallback) {
-    invoke(command_GET_DOOR_SENSOR_STATE, lockData, callback,
+    invoke(COMMAND_GET_DOOR_SENSOR_STATE, lockData, callback,
         fail: failedCallback);
   }
 
@@ -862,12 +862,12 @@ class TTLock {
         TTFunctionSupportCallback functionSupportCallback = callBack;
         functionSupportCallback(data[TTResponse.isSupport]);
         break;
-      case command_GET_NB_AWAKE_MODES:
+      case COMMAND_GET_NB_AWAKE_MODES:
         TTGetNbAwakeModesCallback getNbAwakeModesCallback = callBack;
         getNbAwakeModesCallback(data[TTResponse.nbAwakeModes]);
         break;
 
-      case command_GET_NB_AWAKE_TIMES:
+      case COMMAND_GET_NB_AWAKE_TIMES:
         TTGetNbAwakeTimesCallback getNbAwakeTimesCallback = callBack;
         List<Map> nbAwakeTimeList = data[TTResponse.nbAwakeTimeList];
         List<TTNbAwakeTimeModel> list = new List();
@@ -1088,9 +1088,9 @@ class TTLockScanModel {
 class TTCycleModel {
   // weekDay  1-7,1 means Monday，2 means  Tuesday ,...,7 means Sunday
   int weekDay;
-  //startTime The time when it becomes valid (minutes from 0 clock)
+  // startTime The time when it becomes valid (minutes from 0 clock)
   int startTime;
-  //endTime  The time when it is expired (minutes from 0 clock)
+  // endTime  The time when it is expired (minutes from 0 clock)
   int endTime;
 
   /// jsonDecode(jsonStr) 方法中会调用实体类的这个方法。如果实体类中没有这个方法，会报错。

@@ -107,6 +107,7 @@
 
 
 
+
 + (TtlockModel *)modelWithDict:(NSDictionary *)dict;
 - (NSDictionary *)toDictionary;
 @end
