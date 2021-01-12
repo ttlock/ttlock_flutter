@@ -35,7 +35,16 @@ public void onRequestPermissionsResult(int requestCode, String[] permissions, in
     }
 ```
 
- 
+5.you need config buildTypes in build.gradle file.like this:
+
+```
+    buildTypes {
+        release {
+            minifyEnabled false
+            shrinkResources false
+        }
+    }
+```
 
 ##### Ussage
 ```

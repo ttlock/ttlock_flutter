@@ -532,6 +532,109 @@ typedef NS_ENUM(NSInteger, ResultState) {
         [weakSelf successCallbackCommand:command data:data];
     }
     
+    else if ([command isEqualToString:command_active_elevator_floors]) {
+        [TTLock activateLiftFloors:lockModel.floors lockData:lockModel.lockData success:^(long long lockTime, NSInteger electricQuantity, long long uniqueId) {
+            TtlockModel *data = [TtlockModel new];
+            data.lockTime = @(lockTime);
+            data.electricQuantity = @(electricQuantity);
+            data.uniqueId = @(uniqueId);
+            [weakSelf successCallbackCommand:command data:data];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }else if ([command isEqualToString:command_set_elevator_controlable_floors]) {
+        [TTLock setLiftControlableFloors:lockModel.floors lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }else if ([command isEqualToString:command_set_elevator_work_mode]) {
+        [TTLock setLiftWorkMode:lockModel.elevatorWorkActiveType.intValue lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }else if ([command isEqualToString:command_set_power_saver_work_mode]) {
+        TTPowerSaverWorkMode mode = lockModel.savePowerType.intValue;
+        [TTLock setPowerSaverWorkMode:mode lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }else if ([command isEqualToString:command_set_power_saver_controlable]) {
+        [TTLock setPowerSaverControlableLockWithLockMac:lockModel.lockMac lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }else if ([command isEqualToString:command_set_nb_awake_modes]) {
+        [TTLock setNBAwakeModes:lockModel.nbAwakeModes lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+        
+    }else if ([command isEqualToString:command_get_nb_awake_modes]) {
+        [TTLock getNBAwakeModesWithLockData:lockModel.lockData success:^(NSArray<NSNumber *> *awakeModes) {
+            TtlockModel *data = [TtlockModel new];
+            data.nbAwakeModes = awakeModes;
+            [weakSelf successCallbackCommand:command data:data];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }else if ([command isEqualToString:command_set_nb_awake_times]) {
+        
+        [TTLock setNBAwakeTimes:lockModel.nbAwakeTimeList lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+        
+    }else if ([command isEqualToString:command_get_nb_awake_times]) {
+        [TTLock getNBAwakeTimesWithLockData:lockModel.lockData success:^(NSArray<NSDictionary *> *awakeTimes) {
+            TtlockModel *data = [TtlockModel new];
+            data.nbAwakeTimeList = awakeTimes;
+            [weakSelf successCallbackCommand:command data:data];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }else if ([command isEqualToString:command_set_door_sensor_switch]) {
+        [TTLock setDoorSensorLockingSwitchOn:lockModel.isOn.boolValue lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }else if ([command isEqualToString:command_get_door_sensor_switch]) {
+        [TTLock getDoorSensorLockingSwitchStateWithLockData:lockModel.lockData success:^(BOOL isOn) {
+            TtlockModel *data = [TtlockModel new];
+            data.isOn = @(isOn);
+            [weakSelf successCallbackCommand:command data:data];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }else if ([command isEqualToString:command_get_door_sensor_state]) {
+        [TTLock getDoorSensorStateWithLockData:lockModel.lockData success:^(BOOL isOn) {
+            TtlockModel *data = [TtlockModel new];
+            data.isOn = @(isOn);
+            [weakSelf successCallbackCommand:command data:data];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }else if ([command isEqualToString:command_set_hotel_info]) {
+        [TTLock setHotelDataWithHotelInfo:lockModel.hotelData buildingNumber:lockModel.building.intValue floorNumber:lockModel.floor.intValue lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+        
+    }else if ([command isEqualToString:command_set_hotel_card_sector]) {
+        [TTLock setHotelCardSector:lockModel.sector lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }
+    
 }
 
 - (void)successCallbackCommand:(NSString *)command data:(NSObject *)data {
@@ -637,7 +740,6 @@ typedef NS_ENUM(NSInteger, ResultState) {
         return @(code.integerValue - 1);
     }
     return code;
-
 }
 
 @end

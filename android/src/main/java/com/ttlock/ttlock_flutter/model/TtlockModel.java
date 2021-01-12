@@ -35,7 +35,6 @@ public class TtlockModel {
     public ArrayList<Integer> monthly;
 
 
-
 /*************      返回值     ****************/
 
 
@@ -64,24 +63,23 @@ public class TtlockModel {
 
 
     public String passcodeInfo;
-//添加指纹时候 剩余手指按压次数
+    //添加指纹时候 剩余手指按压次数
     public int currentCount;
-//添加指纹时候 剩余手指按压次数
+    //添加指纹时候 剩余手指按压次数
     public int totalCount;
-//指纹码
+    //指纹码
     public String fingerprintNumber;
     public String cardNumber;
 //    @property (nonatomic, strong) NSString *passageModes;
 
-//最大可设置自动闭锁时间
-
+    //最大可设置自动闭锁时间
     public int maxTime;
-//最小可设置自动闭锁时间
+    //最小可设置自动闭锁时间
     public int minTime;
-//当前自动闭锁时间
+    //当前自动闭锁时间
     public int currentTime;
 
-//管理员密码
+    //管理员密码
     public String adminPasscode;
     public String erasePasscode;
 
@@ -142,7 +140,7 @@ public class TtlockModel {
     public TtlockModel toObject(Map<String, Object> params) {
         Field[] fields = this.getClass().getDeclaredFields();
         try {
-            for(int i = 0 ; i < fields.length ; i++) {
+            for (int i = 0; i < fields.length; i++) {
                 //设置是否允许访问，不是修改原来的访问权限修饰词。
                 fields[i].setAccessible(true);
                 if (params.get(fields[i].getName()) != null) {
@@ -159,7 +157,7 @@ public class TtlockModel {
         HashMap<String, Object> hashMap = new HashMap<>();
         Field[] fields = this.getClass().getDeclaredFields();
         try {
-            for(int i = 0 ; i < fields.length ; i++) {
+            for (int i = 0; i < fields.length; i++) {
                 //设置是否允许访问，不是修改原来的访问权限修饰词。
                 fields[i].setAccessible(true);
                 hashMap.put(fields[i].getName(), fields[i].get(this));

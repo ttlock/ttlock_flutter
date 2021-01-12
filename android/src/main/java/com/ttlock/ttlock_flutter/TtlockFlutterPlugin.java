@@ -1083,9 +1083,8 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       repeatJson = GsonUtil.toJson(ttlockModel.monthly);
     }
     passageModeConfig.setRepeatWeekOrDays(repeatJson);
-    //todo:
-//    passageModeConfig.setStartDate(ttlockModel.startDate);
-//    passageModeConfig.setEndDate(ttlockModel.endDate);
+    passageModeConfig.setStartDate((int) ttlockModel.startDate);
+    passageModeConfig.setEndDate((int) ttlockModel.endDate);
 
     TTLockClient.getDefault().setPassageMode(passageModeConfig, ttlockModel.lockData, ttlockModel.lockMac, new SetPassageModeCallback() {
       @Override

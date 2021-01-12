@@ -55,6 +55,29 @@ class TTLock {
   static const String COMMAND_CLEAR_ALL_PASSAGE_MODE = "clearAllPassageModes";
   static const String COMMAND_FUNCTION_SUPPORT = "functionSupport";
 
+  static const String COMMAND_ACTIVE_ELEVATOR_FLOORS = "activateElevatorFloors";
+
+  static const String COMMAND_SET_ELEVATOR_CONTROLABLE_FLOORS =
+      "setElevatorControlableFloors";
+  static const String COMMAND_SET_ELEVATOR_WORK_MODE = "setElevatorWorkMode";
+
+  static const String COMMAND_SET_POWSER_SAVER_WORK_MODE =
+      "setPowerSaverWorkMode";
+  static const String COMMAND_SET_POWSER_SAVER_CONTROLABLE =
+      "setPowerSaverControlable";
+
+  static const String COMMAND_SET_NB_AWAKE_MODES = "setNBAwakeModes";
+  static const String COMMAND_GET_NB_AWAKE_MODES = "getNBAwakeModes";
+  static const String COMMAND_SET_NB_AWAKE_TIMES = "setNBAwakeTimes";
+  static const String COMMAND_GET_NB_AWAKE_TIMES = "getNBAwakeTimes";
+
+  static const String COMMAND_SET_DOOR_SENSOR_SWITCH = "setDoorSensorSwitch";
+  static const String COMMAND_GET_DOOR_SENSOR_SWITCH = "getDoorSensorSwitch";
+  static const String COMMAND_GET_DOOR_SENSOR_STATE = "getDoorSensorState";
+
+  static const String COMMAND_SET_HOTLE_CARD_SECTOR = "setHotelCardSector";
+  static const String COMMAND_SET_HOTLE_INOF = "setHotelInfo";
+
   static Map _callbackMap = Map();
   static Map _failCallbackMap = Map();
   static Map _progressCallbackMap = Map();
@@ -80,7 +103,7 @@ class TTLock {
 
   // ignore: slash_for_doc_comments
 /**
-   * Current iPhone/iPoad Bluetooth state
+   * Current Phone/Pad Bluetooth state
    */
   static void getBluetoothState(TTBluetoothStateCallback stateCallback) {
     invoke(COMMAND_GET_BLUETOOTH_STATE, null, stateCallback);
@@ -89,7 +112,7 @@ class TTLock {
 // ignore: slash_for_doc_comments
 /**
  * Initialize the lock
- * map {"lockMac": xxx, "lockVersion": xxx, "isInited": bool}
+ * map {"lockMac": string, "lockVersion": string, "isInited": bool}
  */
   static void initLock(
       Map map, TTLockDataCallback callback, TTFailedCallback failedCallback) {
@@ -543,23 +566,23 @@ class TTLock {
  * type 
  * weekly Any number 1-7, 1 means Monday，2 means  Tuesday ,...,7 means Sunday, such as [1,3,6,7]. If type == TTPassageModeTypeMonthly, the weekly should be set null
  * monthly Any number from 1 to 31, such as @[@1,@13,@26,@31]. If type == TTPassageModeTypeWeekly, the monthly should be set null
- * startDate The time（millisecond） when it becomes valid
- * endDate The time（millisecond） when it is expired
+ * startTime  The time when it becomes valid (minutes from 0 clock)
+ * endTime The time when it is expired (minutes from 0 clock)
  * lockData The lock data string used to operate lock
  */
   static void addPassageMode(
       TTPassageModeType type,
       List<int> weekly,
       List<int> monthly,
-      int startDate,
-      int endDate,
+      int startTime,
+      int endTime,
       String lockData,
       TTSuccessCallback callback,
       TTFailedCallback failedCallback) {
     Map map = Map();
     map[TTResponse.passageModeType] = type.index;
-    map[TTResponse.startDate] = startDate;
-    map[TTResponse.endDate] = endDate;
+    map[TTResponse.startDate] = startTime;
+    map[TTResponse.endDate] = endTime;
     map[TTResponse.lockData] = lockData;
     if (type == TTPassageModeType.weekly) {
       map[TTResponse.weekly] = weekly;
@@ -578,6 +601,137 @@ class TTLock {
   static void clearAllPassageModes(String lockData, TTSuccessCallback callback,
       TTFailedCallback failedCallback) {
     invoke(COMMAND_CLEAR_ALL_PASSAGE_MODE, lockData, callback,
+        fail: failedCallback);
+  }
+
+  static void activateElevatorFloors(String floors, String lockData,
+      TTElevatorCallback callback, TTFailedCallback failedCallback) {
+    Map map = Map();
+    map["floors"] = floors;
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_ACTIVE_ELEVATOR_FLOORS, map, callback, fail: failedCallback);
+  }
+
+  static void setElevatorControlable(String floors, String lockData,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+    Map map = Map();
+    map["floors"] = floors;
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_SET_ELEVATOR_CONTROLABLE_FLOORS, map, callback,
+        fail: failedCallback);
+  }
+
+  static void setElevatorWorkMode(
+      TTElevatorWorkActivateType type,
+      String lockData,
+      TTSuccessCallback callback,
+      TTFailedCallback failedCallback) {
+    Map map = Map();
+    map["elevatorWorkActiveType"] = type.index;
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_SET_ELEVATOR_WORK_MODE, map, callback, fail: failedCallback);
+  }
+
+  static void setPowerSaverWorkMode(TTPowerSaverWorkType type, String lockData,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+    Map map = Map();
+    map["savePowerType"] = type;
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_SET_POWSER_SAVER_WORK_MODE, map, callback,
+        fail: failedCallback);
+  }
+
+  static void setPowerSaverControlable(String lockMac, String lockData,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+    Map map = Map();
+
+    map[TTResponse.lockMac] = lockMac;
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_SET_POWSER_SAVER_CONTROLABLE, map, callback,
+        fail: failedCallback);
+  }
+
+  static void setNbAwakeModes(List<TTNbAwakeMode> modes, String lockData,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+    List list = new List();
+    modes.forEach((element) {
+      list.add(element.index);
+    });
+
+    Map map = Map();
+    map[TTResponse.nbAwakeModes] = list;
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_SET_NB_AWAKE_MODES, map, callback, fail: failedCallback);
+  }
+
+  static void getNbAwakeModes(String lockData,
+      TTGetNbAwakeModesCallback callback, TTFailedCallback failedCallback) {
+    invoke(COMMAND_GET_NB_AWAKE_MODES, lockData, callback,
+        fail: failedCallback);
+  }
+
+  static void setNbAwakeTimes(List<TTNbAwakeTimeModel> times, String lockData,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+    List list = new List();
+    times.forEach((element) {
+      Map map = new Map();
+      map[TTResponse.minutes] = element.minutes;
+      map[TTResponse.type] = element.type.index + 1;
+      list.add(map);
+    });
+
+    Map map = Map();
+    map[TTResponse.nbAwakeTimeList] = list;
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_SET_NB_AWAKE_TIMES, map, callback, fail: failedCallback);
+  }
+
+  static void getNBAwakeTimes(String lockData,
+      TTGetNbAwakeTimesCallback callback, TTFailedCallback failedCallback) {
+    invoke(COMMAND_GET_NB_AWAKE_TIMES, lockData, callback,
+        fail: failedCallback);
+  }
+
+  static void setDoorSensorLockingSwitchState(bool isOn, String lockData,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.isOn] = isOn;
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_SET_DOOR_SENSOR_SWITCH, map, callback, fail: failedCallback);
+  }
+
+  static void getDoorSensorLockingSwitchState(String lockData,
+      TTGetSwitchStateCallback callback, TTFailedCallback failedCallback) {
+    invoke(COMMAND_GET_DOOR_SENSOR_SWITCH, lockData, callback,
+        fail: failedCallback);
+  }
+
+  static void setHotel(
+      String hotelData,
+      int building,
+      int floor,
+      String lockData,
+      TTSuccessCallback callback,
+      TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.hotelData] = hotelData;
+    map[TTResponse.building] = building;
+    map[TTResponse.floor] = floor;
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_SET_HOTLE_INOF, map, callback, fail: failedCallback);
+  }
+
+  static void setHotelCardSector(String sector, String lockData,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.sector] = sector;
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_SET_HOTLE_CARD_SECTOR, map, callback, fail: failedCallback);
+  }
+
+  static void getDoorSensorState(String lockData,
+      TTGetSwitchStateCallback callback, TTFailedCallback failedCallback) {
+    invoke(COMMAND_GET_DOOR_SENSOR_STATE, lockData, callback,
         fail: failedCallback);
   }
 
@@ -661,6 +815,7 @@ class TTLock {
         break;
 
       case COMMAND_CONTROL_LOCK:
+      case COMMAND_ACTIVE_ELEVATOR_FLOORS:
         TTControlLockCallback controlLockCallback = callBack;
         controlLockCallback(data[TTResponse.lockTime],
             data[TTResponse.electricQuantity], data[TTResponse.uniqueId]);
@@ -706,6 +861,24 @@ class TTLock {
       case COMMAND_FUNCTION_SUPPORT:
         TTFunctionSupportCallback functionSupportCallback = callBack;
         functionSupportCallback(data[TTResponse.isSupport]);
+        break;
+      case COMMAND_GET_NB_AWAKE_MODES:
+        TTGetNbAwakeModesCallback getNbAwakeModesCallback = callBack;
+        getNbAwakeModesCallback(data[TTResponse.nbAwakeModes]);
+        break;
+
+      case COMMAND_GET_NB_AWAKE_TIMES:
+        TTGetNbAwakeTimesCallback getNbAwakeTimesCallback = callBack;
+        List<Map> nbAwakeTimeList = data[TTResponse.nbAwakeTimeList];
+        List<TTNbAwakeTimeModel> list = new List();
+
+        nbAwakeTimeList.forEach((element) {
+          TTNbAwakeTimeModel model = new TTNbAwakeTimeModel();
+          model.minutes = element[TTResponse.minutes];
+          model.type = TTNbAwakeTimeType.values[element[TTResponse.type]];
+          list.add(model);
+        });
+        getNbAwakeTimesCallback(list);
         break;
 
       case TTGateway.COMMAND_CONNECT_GATEWAY:
@@ -759,6 +932,11 @@ class TTLock {
 
   static void _errorCallback(
       String command, int errorCode, String errorMessage) {
+    if (errorCode == TTLockError.sdkIsBusy.index) {
+      errorMessage =
+          "The TTLock SDK can only communicate with one lock at a time";
+    }
+
     if (command == TTGateway.COMMAND_GET_SURROUND_WIFI ||
         command == TTGateway.COMMAND_INIT_GATEWAY) {
       TTGatewayFailedCallback failedCallback = _failCallbackMap[command];
@@ -867,6 +1045,15 @@ class TTResponse {
 
   static const String isSupport = "isSupport";
   static const String supportFunction = "supportFunction";
+
+  static const String nbAwakeModes = "nbAwakeModes";
+  static const String nbAwakeTimeList = "nbAwakeTimeList";
+  static const String minutes = "minutes";
+  static const String type = "type";
+  static const String hotelData = "hotelData";
+  static const String building = "building";
+  static const String floor = "floor";
+  static const String sector = "sector";
 }
 
 class TTLockScanModel {
@@ -899,8 +1086,11 @@ class TTLockScanModel {
 }
 
 class TTCycleModel {
+  // weekDay  1-7,1 means Monday，2 means  Tuesday ,...,7 means Sunday
   int weekDay;
+  // startTime The time when it becomes valid (minutes from 0 clock)
   int startTime;
+  // endTime  The time when it is expired (minutes from 0 clock)
   int endTime;
 
   /// jsonDecode(jsonStr) 方法中会调用实体类的这个方法。如果实体类中没有这个方法，会报错。
@@ -951,46 +1141,55 @@ enum TTLockConfig {
 }
 
 enum TTLockError {
-  reseted,
-  crcError,
+  reseted, //0
+  crcError, //1
   noPermisstion,
   wrongAdminCode,
   noStorageSpace,
-  inSettingMode,
+  inSettingMode, //5
   noAdmin,
   notInSettingMode,
   wrongDynamicCode,
   noPower,
-  resetPasscode,
+  resetPasscode, //10
   unpdatePasscodeIndex,
   invalidLockFlagPos,
   ekeyExpired,
   passcodeLengthInvalid,
-  samePasscodes,
+  samePasscodes, //15
   ekeyInactive,
   aesKey,
   fail,
   passcodeExist,
-  passcodeNotExist,
+  passcodeNotExist, //20
   lackOfStorageSpaceWhenAddingPasscodes,
   invalidParaLength,
   cardNotExist,
   fingerprintDuplication,
-  fingerprintNotExist,
+  fingerprintNotExist, //25
   invalidCommand,
   inFreezeMode,
   invalidClientPara,
   lockIsLocked,
-  recordNotExist,
+  recordNotExist, //30
 
   notSupportModifyPasscode,
   bluetoothOff,
   bluetoothConnectTimeount,
   bluetoothDisconnection,
-  lockIsBusy,
+  sdkIsBusy, //35
   invalidLockData,
   invalidParameter,
+  lockIsBusy //38
 }
+
+enum TTElevatorWorkActivateType { allFloors, specificFloors }
+
+enum TTPowerSaverWorkType { allCards, hotelCard, roomCard }
+
+enum TTNbAwakeMode { keypad, card, fingerprint }
+
+enum TTNbAwakeTimeType { point, interval }
 
 typedef TTSuccessCallback = void Function();
 typedef TTFailedCallback = void Function(
@@ -1033,6 +1232,13 @@ typedef TTGatewayGetAroundWifiCallback = void Function(
 typedef TTGatewayInitCallback = void Function(Map map);
 typedef TTFunctionSupportCallback = void Function(bool isSupport);
 
+typedef TTElevatorCallback = void Function(
+    int lockTime, int electricQuantity, int uniqueId);
+
+typedef TTGetNbAwakeModesCallback = void Function(List<TTNbAwakeMode> list);
+typedef TTGetNbAwakeTimesCallback = void Function(
+    List<TTNbAwakeTimeModel> list);
+
 class TTGatewayScanModel {
   String gatewayName;
   String gatewayMac;
@@ -1045,6 +1251,11 @@ class TTGatewayScanModel {
     this.rssi = map["rssi"];
     this.isDfuMode = map["isDfuMode"];
   }
+}
+
+class TTNbAwakeTimeModel {
+  TTNbAwakeTimeType type;
+  int minutes;
 }
 
 enum TTGatewayError {

@@ -32,14 +32,15 @@ class _GatewayPageState extends State<GatewayPage> {
   void _initGateway(String wifi, String wifiPassword) {
     FocusScope.of(_context).requestFocus(FocusNode());
 
-    Map map = Map();
-    map["wifi"] = wifi;
-    map["wifiPassword"] = wifiPassword;
-    map["gatewayName"] = Config.gatewayName;
-    map["ttlockUid"] = Config.ttlockUid;
-    map["ttlockLoginPassword"] = Config.ttlockLoginPassword;
+    Map paramMap = Map();
+    paramMap["wifi"] = wifi;
+    paramMap["wifiPassword"] = wifiPassword;
+    paramMap["gatewayName"] = Config.gatewayName;
+    paramMap["ttlockUid"] = Config.ttlockUid;
+    paramMap["ttlockLoginPassword"] = Config.ttlockLoginPassword;
 
-    if (Config.ttlockUid == 0) {
+    // test account.  ttlockUid = 17498, ttlockLoginPassword = "1111111"
+    if (Config.ttlockUid == 17498) {
       String errorDesc =
           "Please config ttlockUid and ttlockLoginPassword. Reference documentation ‘https://open.sciener.com/doc/api/v3/user/getUid’";
       _showAndDismiss(ProgressHudType.error, errorDesc);
@@ -48,7 +49,7 @@ class _GatewayPageState extends State<GatewayPage> {
     }
 
     _showLoading();
-    TTGateway.init(map, (map) {
+    TTGateway.init(paramMap, (map) {
       print(map);
       _showAndDismiss(ProgressHudType.success, 'Init Gateway Success');
     }, (errorCode, errorMsg) {
