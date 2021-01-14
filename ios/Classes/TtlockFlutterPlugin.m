@@ -532,7 +532,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
         [weakSelf successCallbackCommand:command data:data];
     }
     
-    else if ([command isEqualToString:command_active_elevator_floors]) {
+    else if ([command isEqualToString:command_active_lift_floors]) {
         [TTLock activateLiftFloors:lockModel.floors lockData:lockModel.lockData success:^(long long lockTime, NSInteger electricQuantity, long long uniqueId) {
             TtlockModel *data = [TtlockModel new];
             data.lockTime = @(lockTime);
@@ -542,20 +542,20 @@ typedef NS_ENUM(NSInteger, ResultState) {
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
-    }else if ([command isEqualToString:command_set_elevator_controlable_floors]) {
+    }else if ([command isEqualToString:command_set_lift_controlable_floors]) {
         [TTLock setLiftControlableFloors:lockModel.floors lockData:lockModel.lockData success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
-    }else if ([command isEqualToString:command_set_elevator_work_mode]) {
-        [TTLock setLiftWorkMode:lockModel.elevatorWorkActiveType.intValue lockData:lockModel.lockData success:^{
+    }else if ([command isEqualToString:command_set_lift_work_mode]) {
+        [TTLock setLiftWorkMode:lockModel.liftWorkActiveType.intValue lockData:lockModel.lockData success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
     }else if ([command isEqualToString:command_set_power_saver_work_mode]) {
-        TTPowerSaverWorkMode mode = lockModel.savePowerType.intValue;
+        TTPowerSaverWorkMode mode = lockModel.powerSaverType.intValue;
         [TTLock setPowerSaverWorkMode:mode lockData:lockModel.lockData success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTError errorCode, NSString *errorMsg) {
@@ -583,8 +583,13 @@ typedef NS_ENUM(NSInteger, ResultState) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
     }else if ([command isEqualToString:command_set_nb_awake_times]) {
-        
-        [TTLock setNBAwakeTimes:lockModel.nbAwakeTimeList lockData:lockModel.lockData success:^{
+        NSMutableArray *awakeTimeArray = @[].mutableCopy;
+        for (NSDictionary *dict in lockModel.nbAwakeTimeList) {
+            NSMutableDictionary *nbAwakeTimeDict = dict.mutableCopy;
+            nbAwakeTimeDict[@"type"] = @([nbAwakeTimeDict[@"type"] intValue] + 1);
+            [awakeTimeArray addObject:nbAwakeTimeDict];
+        }
+        [TTLock setNBAwakeTimes:awakeTimeArray lockData:lockModel.lockData success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];

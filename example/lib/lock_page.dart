@@ -44,9 +44,9 @@ enum Command {
   addPassageMode,
   clearAllPassageModes,
 
-  activateElevatorFloors,
-  setElevatorControlableFloors,
-  setElevatorWorkMode,
+  activateLiftFloors,
+  setLiftControlableFloors,
+  setLiftWorkMode,
   setPowerSaverWorkMode,
   setPowerSaverControlable,
   setNbAwakeModes,
@@ -103,9 +103,9 @@ class _LockPageState extends State<LockPage> {
     {"Set Lock Audio Switch State": Command.setLockAudioSwitchState},
     {"Add Passage Mode": Command.addPassageMode},
     {"Clear All Passage Mode": Command.clearAllPassageModes},
-    {"Activate Elevator Floors": Command.activateElevatorFloors},
-    {"Set Elevator Controlable Floors": Command.setElevatorControlableFloors},
-    {"Set Elevator Work Mode": Command.setElevatorWorkMode},
+    {"Activate Elevator Floors": Command.activateLiftFloors},
+    {"Set Elevator Controlable Floors": Command.setLiftControlableFloors},
+    {"Set Elevator Work Mode": Command.setLiftWorkMode},
     {"Set Power Saver Work Mode": Command.setPowerSaverWorkMode},
     {"Set Power Saver Controlable": Command.setPowerSaverControlable},
     {"Set Nb Awake Modes": Command.setNbAwakeModes},
@@ -413,8 +413,8 @@ class _LockPageState extends State<LockPage> {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
         break;
-      case Command.activateElevatorFloors:
-        TTLock.activateElevatorFloors("1,2,3", lockData,
+      case Command.activateLiftFloors:
+        TTLock.activateLiftFloors("1,2,3", lockData,
             (lockTime, electricQuantity, uniqueId) {
           _showSuccessAndDismiss(
               "Unlock Success lockTime:$lockTime electricQuantity:$electricQuantity uniqueId:$uniqueId");
@@ -422,16 +422,15 @@ class _LockPageState extends State<LockPage> {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
         break;
-      case Command.setElevatorControlableFloors:
-        TTLock.setElevatorControlable("3", lockData, () {
+      case Command.setLiftControlableFloors:
+        TTLock.setLiftControlable("3", lockData, () {
           _showSuccessAndDismiss("Success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
         break;
-      case Command.setElevatorWorkMode:
-        TTLock.setElevatorWorkMode(
-            TTElevatorWorkActivateType.allFloors, lockData, () {
+      case Command.setLiftWorkMode:
+        TTLock.setLiftWorkMode(TTLiftWorkActivateType.allFloors, lockData, () {
           _showSuccessAndDismiss("Success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);

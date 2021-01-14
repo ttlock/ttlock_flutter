@@ -55,11 +55,11 @@ class TTLock {
   static const String COMMAND_CLEAR_ALL_PASSAGE_MODE = "clearAllPassageModes";
   static const String COMMAND_FUNCTION_SUPPORT = "functionSupport";
 
-  static const String COMMAND_ACTIVE_ELEVATOR_FLOORS = "activateElevatorFloors";
+  static const String COMMAND_ACTIVE_LIFT_FLOORS = "activateLiftFloors";
 
-  static const String COMMAND_SET_ELEVATOR_CONTROLABLE_FLOORS =
-      "setElevatorControlableFloors";
-  static const String COMMAND_SET_ELEVATOR_WORK_MODE = "setElevatorWorkMode";
+  static const String COMMAND_SET_LIFT_CONTROLABLE_FLOORS =
+      "setLiftControlableFloors";
+  static const String COMMAND_SET_LIFT_WORK_MODE = "setLiftWorkMode";
 
   static const String COMMAND_SET_POWSER_SAVER_WORK_MODE =
       "setPowerSaverWorkMode";
@@ -604,38 +604,35 @@ class TTLock {
         fail: failedCallback);
   }
 
-  static void activateElevatorFloors(String floors, String lockData,
-      TTElevatorCallback callback, TTFailedCallback failedCallback) {
+  static void activateLiftFloors(String floors, String lockData,
+      TTLiftCallback callback, TTFailedCallback failedCallback) {
     Map map = Map();
     map["floors"] = floors;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_ACTIVE_ELEVATOR_FLOORS, map, callback, fail: failedCallback);
+    invoke(COMMAND_ACTIVE_LIFT_FLOORS, map, callback, fail: failedCallback);
   }
 
-  static void setElevatorControlable(String floors, String lockData,
+  static void setLiftControlable(String floors, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     Map map = Map();
     map["floors"] = floors;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_SET_ELEVATOR_CONTROLABLE_FLOORS, map, callback,
+    invoke(COMMAND_SET_LIFT_CONTROLABLE_FLOORS, map, callback,
         fail: failedCallback);
   }
 
-  static void setElevatorWorkMode(
-      TTElevatorWorkActivateType type,
-      String lockData,
-      TTSuccessCallback callback,
-      TTFailedCallback failedCallback) {
+  static void setLiftWorkMode(TTLiftWorkActivateType type, String lockData,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
     Map map = Map();
-    map["elevatorWorkActiveType"] = type.index;
+    map["liftWorkActiveType"] = type.index;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_SET_ELEVATOR_WORK_MODE, map, callback, fail: failedCallback);
+    invoke(COMMAND_SET_LIFT_WORK_MODE, map, callback, fail: failedCallback);
   }
 
   static void setPowerSaverWorkMode(TTPowerSaverWorkType type, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     Map map = Map();
-    map["savePowerType"] = type;
+    map["powerSaverType"] = type;
     map[TTResponse.lockData] = lockData;
     invoke(COMMAND_SET_POWSER_SAVER_WORK_MODE, map, callback,
         fail: failedCallback);
@@ -676,7 +673,7 @@ class TTLock {
     times.forEach((element) {
       Map map = new Map();
       map[TTResponse.minutes] = element.minutes;
-      map[TTResponse.type] = element.type.index + 1;
+      map[TTResponse.type] = element.type.index;
       list.add(map);
     });
 
@@ -815,7 +812,7 @@ class TTLock {
         break;
 
       case COMMAND_CONTROL_LOCK:
-      case COMMAND_ACTIVE_ELEVATOR_FLOORS:
+      case COMMAND_ACTIVE_LIFT_FLOORS:
         TTControlLockCallback controlLockCallback = callBack;
         controlLockCallback(data[TTResponse.lockTime],
             data[TTResponse.electricQuantity], data[TTResponse.uniqueId]);
@@ -1183,7 +1180,7 @@ enum TTLockError {
   lockIsBusy //38
 }
 
-enum TTElevatorWorkActivateType { allFloors, specificFloors }
+enum TTLiftWorkActivateType { allFloors, specificFloors }
 
 enum TTPowerSaverWorkType { allCards, hotelCard, roomCard }
 
@@ -1232,7 +1229,7 @@ typedef TTGatewayGetAroundWifiCallback = void Function(
 typedef TTGatewayInitCallback = void Function(Map map);
 typedef TTFunctionSupportCallback = void Function(bool isSupport);
 
-typedef TTElevatorCallback = void Function(
+typedef TTLiftCallback = void Function(
     int lockTime, int electricQuantity, int uniqueId);
 
 typedef TTGetNbAwakeModesCallback = void Function(List<TTNbAwakeMode> list);
