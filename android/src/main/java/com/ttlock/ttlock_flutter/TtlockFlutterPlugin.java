@@ -58,6 +58,7 @@ import com.ttlock.bl.sdk.callback.SetPassageModeCallback;
 import com.ttlock.bl.sdk.callback.SetPowerSaverControlableLockCallback;
 import com.ttlock.bl.sdk.callback.SetPowerSaverWorkModeCallback;
 import com.ttlock.bl.sdk.callback.SetRemoteUnlockSwitchCallback;
+import com.ttlock.bl.sdk.entity.ActivateLiftFloorsResult;
 import com.ttlock.bl.sdk.entity.ControlLockResult;
 import com.ttlock.bl.sdk.entity.CyclicConfig;
 import com.ttlock.bl.sdk.entity.HotelData;
@@ -439,10 +440,10 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       case TTLockCommand.COMMAND_RESET_EKEY:
         resetEKey();
         break;
-      case TTLockCommand.COMMAND_SET_ELEVATOR_CONTROLABLE_FLOORS:
+      case TTLockCommand.COMMAND_SET_LIFT_CONTROLABLE_FLOORS:
         setLiftControlableFloors();
         break;
-      case TTLockCommand.COMMAND_ACTIVE_ELEVATOR_FLOORS:
+      case TTLockCommand.COMMAND_ACTIVE_LIFT_FLOORS:
         activateLiftFloors();
         break;
       case TTLockCommand.COMMAND_SET_HOTLE_CARD_SECTOR:
@@ -451,7 +452,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       case TTLockCommand.COMMAND_SET_HOTLE_INFO:
         setHotelData();
         break;
-      case TTLockCommand.COMMAND_SET_ELEVATOR_WORK_MODE:
+      case TTLockCommand.COMMAND_SET_LIFT_WORK_MODE:
         setLiftWorkMode();
         break;
       case TTLockCommand.COMMAND_SET_POWSER_SAVER_WORK_MODE:
@@ -1202,11 +1203,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().getLockConfig(ttLockConfigType, ttlockModel.lockData, new GetLockConfigCallback() {
       @Override
       public void onGetLockConfigSuccess(TTLockConfigType ttLockConfigType, boolean switchOn) {
-        removeCommandTimeOutRunable();
-        ttlockModel.lockConfig = ttLockConfigType.ordinal();
+        ttlockModel.lockConfig = TTLockConfigConverter.native2Flutter(ttLockConfigType);
         ttlockModel.isOn = switchOn;
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
@@ -1248,10 +1247,11 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     long currentTime = System.currentTimeMillis();//todo:暂时使用手机时间
     TTLockClient.getDefault().activateLiftFloors(floorList, currentTime, ttlockModel.lockData, new ActivateLiftFloorsCallback() {
       @Override
-      public void onActivateLiftFloorsSuccess() {
-        removeCommandTimeOutRunable();
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+      public void onActivateLiftFloorsSuccess(ActivateLiftFloorsResult activateLiftFloorsResult) {
+        ttlockModel.lockTime = activateLiftFloorsResult.deviceTime;
+        ttlockModel.uniqueId = activateLiftFloorsResult.uniqueid;
+        ttlockModel.electricQuantity = activateLiftFloorsResult.battery;
+        apiSuccess();
       }
 
       @Override
@@ -1288,7 +1288,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void setLiftWorkMode() {
-      TTLiftWorkMode ttLiftWorkMode = LiftWorkModeConverter.flutter2Native(ttlockModel.elevatorWorkActiveType);
+      TTLiftWorkMode ttLiftWorkMode = LiftWorkModeConverter.flutter2Native(ttlockModel.liftWorkActiveType);
       if (ttLiftWorkMode == null) {
         dataError();
         return;
@@ -1307,7 +1307,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void setPowerSaverWorkMode() {
-     PowerSaverWorkMode powerSaverWorkMode = PowerSaverWorkModeConverter.flutter2Native(ttlockModel.savePowerType);
+     PowerSaverWorkMode powerSaverWorkMode = PowerSaverWorkModeConverter.flutter2Native(ttlockModel.powerSaverType);
      if (powerSaverWorkMode == null) {
        dataError();
        return;

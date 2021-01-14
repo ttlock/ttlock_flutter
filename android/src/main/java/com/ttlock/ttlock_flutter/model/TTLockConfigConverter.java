@@ -38,4 +38,22 @@ public enum  TTLockConfigConverter {
         }
         return null;
     }
+
+    public static int native2Flutter(TTLockConfigType ttLockConfigType) {
+        switch (ttLockConfigType) {
+            case TAMPER_ALERT:
+                return tamperAlert.ordinal();
+            case LOCK_FREEZE:
+                return freeze.ordinal();
+            case LOCK_SOUND:
+                return audio.ordinal();
+            case PASSCODE_VISIBLE:
+                return passcodeVisible.ordinal();
+            case RESET_BUTTON:
+                return resetButton.ordinal();
+            case PRIVACY_LOCK:
+                return privacyLock.ordinal();
+        }
+        return -1;
+    }
 }

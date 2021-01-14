@@ -68,11 +68,11 @@ public class TTLockCommand {
 
     public static final String COMMAND_SUPPORT_FEATURE = "functionSupport";
 
-    public static final String COMMAND_ACTIVE_ELEVATOR_FLOORS = "activateElevatorFloors";
+    public static final String COMMAND_ACTIVE_LIFT_FLOORS = "activateLiftFloors";
 
-    public static final String COMMAND_SET_ELEVATOR_CONTROLABLE_FLOORS =
-            "setElevatorControlableFloors";
-    public static final String COMMAND_SET_ELEVATOR_WORK_MODE = "setElevatorWorkMode";
+    public static final String COMMAND_SET_LIFT_CONTROLABLE_FLOORS =
+            "setLiftControlableFloors";
+    public static final String COMMAND_SET_LIFT_WORK_MODE = "setLiftWorkMode";
 
     public static final String COMMAND_SET_POWSER_SAVER_WORK_MODE =
             "setPowerSaverWorkMode";

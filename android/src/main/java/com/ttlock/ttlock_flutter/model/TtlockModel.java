@@ -106,8 +106,8 @@ public class TtlockModel {
 
     //todo:该字段
     public String floors;
-    public int elevatorWorkActiveType;
-    public int savePowerType;
+    public int liftWorkActiveType;
+    public int powerSaverType;
     public String nbAwakeModes;
     public String hotelData;
     public int building;
@@ -118,7 +118,6 @@ public class TtlockModel {
     @Override
     public String toString() {
         return "TtlockModel{" +
-                "lockData='" + lockData + '\'' +
                 ", controlAction=" + controlAction +
                 ", passcode='" + passcode + '\'' +
                 ", passcodeOrigin='" + passcodeOrigin + '\'' +
@@ -128,6 +127,8 @@ public class TtlockModel {
                 ", logType=" + logType +
                 ", records='" + records + '\'' +
                 ", passageModeType=" + passageModeType +
+                ", weekly=" + weekly +
+                ", monthly=" + monthly +
                 ", state=" + state +
                 ", scanState=" + scanState +
                 ", specialValue=" + specialValue +
@@ -147,13 +148,28 @@ public class TtlockModel {
                 ", passcodeInfo='" + passcodeInfo + '\'' +
                 ", currentCount=" + currentCount +
                 ", totalCount=" + totalCount +
-                ", fingerprintNumber=" + fingerprintNumber +
-                ", cardNumber=" + cardNumber +
+                ", fingerprintNumber='" + fingerprintNumber + '\'' +
+                ", cardNumber='" + cardNumber + '\'' +
                 ", maxTime=" + maxTime +
                 ", minTime=" + minTime +
                 ", currentTime=" + currentTime +
                 ", adminPasscode='" + adminPasscode + '\'' +
                 ", erasePasscode='" + erasePasscode + '\'' +
+                ", lockConfig=" + lockConfig +
+                ", feature=" + feature +
+                ", isSupportFeature=" + isSupportFeature +
+                ", cycleJsonList='" + cycleJsonList + '\'' +
+                ", isSupport=" + isSupport +
+                ", supportFunction=" + supportFunction +
+                ", floors='" + floors + '\'' +
+                ", liftWorkActiveType=" + liftWorkActiveType +
+                ", powerSaverType=" + powerSaverType +
+                ", nbAwakeModes='" + nbAwakeModes + '\'' +
+                ", hotelData='" + hotelData + '\'' +
+                ", building=" + building +
+                ", floor=" + floor +
+                ", sector='" + sector + '\'' +
+                ", nbAwakeTimeList='" + nbAwakeTimeList + '\'' +
                 '}';
     }
 
@@ -246,8 +262,7 @@ public class TtlockModel {
                 for (TTNbAwakeTimeModel ttNbAwakeTimeModel : ttNbAwakeTimeModelList) {
                     NBAwakeTime nbAwakeTime = new NBAwakeTime();
                     nbAwakeTime.setMinutes(ttNbAwakeTimeModel.getMinutes());
-                    //todo:前端+1过来的
-                    nbAwakeTime.setNbAwakeTimeType(TTNbAwakeTimeType.flutter2Native(ttNbAwakeTimeModel.getType() - 1));
+                    nbAwakeTime.setNbAwakeTimeType(TTNbAwakeTimeType.flutter2Native(ttNbAwakeTimeModel.getType()));
                     if (nbAwakeTime.getNbAwakeTimeType() != null) {
                         nbAwakeTimes.add(nbAwakeTime);
                     }
@@ -265,8 +280,7 @@ public class TtlockModel {
             for (NBAwakeTime nbAwakeTime : nbAwakeTimeList) {
                 TTNbAwakeTimeModel ttNbAwakeTimeModel = new TTNbAwakeTimeModel();
                 ttNbAwakeTimeModel.setMinutes(nbAwakeTime.getMinutes());
-                //todo:前端需要+1
-                ttNbAwakeTimeModel.setType(TTNbAwakeTimeType.native2Flutter(nbAwakeTime.getNbAwakeTimeType()) + 1);
+                ttNbAwakeTimeModel.setType(TTNbAwakeTimeType.native2Flutter(nbAwakeTime.getNbAwakeTimeType()));
             }
         }
         this.nbAwakeTimeList = GsonUtil.toJson(ttNbAwakeTimeModelList);
