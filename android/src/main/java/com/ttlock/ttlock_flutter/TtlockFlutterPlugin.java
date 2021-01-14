@@ -629,7 +629,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       @Override
       public void onGetLockTimeSuccess(long lockTimestamp) {
         removeCommandTimeOutRunable();
-        ttlockModel.lockTime = lockTimestamp;
+        ttlockModel.timestamp = lockTimestamp;
         successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
         doNextCommandAction();
       }
@@ -644,7 +644,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void setLockTime() {
-    TTLockClient.getDefault().setLockTime(ttlockModel.lockTime, ttlockModel.lockData, ttlockModel.lockMac, new SetLockTimeCallback() {
+    TTLockClient.getDefault().setLockTime(ttlockModel.timestamp, ttlockModel.lockData, ttlockModel.lockMac, new SetLockTimeCallback() {
       @Override
       public void onSetTimeSuccess() {
         removeCommandTimeOutRunable();
