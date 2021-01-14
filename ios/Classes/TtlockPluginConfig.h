@@ -81,9 +81,9 @@
 #define command_init_gateway @"initGateway"
 
 #pragma mark - 梯控
-#define command_active_elevator_floors @"activateElevatorFloors"
-#define command_set_elevator_controlable_floors @"setElevatorControlableFloors"
-#define command_set_elevator_work_mode @"setElevatorWorkMode"
+#define command_active_lift_floors @"activateLiftFloors"
+#define command_set_lift_controlable_floors @"setLiftControlableFloors"
+#define command_set_lift_work_mode @"setLiftWorkMode"
 
 #pragma mark - 取电开关
 #define command_set_power_saver_work_mode @"setPowerSaverWorkMode"

@@ -91,9 +91,9 @@
 
 @property (nonatomic, strong) NSString *floors;
 
-@property (nonatomic, strong) NSNumber *elevatorWorkActiveType;
+@property (nonatomic, strong) NSNumber *liftWorkActiveType;
 
-@property (nonatomic, strong) NSNumber *savePowerType;
+@property (nonatomic, strong) NSNumber *powerSaverType;
 
 @property (nonatomic, strong) NSArray<NSNumber *> *nbAwakeModes;
 
