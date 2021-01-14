@@ -7,6 +7,7 @@ class TTGateway {
   static const String COMMAND_DISCONNECT_GATEWAY = "disconnectGateway";
   static const String COMMAND_GET_SURROUND_WIFI = "getSurroundWifi";
   static const String COMMAND_INIT_GATEWAY = "initGateway";
+  static const String COMMAND_UPGRADE_GATEWAY = "upgradeGateway";
 
   static void startScan(TTGatewayScanCallback scanCallback) {
     TTLock.invoke(COMMAND_START_SCAN_GATEWAY, null, scanCallback);
@@ -34,6 +35,13 @@ class TTGateway {
     TTGatewayFailedCallback failedCallback,
   ) {
     TTLock.invoke(COMMAND_INIT_GATEWAY, map, callback, fail: failedCallback);
+  }
+
+  static void upgrade(String mac, TTSuccessCallback callback,
+      TTGatewayFailedCallback failedCallback) {
+    Map map = Map();
+    map["mac"] = mac;
+    TTLock.invoke(COMMAND_UPGRADE_GATEWAY, map, callback, fail: failedCallback);
   }
 
   // static void disconnect(String mac, TTSuccessCallback callback) {

@@ -79,6 +79,8 @@
 #define command_disconnect_gateway @"disconnectGateway"
 #define command_get_surround_wifi @"getSurroundWifi"
 #define command_init_gateway @"initGateway"
+#define command_upgrade_gateway @"upgradeGateway"
+
 
 #pragma mark - 梯控
 #define command_active_lift_floors @"activateLiftFloors"

@@ -315,7 +315,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
     }else if ([command isEqualToString:command_get_lock_time]) {
         [TTLock getLockTimeWithLockData:lockModel.lockData success:^(long long lockTimestamp) {
             TtlockModel *data = [TtlockModel new];
-            data.lockTime = @(lockTimestamp);
+            data.timestamp = @(lockTimestamp);
             [weakSelf successCallbackCommand:command data:data];
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
@@ -513,6 +513,15 @@ typedef NS_ENUM(NSInteger, ResultState) {
                 NSInteger errorCode = [self getTTGatewayErrorCode:status];
                 [weakSelf errorCallbackCommand:command code:errorCode details:nil];
              }
+        }];
+    }else if ([command isEqualToString:command_upgrade_gateway]) {
+        [TTGateway upgradeGatewayWithGatewayMac:lockModel.mac block:^(TTGatewayStatus status) {
+            if (status == TTGatewaySuccess) {
+                [weakSelf successCallbackCommand:command data:nil];
+            }else{
+               NSInteger errorCode = [self getTTGatewayErrorCode:status];
+               [weakSelf errorCallbackCommand:command code:errorCode details:nil];
+            }
         }];
     }else if ([command isEqualToString:command_function_support]) {
         NSInteger supportFunction = lockModel.supportFunction.integerValue;
