@@ -1,10 +1,18 @@
 package com.ttlock.ttlock_flutter.model;
 
+import android.text.TextUtils;
+
+import com.google.gson.reflect.TypeToken;
 import com.ttlock.bl.sdk.constant.ControlAction;
+import com.ttlock.bl.sdk.entity.NBAwakeMode;
+import com.ttlock.bl.sdk.entity.NBAwakeTime;
+import com.ttlock.bl.sdk.util.GsonUtil;
+import com.ttlock.bl.sdk.util.LogUtil;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -95,6 +103,18 @@ public class TtlockModel {
     public boolean isSupport;
     public int supportFunction;
 
+
+    //todo:该字段
+    public String floors;
+    public int elevatorWorkActiveType;
+    public int savePowerType;
+    public String nbAwakeModes;
+    public String hotelData;
+    public int building;
+    public int floor;
+    public String sector;
+    public String nbAwakeTimeList;
+
     @Override
     public String toString() {
         return "TtlockModel{" +
@@ -144,6 +164,7 @@ public class TtlockModel {
                 //设置是否允许访问，不是修改原来的访问权限修饰词。
                 fields[i].setAccessible(true);
                 if (params.get(fields[i].getName()) != null) {
+                    LogUtil.d(fields[i].getName() + ":" + params.get(fields[i].getName()));
                     fields[i].set(this, params.get(fields[i].getName()));
                 }
             }
@@ -177,6 +198,78 @@ public class TtlockModel {
                 return ControlAction.LOCK;
         }
         return ControlAction.UNLOCK;
+    }
+
+    public List<Integer> getFloorList() {
+        List<Integer> floorList = new ArrayList<>();
+        try {
+            if (!TextUtils.isEmpty(floors)) {
+                String[] floorArray = floors.split(",");
+                for (int i=0;i<floorArray.length;i++) {
+                    floorList.add(Integer.valueOf(floorArray[i]));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return floorList;
+    }
+
+    public List<NBAwakeMode> getNbAwakeModeList() {
+        List<NBAwakeMode> nbAwakeModeList = new ArrayList<>();
+        if (!TextUtils.isEmpty(nbAwakeModes)) {
+            try {
+                nbAwakeModeList = GsonUtil.toObject(nbAwakeModes, new TypeToken<ArrayList<NBAwakeMode>>(){});
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return nbAwakeModeList;
+    }
+
+    public void setNbAwakeModeList(List<NBAwakeMode> nbAwakeModeList) {
+        List<Integer> awakeModeList = new ArrayList<>();
+        if (nbAwakeModeList != null) {
+            for (NBAwakeMode nbAwakeMode : nbAwakeModeList) {
+                TTNbAwakeModeConverter ttNbAwakeModeConverter = TTNbAwakeModeConverter.native2Flutter(nbAwakeMode);
+                awakeModeList.add(ttNbAwakeModeConverter.ordinal());
+            }
+        }
+        this.nbAwakeModes = GsonUtil.toJson(awakeModeList);
+    }
+
+    public List<NBAwakeTime> getNbAwakeTimeList() {
+        List<NBAwakeTime> nbAwakeTimes = new ArrayList<>();
+        if (!TextUtils.isEmpty(nbAwakeTimeList)) {
+            try {
+                List<TTNbAwakeTimeModel> ttNbAwakeTimeModelList = GsonUtil.toObject(nbAwakeTimeList, new TypeToken<List<TTNbAwakeTimeModel>>(){});
+                for (TTNbAwakeTimeModel ttNbAwakeTimeModel : ttNbAwakeTimeModelList) {
+                    NBAwakeTime nbAwakeTime = new NBAwakeTime();
+                    nbAwakeTime.setMinutes(ttNbAwakeTimeModel.getMinutes());
+                    //todo:前端+1过来的
+                    nbAwakeTime.setNbAwakeTimeType(TTNbAwakeTimeType.flutter2Native(ttNbAwakeTimeModel.getType() - 1));
+                    if (nbAwakeTime.getNbAwakeTimeType() != null) {
+                        nbAwakeTimes.add(nbAwakeTime);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return nbAwakeTimes;
+    }
+
+    public void setNbAwakeTimeList(List<NBAwakeTime> nbAwakeTimeList) {
+        List<TTNbAwakeTimeModel> ttNbAwakeTimeModelList = new ArrayList<>();
+        if (nbAwakeTimeList != null) {
+            for (NBAwakeTime nbAwakeTime : nbAwakeTimeList) {
+                TTNbAwakeTimeModel ttNbAwakeTimeModel = new TTNbAwakeTimeModel();
+                ttNbAwakeTimeModel.setMinutes(nbAwakeTime.getMinutes());
+                //todo:前端需要+1
+                ttNbAwakeTimeModel.setType(TTNbAwakeTimeType.native2Flutter(nbAwakeTime.getNbAwakeTimeType()) + 1);
+            }
+        }
+        this.nbAwakeTimeList = GsonUtil.toJson(ttNbAwakeTimeModelList);
     }
 
 }

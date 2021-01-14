@@ -1,6 +1,7 @@
 package com.ttlock.ttlock_flutter.model;
 
-import com.ttlock.bl.sdk.constant.TTLockConfigType;
+
+import com.ttlock.bl.sdk.entity.TTLockConfigType;
 
 /**
  * Created by TTLock on 2020/9/10.

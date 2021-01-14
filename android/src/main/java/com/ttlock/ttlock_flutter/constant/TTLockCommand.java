@@ -3,7 +3,7 @@ package com.ttlock.ttlock_flutter.constant;
 /**
  * Created by TTLock on 2020/8/21.
  */
-public class Constant {
+public class TTLockCommand {
     public static final String METHOD_CHANNEL_NAME = "com.ttlock/command/ttlock";
     public static final String EVENT_CHANNEL_NAME = "com.ttlock/listen/ttlock";
 
@@ -67,4 +67,27 @@ public class Constant {
     public static final String COMMAND_GET_LOCK_CONFIG = "getLockConfig";
 
     public static final String COMMAND_SUPPORT_FEATURE = "functionSupport";
+
+    public static final String COMMAND_ACTIVE_ELEVATOR_FLOORS = "activateElevatorFloors";
+
+    public static final String COMMAND_SET_ELEVATOR_CONTROLABLE_FLOORS =
+            "setElevatorControlableFloors";
+    public static final String COMMAND_SET_ELEVATOR_WORK_MODE = "setElevatorWorkMode";
+
+    public static final String COMMAND_SET_POWSER_SAVER_WORK_MODE =
+            "setPowerSaverWorkMode";
+    public static final String COMMAND_SET_POWSER_SAVER_CONTROLABLE =
+            "setPowerSaverControlable";
+
+    public static final String COMMAND_SET_NB_AWAKE_MODES = "setNBAwakeModes";
+    public static final String COMMAND_GET_NB_AWAKE_MODES = "getNBAwakeModes";
+    public static final String COMMAND_SET_NB_AWAKE_TIMES = "setNBAwakeTimes";
+    public static final String COMMAND_GET_NB_AWAKE_TIMES = "getNBAwakeTimes";
+
+    public static final String COMMAND_SET_DOOR_SENSOR_SWITCH = "setDoorSensorSwitch";
+    public static final String COMMAND_GET_DOOR_SENSOR_SWITCH = "getDoorSensorSwitch";
+    public static final String COMMAND_GET_DOOR_SENSOR_STATE = "getDoorSensorState";
+
+    public static final String COMMAND_SET_HOTLE_CARD_SECTOR = "setHotelCardSector";
+    public static final String COMMAND_SET_HOTLE_INFO = "setHotelInfo";
 }
