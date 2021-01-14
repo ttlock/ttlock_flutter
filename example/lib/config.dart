@@ -5,4 +5,8 @@ class Config {
   static String ttlockLoginPassword = '111111';
   // custom gateway name
   static String gatewayName = 'My gateway 1';
+
+  static String gatewayServerIp = '';
+
+  static String gatewayServerPort = '';
 }
