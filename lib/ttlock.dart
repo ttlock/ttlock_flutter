@@ -841,7 +841,7 @@ class TTLock {
 
       case COMMAND_GET_LOCK_TIME:
         TTGetLockTimeCallback getLockTimeCallback = callBack;
-        getLockTimeCallback(data[TTResponse.lockTime]);
+        getLockTimeCallback(data[TTResponse.timestamp]);
         break;
 
       case COMMAND_GET_LOCK_OPERATE_RECORD:
@@ -1201,7 +1201,7 @@ typedef TTGetAdminPasscodeCallback = void Function(String adminPasscode);
 typedef TTGetLockElectricQuantityCallback = void Function(int electricQuantity);
 typedef TTGetLockOperateRecordCallback = void Function(String records);
 typedef TTGetLockSpecialValueCallback = void Function(int specialValue);
-typedef TTGetLockTimeCallback = void Function(int lockTimestamp);
+typedef TTGetLockTimeCallback = void Function(int timestamp);
 
 typedef TTGetLockPasscodeDataCallback = void Function(String passcodeData);
 typedef TTGetLockAutomaticLockingPeriodicTimeCallback = void Function(
