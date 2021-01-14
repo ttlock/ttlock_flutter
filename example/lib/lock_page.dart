@@ -47,15 +47,14 @@ enum Command {
   activateLiftFloors,
   setLiftControlableFloors,
   setLiftWorkMode,
+
   setPowerSaverWorkMode,
   setPowerSaverControlable,
-  setNbAwakeModes,
-  getNbAwakeModes,
-  setNbAwakeTimes,
-  getNbAwakeTimes,
+
   setDoorSensorSwitch,
   getDoorSensorSwitch,
   getDoorSensorState,
+
   setHotelCardSector,
   setHotelData
 }
@@ -103,15 +102,11 @@ class _LockPageState extends State<LockPage> {
     {"Set Lock Audio Switch State": Command.setLockAudioSwitchState},
     {"Add Passage Mode": Command.addPassageMode},
     {"Clear All Passage Mode": Command.clearAllPassageModes},
-    {"Activate Elevator Floors": Command.activateLiftFloors},
-    {"Set Elevator Controlable Floors": Command.setLiftControlableFloors},
-    {"Set Elevator Work Mode": Command.setLiftWorkMode},
+    {"Activate Lift Floors": Command.activateLiftFloors},
+    {"Set Lift Controlable Floors": Command.setLiftControlableFloors},
+    {"Set Lift Work Mode": Command.setLiftWorkMode},
     {"Set Power Saver Work Mode": Command.setPowerSaverWorkMode},
     {"Set Power Saver Controlable": Command.setPowerSaverControlable},
-    {"Set Nb Awake Modes": Command.setNbAwakeModes},
-    {"Get Nb Awake Modes": Command.getNbAwakeModes},
-    {"Set Nb Awake Times": Command.setNbAwakeTimes},
-    {"Get Nb Awake Times": Command.getNbAwakeTimes},
     {"Set Door Sensor Switch": Command.setDoorSensorSwitch},
     {"Get Door Sensor Switch": Command.getDoorSensorSwitch},
     {"Get Door Sensor State": Command.getDoorSensorState},
@@ -414,10 +409,10 @@ class _LockPageState extends State<LockPage> {
         });
         break;
       case Command.activateLiftFloors:
-        TTLock.activateLiftFloors("1,2,3", lockData,
+        TTLock.activateLift("1,2,3", lockData,
             (lockTime, electricQuantity, uniqueId) {
           _showSuccessAndDismiss(
-              "Unlock Success lockTime:$lockTime electricQuantity:$electricQuantity uniqueId:$uniqueId");
+              "Active lift florrs success lockTime:$lockTime electricQuantity:$electricQuantity uniqueId:$uniqueId");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
@@ -447,40 +442,6 @@ class _LockPageState extends State<LockPage> {
       case Command.setPowerSaverControlable:
         TTLock.setPowerSaverControlable(this.lockMac, lockData, () {
           _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.setNbAwakeModes:
-        TTLock.setNbAwakeModes(
-            [TTNbAwakeMode.fingerprint, TTNbAwakeMode.card], lockData, () {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.getNbAwakeModes:
-        TTLock.getNbAwakeModes(lockData, (List<TTNbAwakeMode> list) {
-          _showSuccessAndDismiss(list.toString());
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.setNbAwakeTimes:
-        List list = new List();
-        TTNbAwakeTimeModel nbAwakeTimeModel = new TTNbAwakeTimeModel();
-        nbAwakeTimeModel.minutes = 100;
-        nbAwakeTimeModel.type = TTNbAwakeTimeType.point;
-        list.add(nbAwakeTimeModel);
-        TTLock.setNbAwakeTimes(list, lockData, () {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.getNbAwakeTimes:
-        TTLock.getNBAwakeTimes(lockData, (list) {
-          _showSuccessAndDismiss(list.toString());
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });

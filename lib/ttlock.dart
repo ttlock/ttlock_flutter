@@ -604,7 +604,7 @@ class TTLock {
         fail: failedCallback);
   }
 
-  static void activateLiftFloors(String floors, String lockData,
+  static void activateLift(String floors, String lockData,
       TTLiftCallback callback, TTFailedCallback failedCallback) {
     Map map = Map();
     map["floors"] = floors;
@@ -632,7 +632,7 @@ class TTLock {
   static void setPowerSaverWorkMode(TTPowerSaverWorkType type, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     Map map = Map();
-    map["powerSaverType"] = type;
+    map["powerSaverType"] = type.index;
     map[TTResponse.lockData] = lockData;
     invoke(COMMAND_SET_POWSER_SAVER_WORK_MODE, map, callback,
         fail: failedCallback);
@@ -648,46 +648,46 @@ class TTLock {
         fail: failedCallback);
   }
 
-  static void setNbAwakeModes(List<TTNbAwakeMode> modes, String lockData,
-      TTSuccessCallback callback, TTFailedCallback failedCallback) {
-    List list = new List();
-    modes.forEach((element) {
-      list.add(element.index);
-    });
+  // static void setNbAwakeModes(List<TTNbAwakeMode> modes, String lockData,
+  //     TTSuccessCallback callback, TTFailedCallback failedCallback) {
+  //   List list = new List();
+  //   modes.forEach((element) {
+  //     list.add(element.index);
+  //   });
 
-    Map map = Map();
-    map[TTResponse.nbAwakeModes] = list;
-    map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_SET_NB_AWAKE_MODES, map, callback, fail: failedCallback);
-  }
+  //   Map map = Map();
+  //   map[TTResponse.nbAwakeModes] = list;
+  //   map[TTResponse.lockData] = lockData;
+  //   invoke(COMMAND_SET_NB_AWAKE_MODES, map, callback, fail: failedCallback);
+  // }
 
-  static void getNbAwakeModes(String lockData,
-      TTGetNbAwakeModesCallback callback, TTFailedCallback failedCallback) {
-    invoke(COMMAND_GET_NB_AWAKE_MODES, lockData, callback,
-        fail: failedCallback);
-  }
+  // static void getNbAwakeModes(String lockData,
+  //     TTGetNbAwakeModesCallback callback, TTFailedCallback failedCallback) {
+  //   invoke(COMMAND_GET_NB_AWAKE_MODES, lockData, callback,
+  //       fail: failedCallback);
+  // }
 
-  static void setNbAwakeTimes(List<TTNbAwakeTimeModel> times, String lockData,
-      TTSuccessCallback callback, TTFailedCallback failedCallback) {
-    List list = new List();
-    times.forEach((element) {
-      Map map = new Map();
-      map[TTResponse.minutes] = element.minutes;
-      map[TTResponse.type] = element.type.index;
-      list.add(map);
-    });
+  // static void setNbAwakeTimes(List<TTNbAwakeTimeModel> times, String lockData,
+  //     TTSuccessCallback callback, TTFailedCallback failedCallback) {
+  //   List list = new List();
+  //   times.forEach((element) {
+  //     Map nbAwakeTimeMap = new Map();
+  //     nbAwakeTimeMap[TTResponse.minutes] = element.minutes;
+  //     nbAwakeTimeMap[TTResponse.type] = element.type.index;
+  //     list.add(nbAwakeTimeMap);
+  //   });
 
-    Map map = Map();
-    map[TTResponse.nbAwakeTimeList] = list;
-    map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_SET_NB_AWAKE_TIMES, map, callback, fail: failedCallback);
-  }
+  //   Map map = Map();
+  //   map[TTResponse.nbAwakeTimeList] = list;
+  //   map[TTResponse.lockData] = lockData;
+  //   invoke(COMMAND_SET_NB_AWAKE_TIMES, map, callback, fail: failedCallback);
+  // }
 
-  static void getNBAwakeTimes(String lockData,
-      TTGetNbAwakeTimesCallback callback, TTFailedCallback failedCallback) {
-    invoke(COMMAND_GET_NB_AWAKE_TIMES, lockData, callback,
-        fail: failedCallback);
-  }
+  // static void getNBAwakeTimes(String lockData,
+  //     TTGetNbAwakeTimesCallback callback, TTFailedCallback failedCallback) {
+  //   invoke(COMMAND_GET_NB_AWAKE_TIMES, lockData, callback,
+  //       fail: failedCallback);
+  // }
 
   static void setDoorSensorLockingSwitchState(bool isOn, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
@@ -841,7 +841,7 @@ class TTLock {
 
       case COMMAND_GET_LOCK_TIME:
         TTGetLockTimeCallback getLockTimeCallback = callBack;
-        getLockTimeCallback(data[TTResponse.lockTime]);
+        getLockTimeCallback(data[TTResponse.timestamp]);
         break;
 
       case COMMAND_GET_LOCK_OPERATE_RECORD:
@@ -1201,7 +1201,7 @@ typedef TTGetAdminPasscodeCallback = void Function(String adminPasscode);
 typedef TTGetLockElectricQuantityCallback = void Function(int electricQuantity);
 typedef TTGetLockOperateRecordCallback = void Function(String records);
 typedef TTGetLockSpecialValueCallback = void Function(int specialValue);
-typedef TTGetLockTimeCallback = void Function(int lockTimestamp);
+typedef TTGetLockTimeCallback = void Function(int timestamp);
 
 typedef TTGetLockPasscodeDataCallback = void Function(String passcodeData);
 typedef TTGetLockAutomaticLockingPeriodicTimeCallback = void Function(
