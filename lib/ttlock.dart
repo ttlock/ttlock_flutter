@@ -648,46 +648,46 @@ class TTLock {
         fail: failedCallback);
   }
 
-  static void setNbAwakeModes(List<TTNbAwakeMode> modes, String lockData,
-      TTSuccessCallback callback, TTFailedCallback failedCallback) {
-    List list = new List();
-    modes.forEach((element) {
-      list.add(element.index);
-    });
+  // static void setNbAwakeModes(List<TTNbAwakeMode> modes, String lockData,
+  //     TTSuccessCallback callback, TTFailedCallback failedCallback) {
+  //   List list = new List();
+  //   modes.forEach((element) {
+  //     list.add(element.index);
+  //   });
 
-    Map map = Map();
-    map[TTResponse.nbAwakeModes] = list;
-    map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_SET_NB_AWAKE_MODES, map, callback, fail: failedCallback);
-  }
+  //   Map map = Map();
+  //   map[TTResponse.nbAwakeModes] = list;
+  //   map[TTResponse.lockData] = lockData;
+  //   invoke(COMMAND_SET_NB_AWAKE_MODES, map, callback, fail: failedCallback);
+  // }
 
-  static void getNbAwakeModes(String lockData,
-      TTGetNbAwakeModesCallback callback, TTFailedCallback failedCallback) {
-    invoke(COMMAND_GET_NB_AWAKE_MODES, lockData, callback,
-        fail: failedCallback);
-  }
+  // static void getNbAwakeModes(String lockData,
+  //     TTGetNbAwakeModesCallback callback, TTFailedCallback failedCallback) {
+  //   invoke(COMMAND_GET_NB_AWAKE_MODES, lockData, callback,
+  //       fail: failedCallback);
+  // }
 
-  static void setNbAwakeTimes(List<TTNbAwakeTimeModel> times, String lockData,
-      TTSuccessCallback callback, TTFailedCallback failedCallback) {
-    List list = new List();
-    times.forEach((element) {
-      Map nbAwakeTimeMap = new Map();
-      nbAwakeTimeMap[TTResponse.minutes] = element.minutes;
-      nbAwakeTimeMap[TTResponse.type] = element.type.index;
-      list.add(nbAwakeTimeMap);
-    });
+  // static void setNbAwakeTimes(List<TTNbAwakeTimeModel> times, String lockData,
+  //     TTSuccessCallback callback, TTFailedCallback failedCallback) {
+  //   List list = new List();
+  //   times.forEach((element) {
+  //     Map nbAwakeTimeMap = new Map();
+  //     nbAwakeTimeMap[TTResponse.minutes] = element.minutes;
+  //     nbAwakeTimeMap[TTResponse.type] = element.type.index;
+  //     list.add(nbAwakeTimeMap);
+  //   });
 
-    Map map = Map();
-    map[TTResponse.nbAwakeTimeList] = list;
-    map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_SET_NB_AWAKE_TIMES, map, callback, fail: failedCallback);
-  }
+  //   Map map = Map();
+  //   map[TTResponse.nbAwakeTimeList] = list;
+  //   map[TTResponse.lockData] = lockData;
+  //   invoke(COMMAND_SET_NB_AWAKE_TIMES, map, callback, fail: failedCallback);
+  // }
 
-  static void getNBAwakeTimes(String lockData,
-      TTGetNbAwakeTimesCallback callback, TTFailedCallback failedCallback) {
-    invoke(COMMAND_GET_NB_AWAKE_TIMES, lockData, callback,
-        fail: failedCallback);
-  }
+  // static void getNBAwakeTimes(String lockData,
+  //     TTGetNbAwakeTimesCallback callback, TTFailedCallback failedCallback) {
+  //   invoke(COMMAND_GET_NB_AWAKE_TIMES, lockData, callback,
+  //       fail: failedCallback);
+  // }
 
   static void setDoorSensorLockingSwitchState(bool isOn, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
