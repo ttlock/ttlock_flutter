@@ -467,11 +467,11 @@ class _LockPageState extends State<LockPage> {
         });
         break;
       case Command.setNbAwakeTimes:
-        List list = new List();
-        Map map = new Map();
-        map["minutes"] = 100;
-        map["type"] = TTNbAwakeTimeType.point;
-        list.add(map);
+        List<TTNbAwakeTimeModel> list = new List<TTNbAwakeTimeModel>();
+        TTNbAwakeTimeModel awakeTimeModel = new TTNbAwakeTimeModel();
+        awakeTimeModel.minutes = 100;
+        awakeTimeModel.type = TTNbAwakeTimeType.point;
+        list.add(awakeTimeModel);
         TTLock.setNbAwakeTimes(list, lockData, () {
           _showSuccessAndDismiss("Success");
         }, (errorCode, errorMsg) {

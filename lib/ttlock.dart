@@ -671,10 +671,10 @@ class TTLock {
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     List list = new List();
     times.forEach((element) {
-      Map map = new Map();
-      map[TTResponse.minutes] = element.minutes;
-      map[TTResponse.type] = element.type.index;
-      list.add(map);
+      Map nbAwakeTimeMap = new Map();
+      nbAwakeTimeMap[TTResponse.minutes] = element.minutes;
+      nbAwakeTimeMap[TTResponse.type] = element.type.index;
+      list.add(nbAwakeTimeMap);
     });
 
     Map map = Map();
