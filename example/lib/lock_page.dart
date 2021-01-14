@@ -103,9 +103,9 @@ class _LockPageState extends State<LockPage> {
     {"Set Lock Audio Switch State": Command.setLockAudioSwitchState},
     {"Add Passage Mode": Command.addPassageMode},
     {"Clear All Passage Mode": Command.clearAllPassageModes},
-    {"Activate Elevator Floors": Command.activateLiftFloors},
-    {"Set Elevator Controlable Floors": Command.setLiftControlableFloors},
-    {"Set Elevator Work Mode": Command.setLiftWorkMode},
+    {"Activate Lift Floors": Command.activateLiftFloors},
+    {"Set Lift Controlable Floors": Command.setLiftControlableFloors},
+    {"Set Lift Work Mode": Command.setLiftWorkMode},
     {"Set Power Saver Work Mode": Command.setPowerSaverWorkMode},
     {"Set Power Saver Controlable": Command.setPowerSaverControlable},
     {"Set Nb Awake Modes": Command.setNbAwakeModes},
@@ -414,10 +414,10 @@ class _LockPageState extends State<LockPage> {
         });
         break;
       case Command.activateLiftFloors:
-        TTLock.activateLiftFloors("1,2,3", lockData,
+        TTLock.activateLift("1,2,3", lockData,
             (lockTime, electricQuantity, uniqueId) {
           _showSuccessAndDismiss(
-              "Unlock Success lockTime:$lockTime electricQuantity:$electricQuantity uniqueId:$uniqueId");
+              "Active lift florrs success lockTime:$lockTime electricQuantity:$electricQuantity uniqueId:$uniqueId");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
@@ -468,10 +468,10 @@ class _LockPageState extends State<LockPage> {
         break;
       case Command.setNbAwakeTimes:
         List list = new List();
-        TTNbAwakeTimeModel nbAwakeTimeModel = new TTNbAwakeTimeModel();
-        nbAwakeTimeModel.minutes = 100;
-        nbAwakeTimeModel.type = TTNbAwakeTimeType.point;
-        list.add(nbAwakeTimeModel);
+        Map map = new Map();
+        map["minutes"] = 100;
+        map["type"] = TTNbAwakeTimeType.point;
+        list.add(map);
         TTLock.setNbAwakeTimes(list, lockData, () {
           _showSuccessAndDismiss("Success");
         }, (errorCode, errorMsg) {

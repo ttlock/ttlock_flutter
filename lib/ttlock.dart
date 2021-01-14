@@ -604,7 +604,7 @@ class TTLock {
         fail: failedCallback);
   }
 
-  static void activateLiftFloors(String floors, String lockData,
+  static void activateLift(String floors, String lockData,
       TTLiftCallback callback, TTFailedCallback failedCallback) {
     Map map = Map();
     map["floors"] = floors;
@@ -632,7 +632,7 @@ class TTLock {
   static void setPowerSaverWorkMode(TTPowerSaverWorkType type, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     Map map = Map();
-    map["powerSaverType"] = type;
+    map["powerSaverType"] = type.index;
     map[TTResponse.lockData] = lockData;
     invoke(COMMAND_SET_POWSER_SAVER_WORK_MODE, map, callback,
         fail: failedCallback);
