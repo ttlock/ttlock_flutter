@@ -35,6 +35,8 @@
 @property (nonatomic, strong) NSString *wifiPassword;
 @property (nonatomic, strong) NSString *ttlockLoginPassword;
 @property (nonatomic, strong) NSString *ttlockUid;
+@property (nonatomic, strong) NSString *serverIp;
+@property (nonatomic, strong) NSString *serverPort;
 @property (nonatomic, strong) NSString *gatewayName;
 @property (nonatomic, strong) NSNumber *supportFunction;
 @property (nonatomic, strong) NSNumber *isSupport;
