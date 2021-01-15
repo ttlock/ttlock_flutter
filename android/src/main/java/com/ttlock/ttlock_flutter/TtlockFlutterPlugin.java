@@ -133,15 +133,19 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   public static final int ResultStateFail = 2;
 
   private boolean isGatewayCommand;
+  /**
+   * lock is busy try
+   */
+  private boolean tryAgain;
 
   /**
-   * time out: 15s
+   * time out: 30s
    */
   private static final long COMMAND_TIME_OUT = 30 * 1000;
   private Runnable commandTimeOutRunable = new Runnable() {
     @Override
     public void run() {
-      //todo:disconnect the connect
+      TTLockClient.getDefault().disconnect();
       errorCallbackCommand(commandQue.poll(), LockError.Failed);
       clearCommand();
     }
@@ -198,6 +202,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         commandQue.add(call.method);
         LogUtil.d("commandQue:" + commandQue.size());
         if (commandQue.size() == 1) {
+          tryAgain = true;
           doNextCommandAction();
         }
         break;
@@ -220,13 +225,16 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         connectGateway(gatewayModel);
         break;
       case GatewayCommand.COMMAND_DISCONNECT_GATEWAY:
-
+        disconnectGateway();
         break;
       case GatewayCommand.COMMAND_GET_SURROUND_WIFI:
         getSurroundWifi(gatewayModel);
         break;
       case GatewayCommand.COMMAND_INIT_GATEWAY:
         initGateway(gatewayModel);
+        break;
+      case GatewayCommand.COMMAND_UPGRADE_GATEWAY:
+
         break;
     }
   }
@@ -279,6 +287,10 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void disconnectGateway() {//todo:
+    GatewayClient.getDefault().disconnectGateway();
+  }
+
+  public void gatewayUpgrade() {
 
   }
 
@@ -474,8 +486,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         setPowerSaverControlableLock();
         break;
       default:
-        errorCallbackCommand(commandQue.poll(), LockError.INVALID_COMMAND);
-        clearCommand();
+        apiFail(LockError.INVALID_COMMAND);
+//        errorCallbackCommand(commandQue.poll(), LockError.INVALID_COMMAND);
+//        clearCommand();
         LogUtil.d("unknown command:" + command);
         break;
     }
@@ -538,16 +551,10 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         LogUtil.d("lockError:" + lockError);
       }
     });
-
-//    doNextCommandAction();
   }
 
   public void stopScan() {
     TTLockClient.getDefault().stopScanLock();
-
-//    commandQue.poll();
-//    removeCommandTimeOutRunable();
-//    doNextCommandAction();
   }
 
   public void initLock() {
@@ -567,17 +574,13 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().initLock(extendedBluetoothDevice, new InitLockCallback() {
       @Override
       public void onInitLockSuccess(String lockData) {
-        removeCommandTimeOutRunable();
         ttlockModel.lockData = lockData;
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -587,20 +590,16 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
       @Override
       public void onControlLockSuccess(ControlLockResult controlLockResult) {
-        removeCommandTimeOutRunable();
         ttlockModel.lockTime = controlLockResult.lockTime;
         ttlockModel.controlAction = controlLockResult.controlAction;
         ttlockModel.electricQuantity = controlLockResult.battery;
         ttlockModel.uniqueId = controlLockResult.uniqueid;
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -609,16 +608,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().resetLock(ttlockModel.lockData, ttlockModel.lockMac, new ResetLockCallback() {
       @Override
       public void onResetLockSuccess() {
-        removeCommandTimeOutRunable();
-        successCallbackCommand(commandQue.poll(), null);
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -628,17 +623,13 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
       @Override
       public void onGetLockTimeSuccess(long lockTimestamp) {
-        removeCommandTimeOutRunable();
         ttlockModel.timestamp = lockTimestamp;
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -647,16 +638,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().setLockTime(ttlockModel.timestamp, ttlockModel.lockData, ttlockModel.lockMac, new SetLockTimeCallback() {
       @Override
       public void onSetTimeSuccess() {
-        removeCommandTimeOutRunable();
-        successCallbackCommand(commandQue.poll(), null);
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -664,23 +651,18 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   public void getOperationLog() {
     //long period operation
     removeCommandTimeOutRunable();
-
     commandTimeOutCheck(4 * COMMAND_TIME_OUT);
 
     TTLockClient.getDefault().getOperationLog(ttlockModel.logType, ttlockModel.lockData, ttlockModel.lockMac, new GetOperationLogCallback() {
       @Override
       public void onGetLogSuccess(String log) {
-        removeCommandTimeOutRunable();
         ttlockModel.records = log;
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -689,17 +671,13 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().getLockStatus(ttlockModel.lockData, ttlockModel.lockMac, new GetLockStatusCallback() {
       @Override
       public void onGetLockStatusSuccess(int status) {
-        removeCommandTimeOutRunable();
         ttlockModel.lockSwitchState = status;
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -708,17 +686,13 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().modifyAdminPasscode(ttlockModel.adminPasscode, ttlockModel.lockData, ttlockModel.lockMac, new ModifyAdminPasscodeCallback() {
       @Override
       public void onModifyAdminPasscodeSuccess(String passcode) {
-        removeCommandTimeOutRunable();
         ttlockModel.adminPasscode = passcode;
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -727,17 +701,13 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().getAdminPasscode(ttlockModel.lockData, ttlockModel.lockMac, new GetAdminPasscodeCallback() {
       @Override
       public void onGetAdminPasscodeSuccess(String passcode) {
-        removeCommandTimeOutRunable();
         ttlockModel.adminPasscode = passcode;
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -746,17 +716,13 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().createCustomPasscode(ttlockModel.passcode, ttlockModel.startDate, ttlockModel.endDate, ttlockModel.lockData, ttlockModel.lockMac, new CreateCustomPasscodeCallback() {
       @Override
       public void onCreateCustomPasscodeSuccess(String passcode) {
-        removeCommandTimeOutRunable();
         ttlockModel.passcode = passcode;
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -765,16 +731,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().modifyPasscode(ttlockModel.passcodeOrigin, ttlockModel.passcodeNew, ttlockModel.startDate, ttlockModel.endDate, ttlockModel.lockData, ttlockModel.lockMac, new ModifyPasscodeCallback() {
       @Override
       public void onModifyPasscodeSuccess() {
-        removeCommandTimeOutRunable();
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -783,16 +745,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().deletePasscode(ttlockModel.passcode, ttlockModel.lockData, ttlockModel.lockMac, new DeletePasscodeCallback() {
       @Override
       public void onDeletePasscodeSuccess() {
-        removeCommandTimeOutRunable();
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -801,17 +759,13 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().resetPasscode(ttlockModel.lockData, ttlockModel.lockMac, new ResetPasscodeCallback() {
       @Override
       public void onResetPasscodeSuccess(String lockData) {
-        removeCommandTimeOutRunable();
         ttlockModel.lockData = lockData;
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -831,7 +785,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().addICCard(validityInfo, ttlockModel.lockData, new AddICCardCallback() {
       @Override
       public void onEnterAddMode() {
+        //重新设置超时时间
         removeCommandTimeOutRunable();
+        commandTimeOutCheck();
         progressCallbackCommand(commandQue.peek(), ttlockModel.toMap());
       }
 
@@ -842,10 +798,8 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -865,16 +819,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().modifyICCardValidityPeriod(validityInfo, ttlockModel.cardNumber, ttlockModel.lockData, new ModifyICCardPeriodCallback() {
       @Override
       public void onModifyICCardPeriodSuccess() {
-        removeCommandTimeOutRunable();
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -883,16 +833,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().deleteICCard(ttlockModel.cardNumber, ttlockModel.lockData, ttlockModel.lockMac, new DeleteICCardCallback() {
       @Override
       public void onDeleteICCardSuccess() {
-        removeCommandTimeOutRunable();
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -901,14 +847,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().clearAllICCard(ttlockModel.lockData, ttlockModel.lockMac, new ClearAllICCardCallback() {
       @Override
       public void onClearAllICCardSuccess() {
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -928,12 +872,17 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().addFingerprint(validityInfo, ttlockModel.lockData, new AddFingerprintCallback() {
       @Override
       public void onEnterAddMode(int totalCount) {
+        //重新设置超时时间
         removeCommandTimeOutRunable();
+        commandTimeOutCheck();
         ttlockModel.totalCount = totalCount;
       }
 
       @Override
       public void onCollectFingerprint(int currentCount) {
+        //重新设置超时时间
+        removeCommandTimeOutRunable();
+        commandTimeOutCheck();
         ttlockModel.currentCount = currentCount;
         progressCallbackCommand(commandQue.peek(), ttlockModel.toMap());
       }
@@ -941,15 +890,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       @Override
       public void onAddFingerpintFinished(long fingerprintNum) {
         ttlockModel.fingerprintNumber = String.valueOf(fingerprintNum);
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -969,16 +915,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().modifyFingerprintValidityPeriod(validityInfo, ttlockModel.fingerprintNumber, ttlockModel.lockData, new ModifyFingerprintPeriodCallback() {
       @Override
       public void onModifyPeriodSuccess() {
-        removeCommandTimeOutRunable();
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -987,16 +929,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().deleteFingerprint(ttlockModel.fingerprintNumber, ttlockModel.lockData, ttlockModel.lockMac, new DeleteFingerprintCallback() {
       @Override
       public void onDeleteFingerprintSuccess() {
-        removeCommandTimeOutRunable();
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -1005,16 +943,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().clearAllICCard(ttlockModel.lockData, ttlockModel.lockMac, new ClearAllICCardCallback() {
       @Override
       public void onClearAllICCardSuccess() {
-        removeCommandTimeOutRunable();
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -1023,17 +957,13 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().getBatteryLevel(ttlockModel.lockData, ttlockModel.lockMac, new GetBatteryLevelCallback() {
       @Override
       public void onGetBatteryLevelSuccess(int electricQuantity) {
-        removeCommandTimeOutRunable();
         ttlockModel.electricQuantity = electricQuantity;
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -1042,16 +972,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().setAutomaticLockingPeriod(ttlockModel.currentTime, ttlockModel.lockData, ttlockModel.lockMac, new SetAutoLockingPeriodCallback() {
       @Override
       public void onSetAutoLockingPeriodSuccess() {
-        removeCommandTimeOutRunable();
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -1063,15 +989,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         ttlockModel.currentTime = currtentTime;
         ttlockModel.minTime = minTime;
         ttlockModel.maxTime = maxTime;
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -1080,17 +1003,13 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().setRemoteUnlockSwitchState(ttlockModel.isOn, ttlockModel.lockData, ttlockModel.lockMac, new SetRemoteUnlockSwitchCallback() {
       @Override
       public void onSetRemoteUnlockSwitchSuccess(String lockData) {
-        removeCommandTimeOutRunable();
         ttlockModel.lockData = lockData;
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -1099,17 +1018,13 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().getRemoteUnlockSwitchState(ttlockModel.lockData, ttlockModel.lockMac, new GetRemoteUnlockStateCallback() {
       @Override
       public void onGetRemoteUnlockSwitchStateSuccess(boolean enabled) {
-        removeCommandTimeOutRunable();
         ttlockModel.isOn = enabled;
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -1129,16 +1044,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().setPassageMode(passageModeConfig, ttlockModel.lockData, ttlockModel.lockMac, new SetPassageModeCallback() {
       @Override
       public void onSetPassageModeSuccess() {
-        removeCommandTimeOutRunable();
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -1147,16 +1058,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().clearPassageMode(ttlockModel.lockData, ttlockModel.lockMac, new ClearPassageModeCallback() {
       @Override
       public void onClearPassageModeSuccess() {
-        removeCommandTimeOutRunable();
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -1165,9 +1072,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockConfigType ttLockConfigType = TTLockConfigConverter.flutter2Native(ttlockModel.lockConfig);
 
     if (ttLockConfigType == null) {
-      removeCommandTimeOutRunable();
-      errorCallbackCommand(commandQue.poll(), LockError.DATA_FORMAT_ERROR);
-      clearCommand();
+      dataError();
       return;
     }
 
@@ -1175,17 +1080,14 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().setLockConfig(ttLockConfigType, ttlockModel.isOn, ttlockModel.lockData, new SetLockConfigCallback() {
       @Override
       public void onSetLockConfigSuccess(TTLockConfigType ttLockConfigType) {
-        removeCommandTimeOutRunable();
-        ttlockModel.lockConfig = ttLockConfigType.ordinal();
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        LogUtil.d("ttLockConfigType:" + ttLockConfigType);
+        ttlockModel.lockConfig = TTLockConfigConverter.native2Flutter(ttLockConfigType);
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -1194,9 +1096,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockConfigType ttLockConfigType = TTLockConfigConverter.flutter2Native(ttlockModel.lockConfig);
 
     if (ttLockConfigType == null) {
-      removeCommandTimeOutRunable();
-      errorCallbackCommand(commandQue.poll(), LockError.DATA_FORMAT_ERROR);
-      clearCommand();
+      dataError();
       return;
     }
     LogUtil.d("ttLockConfigType:" + ttLockConfigType);
@@ -1209,10 +1109,8 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -1221,17 +1119,13 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().resetEkey(ttlockModel.lockData, ttlockModel.lockMac, new ResetKeyCallback() {
       @Override
       public void onResetKeySuccess(String lockData) {
-        removeCommandTimeOutRunable();
         ttlockModel.lockData = lockData;
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
-      public void onFail(LockError error) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), error);
-        clearCommand();
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
       }
     });
   }
@@ -1239,9 +1133,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   public void activateLiftFloors() {
     List<Integer> floorList = ttlockModel.getFloorList();
     if (floorList == null || floorList.size() == 0) {
-      removeCommandTimeOutRunable();
-      errorCallbackCommand(commandQue.poll(), LockError.DATA_FORMAT_ERROR);
-      clearCommand();
+      dataError();
       return;
     }
     long currentTime = System.currentTimeMillis();//todo:暂时使用手机时间
@@ -1256,33 +1148,25 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
       @Override
       public void onFail(LockError lockError) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), lockError);
-        clearCommand();
+        apiFail(lockError);
       }
     });
   }
 
   public void setLiftControlableFloors() {
     if (TextUtils.isEmpty(ttlockModel.floors)) {
-      removeCommandTimeOutRunable();
-      errorCallbackCommand(commandQue.poll(), LockError.DATA_FORMAT_ERROR);
-      clearCommand();
+      dataError();
       return;
     }
     TTLockClient.getDefault().setLiftControlableFloors(ttlockModel.floors, ttlockModel.lockData, new SetLiftControlableFloorsCallback() {
       @Override
       public void onSetLiftControlableFloorsSuccess() {
-        removeCommandTimeOutRunable();
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-        doNextCommandAction();
+        apiSuccess();
       }
 
       @Override
       public void onFail(LockError lockError) {
-        removeCommandTimeOutRunable();
-        errorCallbackCommand(commandQue.poll(), lockError);
-        clearCommand();
+        apiFail(lockError);
       }
     });
   }
@@ -1548,13 +1432,20 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   public void apiSuccess() {
     removeCommandTimeOutRunable();
     successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
+    tryAgain = true;
     doNextCommandAction();
   }
 
   public void apiFail(LockError lockError) {
     removeCommandTimeOutRunable();
-    errorCallbackCommand(commandQue.poll(), lockError);
-    clearCommand();
+    if (tryAgain && lockError == LockError.LOCK_IS_BUSY) {
+        tryAgain = false;
+        TTLockClient.getDefault().clearAllCallback();
+        doNextCommandAction();
+    } else {
+      errorCallbackCommand(commandQue.poll(), lockError);
+      clearCommand();
+    }
   }
 
   public void dataError() {
