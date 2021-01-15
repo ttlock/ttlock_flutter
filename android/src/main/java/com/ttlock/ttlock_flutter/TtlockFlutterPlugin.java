@@ -81,6 +81,7 @@ import com.ttlock.bl.sdk.gateway.model.ConfigureGatewayInfo;
 import com.ttlock.bl.sdk.gateway.model.DeviceInfo;
 import com.ttlock.bl.sdk.gateway.model.GatewayError;
 import com.ttlock.bl.sdk.gateway.model.WiFi;
+import com.ttlock.bl.sdk.util.DigitUtil;
 import com.ttlock.bl.sdk.util.FeatureValueUtil;
 import com.ttlock.bl.sdk.util.GsonUtil;
 import com.ttlock.bl.sdk.util.LogUtil;
@@ -332,6 +333,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     configureGatewayInfo.uid = gatewayModel.ttlockUid;
     configureGatewayInfo.userPwd = gatewayModel.ttlockLoginPassword;
 
+    if (!TextUtils.isEmpty(gatewayModel.serverIp)) {
+      configureGatewayInfo.server = gatewayModel.serverIp;
+    }
+    if (!TextUtils.isEmpty(gatewayModel.serverPort) && DigitUtil.isNumeric(gatewayModel.serverPort)) {
+      configureGatewayInfo.port = Integer.valueOf(gatewayModel.serverPort);
+    }
 //    configureGatewayInfo.uid = 8409;
 //    configureGatewayInfo.userPwd = "xtc123456";
 

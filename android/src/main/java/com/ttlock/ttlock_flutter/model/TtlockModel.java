@@ -104,7 +104,6 @@ public class TtlockModel {
     public int supportFunction;
 
 
-    //todo:该字段
     public String floors;
     public int liftWorkActiveType;
     public int powerSaverType;
