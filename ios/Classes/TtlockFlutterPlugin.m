@@ -502,8 +502,8 @@ typedef NS_ENUM(NSInteger, ResultState) {
         dict[@"gatewayName"] = lockModel.gatewayName;
         dict[@"uid"] = lockModel.ttlockUid;
         dict[@"userPwd"] = lockModel.ttlockLoginPassword;
-        dict[] = lockModel.serverIp;
-        dict[] = lockModel.serverPort;
+        dict[@"serverAddress"] = lockModel.serverIp;
+        dict[@"portNumber"] = lockModel.serverPort;
         [TTGateway initializeGatewayWithInfoDic:dict block:^(TTSystemInfoModel *systemInfoModel, TTGatewayStatus status) {
              if (status == TTGatewaySuccess) {
                  NSMutableDictionary *resultDict = @{}.mutableCopy;
