@@ -42,7 +42,6 @@ UIKIT_EXTERN NSString * const  TTErrorMessageInFreezeMode;
 UIKIT_EXTERN NSString * const  TTErrorMessageInvalidClientPara;
 UIKIT_EXTERN NSString * const  TTErrorMessageLockIsLocked;
 UIKIT_EXTERN NSString * const  TTErrorMessageRecordNotExist;
-UIKIT_EXTERN NSString * const  TTErrorMessageNotSupportModifyPasscode;
 UIKIT_EXTERN NSString * const  TTErrorMessageBluetoothPoweredOff;
 UIKIT_EXTERN NSString * const  TTErrorMessageConnectionTimeout;
 UIKIT_EXTERN NSString * const  TTErrorMessageDisconnection;
@@ -95,7 +94,6 @@ typedef NS_ENUM(NSInteger, TTError)
     TTErrorLockIsLocked = 0x1E,
     TTErrorRecordNotExist = 0x1F,
     
-    TTErrorNotSupportModifyPasscode = 0x60,
     TTErrorBluetoothPoweredOff = 0x61,
     TTErrorConnectionTimeout = 0x62,
     TTErrorDisconnection = 0x63,
@@ -170,7 +168,8 @@ typedef NS_ENUM(int, TTLockType)
     TTLockTypeCylinderLock  ,
     TTLockTypeRemoteControl  ,
     TTLockTypeHotelLock ,
-	TTLockTypeElevator
+	TTLockTypeLift,
+	TTLockTypePowerSaver
 };
 
 
@@ -379,6 +378,12 @@ typedef NS_ENUM(NSInteger,TTLockFeatureValue) {
     TTLockFeatureValuePrivacyLock = 30,
     TTLockFeatureValueDeadLock = 32,
     TTLockFeatureValueCyclicCardOrFingerprint = 34,
+	TTLockFeatureValueFingerVein = 37,
+	TTLockFeatureValueBle5G = 38,
+	TTLockFeatureValueNBAwake = 39,
+	TTLockFeatureValueRecoverCyclePasscode = 40,
+	TTLockFeatureValueWirelessKeyFob = 41,
+	TTLockFeatureValueGetAccessoryElectricQuantity = 42,
 };
 
 typedef NS_ENUM(NSInteger ,TTLockConfigType) {
@@ -391,17 +396,44 @@ typedef NS_ENUM(NSInteger ,TTLockConfigType) {
 };
 
 /*!
-*  @enum TTElevatorWorkMode
+*  @enum TTLiftWorkMode
 *
-*  @discussion Elevator Work Mode
+*  @discussion Lift Work Mode
 *
-*  @constant TTElevatorWorkModeActivateAllFloors           any floor can press by this hotel card
-*  @constant TTElevatorWorkModeActivateSpecificFloors      only floors corresponding to the card can be allowed to press
+*  @constant TTLiftWorkModeActivateAllFloors           any floor can press by this hotel card
+*  @constant TTLiftWorkModeActivateSpecificFloors      only floors corresponding to the card can be allowed to press
 *
 */
-typedef NS_ENUM(int, TTElevatorWorkMode) {
-	TTElevatorWorkModeActivateAllFloors,
-	TTElevatorWorkModeActivateSpecificFloors
+typedef NS_ENUM(int, TTLiftWorkMode) {
+	TTLiftWorkModeActivateAllFloors,
+	TTLiftWorkModeModeActivateSpecificFloors
+};
+
+typedef NS_ENUM(int, TTPowerSaverWorkMode) {
+	TTPowerSaverWorkModeAllCards,
+	TTPowerSaverWorkModeHotelCard,
+	TTPowerSaverWorkModeRoomCard
+};
+
+typedef NS_ENUM(NSInteger, TTNBAwakeMode) {
+	TTNBAwakeModeKeypad = 0,
+	TTNBAwakeModeCard = 1,
+	TTNBAwakeModeFingerprint = 2,
+};
+
+typedef NS_ENUM(NSInteger, TTNBAwakeTimeType) {
+	TTNBAwakeTimeTypePoint = 1,
+	TTNBAwakeTimeTypeInterval = 2,
+};
+
+typedef NS_ENUM(int, TTUnlockDirection) {
+	TTUnlockDirectionLeft = 1,
+	TTUnlockDirectionRight
+};
+
+typedef NS_ENUM(int, TTAccessoryType) {
+	TTAccessoryTypeWirelessKeypad = 1,
+	TTAccessoryTypeWirelessKeyFob
 };
 
 @end

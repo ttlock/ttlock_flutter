@@ -21,7 +21,7 @@ typedef enum {
 
 typedef void(^TTKeypadScanBlock)(TTWirelessKeypadScanModel *model);
 
-typedef void(^TTInitializeKeypadBlock)(NSString *wirelessKeypadFeatureValue,TTKeypadStatus status);
+typedef void(^TTInitializeKeypadBlock)(NSString *wirelessKeypadFeatureValue,TTKeypadStatus status,int electricQuantity);
 
 /**
  start Scan Keypad
