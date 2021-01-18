@@ -3,11 +3,13 @@ import 'package:ttlock_premise_flutter/ttlock.dart';
 import 'package:bmprogresshud/progresshud.dart';
 
 class LockPage extends StatefulWidget {
-  LockPage({Key key, this.title, this.lockData}) : super(key: key);
+  LockPage({Key key, this.title, this.lockData, this.lockMac})
+      : super(key: key);
   final String title;
   final String lockData;
+  final String lockMac;
   @override
-  _LockPageState createState() => _LockPageState(lockData);
+  _LockPageState createState() => _LockPageState(lockData, lockMac);
 }
 
 enum Command {
@@ -41,6 +43,20 @@ enum Command {
   setLockAudioSwitchState,
   addPassageMode,
   clearAllPassageModes,
+
+  activateLiftFloors,
+  setLiftControlableFloors,
+  setLiftWorkMode,
+
+  setPowerSaverWorkMode,
+  setPowerSaverControlable,
+
+  setDoorSensorSwitch,
+  getDoorSensorSwitch,
+  getDoorSensorState,
+
+  setHotelCardSector,
+  setHotelData
 }
 
 class _LockPageState extends State<LockPage> {
@@ -86,19 +102,31 @@ class _LockPageState extends State<LockPage> {
     {"Set Lock Audio Switch State": Command.setLockAudioSwitchState},
     {"Add Passage Mode": Command.addPassageMode},
     {"Clear All Passage Mode": Command.clearAllPassageModes},
+    {"Activate Lift Floors": Command.activateLiftFloors},
+    {"Set Lift Controlable Floors": Command.setLiftControlableFloors},
+    {"Set Lift Work Mode": Command.setLiftWorkMode},
+    {"Set Power Saver Work Mode": Command.setPowerSaverWorkMode},
+    {"Set Power Saver Controlable": Command.setPowerSaverControlable},
+    {"Set Door Sensor Switch": Command.setDoorSensorSwitch},
+    {"Get Door Sensor Switch": Command.getDoorSensorSwitch},
+    {"Get Door Sensor State": Command.getDoorSensorState},
+    {"Set Hotel Card Sector": Command.setHotelCardSector},
+    {"Set Hotel Data": Command.setHotelData}
   ];
 
   String note =
       'Note: You need to reset the lock befor pop current page,otherwise the lock will can\'t be initialized again';
 
   String lockData;
+  String lockMac;
   String addCardNumber;
   String addFingerprintNumber;
   BuildContext _context;
 
-  _LockPageState(String lockData) {
+  _LockPageState(String lockData, String lockMac) {
     super.initState();
     this.lockData = lockData;
+    this.lockMac = lockMac;
   }
 
   void _showLoading(String text) {
@@ -118,7 +146,6 @@ class _LockPageState extends State<LockPage> {
   void dispose() {
     //You need to reset lock, otherwise the lock will can't be initialized again
     TTLock.resetLock(lockData, () {}, (errorCode, errorMsg) {});
-    ProgressHud.of(_context).dismiss();
     super.dispose();
   }
 
@@ -363,8 +390,12 @@ class _LockPageState extends State<LockPage> {
         break;
 
       case Command.addPassageMode:
-        TTLock.addPassageMode(
-            TTPassageModeType.weekly, [1, 2], null, 0, 23 * 60, lockData, () {
+        int startTime = 8 * 60; //8:00 am
+        int endTime = 17 * 60; //17:00 pm
+        List<int> weekly = [1, 2]; // [Monday，Tuesday]
+
+        TTLock.addPassageMode(TTPassageModeType.weekly, weekly, null, startTime,
+            endTime, lockData, () {
           _showSuccessAndDismiss("Success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
@@ -377,7 +408,82 @@ class _LockPageState extends State<LockPage> {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
         break;
-
+      case Command.activateLiftFloors:
+        TTLock.activateLift("1,2,3", lockData,
+            (lockTime, electricQuantity, uniqueId) {
+          _showSuccessAndDismiss(
+              "Active lift florrs success lockTime:$lockTime electricQuantity:$electricQuantity uniqueId:$uniqueId");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+      case Command.setLiftControlableFloors:
+        TTLock.setLiftControlable("3", lockData, () {
+          _showSuccessAndDismiss("Success");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+      case Command.setLiftWorkMode:
+        TTLock.setLiftWorkMode(TTLiftWorkActivateType.allFloors, lockData, () {
+          _showSuccessAndDismiss("Success");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+      case Command.setPowerSaverWorkMode:
+        TTLock.setPowerSaverWorkMode(TTPowerSaverWorkType.allCards, lockData,
+            () {
+          _showSuccessAndDismiss("Success");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+      case Command.setPowerSaverControlable:
+        TTLock.setPowerSaverControlable(this.lockMac, lockData, () {
+          _showSuccessAndDismiss("Success");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+      case Command.setDoorSensorSwitch:
+        TTLock.setDoorSensorLockingSwitchState(true, lockData, () {
+          _showSuccessAndDismiss("Success");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+      case Command.getDoorSensorSwitch:
+        TTLock.getDoorSensorLockingSwitchState(lockData, (isOn) {
+          _showSuccessAndDismiss(isOn.toString());
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+      case Command.getDoorSensorState:
+        TTLock.getDoorSensorState(lockData, (isOn) {
+          _showSuccessAndDismiss(isOn.toString());
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+      case Command.setHotelCardSector:
+        TTLock.setHotelCardSector("1,4", lockData, () {
+          _showSuccessAndDismiss("Success");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+      case Command.setHotelData:
+        String hotelData = "";
+        int building = 0;
+        int floor = 0;
+        TTLock.setHotel(hotelData, building, floor, lockData, () {
+          _showSuccessAndDismiss("Success");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
       default:
     }
   }

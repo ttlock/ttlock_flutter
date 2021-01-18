@@ -79,7 +79,32 @@
 #define command_disconnect_gateway @"disconnectGateway"
 #define command_get_surround_wifi @"getSurroundWifi"
 #define command_init_gateway @"initGateway"
+#define command_upgrade_gateway @"upgradeGateway"
 
+
+#pragma mark - 梯控
+#define command_active_lift_floors @"activateLiftFloors"
+#define command_set_lift_controlable_floors @"setLiftControlableFloors"
+#define command_set_lift_work_mode @"setLiftWorkMode"
+
+#pragma mark - 取电开关
+#define command_set_power_saver_work_mode @"setPowerSaverWorkMode"
+#define command_set_power_saver_controlable @"setPowerSaverControlable"
+
+#pragma mark - NB锁
+#define command_set_nb_awake_modes @"setNBAwakeModes"
+#define command_get_nb_awake_modes @"getNBAwakeModes"
+#define command_set_nb_awake_times @"setNBAwakeTimes"
+#define command_get_nb_awake_times @"getNBAwakeTimes"
+
+#pragma mark - 门禁
+#define command_set_door_sensor_switch @"setDoorSensorSwitch"
+#define command_get_door_sensor_switch @"getDoorSensorSwitch"
+#define command_get_door_sensor_state @"getDoorSensorState"
+
+#pragma mark - 酒店锁
+#define command_set_hotel_card_sector @"setHotelCardSector"
+#define command_set_hotel_info @"setHotelInfo"
 
 
 

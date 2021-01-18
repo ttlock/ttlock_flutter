@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:bmprogresshud/progresshud.dart';
 import 'scan_page.dart';
+import 'config.dart';
 
 class HomePage extends StatefulWidget {
   HomePage() : super();
@@ -9,16 +10,16 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // BuildContext _context;
+  BuildContext _context;
 
-  // void _startScanGateway() {
-  //   if (Config.ttlockUid == 0 || Config.ttlockLoginPassword.length == 0) {
-  //     String text = 'Please config the ttlockUid and the ttlockLoginPassword';
-  //     ProgressHud.of(_context).showAndDismiss(ProgressHudType.error, text);
-  //     return;
-  //   }
-  //   _startScan(ScanType.gateway);
-  // }
+  void _startScanGateway() {
+    if (Config.ttlockUid == 0 || Config.ttlockLoginPassword.length == 0) {
+      String text = 'Please config the ttlockUid and the ttlockLoginPassword';
+      ProgressHud.of(_context).showAndDismiss(ProgressHudType.error, text);
+      return;
+    }
+    _startScan(ScanType.gateway);
+  }
 
   void _startScanLock() {
     _startScan(ScanType.lock);
@@ -39,10 +40,10 @@ class _HomePageState extends State<HomePage> {
         child: Text('Lock', style: TextStyle(fontWeight: FontWeight.w600)),
         onPressed: _startScanLock,
       ),
-      // RaisedButton(
-      //   child: Text('Gateway', style: TextStyle(fontWeight: FontWeight.w600)),
-      //   onPressed: _startScanGateway,
-      // )
+      RaisedButton(
+        child: Text('Gateway', style: TextStyle(fontWeight: FontWeight.w600)),
+        onPressed: _startScanGateway,
+      )
     ]);
   }
 
@@ -55,7 +56,7 @@ class _HomePageState extends State<HomePage> {
         body: Material(child: ProgressHud(
           child: Center(
             child: Builder(builder: (context) {
-              // _context = context;
+              _context = context;
               return getChild();
             }),
           ),

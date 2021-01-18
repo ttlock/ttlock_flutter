@@ -300,9 +300,9 @@ typedef NS_ENUM(NSInteger, ResultState) {
         
     }else if ([command isEqualToString:command_modify_admin_passcode]) {
         [TTLock modifyAdminPasscode:lockModel.adminPasscode lockData:lockModel.lockData success:^(NSString *lockData) {
-            TtlockModel *data = [TtlockModel new];
-            data.lockData = lockData;
-            [weakSelf successCallbackCommand:command data:data];
+                    TtlockModel *data = [TtlockModel new];
+                    data.lockData = lockData;
+                    [weakSelf successCallbackCommand:command data:data];
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
@@ -317,7 +317,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
     }else if ([command isEqualToString:command_get_lock_time]) {
         [TTLock getLockTimeWithLockData:lockModel.lockData success:^(long long lockTimestamp) {
             TtlockModel *data = [TtlockModel new];
-            data.lockTime = @(lockTimestamp);
+            data.timestamp = @(lockTimestamp);
             [weakSelf successCallbackCommand:command data:data];
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
@@ -504,6 +504,8 @@ typedef NS_ENUM(NSInteger, ResultState) {
         dict[@"gatewayName"] = lockModel.gatewayName;
         dict[@"uid"] = lockModel.ttlockUid;
         dict[@"userPwd"] = lockModel.ttlockLoginPassword;
+        dict[@"serverAddress"] = lockModel.serverIp;
+        dict[@"portNumber"] = lockModel.serverPort;
         [TTGateway initializeGatewayWithInfoDic:dict block:^(TTSystemInfoModel *systemInfoModel, TTGatewayStatus status) {
              if (status == TTGatewaySuccess) {
                  NSMutableDictionary *resultDict = @{}.mutableCopy;
@@ -515,6 +517,15 @@ typedef NS_ENUM(NSInteger, ResultState) {
                 NSInteger errorCode = [self getTTGatewayErrorCode:status];
                 [weakSelf errorCallbackCommand:command code:errorCode details:nil];
              }
+        }];
+    }else if ([command isEqualToString:command_upgrade_gateway]) {
+        [TTGateway upgradeGatewayWithGatewayMac:lockModel.mac block:^(TTGatewayStatus status) {
+            if (status == TTGatewaySuccess) {
+                [weakSelf successCallbackCommand:command data:nil];
+            }else{
+               NSInteger errorCode = [self getTTGatewayErrorCode:status];
+               [weakSelf errorCallbackCommand:command code:errorCode details:nil];
+            }
         }];
     }else if ([command isEqualToString:command_function_support]) {
         NSInteger supportFunction = lockModel.supportFunction.integerValue;
@@ -532,6 +543,114 @@ typedef NS_ENUM(NSInteger, ResultState) {
         TtlockModel *data = [TtlockModel new];
         data.isSupport = @(isSupport);
         [weakSelf successCallbackCommand:command data:data];
+    }
+    
+    else if ([command isEqualToString:command_active_lift_floors]) {
+        [TTLock activateLiftFloors:lockModel.floors lockData:lockModel.lockData success:^(long long lockTime, NSInteger electricQuantity, long long uniqueId) {
+            TtlockModel *data = [TtlockModel new];
+            data.lockTime = @(lockTime);
+            data.electricQuantity = @(electricQuantity);
+            data.uniqueId = @(uniqueId);
+            [weakSelf successCallbackCommand:command data:data];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }else if ([command isEqualToString:command_set_lift_controlable_floors]) {
+        [TTLock setLiftControlableFloors:lockModel.floors lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }else if ([command isEqualToString:command_set_lift_work_mode]) {
+        [TTLock setLiftWorkMode:lockModel.liftWorkActiveType.intValue lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }else if ([command isEqualToString:command_set_power_saver_work_mode]) {
+        TTPowerSaverWorkMode mode = lockModel.powerSaverType.intValue;
+        [TTLock setPowerSaverWorkMode:mode lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }else if ([command isEqualToString:command_set_power_saver_controlable]) {
+        [TTLock setPowerSaverControlableLockWithLockMac:lockModel.lockMac lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }else if ([command isEqualToString:command_set_nb_awake_modes]) {
+        [TTLock setNBAwakeModes:lockModel.nbAwakeModes lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+        
+    }else if ([command isEqualToString:command_get_nb_awake_modes]) {
+        [TTLock getNBAwakeModesWithLockData:lockModel.lockData success:^(NSArray<NSNumber *> *awakeModes) {
+            TtlockModel *data = [TtlockModel new];
+            data.nbAwakeModes = awakeModes;
+            [weakSelf successCallbackCommand:command data:data];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }else if ([command isEqualToString:command_set_nb_awake_times]) {
+        NSMutableArray *awakeTimeArray = @[].mutableCopy;
+        for (NSDictionary *dict in lockModel.nbAwakeTimeList) {
+            NSMutableDictionary *nbAwakeTimeDict = dict.mutableCopy;
+            nbAwakeTimeDict[@"type"] = @([nbAwakeTimeDict[@"type"] intValue] + 1);
+            [awakeTimeArray addObject:nbAwakeTimeDict];
+        }
+        [TTLock setNBAwakeTimes:awakeTimeArray lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+        
+    }else if ([command isEqualToString:command_get_nb_awake_times]) {
+        [TTLock getNBAwakeTimesWithLockData:lockModel.lockData success:^(NSArray<NSDictionary *> *awakeTimes) {
+            TtlockModel *data = [TtlockModel new];
+            data.nbAwakeTimeList = awakeTimes;
+            [weakSelf successCallbackCommand:command data:data];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }else if ([command isEqualToString:command_set_door_sensor_switch]) {
+//        [TTLock setDoorSensorLockingSwitchOn:lockModel.isOn.boolValue lockData:lockModel.lockData success:^{
+//            [weakSelf successCallbackCommand:command data:nil];
+//        } failure:^(TTError errorCode, NSString *errorMsg) {
+//            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+//        }];
+    }else if ([command isEqualToString:command_get_door_sensor_switch]) {
+//        [TTLock getDoorSensorLockingSwitchStateWithLockData:lockModel.lockData success:^(BOOL isOn) {
+//            TtlockModel *data = [TtlockModel new];
+//            data.isOn = @(isOn);
+//            [weakSelf successCallbackCommand:command data:data];
+//        } failure:^(TTError errorCode, NSString *errorMsg) {
+//            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+//        }];
+    }else if ([command isEqualToString:command_get_door_sensor_state]) {
+//        [TTLock getDoorSensorStateWithLockData:lockModel.lockData success:^(BOOL isOn) {
+//            TtlockModel *data = [TtlockModel new];
+//            data.isOn = @(isOn);
+//            [weakSelf successCallbackCommand:command data:data];
+//        } failure:^(TTError errorCode, NSString *errorMsg) {
+//            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+//        }];
+    }else if ([command isEqualToString:command_set_hotel_info]) {
+        [TTLock setHotelDataWithHotelInfo:lockModel.hotelData buildingNumber:lockModel.building.intValue floorNumber:lockModel.floor.intValue lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+        
+    }else if ([command isEqualToString:command_set_hotel_card_sector]) {
+        [TTLock setHotelCardSector:lockModel.sector lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
     }
     
 }
@@ -639,7 +758,6 @@ typedef NS_ENUM(NSInteger, ResultState) {
         return @(code.integerValue - 1);
     }
     return code;
-
 }
 
 @end

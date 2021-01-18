@@ -35,6 +35,8 @@
 @property (nonatomic, strong) NSString *wifiPassword;
 @property (nonatomic, strong) NSString *ttlockLoginPassword;
 @property (nonatomic, strong) NSString *ttlockUid;
+@property (nonatomic, strong) NSString *serverIp;
+@property (nonatomic, strong) NSString *serverPort;
 @property (nonatomic, strong) NSString *gatewayName;
 @property (nonatomic, strong) NSNumber *supportFunction;
 @property (nonatomic, strong) NSNumber *isSupport;
@@ -88,6 +90,24 @@
 //管理员密码
 @property (nonatomic, strong) NSString *adminPasscode;
 @property (nonatomic, strong) NSString *erasePasscode;
+
+@property (nonatomic, strong) NSString *floors;
+
+@property (nonatomic, strong) NSNumber *liftWorkActiveType;
+
+@property (nonatomic, strong) NSNumber *powerSaverType;
+
+@property (nonatomic, strong) NSArray<NSNumber *> *nbAwakeModes;
+
+@property (nonatomic, strong) NSArray<NSDictionary *> *nbAwakeTimeList;
+
+@property (nonatomic, strong) NSString *hotelData;
+@property (nonatomic, strong) NSNumber *building;
+@property (nonatomic, strong) NSNumber *floor;
+
+@property (nonatomic, strong) NSString *sector;
+
+
 
 
 + (TtlockModel *)modelWithDict:(NSDictionary *)dict;

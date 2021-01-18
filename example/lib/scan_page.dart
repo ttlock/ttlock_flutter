@@ -62,6 +62,7 @@ class _ScanPageState extends State<ScanPage> {
         return LockPage(
           title: scanModel.lockName,
           lockData: lockData,
+          lockMac: scanModel.lockMac,
         );
       }));
     }, (errorCode, errorMsg) {
@@ -88,15 +89,24 @@ class _ScanPageState extends State<ScanPage> {
     _lockList = List();
     TTLock.startScanLock((scanModel) {
       bool contain = false;
+      bool initStateChanged = false;
       for (var model in _lockList) {
         if (scanModel.lockMac == model.lockMac) {
           contain = true;
+          initStateChanged = model.isInited != scanModel.isInited;
+          if (initStateChanged) {
+            model.isInited = scanModel.isInited;
+          }
           break;
         }
       }
-      if (!contain && !scanModel.isInited) {
+      if (!contain) {
+        _lockList.add(scanModel);
+      }
+      if (!contain || initStateChanged) {
         setState(() {
-          _lockList.add(scanModel);
+          _lockList.sort((model1, model2) =>
+              (model2.isInited ? 0 : 1) - (model1.isInited ? 0 : 1));
         });
       }
     });
@@ -155,23 +165,34 @@ class _ScanPageState extends State<ScanPage> {
                 itemBuilder: (context, index) {
                   String title;
                   String subtitle;
+                  Color textColor = Colors.black;
                   if (scanType == ScanType.lock) {
                     TTLockScanModel scanModel = _lockList[index];
                     title = 'Lock：${scanModel.lockName}';
-                    subtitle = 'click to init the lock';
+                    subtitle = scanModel.isInited
+                        ? 'lock has been inited'
+                        : 'click to init the lock';
+                    if (scanModel.isInited) {
+                      textColor = Colors.grey;
+                    }
                   } else {
                     TTGatewayScanModel scanModel = _gatewayList[index];
                     title = 'Gateway：${scanModel.gatewayName}';
                     subtitle = 'click to connect the gateway';
                   }
+
+                  TextStyle textStyle = new TextStyle(color: textColor);
+
                   return ListTile(
-                    title: Text(title),
-                    subtitle: Text(subtitle),
+                    title: Text(title, style: textStyle),
+                    subtitle: Text(subtitle, style: textStyle),
                     onTap: () {
                       if (scanType == ScanType.lock) {
                         TTLockScanModel scanModel = _lockList[index];
-                        TTLock.stopScanLock();
-                        _initLock(scanModel);
+                        if (!scanModel.isInited) {
+                          TTLock.stopScanLock();
+                          _initLock(scanModel);
+                        }
                       } else {
                         TTGatewayScanModel scanModel = _gatewayList[index];
                         TTGateway.stopScan();
