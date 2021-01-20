@@ -1,10 +1,18 @@
 package com.ttlock.ttlock_flutter.model;
 
+import android.text.TextUtils;
+
+import com.google.gson.reflect.TypeToken;
 import com.ttlock.bl.sdk.constant.ControlAction;
+import com.ttlock.bl.sdk.entity.NBAwakeMode;
+import com.ttlock.bl.sdk.entity.NBAwakeTime;
+import com.ttlock.bl.sdk.util.GsonUtil;
+import com.ttlock.bl.sdk.util.LogUtil;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,7 +43,6 @@ public class TtlockModel {
     public ArrayList<Integer> monthly;
 
 
-
 /*************      返回值     ****************/
 
 
@@ -64,24 +71,23 @@ public class TtlockModel {
 
 
     public String passcodeInfo;
-//添加指纹时候 剩余手指按压次数
+    //添加指纹时候 剩余手指按压次数
     public int currentCount;
-//添加指纹时候 剩余手指按压次数
+    //添加指纹时候 剩余手指按压次数
     public int totalCount;
-//指纹码
+    //指纹码
     public String fingerprintNumber;
     public String cardNumber;
 //    @property (nonatomic, strong) NSString *passageModes;
 
-//最大可设置自动闭锁时间
-
+    //最大可设置自动闭锁时间
     public int maxTime;
-//最小可设置自动闭锁时间
+    //最小可设置自动闭锁时间
     public int minTime;
-//当前自动闭锁时间
+    //当前自动闭锁时间
     public int currentTime;
 
-//管理员密码
+    //管理员密码
     public String adminPasscode;
     public String erasePasscode;
 
@@ -97,10 +103,20 @@ public class TtlockModel {
     public boolean isSupport;
     public int supportFunction;
 
+
+    public String floors;
+    public int liftWorkActiveType;
+    public int powerSaverType;
+    public String nbAwakeModes;
+    public String hotelData;
+    public int building;
+    public int floor;
+    public String sector;
+    public String nbAwakeTimeList;
+
     @Override
     public String toString() {
         return "TtlockModel{" +
-                "lockData='" + lockData + '\'' +
                 ", controlAction=" + controlAction +
                 ", passcode='" + passcode + '\'' +
                 ", passcodeOrigin='" + passcodeOrigin + '\'' +
@@ -110,6 +126,8 @@ public class TtlockModel {
                 ", logType=" + logType +
                 ", records='" + records + '\'' +
                 ", passageModeType=" + passageModeType +
+                ", weekly=" + weekly +
+                ", monthly=" + monthly +
                 ", state=" + state +
                 ", scanState=" + scanState +
                 ", specialValue=" + specialValue +
@@ -129,23 +147,39 @@ public class TtlockModel {
                 ", passcodeInfo='" + passcodeInfo + '\'' +
                 ", currentCount=" + currentCount +
                 ", totalCount=" + totalCount +
-                ", fingerprintNumber=" + fingerprintNumber +
-                ", cardNumber=" + cardNumber +
+                ", fingerprintNumber='" + fingerprintNumber + '\'' +
+                ", cardNumber='" + cardNumber + '\'' +
                 ", maxTime=" + maxTime +
                 ", minTime=" + minTime +
                 ", currentTime=" + currentTime +
                 ", adminPasscode='" + adminPasscode + '\'' +
                 ", erasePasscode='" + erasePasscode + '\'' +
+                ", lockConfig=" + lockConfig +
+                ", feature=" + feature +
+                ", isSupportFeature=" + isSupportFeature +
+                ", cycleJsonList='" + cycleJsonList + '\'' +
+                ", isSupport=" + isSupport +
+                ", supportFunction=" + supportFunction +
+                ", floors='" + floors + '\'' +
+                ", liftWorkActiveType=" + liftWorkActiveType +
+                ", powerSaverType=" + powerSaverType +
+                ", nbAwakeModes='" + nbAwakeModes + '\'' +
+                ", hotelData='" + hotelData + '\'' +
+                ", building=" + building +
+                ", floor=" + floor +
+                ", sector='" + sector + '\'' +
+                ", nbAwakeTimeList='" + nbAwakeTimeList + '\'' +
                 '}';
     }
 
     public TtlockModel toObject(Map<String, Object> params) {
         Field[] fields = this.getClass().getDeclaredFields();
         try {
-            for(int i = 0 ; i < fields.length ; i++) {
+            for (int i = 0; i < fields.length; i++) {
                 //设置是否允许访问，不是修改原来的访问权限修饰词。
                 fields[i].setAccessible(true);
                 if (params.get(fields[i].getName()) != null) {
+                    LogUtil.d(fields[i].getName() + ":" + params.get(fields[i].getName()));
                     fields[i].set(this, params.get(fields[i].getName()));
                 }
             }
@@ -159,7 +193,7 @@ public class TtlockModel {
         HashMap<String, Object> hashMap = new HashMap<>();
         Field[] fields = this.getClass().getDeclaredFields();
         try {
-            for(int i = 0 ; i < fields.length ; i++) {
+            for (int i = 0; i < fields.length; i++) {
                 //设置是否允许访问，不是修改原来的访问权限修饰词。
                 fields[i].setAccessible(true);
                 hashMap.put(fields[i].getName(), fields[i].get(this));
@@ -179,6 +213,76 @@ public class TtlockModel {
                 return ControlAction.LOCK;
         }
         return ControlAction.UNLOCK;
+    }
+
+    public List<Integer> getFloorList() {
+        List<Integer> floorList = new ArrayList<>();
+        try {
+            if (!TextUtils.isEmpty(floors)) {
+                String[] floorArray = floors.split(",");
+                for (int i=0;i<floorArray.length;i++) {
+                    floorList.add(Integer.valueOf(floorArray[i]));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return floorList;
+    }
+
+    public List<NBAwakeMode> getNbAwakeModeList() {
+        List<NBAwakeMode> nbAwakeModeList = new ArrayList<>();
+        if (!TextUtils.isEmpty(nbAwakeModes)) {
+            try {
+                nbAwakeModeList = GsonUtil.toObject(nbAwakeModes, new TypeToken<ArrayList<NBAwakeMode>>(){});
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return nbAwakeModeList;
+    }
+
+    public void setNbAwakeModeList(List<NBAwakeMode> nbAwakeModeList) {
+        List<Integer> awakeModeList = new ArrayList<>();
+        if (nbAwakeModeList != null) {
+            for (NBAwakeMode nbAwakeMode : nbAwakeModeList) {
+                TTNbAwakeModeConverter ttNbAwakeModeConverter = TTNbAwakeModeConverter.native2Flutter(nbAwakeMode);
+                awakeModeList.add(ttNbAwakeModeConverter.ordinal());
+            }
+        }
+        this.nbAwakeModes = GsonUtil.toJson(awakeModeList);
+    }
+
+    public List<NBAwakeTime> getNbAwakeTimeList() {
+        List<NBAwakeTime> nbAwakeTimes = new ArrayList<>();
+        if (!TextUtils.isEmpty(nbAwakeTimeList)) {
+            try {
+                List<TTNbAwakeTimeModel> ttNbAwakeTimeModelList = GsonUtil.toObject(nbAwakeTimeList, new TypeToken<List<TTNbAwakeTimeModel>>(){});
+                for (TTNbAwakeTimeModel ttNbAwakeTimeModel : ttNbAwakeTimeModelList) {
+                    NBAwakeTime nbAwakeTime = new NBAwakeTime();
+                    nbAwakeTime.setMinutes(ttNbAwakeTimeModel.getMinutes());
+                    nbAwakeTime.setNbAwakeTimeType(TTNbAwakeTimeType.flutter2Native(ttNbAwakeTimeModel.getType()));
+                    if (nbAwakeTime.getNbAwakeTimeType() != null) {
+                        nbAwakeTimes.add(nbAwakeTime);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return nbAwakeTimes;
+    }
+
+    public void setNbAwakeTimeList(List<NBAwakeTime> nbAwakeTimeList) {
+        List<TTNbAwakeTimeModel> ttNbAwakeTimeModelList = new ArrayList<>();
+        if (nbAwakeTimeList != null) {
+            for (NBAwakeTime nbAwakeTime : nbAwakeTimeList) {
+                TTNbAwakeTimeModel ttNbAwakeTimeModel = new TTNbAwakeTimeModel();
+                ttNbAwakeTimeModel.setMinutes(nbAwakeTime.getMinutes());
+                ttNbAwakeTimeModel.setType(TTNbAwakeTimeType.native2Flutter(nbAwakeTime.getNbAwakeTimeType()));
+            }
+        }
+        this.nbAwakeTimeList = GsonUtil.toJson(ttNbAwakeTimeModelList);
     }
 
 }

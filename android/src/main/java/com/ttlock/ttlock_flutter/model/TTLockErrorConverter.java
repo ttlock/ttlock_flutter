@@ -13,9 +13,10 @@ public class TTLockErrorConverter {
     public static final int bluetoothOff = 32;
     public static final int bluetoothConnectTimeount = 33;
     public static final int bluetoothDisconnection = 34;
-    public static final int lockIsBusy = 35;
+    
     public static final int invalidLockData = 36;
     public static final int invalidParameter = 37;
+    public static final int lockIsBusy = 38;
 
     public static int native2Flutter(LockError error) {
         int errorCode = error.getIntErrorCode();

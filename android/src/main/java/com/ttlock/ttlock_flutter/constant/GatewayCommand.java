@@ -13,6 +13,7 @@ public class GatewayCommand {
     public static final String COMMAND_DISCONNECT_GATEWAY = "disconnectGateway";
     public static final String COMMAND_GET_SURROUND_WIFI = "getSurroundWifi";
     public static final String COMMAND_INIT_GATEWAY = "initGateway";
+    public static final String COMMAND_UPGRADE_GATEWAY = "upgradeGateway";
 
     public static boolean isGatewayCommand(String command) {
         Field[] fields = GatewayCommand.class.getDeclaredFields();

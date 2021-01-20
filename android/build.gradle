@@ -16,6 +16,9 @@ rootProject.allprojects {
     repositories {
         google()
         jcenter()
+        flatDir {
+            dirs 'libs'
+        }
     }
 }
 
@@ -30,24 +33,10 @@ android {
     lintOptions {
         disable 'InvalidPackage'
     }
-
-    sourceSets {
-        main {
-            jniLibs.srcDirs = ['libs']
-        }
-    }
-
-    //添加本地仓库，并把libs目录作为仓库地址
-    repositories {
-        flatDir {
-            dirs 'libs'
-        }
-    }
-
 }
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-//    implementation 'com.tongtonglock:ttlock:3.1.0'
+//    implementation 'com.tongtonglock:ttlock:3.1.2'
     implementation 'com.google.code.gson:gson:2.6.2'
     implementation(name: 'TTLockOnPremise', ext: 'aar')
 }

@@ -14,6 +14,8 @@ public class GatewayModel {
     public String gatewayName;
     public int ttlockUid;
     public String ttlockLoginPassword;
+    public String serverIp;
+    public String serverPort;
 
     public GatewayModel toObject(Map<String, Object> params) {
         if (params == null) {
