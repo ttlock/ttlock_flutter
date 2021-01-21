@@ -23,19 +23,9 @@ class _WifiPageState extends State<WifiPage> {
     // ProgressHud.of(_context).showLoading();
     TTGateway.getNearbyWifi((finished, wifiList) {
       // ProgressHud.of(_context).dismiss();
-      for (var map1 in wifiList) {
-        bool contain = false;
-        for (var map2 in _wifiList) {
-          if (map1['wifi'] == map2['wifi']) {
-            contain = true;
-          }
-        }
-        if (!contain) {
-          setState(() {
-            _wifiList.add(map1);
-          });
-        }
-      }
+      setState(() {
+        _wifiList = wifiList;
+      });
     }, (errorCode, errorMsg) {});
   }
 
