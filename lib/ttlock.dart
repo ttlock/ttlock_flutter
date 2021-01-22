@@ -641,7 +641,7 @@ class TTLock {
         fail: failedCallback);
   }
 
-  static void setPowerSaverControlable(String lockMac, String lockData,
+  static void setPowerSaverControlableLock(String lockMac, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     Map map = Map();
 

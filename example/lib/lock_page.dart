@@ -49,7 +49,7 @@ enum Command {
   setLiftWorkMode,
 
   setPowerSaverWorkMode,
-  setPowerSaverControlable,
+  setPowerSaverControlableLock,
 
   setDoorSensorSwitch,
   getDoorSensorSwitch,
@@ -106,7 +106,7 @@ class _LockPageState extends State<LockPage> {
     {"Set Lift Controlable Floors": Command.setLiftControlableFloors},
     {"Set Lift Work Mode": Command.setLiftWorkMode},
     {"Set Power Saver Work Mode": Command.setPowerSaverWorkMode},
-    {"Set Power Saver Controlable": Command.setPowerSaverControlable},
+    {"Set Power Saver Controlable": Command.setPowerSaverControlableLock},
     {"Set Door Sensor Switch": Command.setDoorSensorSwitch},
     {"Get Door Sensor Switch": Command.getDoorSensorSwitch},
     {"Get Door Sensor State": Command.getDoorSensorState},
@@ -464,8 +464,8 @@ class _LockPageState extends State<LockPage> {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
         break;
-      case Command.setPowerSaverControlable:
-        TTLock.setPowerSaverControlable(this.lockMac, lockData, () {
+      case Command.setPowerSaverControlableLock:
+        TTLock.setPowerSaverControlableLock(this.lockMac, lockData, () {
           _showSuccessAndDismiss("Success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
