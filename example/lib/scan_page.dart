@@ -36,8 +36,13 @@ class _ScanPageState extends State<ScanPage> {
   List<TTGatewayScanModel> _gatewayList;
 
   @override
-  void initState() {
-    super.initState();
+  void dispose() {
+    if (scanType == ScanType.lock) {
+      TTLock.stopScanLock();
+    } else {
+      TTGateway.stopScan();
+    }
+    super.dispose();
   }
 
   void _showLoading() {
