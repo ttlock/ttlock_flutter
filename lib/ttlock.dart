@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'dart:convert' as convert;
 
-import 'package:ttlock_premise_flutter/ttgateway.dart';
+import 'package:ttlock_flutter/ttgateway.dart';
 
 class TTLock {
   static bool isOnPremise = true;
