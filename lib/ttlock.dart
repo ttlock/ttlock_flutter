@@ -800,7 +800,6 @@ class TTLock {
       String key = map.keys.first;
 
       if (key.compareTo(command) == 0) {
-        print(map);
         callBack = map[command][CALLBACK_SUCCESS];
         index = i;
         break;
