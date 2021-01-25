@@ -268,8 +268,7 @@ class _LockPageState extends State<LockPage> {
         TTLock.supportFunction(TTLockFuction.managePasscode, lockData,
             (isSupport) {
           if (isSupport) {
-            TTLock.modifyPasscode("6666", "7777", startDate, endDate, lockData,
-                () {
+            TTLock.deletePasscode("7777", lockData, () {
               _showSuccessAndDismiss("Success");
             }, (errorCode, errorMsg) {
               _showErrorAndDismiss(errorCode, errorMsg);
@@ -279,11 +278,7 @@ class _LockPageState extends State<LockPage> {
                 TTLockError.fail, 'Not support modify passcode');
           }
         });
-        TTLock.deletePasscode("7777", lockData, () {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
+
         break;
 
       case Command.resetPasscode:
