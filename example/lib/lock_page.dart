@@ -106,7 +106,7 @@ class _LockPageState extends State<LockPage> {
     {"Set Lift Controlable Floors": Command.setLiftControlableFloors},
     {"Set Lift Work Mode": Command.setLiftWorkMode},
     {"Set Power Saver Work Mode": Command.setPowerSaverWorkMode},
-    {"Set Power Saver Controlable Lock": Command.setPowerSaverControlablLock},
+    {"Set Power Saver Controlable Lock": Command.setPowerSaverControlableLock},
     {"Set Door Sensor Switch": Command.setDoorSensorSwitch},
     {"Get Door Sensor Switch": Command.getDoorSensorSwitch},
     {"Get Door Sensor State": Command.getDoorSensorState},
