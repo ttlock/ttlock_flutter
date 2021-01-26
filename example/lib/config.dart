@@ -6,9 +6,9 @@ class Config {
   // custom gateway name
   static String gatewayName = 'My gateway 1';
 
-  // your gateway server ip dress. For example  gatewayServerIp ="192.168.0.0"
+  // your gateway server ip dress. For example  gatewayServerIp ="121.196.45.100"
   static String gatewayServerIp = '192.168.8.33';
 
-  // your gateway server port. For example gatewayServerPort = "8888"
+  // your gateway server port. For example gatewayServerPort = "2999"
   static String gatewayServerPort = '2999';
 }
