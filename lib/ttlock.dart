@@ -809,16 +809,17 @@ class TTLock {
     bool reomveCommand = true;
     if (index == -1) {
       reomveCommand = false;
-    }
-    if (command == COMMAND_START_SCAN_LOCK) {
-      reomveCommand = false;
-    }
-    if (command == TTGateway.COMMAND_START_SCAN_GATEWAY) {
-      reomveCommand = false;
-    }
-    if (command == TTGateway.COMMAND_GET_SURROUND_WIFI &&
-        data[TTResponse.finished] == false) {
-      reomveCommand = false;
+    } else {
+      if (command == COMMAND_START_SCAN_LOCK) {
+        reomveCommand = false;
+      }
+      if (command == TTGateway.COMMAND_START_SCAN_GATEWAY) {
+        reomveCommand = false;
+      }
+      if (command == TTGateway.COMMAND_GET_SURROUND_WIFI &&
+          data[TTResponse.finished] == false) {
+        reomveCommand = false;
+      }
     }
     if (reomveCommand) {
       _commandQueue.removeAt(index);
