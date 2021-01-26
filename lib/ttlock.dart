@@ -793,21 +793,36 @@ class TTLock {
   }
 
   static void _successCallback(String command, Map data) {
+    //获取队列里面能匹配到最前一个回调指令
     Object callBack;
     int index = -1;
     for (var i = 0; i < _commandQueue.length; i++) {
       Map map = _commandQueue[i];
       String key = map.keys.first;
-
       if (key.compareTo(command) == 0) {
         callBack = map[command][CALLBACK_SUCCESS];
         index = i;
         break;
       }
     }
-    if (index > -1 &&
-        command != COMMAND_START_SCAN_LOCK &&
-        command != TTGateway.COMMAND_START_SCAN_GATEWAY) {
+    //如果是 网关扫描、锁扫描、网关获取附近wifi 需要特殊处理
+    bool reomveCommand = true;
+    if (index == -1) {
+      reomveCommand = false;
+    } else {
+      if (command == COMMAND_START_SCAN_LOCK) {
+        reomveCommand = false;
+      }
+      if (command == TTGateway.COMMAND_START_SCAN_GATEWAY) {
+        reomveCommand = false;
+      }
+      if (command == TTGateway.COMMAND_GET_SURROUND_WIFI &&
+          data[TTResponse.finished] == false) {
+        reomveCommand = false;
+      }
+    }
+
+    if (reomveCommand) {
       _commandQueue.removeAt(index);
     }
 
@@ -944,9 +959,6 @@ class TTLock {
         bool finished = data[TTResponse.finished];
         List wifiList = data[TTResponse.wifiList];
         getAroundWifiCallback(finished, wifiList);
-        if (finished == false) {
-          return;
-        }
         break;
 
       case TTGateway.COMMAND_INIT_GATEWAY:
