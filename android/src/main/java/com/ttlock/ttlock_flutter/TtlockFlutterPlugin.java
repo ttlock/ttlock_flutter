@@ -1347,7 +1347,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   public void getBluetoothState(TtlockModel ttlockModel) {
     //4-off 5-on
     ttlockModel.state = TTLockClient.getDefault().isBLEEnabled(activity) ? 5 : 4;
-    successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
+    successCallbackCommand(TTLockCommand.COMMAND_GET_BLUETOOTH_STATE, ttlockModel.toMap());
   }
 
 
