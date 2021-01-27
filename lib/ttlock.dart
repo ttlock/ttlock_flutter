@@ -1352,7 +1352,7 @@ enum TTLockFuction {
   fingerprint,
   wristband,
   autoLock,
-  deletePasscode,
+  deletePasscode, //5
   // 6
   managePasscode,
   locking,
@@ -1363,7 +1363,7 @@ enum TTLockFuction {
   doorSensor,
   unlockSwicth,
   audioSwitch,
-  nbIoT,
+  nbIoT, //15
   //17
   getAdminPasscode,
   hotelCard,
@@ -1377,9 +1377,17 @@ enum TTLockFuction {
   identityCard,
   tamperAlert,
   resetButton,
-  privacyLock,
+  privacyLock, //28
   //31
-  deadLock,
+  deadLock, //29
   //33
-  cyclicCardOrFingerprint
+  cyclicCardOrFingerprint, //30
+  //35
+  //36
+  fingerVein,
+  ble5G,
+  nbAwake,
+  recoverCyclePasscode,
+  wirelessKeyFob,
+  getAccessoryElectricQuantity,
 }

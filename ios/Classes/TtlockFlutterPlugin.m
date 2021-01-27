@@ -529,11 +529,16 @@ typedef NS_ENUM(NSInteger, ResultState) {
         }];
     }else if ([command isEqualToString:command_function_support]) {
         NSInteger supportFunction = lockModel.supportFunction.integerValue;
-        if (supportFunction > 28) {
+        
+        
+        
+        if (supportFunction > 30) {
+            supportFunction += 6;
+        }else if (supportFunction > 29) {
             supportFunction += 4;
-        }else if (supportFunction > 26) {
+        }else if (supportFunction > 28) {
             supportFunction += 3;
-        }else if (supportFunction > 16) {
+        }else if (supportFunction > 15) {
             supportFunction += 2;
         }else if (supportFunction > 5) {
             supportFunction += 1;
