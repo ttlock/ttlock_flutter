@@ -527,11 +527,16 @@ typedef NS_ENUM(NSInteger, ResultState) {
         }];
     }else if ([command isEqualToString:command_function_support]) {
         NSInteger supportFunction = lockModel.supportFunction.integerValue;
-        if (supportFunction > 28) {
+        
+        
+        
+        if (supportFunction > 30) {
+            supportFunction += 6;
+        }else if (supportFunction > 29) {
             supportFunction += 4;
-        }else if (supportFunction > 26) {
+        }else if (supportFunction > 28) {
             supportFunction += 3;
-        }else if (supportFunction > 16) {
+        }else if (supportFunction > 15) {
             supportFunction += 2;
         }else if (supportFunction > 5) {
             supportFunction += 1;
@@ -615,27 +620,27 @@ typedef NS_ENUM(NSInteger, ResultState) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
     }else if ([command isEqualToString:command_set_door_sensor_switch]) {
-        [TTLock setDoorSensorLockingSwitchOn:lockModel.isOn.boolValue lockData:lockModel.lockData success:^{
-            [weakSelf successCallbackCommand:command data:nil];
-        } failure:^(TTError errorCode, NSString *errorMsg) {
-            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
-        }];
+//        [TTLock setDoorSensorLockingSwitchOn:lockModel.isOn.boolValue lockData:lockModel.lockData success:^{
+//            [weakSelf successCallbackCommand:command data:nil];
+//        } failure:^(TTError errorCode, NSString *errorMsg) {
+//            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+//        }];
     }else if ([command isEqualToString:command_get_door_sensor_switch]) {
-        [TTLock getDoorSensorLockingSwitchStateWithLockData:lockModel.lockData success:^(BOOL isOn) {
-            TtlockModel *data = [TtlockModel new];
-            data.isOn = @(isOn);
-            [weakSelf successCallbackCommand:command data:data];
-        } failure:^(TTError errorCode, NSString *errorMsg) {
-            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
-        }];
+//        [TTLock getDoorSensorLockingSwitchStateWithLockData:lockModel.lockData success:^(BOOL isOn) {
+//            TtlockModel *data = [TtlockModel new];
+//            data.isOn = @(isOn);
+//            [weakSelf successCallbackCommand:command data:data];
+//        } failure:^(TTError errorCode, NSString *errorMsg) {
+//            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+//        }];
     }else if ([command isEqualToString:command_get_door_sensor_state]) {
-        [TTLock getDoorSensorStateWithLockData:lockModel.lockData success:^(BOOL isOn) {
-            TtlockModel *data = [TtlockModel new];
-            data.isOn = @(isOn);
-            [weakSelf successCallbackCommand:command data:data];
-        } failure:^(TTError errorCode, NSString *errorMsg) {
-            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
-        }];
+//        [TTLock getDoorSensorStateWithLockData:lockModel.lockData success:^(BOOL isOn) {
+//            TtlockModel *data = [TtlockModel new];
+//            data.isOn = @(isOn);
+//            [weakSelf successCallbackCommand:command data:data];
+//        } failure:^(TTError errorCode, NSString *errorMsg) {
+//            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+//        }];
     }else if ([command isEqualToString:command_set_hotel_info]) {
         [TTLock setHotelDataWithHotelInfo:lockModel.hotelData buildingNumber:lockModel.building.intValue floorNumber:lockModel.floor.intValue lockData:lockModel.lockData success:^{
             [weakSelf successCallbackCommand:command data:nil];

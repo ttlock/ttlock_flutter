@@ -44,9 +44,9 @@ class TTGateway {
   //   TTLock.invoke(COMMAND_UPGRADE_GATEWAY, map, callback, fail: failedCallback);
   // }
 
-  // static void disconnect(String mac, TTSuccessCallback callback) {
-  //   Map map = Map();
-  //   map["mac"] = mac;
-  //   TTLock.invoke(COMMAND_DISCONNECT_GATEWAY, map, callback);
-  // }
+  static void disconnect(String mac, TTSuccessCallback callback) {
+    Map map = Map();
+    map["mac"] = mac;
+    TTLock.invoke(COMMAND_DISCONNECT_GATEWAY, map, callback);
+  }
 }
