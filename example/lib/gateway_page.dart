@@ -38,11 +38,6 @@ class _GatewayPageState extends State<GatewayPage> {
     paramMap["gatewayName"] = Config.gatewayName;
     paramMap["ttlockUid"] = Config.ttlockUid;
     paramMap["ttlockLoginPassword"] = Config.ttlockLoginPassword;
-    if (Config.gatewayServerIp.isNotEmpty &&
-        Config.gatewayServerPort.isNotEmpty) {
-      paramMap["serverIp"] = Config.gatewayServerIp;
-      paramMap["serverPort"] = Config.gatewayServerPort;
-    }
 
     // test account.  ttlockUid = 17498, ttlockLoginPassword = "1111111"
     if (Config.ttlockUid == 17498) {
