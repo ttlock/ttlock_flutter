@@ -291,6 +291,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
   public void disconnectGateway() {//todo:
     GatewayClient.getDefault().disconnectGateway();
+    successCallbackCommand(GatewayCommand.COMMAND_DISCONNECT_GATEWAY, null);
   }
 
   public void gatewayUpgrade() {
