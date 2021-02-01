@@ -1,3 +1,6 @@
-## 0.0.1
+## 0.0.4
 
-* TODO: Describe initial release.
+* Fix bug set lock time
+* Fix bug lock is busy
+* Add some new APIs 
+
