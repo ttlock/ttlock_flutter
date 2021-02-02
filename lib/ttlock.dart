@@ -4,7 +4,7 @@ import 'dart:convert' as convert;
 import 'package:ttlock_flutter/ttgateway.dart';
 
 class TTLock {
-  static bool isOnPremise = true;
+  static bool isOnPremise = false;
 
   static MethodChannel _commandChannel =
       MethodChannel("com.ttlock/command/ttlock");
