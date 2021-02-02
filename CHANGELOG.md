@@ -1,6 +1,4 @@
-## 0.0.4
+## 0.0.5
 
-* Fix bug set lock time
-* Fix bug lock is busy
-* Add some new APIs 
+* Fix bug 
 
