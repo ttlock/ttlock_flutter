@@ -9,6 +9,6 @@ class Config {
   // your gateway server ip dress. For example  gatewayServerIp ="121.196.45.100"
   static String gatewayServerIp = '192.168.8.33';
 
-  // your gateway server port. For example gatewayServerPort = "2999"
-  static String gatewayServerPort = '2999';
+  // your gateway server port. For example gatewayServerPort = "2221"
+  static String gatewayServerPort = '2221';
 }

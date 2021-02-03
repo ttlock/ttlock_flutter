@@ -707,16 +707,16 @@ class TTLock {
   }
 
   static void setHotel(
-      String hotelData,
-      int building,
-      int floor,
+      String hotelInfo,
+      int buildingNumber,
+      int floorNumber,
       String lockData,
       TTSuccessCallback callback,
       TTFailedCallback failedCallback) {
     Map map = Map();
-    map[TTResponse.hotelData] = hotelData;
-    map[TTResponse.building] = building;
-    map[TTResponse.floor] = floor;
+    map[TTResponse.hotelInfo] = hotelInfo;
+    map[TTResponse.buildingNumber] = buildingNumber;
+    map[TTResponse.floorNumber] = floorNumber;
     map[TTResponse.lockData] = lockData;
     invoke(COMMAND_SET_HOTLE_INOF, map, callback, fail: failedCallback);
   }
@@ -1123,9 +1123,9 @@ class TTResponse {
   static const String nbAwakeTimeList = "nbAwakeTimeList";
   static const String minutes = "minutes";
   static const String type = "type";
-  static const String hotelData = "hotelData";
-  static const String building = "building";
-  static const String floor = "floor";
+  static const String hotelInfo = "hotelInfo";
+  static const String buildingNumber = "buildingNumber";
+  static const String floorNumber = "floorNumber";
   static const String sector = "sector";
 }
 
