@@ -49,7 +49,7 @@ enum Command {
   setLiftWorkMode,
 
   setPowerSaverWorkMode,
-  setPowerSaverControlable,
+  setPowerSaverControlableLock,
 
   setDoorSensorSwitch,
   getDoorSensorSwitch,
@@ -106,7 +106,7 @@ class _LockPageState extends State<LockPage> {
     {"Set Lift Controlable Floors": Command.setLiftControlableFloors},
     {"Set Lift Work Mode": Command.setLiftWorkMode},
     {"Set Power Saver Work Mode": Command.setPowerSaverWorkMode},
-    {"Set Power Saver Controlable": Command.setPowerSaverControlable},
+    {"Set Power Saver Controlable Lock": Command.setPowerSaverControlableLock},
     {"Set Door Sensor Switch": Command.setDoorSensorSwitch},
     {"Get Door Sensor Switch": Command.getDoorSensorSwitch},
     {"Get Door Sensor State": Command.getDoorSensorState},
@@ -150,8 +150,7 @@ class _LockPageState extends State<LockPage> {
   }
 
   void _click(Command command, BuildContext context) async {
-    ProgressHud.of(context).showLoading(text: '');
-
+    _showLoading('');
     int startDate = DateTime.now().millisecondsSinceEpoch;
     int endDate = startDate + 3600 * 24 * 30 * 1000;
 
@@ -229,19 +228,47 @@ class _LockPageState extends State<LockPage> {
         });
         break;
       case Command.customPasscode:
-        TTLock.createCustomPasscode("6666", startDate, endDate, lockData, () {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
+        TTLock.supportFunction(TTLockFuction.managePasscode, lockData,
+            (isSupport) {
+          // not support
+          if (!isSupport) {
+            _showErrorAndDismiss(
+                TTLockError.fail, "not support custom passcode");
+            return;
+          }
+
+          TTLock.createCustomPasscode("6666", startDate, endDate, lockData, () {
+            _showSuccessAndDismiss("Success");
+          }, (errorCode, errorMsg) {
+            _showErrorAndDismiss(errorCode, errorMsg);
+          });
         });
+
         break;
 
       case Command.modifyPasscode:
         TTLock.supportFunction(TTLockFuction.managePasscode, lockData,
             (isSupport) {
+          // not support
+          if (!isSupport) {
+            _showErrorAndDismiss(
+                TTLockError.fail, "Not support modify passcode");
+            return;
+          }
+          TTLock.modifyPasscode("6666", "7777", startDate, endDate, lockData,
+              () {
+            _showSuccessAndDismiss("Success");
+          }, (errorCode, errorMsg) {
+            _showErrorAndDismiss(errorCode, errorMsg);
+          });
+        });
+
+        break;
+      case Command.deletePasscode:
+        TTLock.supportFunction(TTLockFuction.managePasscode, lockData,
+            (isSupport) {
           if (isSupport) {
-            TTLock.modifyPasscode("6666", "7777", startDate, endDate, lockData,
-                () {
+            TTLock.deletePasscode("7777", lockData, () {
               _showSuccessAndDismiss("Success");
             }, (errorCode, errorMsg) {
               _showErrorAndDismiss(errorCode, errorMsg);
@@ -252,13 +279,6 @@ class _LockPageState extends State<LockPage> {
           }
         });
 
-        break;
-      case Command.deletePasscode:
-        TTLock.deletePasscode("7777", lockData, () {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
         break;
 
       case Command.resetPasscode:
@@ -439,8 +459,8 @@ class _LockPageState extends State<LockPage> {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
         break;
-      case Command.setPowerSaverControlable:
-        TTLock.setPowerSaverControlable(this.lockMac, lockData, () {
+      case Command.setPowerSaverControlableLock:
+        TTLock.setPowerSaverControlableLock(this.lockMac, lockData, () {
           _showSuccessAndDismiss("Success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);

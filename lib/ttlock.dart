@@ -4,9 +4,15 @@ import 'dart:convert' as convert;
 import 'package:ttlock_premise_flutter/ttgateway.dart';
 
 class TTLock {
+  static bool isOnPremise = true;
+
   static MethodChannel _commandChannel =
       MethodChannel("com.ttlock/command/ttlock");
   static EventChannel _listenChannel = EventChannel("com.ttlock/listen/ttlock");
+
+  static const String CALLBACK_SUCCESS = "callback_success";
+  static const String CALLBACK_PROGRESS = "callback_progress";
+  static const String CALLBACK_FAIL = "callback_fail";
 
   static const String COMMAND_START_SCAN_LOCK = "startScanLock";
   static const String COMMAND_STOP_SCAN_LOCK = "stopScanLock";
@@ -78,9 +84,7 @@ class TTLock {
   static const String COMMAND_SET_HOTLE_CARD_SECTOR = "setHotelCardSector";
   static const String COMMAND_SET_HOTLE_INOF = "setHotelInfo";
 
-  static Map _callbackMap = Map();
-  static Map _failCallbackMap = Map();
-  static Map _progressCallbackMap = Map();
+  static List _commandQueue = List();
 
   static bool printLog = true;
 
@@ -98,7 +102,6 @@ class TTLock {
    */
   static void stopScanLock() {
     invoke(COMMAND_STOP_SCAN_LOCK, null, null);
-    _callbackMap.remove(COMMAND_START_SCAN_LOCK);
   }
 
   // ignore: slash_for_doc_comments
@@ -638,7 +641,7 @@ class TTLock {
         fail: failedCallback);
   }
 
-  static void setPowerSaverControlable(String lockMac, String lockData,
+  static void setPowerSaverControlableLock(String lockMac, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     Map map = Map();
 
@@ -704,16 +707,16 @@ class TTLock {
   }
 
   static void setHotel(
-      String hotelData,
-      int building,
-      int floor,
+      String hotelInfo,
+      int buildingNumber,
+      int floorNumber,
       String lockData,
       TTSuccessCallback callback,
       TTFailedCallback failedCallback) {
     Map map = Map();
-    map[TTResponse.hotelData] = hotelData;
-    map[TTResponse.building] = building;
-    map[TTResponse.floor] = floor;
+    map[TTResponse.hotelInfo] = hotelInfo;
+    map[TTResponse.buildingNumber] = buildingNumber;
+    map[TTResponse.floorNumber] = floorNumber;
     map[TTResponse.lockData] = lockData;
     invoke(COMMAND_SET_HOTLE_INOF, map, callback, fail: failedCallback);
   }
@@ -733,6 +736,12 @@ class TTLock {
   }
 
   static bool isListenEvent = false;
+  static var scanCommandList = [
+    COMMAND_START_SCAN_LOCK,
+    COMMAND_STOP_SCAN_LOCK,
+    TTGateway.COMMAND_START_SCAN_GATEWAY,
+    TTGateway.COMMAND_STOP_SCAN_GATEWAY
+  ];
 
   static void invoke(String command, Object parameter, Object success,
       {Object progress, Object fail}) {
@@ -743,13 +752,35 @@ class TTLock {
           .listen(_onEvent, onError: _onError);
     }
 
-    _callbackMap[command] = success;
-    if (progress != null) {
-      _progressCallbackMap[command] = progress;
+    //开始、停止扫描的时候  清空之前所有的扫描回调
+    scanCommandList.forEach((scanCommand) {
+      if (command.compareTo(scanCommand) == 0) {
+        List removeMapList = new List();
+        _commandQueue.forEach((map) {
+          String key = map.keys.first;
+          if (key.compareTo(COMMAND_START_SCAN_LOCK) == 0 ||
+              key.compareTo(TTGateway.COMMAND_START_SCAN_GATEWAY) == 0) {
+            removeMapList.add(map);
+          }
+        });
+        removeMapList.forEach((map) {
+          _commandQueue.remove(map);
+        });
+      }
+    });
+
+    if (command == COMMAND_STOP_SCAN_LOCK ||
+        command == TTGateway.COMMAND_STOP_SCAN_GATEWAY) {
+    } else {
+      Map commandMap = new Map();
+      Map callbackMap = new Map();
+      callbackMap[CALLBACK_SUCCESS] = success;
+      callbackMap[CALLBACK_PROGRESS] = progress;
+      callbackMap[CALLBACK_FAIL] = fail;
+      commandMap[command] = callbackMap;
+      _commandQueue.add(commandMap);
     }
-    if (fail != null) {
-      _failCallbackMap[command] = fail;
-    }
+
     _commandChannel.invokeMethod(command, parameter);
 
     // if (printLog) {
@@ -762,7 +793,38 @@ class TTLock {
   }
 
   static void _successCallback(String command, Map data) {
-    Object callBack = _callbackMap[command];
+    //获取队列里面能匹配到最前一个回调指令
+    Object callBack;
+    int index = -1;
+    for (var i = 0; i < _commandQueue.length; i++) {
+      Map map = _commandQueue[i];
+      String key = map.keys.first;
+      if (key.compareTo(command) == 0) {
+        callBack = map[command][CALLBACK_SUCCESS];
+        index = i;
+        break;
+      }
+    }
+    //如果是 网关扫描、锁扫描、网关获取附近wifi 需要特殊处理
+    bool reomveCommand = true;
+    if (index == -1) {
+      reomveCommand = false;
+    } else {
+      if (command == COMMAND_START_SCAN_LOCK) {
+        reomveCommand = false;
+      }
+      if (command == TTGateway.COMMAND_START_SCAN_GATEWAY) {
+        reomveCommand = false;
+      }
+      if (command == TTGateway.COMMAND_GET_SURROUND_WIFI &&
+          data[TTResponse.finished] == false) {
+        reomveCommand = false;
+      }
+    }
+    if (reomveCommand) {
+      _commandQueue.removeAt(index);
+    }
+
     if (callBack == null) {
       if (printLog) {
         print(
@@ -819,8 +881,14 @@ class TTLock {
         break;
 
       case COMMAND_RESET_PASSCODE:
-        TTLockDataCallback lockDataCallback = callBack;
-        lockDataCallback(data[TTResponse.lockData]);
+      case COMMAND_MODIFY_ADMIN_PASSCODE:
+        if (isOnPremise) {
+          TTLockDataCallback lockDataCallback = callBack;
+          lockDataCallback(data[TTResponse.lockData]);
+        } else {
+          TTSuccessCallback successCallback = callBack;
+          successCallback();
+        }
         break;
 
       case COMMAND_ADD_CARD:
@@ -890,9 +958,6 @@ class TTLock {
         bool finished = data[TTResponse.finished];
         List wifiList = data[TTResponse.wifiList];
         getAroundWifiCallback(finished, wifiList);
-        if (finished == false) {
-          return;
-        }
         break;
 
       case TTGateway.COMMAND_INIT_GATEWAY:
@@ -903,16 +968,18 @@ class TTLock {
         TTSuccessCallback successCallback = callBack;
         successCallback();
     }
-    _progressCallbackMap.remove(command);
-    _failCallbackMap.remove(command);
-    if (command != COMMAND_START_SCAN_LOCK &&
-        command != TTGateway.COMMAND_START_SCAN_GATEWAY) {
-      _callbackMap.remove(command);
-    }
   }
 
   static void _progressCallback(String command, Map data) {
-    Object callBack = _progressCallbackMap[command];
+    Object callBack;
+    for (var i = 0; i < _commandQueue.length; i++) {
+      Map map = _commandQueue[i];
+      String key = map.keys.first;
+      if (key.compareTo(command) == 0) {
+        callBack = map[command][CALLBACK_PROGRESS];
+        break;
+      }
+    }
     switch (command) {
       case COMMAND_ADD_CARD:
         TTAddCardProgressCallback progressCallback = callBack;
@@ -934,24 +1001,35 @@ class TTLock {
           "The TTLock SDK can only communicate with one lock at a time";
     }
 
+    Object callBack;
+    int index = -1;
+    for (var i = 0; i < _commandQueue.length; i++) {
+      Map map = _commandQueue[i];
+      String key = map.keys.first;
+      if (key.compareTo(command) == 0) {
+        callBack = map[command][CALLBACK_FAIL];
+        index = i;
+        break;
+      }
+    }
+    if (index > -1) {
+      _commandQueue.removeAt(index);
+    }
+
     if (command == TTGateway.COMMAND_GET_SURROUND_WIFI ||
         command == TTGateway.COMMAND_INIT_GATEWAY) {
-      TTGatewayFailedCallback failedCallback = _failCallbackMap[command];
+      TTGatewayFailedCallback failedCallback = callBack;
       TTGatewayError error = TTGatewayError.values[errorCode];
       if (failedCallback != null) {
         failedCallback(error, errorMessage);
       }
     } else {
-      TTFailedCallback failedCallback = _failCallbackMap[command];
+      TTFailedCallback failedCallback = callBack;
       TTLockError error = TTLockError.values[errorCode];
       if (failedCallback != null) {
         failedCallback(error, errorMessage);
       }
     }
-
-    _failCallbackMap.remove(command);
-    _callbackMap.remove(command);
-    _progressCallbackMap.remove(command);
   }
 
   // 数据接收
@@ -961,10 +1039,8 @@ class TTLock {
     }
 
     Map map = value;
-
     String command = map[TTResponse.command];
     Map data = map[TTResponse.data];
-
     int resultState = map[TTResponse.resultState];
 
     if (resultState == TTLockReuslt.fail.index) {
@@ -1047,9 +1123,9 @@ class TTResponse {
   static const String nbAwakeTimeList = "nbAwakeTimeList";
   static const String minutes = "minutes";
   static const String type = "type";
-  static const String hotelData = "hotelData";
-  static const String building = "building";
-  static const String floor = "floor";
+  static const String hotelInfo = "hotelInfo";
+  static const String buildingNumber = "buildingNumber";
+  static const String floorNumber = "floorNumber";
   static const String sector = "sector";
 }
 
@@ -1276,7 +1352,7 @@ enum TTLockFuction {
   fingerprint,
   wristband,
   autoLock,
-  deletePasscode,
+  deletePasscode, //5
   // 6
   managePasscode,
   locking,
@@ -1287,7 +1363,7 @@ enum TTLockFuction {
   doorSensor,
   unlockSwicth,
   audioSwitch,
-  nbIoT,
+  nbIoT, //15
   //17
   getAdminPasscode,
   hotelCard,
@@ -1301,9 +1377,17 @@ enum TTLockFuction {
   identityCard,
   tamperAlert,
   resetButton,
-  privacyLock,
+  privacyLock, //28
   //31
-  deadLock,
+  deadLock, //29
   //33
-  cyclicCardOrFingerprint
+  cyclicCardOrFingerprint, //30
+  //35
+  //36
+  fingerVein,
+  ble5G,
+  nbAwake,
+  recoverCyclePasscode,
+  wirelessKeyFob,
+  getAccessoryElectricQuantity,
 }

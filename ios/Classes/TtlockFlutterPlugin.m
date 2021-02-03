@@ -529,11 +529,16 @@ typedef NS_ENUM(NSInteger, ResultState) {
         }];
     }else if ([command isEqualToString:command_function_support]) {
         NSInteger supportFunction = lockModel.supportFunction.integerValue;
-        if (supportFunction > 28) {
+        
+        
+        
+        if (supportFunction > 30) {
+            supportFunction += 6;
+        }else if (supportFunction > 29) {
             supportFunction += 4;
-        }else if (supportFunction > 26) {
+        }else if (supportFunction > 28) {
             supportFunction += 3;
-        }else if (supportFunction > 16) {
+        }else if (supportFunction > 15) {
             supportFunction += 2;
         }else if (supportFunction > 5) {
             supportFunction += 1;
@@ -639,7 +644,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
 //            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
 //        }];
     }else if ([command isEqualToString:command_set_hotel_info]) {
-        [TTLock setHotelDataWithHotelInfo:lockModel.hotelData buildingNumber:lockModel.building.intValue floorNumber:lockModel.floor.intValue lockData:lockModel.lockData success:^{
+        [TTLock setHotelDataWithHotelInfo:lockModel.hotelInfo buildingNumber:lockModel.buildingNumber.intValue floorNumber:lockModel.floorNumber.intValue lockData:lockModel.lockData success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
