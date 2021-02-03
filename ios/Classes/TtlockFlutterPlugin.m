@@ -642,7 +642,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
 //            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
 //        }];
     }else if ([command isEqualToString:command_set_hotel_info]) {
-        [TTLock setHotelDataWithHotelInfo:lockModel.hotelData buildingNumber:lockModel.building.intValue floorNumber:lockModel.floor.intValue lockData:lockModel.lockData success:^{
+        [TTLock setHotelDataWithHotelInfo:lockModel.hotelInfo buildingNumber:lockModel.buildingNumber.intValue floorNumber:lockModel.floorNumber.intValue lockData:lockModel.lockData success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];

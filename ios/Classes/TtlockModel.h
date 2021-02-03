@@ -100,9 +100,9 @@
 
 @property (nonatomic, strong) NSArray<NSDictionary *> *nbAwakeTimeList;
 
-@property (nonatomic, strong) NSString *hotelData;
-@property (nonatomic, strong) NSNumber *building;
-@property (nonatomic, strong) NSNumber *floor;
+@property (nonatomic, strong) NSString *hotelInfo;
+@property (nonatomic, strong) NSNumber *buildingNumber;
+@property (nonatomic, strong) NSNumber *floorNumber;
 
 @property (nonatomic, strong) NSString *sector;
 
