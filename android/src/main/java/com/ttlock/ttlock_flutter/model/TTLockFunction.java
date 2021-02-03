@@ -9,9 +9,9 @@ public enum TTLockFunction {
     fingerprint,
     wristband,
     autoLock,
-    deletePasscode,
+    deletePasscode,//5
     // 6
-    managePasscode,
+    managePasscode,//6
     locking,
     passcodeVisible,
     gatewayUnlock,
@@ -20,9 +20,9 @@ public enum TTLockFunction {
     doorSensor,
     unlockSwicth,
     audioSwitch,
-    nbIoT,
+    nbIoT,//15
     //17
-    getAdminPasscode,
+    getAdminPasscode,//16
     hotelCard,
     noClock,
     noBroadcastInNormal,
@@ -34,19 +34,29 @@ public enum TTLockFunction {
     identityCard,
     tamperAlert,
     resetButton,
-    privacyLock,
+    privacyLock,//28
     //31
-    deadLock,
+    deadLock,//29
     //33
-    cyclicCardOrFingerprint;
+    cyclicCardOrFingerprint,//30
+    //35
+    //36
+    fingerVein,
+    ble5G,
+    nbAwake,
+    recoverCyclePasscode,
+    wirelessKeyFob,
+    getAccessoryElectricQuantity;
 
     public static int flutter2Native(int index) {
         int supportFunction = index;
-        if (supportFunction > 28) {
+        if (supportFunction > 30) {
+            supportFunction += 6;
+        } else if (supportFunction > 29) {
             supportFunction += 4;
-        } else if (supportFunction > 26) {
+        } else if (supportFunction > 28) {
             supportFunction += 3;
-        } else if (supportFunction > 16) {
+        } else if (supportFunction > 15) {
             supportFunction += 2;
         } else if (supportFunction > 5) {
             supportFunction += 1;

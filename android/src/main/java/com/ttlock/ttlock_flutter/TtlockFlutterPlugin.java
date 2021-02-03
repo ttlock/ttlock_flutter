@@ -87,6 +87,7 @@ import com.ttlock.bl.sdk.util.LogUtil;
 import com.ttlock.ttlock_flutter.constant.GatewayCommand;
 import com.ttlock.ttlock_flutter.constant.TTGatewayConnectStatus;
 import com.ttlock.ttlock_flutter.constant.TTLockCommand;
+import com.ttlock.ttlock_flutter.model.CommandObj;
 import com.ttlock.ttlock_flutter.model.GatewayErrorConverter;
 import com.ttlock.ttlock_flutter.model.GatewayModel;
 import com.ttlock.ttlock_flutter.model.LiftWorkModeConverter;
@@ -121,11 +122,11 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   private EventChannel eventChannel;
   private static Activity activity;
   private EventChannel.EventSink events;
-  private TtlockModel ttlockModel = new TtlockModel();
+//  private TtlockModel ttlockModel = new TtlockModel();
   private GatewayModel gatewayModel = new GatewayModel();
 
   //lock command que
-  private Queue<String> commandQue = new ArrayDeque<>();
+  private Queue<CommandObj> commandQue = new ArrayDeque<>();
 
 
   public static final int ResultStateSuccess = 0;
@@ -175,6 +176,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
   public void doorLockCommand(MethodCall call) {
     Object arguments = call.arguments;
+    TtlockModel ttlockModel = new TtlockModel();
     if (arguments instanceof Map) {
       ttlockModel.toObject((Map<String, Object>) arguments);
     } else {
@@ -182,10 +184,10 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     }
     switch (call.method) {
       case TTLockCommand.COMMAND_SUPPORT_FEATURE:
-        isSupportFeature();
+        isSupportFeature(ttlockModel);
         break;
       case TTLockCommand.COMMAND_SETUP_PUGIN:
-        setupPlug();
+        setupPlug(ttlockModel);
         break;
       case TTLockCommand.COMMAND_START_SCAN_LOCK:
         if (initPermission()) {
@@ -196,10 +198,10 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         stopScan();
         break;
       case TTLockCommand.COMMAND_GET_BLUETOOTH_STATE:
-        getBluetoothState();
+        getBluetoothState(ttlockModel);
         break;
       default:
-        commandQue.add(call.method);
+        commandQue.add(new CommandObj(call.method, ttlockModel));
         LogUtil.d("commandQue:" + commandQue.size());
         if (commandQue.size() == 1) {
           tryAgain = true;
@@ -239,7 +241,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     }
   }
 
-  public void isSupportFeature() {
+  public void isSupportFeature(TtlockModel ttlockModel) {
     boolean isSupport = FeatureValueUtil.isSupportFeature(ttlockModel.lockData, TTLockFunction.flutter2Native(ttlockModel.supportFunction));
     ttlockModel.isSupport = isSupport;
     LogUtil.d(TTLockFunction.flutter2Native(ttlockModel.supportFunction) + ":" + isSupport);
@@ -288,6 +290,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
   public void disconnectGateway() {//todo:
     GatewayClient.getDefault().disconnectGateway();
+    successCallbackCommand(GatewayCommand.COMMAND_DISCONNECT_GATEWAY, null);
   }
 
   public void gatewayUpgrade() {
@@ -363,138 +366,142 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       return;
     }
     commandTimeOutCheck();
-    String command = commandQue.peek();
+    CommandObj commandObj = commandQue.peek();
+    if (commandObj == null || !commandObj.isValid()) {
+      apiFail(LockError.INVALID_COMMAND);
+      return;
+    }
+    String command = commandObj.getCommand();
+    TtlockModel ttlockModel = commandObj.getTtlockModel();
     switch (command) {
       case TTLockCommand.COMMAND_INIT_LOCK:
-        initLock();
+        initLock(ttlockModel);
         break;
       case TTLockCommand.COMMAND_CONTROL_LOCK:
-        controlLock();
+        controlLock(ttlockModel);
         break;
       case TTLockCommand.COMMAND_RESET_LOCK:
-        resetLock();
+        resetLock(ttlockModel);
         break;
       case TTLockCommand.COMMAND_GET_LOCK_TIME:
-        getLockTime();
+        getLockTime(ttlockModel);
         break;
       case TTLockCommand.COMMAND_SET_LOCK_TIME:
-        setLockTime();
+        setLockTime(ttlockModel);
         break;
       case TTLockCommand.COMMAND_MODIFY_PASSCODE:
-        modifyPasscode();
+        modifyPasscode(ttlockModel);
         break;
       case TTLockCommand.COMMAND_CREATE_CUSTOM_PASSCODE:
-        setCustomPasscode();
+        setCustomPasscode(ttlockModel);
         break;
       case TTLockCommand.COMMAND_RESET_PASSCODE:
-        resetPasscodes();
+        resetPasscodes(ttlockModel);
         break;
       case TTLockCommand.COMMAND_GET_LOCK_OPERATE_RECORD:
-        getOperationLog();
+        getOperationLog(ttlockModel);
         break;
       case TTLockCommand.COMMAND_GET_LOCK_SWITCH_STATE:
-        getSwitchStatus();
+        getSwitchStatus(ttlockModel);
         break;
       case TTLockCommand.COMMAND_DELETE_PASSCODE:
-        deletePasscode();
+        deletePasscode(ttlockModel);
         break;
       case TTLockCommand.COMMAND_MODIFY_ADMIN_PASSCODE:
-        setAdminPasscode();
+        setAdminPasscode(ttlockModel);
         break;
 //      case TTLockCommand.COMMAND_GET_ADMIN_PASSCODE:
-//        getAdminPasscode();
+//        getAdminPasscode(ttlockModel);
 //        break;
       case TTLockCommand.COMMAND_ADD_CARD:
-        addICCard();
+        addICCard(ttlockModel);
         break;
       case TTLockCommand.COMMAND_MODIFY_CARD:
-        modifyICCard();
+        modifyICCard(ttlockModel);
         break;
       case TTLockCommand.COMMAND_DELETE_CARD:
-        deleteICCard();
+        deleteICCard(ttlockModel);
         break;
       case TTLockCommand.COMMAND_ADD_FINGERPRINT:
-        addFingerPrint();
+        addFingerPrint(ttlockModel);
         break;
       case TTLockCommand.COMMAND_MODIFY_FINGERPRINT:
-        modifyFingerPrint();
+        modifyFingerPrint(ttlockModel);
         break;
       case TTLockCommand.COMMAND_DELETE_FINGERPRINT:
-        deleteFingerPrint();
+        deleteFingerPrint(ttlockModel);
         break;
       case TTLockCommand.COMMAND_CLEAR_ALL_CARD:
-        clearICCard();
+        clearICCard(ttlockModel);
         break;
       case TTLockCommand.COMMAND_CLEAR_ALL_FINGERPRINT:
-        clearFingerPrint();
+        clearFingerPrint(ttlockModel);
         break;
       case TTLockCommand.COMMAND_GET_LOCK_POWER:
-        getBattery();
+        getBattery(ttlockModel);
         break;
       case TTLockCommand.COMMAND_ADD_PASSAGE_MODE:
-        addPassageMode();
+        addPassageMode(ttlockModel);
         break;
       case TTLockCommand.COMMAND_CLEAR_ALL_PASSAGE_MODE:
-        clearPassageMode();
+        clearPassageMode(ttlockModel);
         break;
       case TTLockCommand.COMMAND_SET_AUTOMATIC_LOCK_PERIODIC_TIME:
-        setAutoLockTime();
+        setAutoLockTime(ttlockModel);
         break;
       case TTLockCommand.COMMAND_GET_AUTOMATIC_LOCK_PERIODIC_TIME:
-        getAutoLockTime();
+        getAutoLockTime(ttlockModel);
         break;
       case TTLockCommand.COMMAND_SET_LOCK_REMOTE_UNLOCK_SWITCH_STATE:
-        setRemoteUnlockSwitch();
+        setRemoteUnlockSwitch(ttlockModel);
         break;
       case TTLockCommand.COMMAND_GET_LOCK_REMOTE_UNLOCK_SWITCH_STATE:
-        getRemoteUnlockSwitch();
+        getRemoteUnlockSwitch(ttlockModel);
         break;
       case TTLockCommand.COMMAND_SET_LOCK_CONFIG:
-        setLockConfig();
+        setLockConfig(ttlockModel);
         break;
       case TTLockCommand.COMMAND_GET_LOCK_CONFIG:
-        getLockConfig();
+        getLockConfig(ttlockModel);
         break;
       case TTLockCommand.COMMAND_RESET_EKEY:
-        resetEKey();
+        resetEKey(ttlockModel);
         break;
       case TTLockCommand.COMMAND_SET_LIFT_CONTROLABLE_FLOORS:
-        setLiftControlableFloors();
+        setLiftControlableFloors(ttlockModel);
         break;
       case TTLockCommand.COMMAND_ACTIVE_LIFT_FLOORS:
-        activateLiftFloors();
+        activateLiftFloors(ttlockModel);
         break;
       case TTLockCommand.COMMAND_SET_HOTLE_CARD_SECTOR:
-        setHotelSector();
+        setHotelSector(ttlockModel);
         break;
       case TTLockCommand.COMMAND_SET_HOTLE_INFO:
-        setHotelData();
+        setHotelData(ttlockModel);
         break;
       case TTLockCommand.COMMAND_SET_LIFT_WORK_MODE:
-        setLiftWorkMode();
+        setLiftWorkMode(ttlockModel);
         break;
       case TTLockCommand.COMMAND_SET_POWSER_SAVER_WORK_MODE:
-        setPowerSaverWorkMode();
+        setPowerSaverWorkMode(ttlockModel);
         break;
       case TTLockCommand.COMMAND_SET_NB_AWAKE_MODES:
-        setNbAwakeModes();
+        setNbAwakeModes(ttlockModel);
         break;
       case TTLockCommand.COMMAND_SET_NB_AWAKE_TIMES:
-        setNbAwakeTimes();
+        setNbAwakeTimes(ttlockModel);
         break;
       case TTLockCommand.COMMAND_GET_NB_AWAKE_MODES:
-        getNbAwakeModes();
+        getNbAwakeModes(ttlockModel);
         break;
       case TTLockCommand.COMMAND_GET_NB_AWAKE_TIMES:
-        getNbAwakeTimes();
+        getNbAwakeTimes(ttlockModel);
         break;
       case TTLockCommand.COMMAND_SET_POWSER_SAVER_CONTROLABLE:
-        setPowerSaverControlableLock();
+        setPowerSaverControlableLock(ttlockModel);
         break;
       default:
         apiFail(LockError.INVALID_COMMAND);
-//        errorCallbackCommand(commandQue.poll(), LockError.INVALID_COMMAND);
-//        clearCommand();
         LogUtil.d("unknown command:" + command);
         break;
     }
@@ -518,7 +525,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     }
   }
 
-  public void setupPlug() {
+  public void setupPlug(TtlockModel ttlockModel) {
     TTLockClient.getDefault().prepareBTService(activity);
     //todo:
     ttlockModel.state = TTBluetoothState.turnOn.ordinal();
@@ -563,7 +570,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().stopScanLock();
   }
 
-  public void initLock() {
+  public void initLock(final TtlockModel ttlockModel) {
 
     ExtendedBluetoothDevice extendedBluetoothDevice = new ExtendedBluetoothDevice();
     BluetoothDevice device = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(ttlockModel.lockMac);
@@ -577,11 +584,23 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
     extendedBluetoothDevice.setSettingMode(!ttlockModel.isInited);
 
+    if (!TextUtils.isEmpty(ttlockModel.clientPara)) {
+      extendedBluetoothDevice.setManufacturerId(ttlockModel.clientPara);
+    }
+
+    if (!TextUtils.isEmpty(ttlockModel.hotelInfo)) {
+      HotelData hotelData = new HotelData();
+      hotelData.setHotelInfo(ttlockModel.hotelInfo);
+      hotelData.setBuildingNumber(ttlockModel.buildingNumber);
+      hotelData.setFloorNumber(ttlockModel.floorNumber);
+      extendedBluetoothDevice.setHotelData(hotelData);
+    }
+
     TTLockClient.getDefault().initLock(extendedBluetoothDevice, new InitLockCallback() {
       @Override
       public void onInitLockSuccess(String lockData) {
         ttlockModel.lockData = lockData;
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -591,7 +610,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void controlLock() {
+  public void controlLock(final TtlockModel ttlockModel) {
     TTLockClient.getDefault().controlLock(ttlockModel.getControlActionValue(), ttlockModel.lockData, new ControlLockCallback(){
 
       @Override
@@ -600,7 +619,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         ttlockModel.controlAction = controlLockResult.controlAction;
         ttlockModel.electricQuantity = controlLockResult.battery;
         ttlockModel.uniqueId = controlLockResult.uniqueid;
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -610,11 +629,11 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void resetLock() {
+  public void resetLock(final TtlockModel ttlockModel) {
     TTLockClient.getDefault().resetLock(ttlockModel.lockData, new ResetLockCallback() {
       @Override
       public void onResetLockSuccess() {
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -624,13 +643,13 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void getLockTime() {
+  public void getLockTime(final TtlockModel ttlockModel) {
     TTLockClient.getDefault().getLockTime(ttlockModel.lockData, new GetLockTimeCallback() {
 
       @Override
       public void onGetLockTimeSuccess(long lockTimestamp) {
         ttlockModel.timestamp = lockTimestamp;
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -640,11 +659,11 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void setLockTime() {
+  public void setLockTime(final TtlockModel ttlockModel) {
     TTLockClient.getDefault().setLockTime(ttlockModel.timestamp, ttlockModel.lockData, new SetLockTimeCallback() {
       @Override
       public void onSetTimeSuccess() {
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -654,7 +673,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void getOperationLog() {
+  public void getOperationLog(final TtlockModel ttlockModel) {
     //long period operation
     removeCommandTimeOutRunable();
     commandTimeOutCheck(4 * COMMAND_TIME_OUT);
@@ -663,7 +682,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       @Override
       public void onGetLogSuccess(String log) {
         ttlockModel.records = log;
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -673,12 +692,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void getSwitchStatus() {
+  public void getSwitchStatus(final TtlockModel ttlockModel) {
     TTLockClient.getDefault().getLockStatus(ttlockModel.lockData, new GetLockStatusCallback() {
       @Override
       public void onGetLockStatusSuccess(int status) {
         ttlockModel.lockSwitchState = status;
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -688,12 +707,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void setAdminPasscode() {
+  public void setAdminPasscode(final TtlockModel ttlockModel) {
     TTLockClient.getDefault().modifyAdminPasscode(ttlockModel.adminPasscode, ttlockModel.lockData, new ModifyAdminPasscodeCallback() {
       @Override
       public void onModifyAdminPasscodeSuccess(String passcode) {
         ttlockModel.adminPasscode = passcode;
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -703,27 +722,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-//  public void getAdminPasscode() {
-//    TTLockClient.getDefault().getAdminPasscode(ttlockModel.lockData, new GetAdminPasscodeCallback() {
-//      @Override
-//      public void onGetAdminPasscodeSuccess(String passcode) {
-//        ttlockModel.adminPasscode = passcode;
-//        apiSuccess();
-//      }
-//
-//      @Override
-//      public void onFail(LockError lockError) {
-//        apiFail(lockError);
-//      }
-//    });
-//  }
-
-  public void setCustomPasscode() {
+  public void setCustomPasscode(final TtlockModel ttlockModel) {
     TTLockClient.getDefault().createCustomPasscode(ttlockModel.passcode, ttlockModel.startDate, ttlockModel.endDate, ttlockModel.lockData, new CreateCustomPasscodeCallback() {
       @Override
       public void onCreateCustomPasscodeSuccess(String passcode) {
         ttlockModel.passcode = passcode;
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -733,11 +737,11 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void modifyPasscode() {
+  public void modifyPasscode(final TtlockModel ttlockModel) {
     TTLockClient.getDefault().modifyPasscode(ttlockModel.passcodeOrigin, ttlockModel.passcodeNew, ttlockModel.startDate, ttlockModel.endDate, ttlockModel.lockData, new ModifyPasscodeCallback() {
       @Override
       public void onModifyPasscodeSuccess() {
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -747,11 +751,11 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void deletePasscode() {
+  public void deletePasscode(final TtlockModel ttlockModel) {
     TTLockClient.getDefault().deletePasscode(ttlockModel.passcode, ttlockModel.lockData, new DeletePasscodeCallback() {
       @Override
       public void onDeletePasscodeSuccess() {
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -761,12 +765,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void resetPasscodes() {
+  public void resetPasscodes(final TtlockModel ttlockModel) {
     TTLockClient.getDefault().resetPasscode(ttlockModel.lockData, new ResetPasscodeCallback() {
       @Override
       public void onResetPasscodeSuccess(String lockData) {
         ttlockModel.lockData = lockData;
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -776,7 +780,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void addICCard() {
+  public void addICCard(final TtlockModel ttlockModel) {
     ValidityInfo validityInfo = new ValidityInfo();
     validityInfo.setStartDate(ttlockModel.startDate);
     validityInfo.setEndDate(ttlockModel.endDate);
@@ -810,7 +814,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void modifyICCard() {
+  public void modifyICCard(final TtlockModel ttlockModel) {
     ValidityInfo validityInfo = new ValidityInfo();
     validityInfo.setStartDate(ttlockModel.startDate);
     validityInfo.setEndDate(ttlockModel.endDate);
@@ -825,7 +829,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().modifyICCardValidityPeriod(validityInfo, ttlockModel.cardNumber, ttlockModel.lockData, new ModifyICCardPeriodCallback() {
       @Override
       public void onModifyICCardPeriodSuccess() {
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -835,11 +839,11 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void deleteICCard() {
+  public void deleteICCard(final TtlockModel ttlockModel) {
     TTLockClient.getDefault().deleteICCard(ttlockModel.cardNumber, ttlockModel.lockData, new DeleteICCardCallback() {
       @Override
       public void onDeleteICCardSuccess() {
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -849,11 +853,11 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void clearICCard() {
+  public void clearICCard(final TtlockModel ttlockModel) {
     TTLockClient.getDefault().clearAllICCard(ttlockModel.lockData, new ClearAllICCardCallback() {
       @Override
       public void onClearAllICCardSuccess() {
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -863,7 +867,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void addFingerPrint() {
+  public void addFingerPrint(final TtlockModel ttlockModel) {
     ValidityInfo validityInfo = new ValidityInfo();
     validityInfo.setStartDate(ttlockModel.startDate);
     validityInfo.setEndDate(ttlockModel.endDate);
@@ -896,7 +900,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       @Override
       public void onAddFingerpintFinished(long fingerprintNum) {
         ttlockModel.fingerprintNumber = String.valueOf(fingerprintNum);
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -906,7 +910,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void modifyFingerPrint() {
+  public void modifyFingerPrint(final TtlockModel ttlockModel) {
     ValidityInfo validityInfo = new ValidityInfo();
     validityInfo.setStartDate(ttlockModel.startDate);
     validityInfo.setEndDate(ttlockModel.endDate);
@@ -921,7 +925,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().modifyFingerprintValidityPeriod(validityInfo, ttlockModel.fingerprintNumber, ttlockModel.lockData, new ModifyFingerprintPeriodCallback() {
       @Override
       public void onModifyPeriodSuccess() {
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -931,11 +935,11 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void deleteFingerPrint() {
-    TTLockClient.getDefault().deleteFingerprint(ttlockModel.fingerprintNumber, ttlockModel.lockData,  new DeleteFingerprintCallback() {
+  public void deleteFingerPrint(final TtlockModel ttlockModel) {
+    TTLockClient.getDefault().deleteFingerprint(ttlockModel.fingerprintNumber, ttlockModel.lockData, new DeleteFingerprintCallback() {
       @Override
       public void onDeleteFingerprintSuccess() {
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -945,11 +949,11 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void clearFingerPrint() {
+  public void clearFingerPrint(final TtlockModel ttlockModel) {
     TTLockClient.getDefault().clearAllICCard(ttlockModel.lockData, new ClearAllICCardCallback() {
       @Override
       public void onClearAllICCardSuccess() {
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -959,12 +963,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void getBattery() {
+  public void getBattery(final TtlockModel ttlockModel) {
     TTLockClient.getDefault().getBatteryLevel(ttlockModel.lockData, new GetBatteryLevelCallback() {
       @Override
       public void onGetBatteryLevelSuccess(int electricQuantity) {
         ttlockModel.electricQuantity = electricQuantity;
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -974,11 +978,11 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void setAutoLockTime() {
+  public void setAutoLockTime(final TtlockModel ttlockModel) {
     TTLockClient.getDefault().setAutomaticLockingPeriod(ttlockModel.currentTime, ttlockModel.lockData, new SetAutoLockingPeriodCallback() {
       @Override
       public void onSetAutoLockingPeriodSuccess() {
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -988,14 +992,14 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void getAutoLockTime() {
+  public void getAutoLockTime(final TtlockModel ttlockModel) {
     TTLockClient.getDefault().getAutomaticLockingPeriod(ttlockModel.lockData, new GetAutoLockingPeriodCallback() {
       @Override
       public void onGetAutoLockingPeriodSuccess(int currtentTime, int minTime, int maxTime) {
         ttlockModel.currentTime = currtentTime;
         ttlockModel.minTime = minTime;
         ttlockModel.maxTime = maxTime;
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -1005,12 +1009,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void setRemoteUnlockSwitch() {
+  public void setRemoteUnlockSwitch(final TtlockModel ttlockModel) {
     TTLockClient.getDefault().setRemoteUnlockSwitchState(ttlockModel.isOn, ttlockModel.lockData, new SetRemoteUnlockSwitchCallback() {
       @Override
       public void onSetRemoteUnlockSwitchSuccess(String lockData) {
         ttlockModel.lockData = lockData;
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -1020,12 +1024,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void getRemoteUnlockSwitch() {
+  public void getRemoteUnlockSwitch(final TtlockModel ttlockModel) {
     TTLockClient.getDefault().getRemoteUnlockSwitchState(ttlockModel.lockData, new GetRemoteUnlockStateCallback() {
       @Override
       public void onGetRemoteUnlockSwitchStateSuccess(boolean enabled) {
         ttlockModel.isOn = enabled;
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -1035,7 +1039,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void addPassageMode() {
+  public void addPassageMode(final TtlockModel ttlockModel) {
     PassageModeConfig passageModeConfig = new PassageModeConfig();
     PassageModeType passageModeType = PassageModeType.class.getEnumConstants()[ttlockModel.passageModeType];
     passageModeConfig.setModeType(passageModeType);
@@ -1050,7 +1054,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().setPassageMode(passageModeConfig, ttlockModel.lockData, new SetPassageModeCallback() {
       @Override
       public void onSetPassageModeSuccess() {
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -1060,11 +1064,11 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void clearPassageMode() {
+  public void clearPassageMode(final TtlockModel ttlockModel) {
     TTLockClient.getDefault().clearPassageMode(ttlockModel.lockData, new ClearPassageModeCallback() {
       @Override
       public void onClearPassageModeSuccess() {
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -1074,7 +1078,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void setLockConfig() {
+  public void setLockConfig(final TtlockModel ttlockModel) {
     TTLockConfigType ttLockConfigType = TTLockConfigConverter.flutter2Native(ttlockModel.lockConfig);
 
     if (ttLockConfigType == null) {
@@ -1088,7 +1092,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       public void onSetLockConfigSuccess(TTLockConfigType ttLockConfigType) {
         LogUtil.d("ttLockConfigType:" + ttLockConfigType);
         ttlockModel.lockConfig = TTLockConfigConverter.native2Flutter(ttLockConfigType);
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -1098,7 +1102,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void getLockConfig() {
+  public void getLockConfig(final TtlockModel ttlockModel) {
     TTLockConfigType ttLockConfigType = TTLockConfigConverter.flutter2Native(ttlockModel.lockConfig);
 
     if (ttLockConfigType == null) {
@@ -1111,7 +1115,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       public void onGetLockConfigSuccess(TTLockConfigType ttLockConfigType, boolean switchOn) {
         ttlockModel.lockConfig = TTLockConfigConverter.native2Flutter(ttLockConfigType);
         ttlockModel.isOn = switchOn;
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -1121,12 +1125,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void resetEKey() {
+  public void resetEKey(final TtlockModel ttlockModel) {
     TTLockClient.getDefault().resetEkey(ttlockModel.lockData, new ResetKeyCallback() {
       @Override
       public void onResetKeySuccess(String lockData) {
         ttlockModel.lockData = lockData;
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -1136,7 +1140,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void activateLiftFloors() {
+  public void activateLiftFloors(final TtlockModel ttlockModel) {
     List<Integer> floorList = ttlockModel.getFloorList();
     if (floorList == null || floorList.size() == 0) {
       dataError();
@@ -1149,7 +1153,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         ttlockModel.lockTime = activateLiftFloorsResult.deviceTime;
         ttlockModel.uniqueId = activateLiftFloorsResult.uniqueid;
         ttlockModel.electricQuantity = activateLiftFloorsResult.battery;
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -1159,7 +1163,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void setLiftControlableFloors() {
+  public void setLiftControlableFloors(final TtlockModel ttlockModel) {
     if (TextUtils.isEmpty(ttlockModel.floors)) {
       dataError();
       return;
@@ -1167,7 +1171,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().setLiftControlableFloors(ttlockModel.floors, ttlockModel.lockData, new SetLiftControlableFloorsCallback() {
       @Override
       public void onSetLiftControlableFloorsSuccess() {
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -1177,7 +1181,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void setLiftWorkMode() {
+  public void setLiftWorkMode(final TtlockModel ttlockModel) {
       TTLiftWorkMode ttLiftWorkMode = LiftWorkModeConverter.flutter2Native(ttlockModel.liftWorkActiveType);
       if (ttLiftWorkMode == null) {
         dataError();
@@ -1186,7 +1190,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       TTLockClient.getDefault().setLiftWorkMode(ttLiftWorkMode, ttlockModel.lockData, new SetLiftWorkModeCallback() {
         @Override
         public void onSetLiftWorkModeSuccess() {
-           apiSuccess();
+           apiSuccess(ttlockModel);
         }
 
         @Override
@@ -1196,7 +1200,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       });
   }
 
-  public void setPowerSaverWorkMode() {
+  public void setPowerSaverWorkMode(final TtlockModel ttlockModel) {
      PowerSaverWorkMode powerSaverWorkMode = PowerSaverWorkModeConverter.flutter2Native(ttlockModel.powerSaverType);
      if (powerSaverWorkMode == null) {
        dataError();
@@ -1205,7 +1209,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
      TTLockClient.getDefault().setPowerSaverWorkMode(powerSaverWorkMode, ttlockModel.lockData, new SetPowerSaverWorkModeCallback() {
        @Override
        public void onSetPowerSaverWorkModeSuccess() {
-         apiSuccess();
+         apiSuccess(ttlockModel);
        }
 
        @Override
@@ -1215,15 +1219,11 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
      });
   }
 
-  public void setPowerSaverControlableLock() {
-    if (TextUtils.isEmpty(ttlockModel.lockMac)) {
-      dataError();
-      return;
-    }
+  public void setPowerSaverControlableLock(final TtlockModel ttlockModel) {
     TTLockClient.getDefault().setPowerSaverControlableLock(ttlockModel.lockMac, ttlockModel.lockData, new SetPowerSaverControlableLockCallback() {
       @Override
       public void onSetPowerSaverControlableLockSuccess() {
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -1233,7 +1233,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void setNbAwakeModes() {
+  public void setNbAwakeModes(final TtlockModel ttlockModel) {
     List<NBAwakeMode> nbAwakeModeList = ttlockModel.getNbAwakeModeList();
     if (nbAwakeModeList == null || nbAwakeModeList.size() == 0) {
       dataError();
@@ -1242,7 +1242,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().setNBAwakeModes(nbAwakeModeList, ttlockModel.lockData, new SetNBAwakeModesCallback() {
       @Override
       public void onSetNBAwakeModesSuccess() {
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -1252,12 +1252,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void getNbAwakeModes() {
+  public void getNbAwakeModes(final TtlockModel ttlockModel) {
     TTLockClient.getDefault().getNBAwakeModes(ttlockModel.lockData, new GetNBAwakeModesCallback() {
       @Override
       public void onGetNBAwakeModesSuccess(List<NBAwakeMode> list) {
         ttlockModel.setNbAwakeModeList(list);
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -1267,7 +1267,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void setNbAwakeTimes() {
+  public void setNbAwakeTimes(final TtlockModel ttlockModel) {
     List<NBAwakeTime> nbAwakeTimeList = ttlockModel.getNbAwakeTimeList();
     if (nbAwakeTimeList == null || nbAwakeTimeList.size() == 0) {
       dataError();
@@ -1276,7 +1276,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().setNBAwakeTimes(nbAwakeTimeList, ttlockModel.lockData, new SetNBAwakeTimesCallback() {
       @Override
       public void onSetNBAwakeTimesSuccess() {
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -1286,12 +1286,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void getNbAwakeTimes() {
+  public void getNbAwakeTimes(final TtlockModel ttlockModel) {
     TTLockClient.getDefault().getNBAwakeTimes(ttlockModel.lockData, new GetNBAwakeTimesCallback() {
       @Override
       public void onGetNBAwakeTimesSuccess(List<NBAwakeTime> list) {
         ttlockModel.setNbAwakeTimeList(list);
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -1301,19 +1301,19 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void setHotelData() {
-    if (TextUtils.isEmpty(ttlockModel.hotelData)) {
+  public void setHotelData(final TtlockModel ttlockModel) {
+    if (TextUtils.isEmpty(ttlockModel.hotelInfo)) {
       dataError();
       return;
     }
     HotelData hotelData = new HotelData();
-    hotelData.setHotelInfo(ttlockModel.hotelData);
-    hotelData.setBuildingNumber(ttlockModel.building);
-    hotelData.setFloorNumber(ttlockModel.floor);
+    hotelData.setHotelInfo(ttlockModel.hotelInfo);
+    hotelData.setBuildingNumber(ttlockModel.buildingNumber);
+    hotelData.setFloorNumber(ttlockModel.floorNumber);
     TTLockClient.getDefault().setHotelData(hotelData, ttlockModel.lockData, new SetHotelDataCallback() {
       @Override
       public void onSetHotelDataSuccess() {
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -1323,7 +1323,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void setHotelSector() {
+  public void setHotelSector(final TtlockModel ttlockModel) {
     if (TextUtils.isEmpty(ttlockModel.sector)) {
       dataError();
       return;
@@ -1331,7 +1331,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().setHotelCardSector(ttlockModel.sector, ttlockModel.lockData, new SetHotelCardSectorCallback() {
       @Override
       public void onSetHotelCardSectorSuccess() {
-        apiSuccess();
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -1341,10 +1341,10 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void getBluetoothState() {
+  public void getBluetoothState(TtlockModel ttlockModel) {
     //4-off 5-on
     ttlockModel.state = TTLockClient.getDefault().isBLEEnabled(activity) ? 5 : 4;
-    apiSuccess();
+    successCallbackCommand(TTLockCommand.COMMAND_GET_BLUETOOTH_STATE, ttlockModel.toMap());
   }
 
 
@@ -1435,7 +1435,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     //todo:
   }
 
-  public void apiSuccess() {
+  public void apiSuccess(TtlockModel ttlockModel) {
     removeCommandTimeOutRunable();
     successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
     tryAgain = true;
@@ -1461,19 +1461,31 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void successCallbackCommand(String command, Map data) {
-    callbackCommand(command, ResultStateSuccess, data,-1, "");
+    if (command != null) {
+      callbackCommand(command, ResultStateSuccess, data, -1, "");
+    }
   }
 
-  public void progressCallbackCommand(String command, Map data) {
-    callbackCommand(command, ResultStateProgress, data,-1, "");
+  public void successCallbackCommand(CommandObj commandObj, Map data) {
+    if (commandObj != null) {
+      successCallbackCommand(commandObj.getCommand(), data);
+    }
+  }
+
+  public void progressCallbackCommand(CommandObj commandObj, Map data) {
+    if (commandObj != null) {
+      callbackCommand(commandObj.getCommand(), ResultStateProgress, data, -1, "");
+    }
   }
 
   public void errorCallbackCommand(String command, GatewayError gatewayError) {
     callbackCommand(command, ResultStateFail, null, GatewayErrorConverter.native2Flutter(gatewayError), gatewayError.getDescription());
   }
 
-  public void errorCallbackCommand(String command, LockError lockError) {
-    callbackCommand(command, ResultStateFail, null, TTLockErrorConverter.native2Flutter(lockError), lockError.getErrorMsg());
+  public void errorCallbackCommand(CommandObj commandObj, LockError lockError) {
+    if (commandObj != null) {
+      callbackCommand(commandObj.getCommand(), ResultStateFail, null, TTLockErrorConverter.native2Flutter(lockError), lockError.getErrorMsg());
+    }
   }
 
   public void callbackCommand(final String command, final int resultState, final Map data, final int errorCode, final String errorMessage) {

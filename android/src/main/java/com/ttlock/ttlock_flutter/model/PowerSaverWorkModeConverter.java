@@ -1,7 +1,6 @@
 package com.ttlock.ttlock_flutter.model;
 
 import com.ttlock.bl.sdk.entity.PowerSaverWorkMode;
-import com.ttlock.bl.sdk.entity.TTLiftWorkMode;
 
 /**
  * Created by TTLock on 2021/1/13.
@@ -10,7 +9,7 @@ public enum PowerSaverWorkModeConverter {
     allCards, hotelCard, roomCard;
 
     public static PowerSaverWorkMode flutter2Native(int index) {
-        if (index < TTLiftWorkMode.class.getEnumConstants().length) {
+        if (index < PowerSaverWorkModeConverter.class.getEnumConstants().length) {
             return flutter2Native(PowerSaverWorkModeConverter.class.getEnumConstants()[index]);
         }
         return null;

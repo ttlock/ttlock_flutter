@@ -108,9 +108,10 @@ public class TtlockModel {
     public int liftWorkActiveType;
     public int powerSaverType;
     public String nbAwakeModes;
-    public String hotelData;
-    public int building;
-    public int floor;
+    public String clientPara;
+    public String hotelInfo;
+    public int buildingNumber;
+    public int floorNumber;
     public String sector;
     public String nbAwakeTimeList;
 
@@ -164,9 +165,6 @@ public class TtlockModel {
                 ", liftWorkActiveType=" + liftWorkActiveType +
                 ", powerSaverType=" + powerSaverType +
                 ", nbAwakeModes='" + nbAwakeModes + '\'' +
-                ", hotelData='" + hotelData + '\'' +
-                ", building=" + building +
-                ", floor=" + floor +
                 ", sector='" + sector + '\'' +
                 ", nbAwakeTimeList='" + nbAwakeTimeList + '\'' +
                 '}';
@@ -196,7 +194,9 @@ public class TtlockModel {
             for (int i = 0; i < fields.length; i++) {
                 //设置是否允许访问，不是修改原来的访问权限修饰词。
                 fields[i].setAccessible(true);
-                hashMap.put(fields[i].getName(), fields[i].get(this));
+                if (fields[i].get(this) != null) {
+                    hashMap.put(fields[i].getName(), fields[i].get(this));
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
