@@ -108,9 +108,10 @@ public class TtlockModel {
     public int liftWorkActiveType;
     public int powerSaverType;
     public String nbAwakeModes;
-    public String hotelData;
-    public int building;
-    public int floor;
+    public String clientPara;
+    public String hotelInfo;
+    public int buildingNumber;
+    public int floorNumber;
     public String sector;
     public String nbAwakeTimeList;
 
@@ -164,9 +165,6 @@ public class TtlockModel {
                 ", liftWorkActiveType=" + liftWorkActiveType +
                 ", powerSaverType=" + powerSaverType +
                 ", nbAwakeModes='" + nbAwakeModes + '\'' +
-                ", hotelData='" + hotelData + '\'' +
-                ", building=" + building +
-                ", floor=" + floor +
                 ", sector='" + sector + '\'' +
                 ", nbAwakeTimeList='" + nbAwakeTimeList + '\'' +
                 '}';

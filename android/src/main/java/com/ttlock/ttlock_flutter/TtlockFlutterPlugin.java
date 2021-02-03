@@ -585,6 +585,18 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
     extendedBluetoothDevice.setSettingMode(!ttlockModel.isInited);
 
+    if (!TextUtils.isEmpty(ttlockModel.clientPara)) {
+      extendedBluetoothDevice.setManufacturerId(ttlockModel.clientPara);
+    }
+
+    if (!TextUtils.isEmpty(ttlockModel.hotelInfo)) {
+      HotelData hotelData = new HotelData();
+      hotelData.setHotelInfo(ttlockModel.hotelInfo);
+      hotelData.setBuildingNumber(ttlockModel.buildingNumber);
+      hotelData.setFloorNumber(ttlockModel.floorNumber);
+      extendedBluetoothDevice.setHotelData(hotelData);
+    }
+
     TTLockClient.getDefault().initLock(extendedBluetoothDevice, new InitLockCallback() {
       @Override
       public void onInitLockSuccess(String lockData) {
@@ -1306,14 +1318,14 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void setHotelData(final TtlockModel ttlockModel) {
-    if (TextUtils.isEmpty(ttlockModel.hotelData)) {
+    if (TextUtils.isEmpty(ttlockModel.hotelInfo)) {
       dataError();
       return;
     }
     HotelData hotelData = new HotelData();
-    hotelData.setHotelInfo(ttlockModel.hotelData);
-    hotelData.setBuildingNumber(ttlockModel.building);
-    hotelData.setFloorNumber(ttlockModel.floor);
+    hotelData.setHotelInfo(ttlockModel.hotelInfo);
+    hotelData.setBuildingNumber(ttlockModel.buildingNumber);
+    hotelData.setFloorNumber(ttlockModel.floorNumber);
     TTLockClient.getDefault().setHotelData(hotelData, ttlockModel.lockData, new SetHotelDataCallback() {
       @Override
       public void onSetHotelDataSuccess() {
