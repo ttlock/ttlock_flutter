@@ -23,7 +23,12 @@ AndroidManifest.xml configuration:
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 ```
 4. in MainActivity extends FlutterActivity, you need add permissions result to ttlock plugin.
-add below code:
+first add import
+```
+import com.ttlock.ttlock_flutter.TtlockFlutterPlugin
+```
+second add below callback code:
+java code:
 
 ```
 @Override
@@ -32,6 +37,13 @@ public void onRequestPermissionsResult(int requestCode, String[] permissions, in
         if (ttlockflutterpluginPlugin != null) {
             ttlockflutterpluginPlugin.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+    }
+```
+kotlin code:
+```
+override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        val ttlockflutterpluginPlugin = flutterEngine!!.plugins[TtlockFlutterPlugin::class.java] as TtlockFlutterPlugin?
+        ttlockflutterpluginPlugin?.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 ```
 
