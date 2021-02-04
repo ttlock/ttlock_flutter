@@ -22,12 +22,15 @@ AndroidManifest.xml configuration:
 <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 ```
-4. in MainActivity extends FlutterActivity, you need add permissions result to ttlock plugin.
+4. in MainActivity extends FlutterActivity, you need add permissions result to ttlock plugin. 
+       
 first add import
+
 ```
 import com.ttlock.ttlock_flutter.TtlockFlutterPlugin
 ```
-second add below callback code:
+
+second add below callback code:   
 java code:
 
 ```
