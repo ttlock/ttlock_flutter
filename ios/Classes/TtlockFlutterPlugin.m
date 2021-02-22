@@ -325,7 +325,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
         
     }else if ([command isEqualToString:command_get_lock_operate_record]) {
         int logType = lockModel.logType.intValue;
-        TTOperateLogType type = logType == 1 ? TTOperateLogTypeLatest :TTOperateLogTypeAll;
+        TTOperateLogType type = logType == 0 ? TTOperateLogTypeLatest :TTOperateLogTypeAll;
         [TTLock getOperationLogWithType:type lockData:lockModel.lockData success:^(NSString *operateRecord) {
             TtlockModel *data = [TtlockModel new];
             data.records = operateRecord;

@@ -474,7 +474,10 @@ class TTLock {
       String lockData,
       TTGetLockOperateRecordCallback callback,
       TTFailedCallback failedCallback) {
-    invoke(COMMAND_GET_LOCK_OPERATE_RECORD, lockData, callback,
+    Map map = Map();
+    map["logType"] = type;
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_GET_LOCK_OPERATE_RECORD, map, callback,
         fail: failedCallback);
   }
 
