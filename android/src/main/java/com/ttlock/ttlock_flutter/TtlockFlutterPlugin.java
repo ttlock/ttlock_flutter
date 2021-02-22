@@ -58,6 +58,7 @@ import com.ttlock.bl.sdk.callback.SetPassageModeCallback;
 import com.ttlock.bl.sdk.callback.SetPowerSaverControlableLockCallback;
 import com.ttlock.bl.sdk.callback.SetPowerSaverWorkModeCallback;
 import com.ttlock.bl.sdk.callback.SetRemoteUnlockSwitchCallback;
+import com.ttlock.bl.sdk.constant.LogType;
 import com.ttlock.bl.sdk.entity.ActivateLiftFloorsResult;
 import com.ttlock.bl.sdk.entity.ControlLockResult;
 import com.ttlock.bl.sdk.entity.CyclicConfig;
@@ -679,7 +680,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     removeCommandTimeOutRunable();
     commandTimeOutCheck(4 * COMMAND_TIME_OUT);
 
-    TTLockClient.getDefault().getOperationLog(ttlockModel.logType, ttlockModel.lockData, ttlockModel.lockMac, new GetOperationLogCallback() {
+    TTLockClient.getDefault().getOperationLog(ttlockModel.logType == 0 ? LogType.NEW : LogType.ALL, ttlockModel.lockData, ttlockModel.lockMac, new GetOperationLogCallback() {
       @Override
       public void onGetLogSuccess(String log) {
         ttlockModel.records = log;
