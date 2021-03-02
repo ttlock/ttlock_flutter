@@ -553,7 +553,10 @@ class TTLock {
 
   static void getLockConfig(TTLockConfig config, String lockData,
       TTGetSwitchStateCallback callback, TTFailedCallback failedCallback) {
-    invoke(COMMAND_GET_LOCK_CONFIG, lockData, callback, fail: failedCallback);
+    Map map = Map();
+    map[TTResponse.lockData] = lockData;
+    map[TTResponse.lockConfig] = config.index;
+    invoke(COMMAND_GET_LOCK_CONFIG, map, callback, fail: failedCallback);
   }
 
   static void setLockConfig(TTLockConfig config, bool isOn, String lockData,
