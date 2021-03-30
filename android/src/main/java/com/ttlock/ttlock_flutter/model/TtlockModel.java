@@ -115,9 +115,14 @@ public class TtlockModel {
     public String sector;
     public String nbAwakeTimeList;
 
+    public String passcodeListString;
+    public String cardListString;
+    public String fingerprintListString;
+
     @Override
     public String toString() {
         return "TtlockModel{" +
+                "lockData='" + lockData + '\'' +
                 ", controlAction=" + controlAction +
                 ", passcode='" + passcode + '\'' +
                 ", passcodeOrigin='" + passcodeOrigin + '\'' +
@@ -165,8 +170,15 @@ public class TtlockModel {
                 ", liftWorkActiveType=" + liftWorkActiveType +
                 ", powerSaverType=" + powerSaverType +
                 ", nbAwakeModes='" + nbAwakeModes + '\'' +
+                ", clientPara='" + clientPara + '\'' +
+                ", hotelInfo='" + hotelInfo + '\'' +
+                ", buildingNumber=" + buildingNumber +
+                ", floorNumber=" + floorNumber +
                 ", sector='" + sector + '\'' +
                 ", nbAwakeTimeList='" + nbAwakeTimeList + '\'' +
+                ", passcodeListString='" + passcodeListString + '\'' +
+                ", cardListString='" + cardListString + '\'' +
+                ", fingerprintListString='" + fingerprintListString + '\'' +
                 '}';
     }
 

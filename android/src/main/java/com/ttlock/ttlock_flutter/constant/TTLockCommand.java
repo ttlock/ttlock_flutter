@@ -90,4 +90,8 @@ public class TTLockCommand {
 
     public static final String COMMAND_SET_HOTLE_CARD_SECTOR = "setHotelCardSector";
     public static final String COMMAND_SET_HOTLE_INFO = "setHotelInfo";
+
+    public static final String COMMAND_GET_ALL_VALID_PASSCODE = "getAllValidPasscode";;
+    public static final String COMMAND_GET_ALL_VALID_CARD = "getAllValidIcCard";
+    public static final String COMMAND_GET_ALL_VALID_FINGERPRINT = "getAllValidFingerprint";
 }
