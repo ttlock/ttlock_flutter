@@ -1,3 +1,10 @@
-## 0.0.1
+## 0.0.2
 
-* TODO: Describe initial release.
+   Add method
+    
+    1. Get valid passcode from lock
+
+    2. Get valid cards from lock
+
+    3. Get valid fingerprints from lock
+
