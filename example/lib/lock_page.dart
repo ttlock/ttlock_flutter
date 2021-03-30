@@ -283,7 +283,7 @@ class _LockPageState extends State<LockPage> {
             });
           } else {
             _showErrorAndDismiss(
-                TTLockError.fail, 'Not support modify passcode');
+                TTLockError.fail, 'Not support delete passcode');
           }
         });
         break;
