@@ -156,7 +156,7 @@ class _LockPageState extends State<LockPage> {
   }
 
   void _click(Command command, BuildContext context) async {
-    // _showLoading('');
+    _showLoading('');
     int startDate = DateTime.now().millisecondsSinceEpoch;
     int endDate = startDate + 3600 * 24 * 30 * 1000;
 
@@ -276,21 +276,15 @@ class _LockPageState extends State<LockPage> {
         TTLock.supportFunction(TTLockFuction.managePasscode, lockData,
             (isSupport) {
           if (isSupport) {
-            TTLock.modifyPasscode("6666", "7777", startDate, endDate, lockData,
-                () {
+            TTLock.deletePasscode("7777", lockData, () {
               _showSuccessAndDismiss("Success");
             }, (errorCode, errorMsg) {
               _showErrorAndDismiss(errorCode, errorMsg);
             });
           } else {
             _showErrorAndDismiss(
-                TTLockError.fail, 'Not support modify passcode');
+                TTLockError.fail, 'Not support delete passcode');
           }
-        });
-        TTLock.deletePasscode("7777", lockData, () {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
         });
         break;
 
