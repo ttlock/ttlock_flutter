@@ -4,7 +4,7 @@
 //
 //  Created by Jinbo Lu on 2019/4/23.
 //  Copyright © 2019 Sciener. All rights reserved.
-//  version:1.0.4
+//  version:1.0.6
 
 #import <Foundation/Foundation.h>
 #import "TTBlocks.h"

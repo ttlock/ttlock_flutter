@@ -6,7 +6,6 @@
 //
 
 #import <Foundation/Foundation.h>
-//#import <TTOnPremiseLock/TTLock.h>
 
 
 @interface TtlockModel : NSObject
@@ -108,7 +107,9 @@
 @property (nonatomic, strong) NSString *sector;
 
 
-
+@property (nonatomic, strong) NSString *passcodeListString;
+@property (nonatomic, strong) NSString *fingerprintListString;
+@property (nonatomic, strong) NSString *cardListString;
 
 + (TtlockModel *)modelWithDict:(NSDictionary *)dict;
 - (NSDictionary *)toDictionary;
