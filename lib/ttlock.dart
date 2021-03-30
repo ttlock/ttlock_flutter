@@ -26,17 +26,21 @@ class TTLock {
   static const String COMMAND_MODIFY_PASSCODE = "modifyPasscode";
   static const String COMMAND_DELETE_PASSCODE = "deletePasscode";
   static const String COMMAND_RESET_PASSCODE = "resetPasscodes";
+  static const String COMMAND_GET_ALL_VALID_PASSCODE = "getAllValidPasscode";
 
   static const String COMMAND_ADD_CARD = "addCard";
   static const String COMMAND_MODIFY_CARD = "modifyIcCard";
   static const String COMMAND_DELETE_CARD = "deleteIcCard";
   static const String COMMAND_CLEAR_ALL_CARD = "clearAllIcCard";
+  static const String COMMAND_GET_ALL_VALID_CARD = "getAllValidIcCard";
 
   static const String COMMAND_ADD_FINGERPRINT = "addFingerprint";
   static const String COMMAND_MODIFY_FINGERPRINT = "modifyFingerprint";
   static const String COMMAND_DELETE_FINGERPRINT = "deleteFingerprint";
   static const String COMMAND_CLEAR_ALL_FINGERPRINT = "clearAllFingerprint";
   static const String COMMAND_MODIFY_ADMIN_PASSCODE = "modifyAdminPasscode";
+  static const String COMMAND_GET_ALL_VALID_FINGERPRINT =
+      "getAllValidFingerprint";
 
   static const String COMMAND_SET_LOCK_TIME = "setLockTime";
   static const String COMMAND_GET_LOCK_TIME = "getLockTime";
@@ -242,6 +246,18 @@ class TTLock {
 
   // ignore: slash_for_doc_comments
 /**
+ * Get all valid cards
+ * 
+ * lockData The lock data string used to operate lock
+ */
+  static void getAllValidPasscode(String lockData,
+      TTGetAllPasscodeCallback callback, TTFailedCallback failedCallback) {
+    invoke(COMMAND_GET_ALL_VALID_PASSCODE, lockData, callback,
+        fail: failedCallback);
+  }
+
+  // ignore: slash_for_doc_comments
+/**
  * Get the lock switch state
  * 
  * lockData The lock data string used to operate lock
@@ -322,6 +338,18 @@ class TTLock {
     map[TTResponse.cardNumber] = cardNumber;
     map[TTResponse.lockData] = lockData;
     invoke(COMMAND_DELETE_CARD, map, callback, fail: failedCallback);
+  }
+
+  // ignore: slash_for_doc_comments
+/**
+ * Get all valid cards
+ * 
+ * lockData The lock data string used to operate lock
+ */
+  static void getAllValidCards(String lockData, TTGetAllCardsCallback callback,
+      TTFailedCallback failedCallback) {
+    invoke(COMMAND_GET_ALL_VALID_CARD, lockData, callback,
+        fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -416,6 +444,18 @@ class TTLock {
   static void clearAllFingerprints(String lockData, TTSuccessCallback callback,
       TTFailedCallback failedCallback) {
     invoke(COMMAND_CLEAR_ALL_FINGERPRINT, lockData, callback,
+        fail: failedCallback);
+  }
+
+// ignore: slash_for_doc_comments
+/**
+ * Get all valid fingerprints
+ * 
+ * lockData The lock data string used to operate lock
+ */
+  static void getAllValidFingerprints(String lockData,
+      TTGetAllFingerprintsCallback callback, TTFailedCallback failedCallback) {
+    invoke(COMMAND_GET_ALL_VALID_FINGERPRINT, lockData, callback,
         fail: failedCallback);
   }
 
@@ -936,7 +976,34 @@ class TTLock {
         TTGetNbAwakeModesCallback getNbAwakeModesCallback = callBack;
         getNbAwakeModesCallback(data[TTResponse.nbAwakeModes]);
         break;
+      case COMMAND_GET_ALL_VALID_PASSCODE:
+        TTGetAllPasscodeCallback getAllPasscodeCallback = callBack;
+        List passcodeList = List();
+        String passcodeListString = data[TTResponse.passcodeListString];
+        if (passcodeListString != null) {
+          passcodeList = convert.jsonDecode(passcodeListString);
+        }
+        getAllPasscodeCallback(passcodeList);
+        break;
+      case COMMAND_GET_ALL_VALID_CARD:
+        TTGetAllCardsCallback getAllCardsCallback = callBack;
 
+        List cardList = List();
+        String cardListString = data[TTResponse.cardListString];
+        if (cardListString != null) {
+          cardList = convert.jsonDecode(cardListString);
+        }
+        getAllCardsCallback(cardList);
+        break;
+      case COMMAND_GET_ALL_VALID_FINGERPRINT:
+        TTGetAllFingerprintsCallback getAllFingerprintsCallback = callBack;
+        List fingerprintList = List();
+        String fingerprintListString = data[TTResponse.fingerprintListString];
+        if (fingerprintListString != null) {
+          fingerprintList = convert.jsonDecode(fingerprintListString);
+        }
+        getAllFingerprintsCallback(fingerprintList);
+        break;
       case COMMAND_GET_NB_AWAKE_TIMES:
         TTGetNbAwakeTimesCallback getNbAwakeTimesCallback = callBack;
         List<Map> nbAwakeTimeList = data[TTResponse.nbAwakeTimeList];
@@ -1132,6 +1199,10 @@ class TTResponse {
   static const String buildingNumber = "buildingNumber";
   static const String floorNumber = "floorNumber";
   static const String sector = "sector";
+
+  static const String passcodeListString = "passcodeListString";
+  static const String cardListString = "cardListString";
+  static const String fingerprintListString = "fingerprintListString";
 }
 
 class TTLockScanModel {
@@ -1287,16 +1358,16 @@ typedef TTGetLockTimeCallback = void Function(int timestamp);
 typedef TTGetLockPasscodeDataCallback = void Function(String passcodeData);
 typedef TTGetLockAutomaticLockingPeriodicTimeCallback = void Function(
     int currentTime, int minTime, int maxTime);
+typedef TTGetAllPasscodeCallback = void Function(List passcodeList);
 
 typedef TTAddCardProgressCallback = void Function();
 typedef TTAddCardCallback = void Function(String cardNumber);
-typedef TTGetAllCardsCallback = void Function(List<Map> cardList);
+typedef TTGetAllCardsCallback = void Function(List cardList);
 
 typedef TTAddFingerprintProgressCallback = void Function(
     int currentCount, int totalCount);
 typedef TTAddFingerprintCallback = void Function(String fingerprintNumber);
-typedef TTGetAllFingerprintsCallback = void Function(
-    List<String> fingerprintList);
+typedef TTGetAllFingerprintsCallback = void Function(List fingerprintList);
 typedef TTGetSwitchStateCallback = void Function(bool isOn);
 typedef TTGetLockStatusCallback = void Function(TTLockSwitchState state);
 

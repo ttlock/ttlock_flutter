@@ -108,3 +108,8 @@
 
 
 
+#define command_get_all_valid_passcode @"getAllValidPasscode"
+#define command_get_all_valid_fingerprint @"getAllValidFingerprint"
+#define command_get_all_valid_card @"getAllValidIcCard"
+
+

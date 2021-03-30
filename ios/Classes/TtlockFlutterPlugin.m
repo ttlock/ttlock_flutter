@@ -528,8 +528,6 @@ typedef NS_ENUM(NSInteger, ResultState) {
     }else if ([command isEqualToString:command_function_support]) {
         NSInteger supportFunction = lockModel.supportFunction.integerValue;
         
-        
-        
         if (supportFunction > 30) {
             supportFunction += 6;
         }else if (supportFunction > 29) {
@@ -651,6 +649,30 @@ typedef NS_ENUM(NSInteger, ResultState) {
     }else if ([command isEqualToString:command_set_hotel_card_sector]) {
         [TTLock setHotelCardSector:lockModel.sector lockData:lockModel.lockData success:^{
             [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }else if ([command isEqualToString:command_get_all_valid_passcode]) {
+        [TTLock getAllValidPasscodesWithLockData:lockModel.lockData success:^(NSString *passcodes) {
+            TtlockModel *data = [TtlockModel new];
+            data.passcodeListString = passcodes;
+            [weakSelf successCallbackCommand:command data:data];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }else if ([command isEqualToString:command_get_all_valid_card]) {
+        [TTLock getAllValidICCardsWithLockData:lockModel.lockData success:^(NSString *allICCardsJsonString) {
+            TtlockModel *data = [TtlockModel new];
+            data.cardListString = allICCardsJsonString;
+            [weakSelf successCallbackCommand:command data:data];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }else if ([command isEqualToString:command_get_all_valid_fingerprint]) {
+        [TTLock getAllValidFingerprintsWithLockData:lockModel.lockData success:^(NSString *allFingerprintsJsonString) {
+            TtlockModel *data = [TtlockModel new];
+            data.fingerprintListString = allFingerprintsJsonString;
+            [weakSelf successCallbackCommand:command data:data];
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];

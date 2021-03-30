@@ -26,14 +26,17 @@ enum Command {
   modifyPasscode,
   deletePasscode,
   resetPasscode,
+  getAllValidPasscode,
   addCard,
   modifyCard,
   deleteCard,
   clearCard,
+  getAllValidCard,
   addFingerprint,
   modifyFingerprint,
   deleteFingerprint,
   clearFingerprint,
+  getAllValidFingerprint,
 
   getLockAutomaticLockingPeriodicTime,
   setLockAutomaticLockingPeriodicTime,
@@ -72,14 +75,17 @@ class _LockPageState extends State<LockPage> {
     {"Get Lock Switch State": Command.getLockSwitchState},
     {"Custom Passcode 6666": Command.customPasscode},
     {"Modify Passcode 6666 -> 7777": Command.modifyPasscode},
+    {"Get All Passcode": Command.getAllValidPasscode},
     {"Delete Passcode 7777": Command.deletePasscode},
     {"Reset Passcode": Command.resetPasscode},
     {"Add Card": Command.addCard},
     {"Modify Card valid Date": Command.modifyCard},
+    {"Get All Cards": Command.getAllValidCard},
     {"Delete Card": Command.deleteCard},
     {"Clear All Cards": Command.clearCard},
     {"Add Fingerprint": Command.addFingerprint},
     {"Modify Fingerprint": Command.modifyFingerprint},
+    {"Get All Fingerprints": Command.getAllValidFingerprint},
     {"Delete Fingerprint": Command.deleteFingerprint},
     {"Cleaer All Fingerprints": Command.clearFingerprint},
     {
@@ -150,7 +156,7 @@ class _LockPageState extends State<LockPage> {
   }
 
   void _click(Command command, BuildContext context) async {
-    _showLoading('');
+    // _showLoading('');
     int startDate = DateTime.now().millisecondsSinceEpoch;
     int endDate = startDate + 3600 * 24 * 30 * 1000;
 
@@ -164,6 +170,8 @@ class _LockPageState extends State<LockPage> {
         });
         break;
       case Command.unlock:
+        //Note: the lockData is not contain userId and valid date.
+        //If you want to get lockData contain userId and valid date please get lockData from api https://open.ttlock.com/doc/api/v3/key/list
         TTLock.controlLock(lockData, TTControlAction.unlock,
             (lockTime, electricQuantity, uniqueId) {
           _showSuccessAndDismiss(
@@ -505,6 +513,27 @@ class _LockPageState extends State<LockPage> {
         int floor = 0;
         TTLock.setHotel(hotelData, building, floor, lockData, () {
           _showSuccessAndDismiss("Success");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+      case Command.getAllValidPasscode:
+        TTLock.getAllValidPasscode(lockData, (passcodeList) {
+          _showSuccessAndDismiss(passcodeList.toString());
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+      case Command.getAllValidCard:
+        TTLock.getAllValidCards(lockData, (cardList) {
+          _showSuccessAndDismiss(cardList.toString());
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+      case Command.getAllValidFingerprint:
+        TTLock.getAllValidFingerprints(lockData, (fingerprintList) {
+          _showSuccessAndDismiss(fingerprintList.toString());
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
