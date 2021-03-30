@@ -156,7 +156,7 @@ class _LockPageState extends State<LockPage> {
   }
 
   void _click(Command command, BuildContext context) async {
-    // _showLoading('');
+    _showLoading('');
     int startDate = DateTime.now().millisecondsSinceEpoch;
     int endDate = startDate + 3600 * 24 * 30 * 1000;
 
