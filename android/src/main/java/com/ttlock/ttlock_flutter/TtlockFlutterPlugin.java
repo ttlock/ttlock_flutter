@@ -19,6 +19,7 @@ import com.ttlock.bl.sdk.api.TTLockClient;
 import com.ttlock.bl.sdk.callback.ActivateLiftFloorsCallback;
 import com.ttlock.bl.sdk.callback.AddFingerprintCallback;
 import com.ttlock.bl.sdk.callback.AddICCardCallback;
+import com.ttlock.bl.sdk.callback.ClearAllFingerprintCallback;
 import com.ttlock.bl.sdk.callback.ClearAllICCardCallback;
 import com.ttlock.bl.sdk.callback.ClearPassageModeCallback;
 import com.ttlock.bl.sdk.callback.ControlLockCallback;
@@ -26,6 +27,9 @@ import com.ttlock.bl.sdk.callback.CreateCustomPasscodeCallback;
 import com.ttlock.bl.sdk.callback.DeleteFingerprintCallback;
 import com.ttlock.bl.sdk.callback.DeleteICCardCallback;
 import com.ttlock.bl.sdk.callback.DeletePasscodeCallback;
+import com.ttlock.bl.sdk.callback.GetAllValidFingerprintCallback;
+import com.ttlock.bl.sdk.callback.GetAllValidICCardCallback;
+import com.ttlock.bl.sdk.callback.GetAllValidPasscodeCallback;
 import com.ttlock.bl.sdk.callback.GetAutoLockingPeriodCallback;
 import com.ttlock.bl.sdk.callback.GetBatteryLevelCallback;
 import com.ttlock.bl.sdk.callback.GetLockConfigCallback;
@@ -500,6 +504,15 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       case TTLockCommand.COMMAND_SET_POWSER_SAVER_CONTROLABLE:
         setPowerSaverControlableLock(ttlockModel);
         break;
+      case TTLockCommand.COMMAND_GET_ALL_VALID_PASSCODE:
+        getAllValidPasscodes(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_GET_ALL_VALID_CARD:
+        getAllValidCards(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_GET_ALL_VALID_FINGERPRINT:
+        getAllValidFingerPrints(ttlockModel);
+        break;
       default:
         apiFail(LockError.INVALID_COMMAND);
         LogUtil.d("unknown command:" + command);
@@ -950,9 +963,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void clearFingerPrint(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().clearAllICCard(ttlockModel.lockData, new ClearAllICCardCallback() {
+    TTLockClient.getDefault().clearAllFingerprints(ttlockModel.lockData, new ClearAllFingerprintCallback() {
       @Override
-      public void onClearAllICCardSuccess() {
+      public void onClearAllFingerprintSuccess() {
         apiSuccess(ttlockModel);
       }
 
@@ -1347,6 +1360,50 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     successCallbackCommand(TTLockCommand.COMMAND_GET_BLUETOOTH_STATE, ttlockModel.toMap());
   }
 
+  public void getAllValidFingerPrints(final TtlockModel ttlockModel) {
+    TTLockClient.getDefault().getAllValidFingerprints(ttlockModel.lockData, new GetAllValidFingerprintCallback() {
+      @Override
+      public void onGetAllFingerprintsSuccess(String fingerprintStr) {
+        ttlockModel.fingerprintListString = fingerprintStr;
+        apiSuccess(ttlockModel);
+      }
+
+      @Override
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
+      }
+    });
+  }
+
+  public void getAllValidPasscodes(final TtlockModel ttlockModel) {
+    TTLockClient.getDefault().getAllValidPasscodes(ttlockModel.lockData, new GetAllValidPasscodeCallback() {
+      @Override
+      public void onGetAllValidPasscodeSuccess(String passcodeStr) {
+        ttlockModel.passcodeListString = passcodeStr;
+        apiSuccess(ttlockModel);
+      }
+
+      @Override
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
+      }
+    });
+  }
+
+  public void getAllValidCards(final TtlockModel ttlockModel) {
+    TTLockClient.getDefault().getAllValidICCards(ttlockModel.lockData, new GetAllValidICCardCallback() {
+      @Override
+      public void onGetAllValidICCardSuccess(String cardListStr) {
+        ttlockModel.cardListString = cardListStr;
+        apiSuccess(ttlockModel);
+      }
+
+      @Override
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
+      }
+    });
+  }
 
   /**
    * android 6.0
