@@ -35,10 +35,12 @@ import com.ttlock.bl.sdk.callback.GetAutoLockingPeriodCallback;
 import com.ttlock.bl.sdk.callback.GetBatteryLevelCallback;
 import com.ttlock.bl.sdk.callback.GetLockConfigCallback;
 import com.ttlock.bl.sdk.callback.GetLockStatusCallback;
+import com.ttlock.bl.sdk.callback.GetLockSystemInfoCallback;
 import com.ttlock.bl.sdk.callback.GetLockTimeCallback;
 import com.ttlock.bl.sdk.callback.GetNBAwakeModesCallback;
 import com.ttlock.bl.sdk.callback.GetNBAwakeTimesCallback;
 import com.ttlock.bl.sdk.callback.GetOperationLogCallback;
+import com.ttlock.bl.sdk.callback.GetPasscodeVerificationInfoCallback;
 import com.ttlock.bl.sdk.callback.GetRemoteUnlockStateCallback;
 import com.ttlock.bl.sdk.callback.InitLockCallback;
 import com.ttlock.bl.sdk.callback.ModifyAdminPasscodeCallback;
@@ -58,6 +60,7 @@ import com.ttlock.bl.sdk.callback.SetLockConfigCallback;
 import com.ttlock.bl.sdk.callback.SetLockTimeCallback;
 import com.ttlock.bl.sdk.callback.SetNBAwakeModesCallback;
 import com.ttlock.bl.sdk.callback.SetNBAwakeTimesCallback;
+import com.ttlock.bl.sdk.callback.SetNBServerCallback;
 import com.ttlock.bl.sdk.callback.SetPassageModeCallback;
 import com.ttlock.bl.sdk.callback.SetPowerSaverControlableLockCallback;
 import com.ttlock.bl.sdk.callback.SetPowerSaverWorkModeCallback;
@@ -104,6 +107,7 @@ import com.ttlock.ttlock_flutter.model.TTLockConfigConverter;
 import com.ttlock.ttlock_flutter.model.TTLockErrorConverter;
 import com.ttlock.ttlock_flutter.model.TTLockFunction;
 import com.ttlock.ttlock_flutter.model.TtlockModel;
+import com.ttlock.ttlock_flutter.util.Utils;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -479,10 +483,10 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       case TTLockCommand.COMMAND_ACTIVE_LIFT_FLOORS:
         activateLiftFloors(ttlockModel);
         break;
-      case TTLockCommand.COMMAND_SET_HOTLE_CARD_SECTOR:
+      case TTLockCommand.COMMAND_SET_HOTEL_CARD_SECTOR:
         setHotelSector(ttlockModel);
         break;
-      case TTLockCommand.COMMAND_SET_HOTLE_INFO:
+      case TTLockCommand.COMMAND_SET_HOTEL_INFO:
         setHotelData(ttlockModel);
         break;
       case TTLockCommand.COMMAND_SET_LIFT_WORK_MODE:
@@ -514,6 +518,18 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         break;
       case TTLockCommand.COMMAND_GET_ALL_VALID_FINGERPRINT:
         getAllValidFingerPrints(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_SET_NB_SERVER_INFO:
+        setNBServerInfo(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_GET_LOCK_SYSTEM_INFO:
+        getLockSystemInfo(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_GET_PASSCODE_VERIFICATION_PARAMS:
+        getPasscodeVerificationParams(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_SET_ADMIN_ERASE_PASSCODE:
+
         break;
       default:
         apiFail(LockError.INVALID_COMMAND);
@@ -1422,6 +1438,53 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
+  public void setNBServerInfo(final TtlockModel ttlockModel) {
+    TTLockClient.getDefault().setNBServerInfo((short) ttlockModel.nbServerPort, ttlockModel.nbServerAddress, ttlockModel.lockData, new SetNBServerCallback() {
+      @Override
+      public void onSetNBServerSuccess(int battery) {
+          apiSuccess(ttlockModel);
+      }
+
+      @Override
+      public void onFail(LockError lockError) {
+          apiFail(lockError);
+      }
+    });
+  }
+
+  public void getLockSystemInfo(final TtlockModel ttlockModel) {
+    TTLockClient.getDefault().getLockSystemInfo(ttlockModel.lockData, null, new GetLockSystemInfoCallback() {
+      @Override
+      public void onGetLockSystemInfoSuccess(com.ttlock.bl.sdk.entity.DeviceInfo deviceInfo) {
+          apiSuccess(Utils.object2Map(deviceInfo));
+      }
+
+      @Override
+      public void onFail(LockError lockError) {
+          apiFail(lockError);
+      }
+    });
+  }
+
+  public void getPasscodeVerificationParams(final TtlockModel ttlockModel) {
+    TTLockClient.getDefault().getPasscodeVerificationParams(ttlockModel.lockData, new GetPasscodeVerificationInfoCallback() {
+      @Override
+      public void onGetInfoSuccess(String lockData) {
+        ttlockModel.lockData = lockData;
+        apiSuccess(ttlockModel);
+      }
+
+      @Override
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
+      }
+    });
+  }
+
+  public void setAdminErasePasscode(final TtlockModel ttlockModel) {
+
+  }
+
   /**
    * android 6.0
    */
@@ -1510,8 +1573,16 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void apiSuccess(TtlockModel ttlockModel) {
+    apiSuccess(ttlockModel.toMap());
+//    removeCommandTimeOutRunable();
+//    successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
+//    tryAgain = true;
+//    doNextCommandAction();
+  }
+
+  public void apiSuccess(Map<String, Object> resMap) {
     removeCommandTimeOutRunable();
-    successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
+    successCallbackCommand(commandQue.poll(), resMap);
     tryAgain = true;
     doNextCommandAction();
   }

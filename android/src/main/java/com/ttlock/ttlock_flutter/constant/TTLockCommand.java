@@ -88,10 +88,14 @@ public class TTLockCommand {
     public static final String COMMAND_GET_DOOR_SENSOR_SWITCH = "getDoorSensorSwitch";
     public static final String COMMAND_GET_DOOR_SENSOR_STATE = "getDoorSensorState";
 
-    public static final String COMMAND_SET_HOTLE_CARD_SECTOR = "setHotelCardSector";
-    public static final String COMMAND_SET_HOTLE_INFO = "setHotelInfo";
+    public static final String COMMAND_SET_HOTEL_CARD_SECTOR = "setHotelCardSector";
+    public static final String COMMAND_SET_HOTEL_INFO = "setHotelInfo";
 
     public static final String COMMAND_GET_ALL_VALID_PASSCODE = "getAllValidPasscode";;
     public static final String COMMAND_GET_ALL_VALID_CARD = "getAllValidIcCard";
     public static final String COMMAND_GET_ALL_VALID_FINGERPRINT = "getAllValidFingerprint";
+
+    public static final String COMMAND_SET_NB_SERVER_INFO = "setNBServerInfo";
+    public static final String COMMAND_GET_LOCK_SYSTEM_INFO = "getLockSystemInfo";
+    public static final String COMMAND_GET_PASSCODE_VERIFICATION_PARAMS = "getPasscodeVerificationParams";
 }

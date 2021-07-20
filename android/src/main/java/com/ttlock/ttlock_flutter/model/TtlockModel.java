@@ -119,6 +119,9 @@ public class TtlockModel {
     public String cardListString;
     public String fingerprintListString;
 
+    public String nbServerAddress;
+    public int nbServerPort;
+
     @Override
     public String toString() {
         return "TtlockModel{" +

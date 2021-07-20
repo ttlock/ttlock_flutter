@@ -59,7 +59,12 @@ enum Command {
   getDoorSensorState,
 
   setHotelCardSector,
-  setHotelData
+  setHotelData,
+
+  setNBServerInfo,
+  getAdminPasscode,
+  getLockSystemInfo,
+  getPasscodeVerificationParams,
 }
 
 class _LockPageState extends State<LockPage> {
@@ -117,7 +122,11 @@ class _LockPageState extends State<LockPage> {
     {"Get Door Sensor Switch": Command.getDoorSensorSwitch},
     {"Get Door Sensor State": Command.getDoorSensorState},
     {"Set Hotel Card Sector": Command.setHotelCardSector},
-    {"Set Hotel Data": Command.setHotelData}
+    {"Set Hotel Data": Command.setHotelData},
+    {"Set Nb Server Info": Command.setNBServerInfo},
+    {"Get Admin Passcode": Command.getAdminPasscode},
+    {"Get Lock System Info": Command.getLockSystemInfo},
+    {"Get Passcode Verification Param": Command.getPasscodeVerificationParams},
   ];
 
   String note =
@@ -528,6 +537,36 @@ class _LockPageState extends State<LockPage> {
       case Command.getAllValidFingerprint:
         TTLock.getAllValidFingerprints(lockData, (fingerprintList) {
           _showSuccessAndDismiss(fingerprintList.toString());
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+      case Command.setNBServerInfo:
+        int nbServerPort = 5683;
+        String nbServerAddress = "117.60.157.137";
+        TTLock.setNBServerInfo(nbServerAddress, nbServerPort, lockData, () {
+          _showSuccessAndDismiss("Success");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+      case Command.getAdminPasscode:
+        TTLock.getAdminPasscode(lockData, (adminPasscode) {
+          _showSuccessAndDismiss("AdminPasscode: $adminPasscode");
+        }, (errorCode, errorMsg) {
+              _showErrorAndDismiss(errorCode, errorMsg);
+            });
+        break;
+      case Command.getLockSystemInfo:
+        TTLock.getLockSystemInfo(lockData, (lockSystemInfoModel) {
+          _showSuccessAndDismiss(lockSystemInfoModel.toString());
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+      case Command.getPasscodeVerificationParams:
+        TTLock.getPasscodeVerificationParams(lockData, (lockData) {
+          _showSuccessAndDismiss("Get Passcode Verification Params success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });

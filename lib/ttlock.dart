@@ -85,8 +85,13 @@ class TTLock {
   static const String COMMAND_GET_DOOR_SENSOR_SWITCH = "getDoorSensorSwitch";
   static const String COMMAND_GET_DOOR_SENSOR_STATE = "getDoorSensorState";
 
-  static const String COMMAND_SET_HOTLE_CARD_SECTOR = "setHotelCardSector";
-  static const String COMMAND_SET_HOTLE_INOF = "setHotelInfo";
+  static const String COMMAND_SET_HOTEL_CARD_SECTOR = "setHotelCardSector";
+  static const String COMMAND_SET_HOTEL_INFO = "setHotelInfo";
+
+  static const String COMMAND_SET_NB_SERVER_INFO = "setNBServerInfo";
+  static const String COMMAND_GET_ADMIN_PASSCODE = "getAdminPasscode";
+  static const String COMMAND_GET_LOCK_SYSTEM_INFO = "getLockSystemInfo";
+  static const String COMMAND_GET_PASSCODE_VERIFICATION_PARAMS = "getPasscodeVerificationParams";
 
   static List _commandQueue = List();
 
@@ -763,7 +768,7 @@ class TTLock {
     map[TTResponse.buildingNumber] = buildingNumber;
     map[TTResponse.floorNumber] = floorNumber;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_SET_HOTLE_INOF, map, callback, fail: failedCallback);
+    invoke(COMMAND_SET_HOTEL_INFO, map, callback, fail: failedCallback);
   }
 
   static void setHotelCardSector(String sector, String lockData,
@@ -771,12 +776,36 @@ class TTLock {
     Map map = Map();
     map[TTResponse.sector] = sector;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_SET_HOTLE_CARD_SECTOR, map, callback, fail: failedCallback);
+    invoke(COMMAND_SET_HOTEL_CARD_SECTOR, map, callback, fail: failedCallback);
   }
 
   static void getDoorSensorState(String lockData,
       TTGetSwitchStateCallback callback, TTFailedCallback failedCallback) {
     invoke(COMMAND_GET_DOOR_SENSOR_STATE, lockData, callback,
+        fail: failedCallback);
+  }
+
+  static void setNBServerInfo(String nbServerAddress, int nbServerPort, String lockData,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.nbServerAddress] = nbServerAddress;
+    map[TTResponse.nbServerPort] = nbServerPort;
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_SET_NB_SERVER_INFO, map, callback, fail: failedCallback);
+  }
+
+  static void getAdminPasscode(String lockData, TTGetAdminPasscodeCallback callback, TTFailedCallback failedCallback) {
+    invoke(COMMAND_GET_ADMIN_PASSCODE, lockData, callback,
+        fail: failedCallback);
+  }
+
+  static void getLockSystemInfo(String lockData, TTGetLockSystemInfoCallback callback, TTFailedCallback failedCallback) {
+    invoke(COMMAND_GET_LOCK_SYSTEM_INFO, lockData, callback,
+        fail: failedCallback);
+  }
+
+  static void getPasscodeVerificationParams(String lockData, TTGetPasscodeVerificationParamsCallback callback, TTFailedCallback failedCallback) {
+    invoke(COMMAND_GET_PASSCODE_VERIFICATION_PARAMS, lockData, callback,
         fail: failedCallback);
   }
 
@@ -1018,6 +1047,21 @@ class TTLock {
         getNbAwakeTimesCallback(list);
         break;
 
+      case COMMAND_GET_ADMIN_PASSCODE:
+        TTGetAdminPasscodeCallback getAdminPasscodeCallback = callBack;
+        getAdminPasscodeCallback(data[TTResponse.adminPasscode]);
+        break;
+
+      case COMMAND_GET_LOCK_SYSTEM_INFO:
+        TTGetLockSystemInfoCallback getLockSystemInfoCallback = callBack;
+        getLockSystemInfoCallback(TTLockSystemInfoModel(data));
+        break;
+
+      case COMMAND_GET_PASSCODE_VERIFICATION_PARAMS:
+        TTGetPasscodeVerificationParamsCallback getPasscodeVerificationParamsCallback = callBack;
+        getPasscodeVerificationParamsCallback(data[TTResponse.lockData]);
+        break;
+
       case TTGateway.COMMAND_CONNECT_GATEWAY:
         TTGatewayConnectCallback connectCallback = callBack;
         TTGatewayConnectStatus status =
@@ -1203,6 +1247,18 @@ class TTResponse {
   static const String passcodeListString = "passcodeListString";
   static const String cardListString = "cardListString";
   static const String fingerprintListString = "fingerprintListString";
+
+  static const String nbServerAddress = "nbServerAddress";
+  static const String nbServerPort = "nbServerPort";
+
+  static const String modelNum = "modelNum";
+  static const String hardwareRevision = "hardwareRevision";
+  static const String firmwareRevision = "firmwareRevision";
+  static const String nbNodeId = "nbNodeId";
+  static const String nbOperator = "nbOperator";
+  static const String nbCardNumber = "nbCardNumber";
+  static const String nbRssi = "nbRssi";
+
 }
 
 class TTLockScanModel {
@@ -1232,6 +1288,42 @@ class TTLockScanModel {
     this.oneMeterRssi = map[TTResponse.oneMeterRssi];
     this.timestamp = map[TTResponse.timestamp];
   }
+}
+
+class TTLockSystemInfoModel {
+  String modelNum;
+  String hardwareRevision;
+  String firmwareRevision;
+
+  /**
+   * NB lock IMEI
+   */
+  String nbNodeId;
+  String nbOperator;
+  String nbCardNumber;
+  int nbRssi;
+
+  TTLockSystemInfoModel(Map map) {
+    this.modelNum = map[TTResponse.modelNum];
+    this.firmwareRevision = map[TTResponse.firmwareRevision];
+    this.hardwareRevision = map[TTResponse.hardwareRevision];
+    this.nbNodeId = map[TTResponse.nbNodeId];
+    this.nbOperator = map[TTResponse.nbOperator];
+    this.nbCardNumber = map[TTResponse.nbCardNumber];
+    this.nbRssi = map[TTResponse.nbRssi];
+  }
+
+  @override
+  String toString() {
+    return "modelNum:" + modelNum
+          + "\nhardwareRevision:" + hardwareRevision
+          + "\nfirmwareRevision:" + firmwareRevision;
+          // + "\nnbNodeId:" + nbNodeId
+          // + "\nnbOperator:" + nbOperator
+          // + "\nnbCardNumber:" + nbCardNumber
+          // + "\nnbRssi:" + nbRssi.toString();
+  }
+
 }
 
 class TTCycleModel {
@@ -1387,6 +1479,9 @@ typedef TTLiftCallback = void Function(
 typedef TTGetNbAwakeModesCallback = void Function(List<TTNbAwakeMode> list);
 typedef TTGetNbAwakeTimesCallback = void Function(
     List<TTNbAwakeTimeModel> list);
+
+typedef TTGetLockSystemInfoCallback = void Function(TTLockSystemInfoModel lockSystemInfoModel);
+typedef TTGetPasscodeVerificationParamsCallback = void Function(String lockData);
 
 class TTGatewayScanModel {
   String gatewayName;
