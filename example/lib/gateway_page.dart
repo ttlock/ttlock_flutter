@@ -6,15 +6,15 @@ import 'package:ttlock_flutter/ttlock.dart';
 import 'config.dart';
 
 class GatewayPage extends StatefulWidget {
-  GatewayPage({this.wifi}) : super();
+  GatewayPage({required this.wifi}) : super();
   final String wifi;
   @override
   _GatewayPageState createState() => _GatewayPageState(wifi);
 }
 
 class _GatewayPageState extends State<GatewayPage> {
-  BuildContext _context;
-  String _wifi;
+  BuildContext? _context;
+  String _wifi = '';
   String _wifiPassword = '';
   _GatewayPageState(String wifi) {
     super.initState();
@@ -22,15 +22,15 @@ class _GatewayPageState extends State<GatewayPage> {
   }
 
   void _showLoading() {
-    ProgressHud.of(_context).showLoading(text: '');
+    ProgressHud.of(_context!).showLoading(text: '');
   }
 
   void _showAndDismiss(ProgressHudType type, String text) {
-    ProgressHud.of(_context).showAndDismiss(type, text);
+    ProgressHud.of(_context!).showAndDismiss(type, text);
   }
 
   void _initGateway(String wifi, String wifiPassword) {
-    FocusScope.of(_context).requestFocus(FocusNode());
+    FocusScope.of(_context!).requestFocus(FocusNode());
 
     Map paramMap = Map();
     paramMap["wifi"] = wifi;

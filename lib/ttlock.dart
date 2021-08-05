@@ -1,7 +1,6 @@
 import 'package:flutter/services.dart';
 import 'dart:convert' as convert;
-
-import 'package:ttlock_flutter/ttgateway.dart';
+import 'ttgateway.dart';
 
 class TTLock {
   static bool isOnPremise = false;
@@ -88,7 +87,7 @@ class TTLock {
   static const String COMMAND_SET_HOTLE_CARD_SECTOR = "setHotelCardSector";
   static const String COMMAND_SET_HOTLE_INOF = "setHotelInfo";
 
-  static List _commandQueue = List();
+  static List _commandQueue = [];
 
   static bool printLog = true;
 
@@ -278,7 +277,7 @@ class TTLock {
    * lockData The lock data string used to operate lock
    */
   static void addCard(
-      List<TTCycleModel> cycleList,
+      List<TTCycleModel>? cycleList,
       int startDate,
       int endDate,
       String lockData,
@@ -308,7 +307,7 @@ class TTLock {
  */
   static void modifyCardValidityPeriod(
       String cardNumber,
-      List<TTCycleModel> cycleList,
+      List<TTCycleModel>? cycleList,
       int startDate,
       int endDate,
       String lockData,
@@ -373,7 +372,7 @@ class TTLock {
    * lockData The lock data string used to operate lock
    */
   static void addFingerprint(
-      List<TTCycleModel> cycleList,
+      List<TTCycleModel>? cycleList,
       int startDate,
       int endDate,
       String lockData,
@@ -403,7 +402,7 @@ class TTLock {
  */
   static void modifyFingerprintValidityPeriod(
       String fingerprintNumber,
-      List<TTCycleModel> cycleList,
+      List<TTCycleModel>? cycleList,
       int startDate,
       int endDate,
       String lockData,
@@ -621,8 +620,8 @@ class TTLock {
  */
   static void addPassageMode(
       TTPassageModeType type,
-      List<int> weekly,
-      List<int> monthly,
+      List<int>? weekly,
+      List<int>? monthly,
       int startTime,
       int endTime,
       String lockData,
@@ -698,7 +697,7 @@ class TTLock {
 
   // static void setNbAwakeModes(List<TTNbAwakeMode> modes, String lockData,
   //     TTSuccessCallback callback, TTFailedCallback failedCallback) {
-  //   List list = new List();
+  //   List list = [];
   //   modes.forEach((element) {
   //     list.add(element.index);
   //   });
@@ -717,7 +716,7 @@ class TTLock {
 
   // static void setNbAwakeTimes(List<TTNbAwakeTimeModel> times, String lockData,
   //     TTSuccessCallback callback, TTFailedCallback failedCallback) {
-  //   List list = new List();
+  //   List list = [];
   //   times.forEach((element) {
   //     Map nbAwakeTimeMap = new Map();
   //     nbAwakeTimeMap[TTResponse.minutes] = element.minutes;
@@ -788,8 +787,8 @@ class TTLock {
     TTGateway.COMMAND_STOP_SCAN_GATEWAY
   ];
 
-  static void invoke(String command, Object parameter, Object success,
-      {Object progress, Object fail}) {
+  static void invoke(String command, Object? parameter, Object? success,
+      {Object? progress, Object? fail}) {
     if (!isListenEvent) {
       isListenEvent = true;
       _listenChannel
@@ -800,7 +799,7 @@ class TTLock {
     //开始、停止扫描的时候  清空之前所有的扫描回调
     scanCommandList.forEach((scanCommand) {
       if (command.compareTo(scanCommand) == 0) {
-        List removeMapList = new List();
+        List removeMapList = [];
         _commandQueue.forEach((map) {
           String key = map.keys.first;
           if (key.compareTo(COMMAND_START_SCAN_LOCK) == 0 ||
@@ -839,7 +838,7 @@ class TTLock {
 
   static void _successCallback(String command, Map data) {
     //获取队列里面能匹配到最前一个回调指令
-    Object callBack;
+    dynamic callBack;
     int index = -1;
     for (var i = 0; i < _commandQueue.length; i++) {
       Map map = _commandQueue[i];
@@ -978,7 +977,7 @@ class TTLock {
         break;
       case COMMAND_GET_ALL_VALID_PASSCODE:
         TTGetAllPasscodeCallback getAllPasscodeCallback = callBack;
-        List passcodeList = List();
+        List passcodeList = [];
         String passcodeListString = data[TTResponse.passcodeListString];
         if (passcodeListString != null) {
           passcodeList = convert.jsonDecode(passcodeListString);
@@ -988,7 +987,7 @@ class TTLock {
       case COMMAND_GET_ALL_VALID_CARD:
         TTGetAllCardsCallback getAllCardsCallback = callBack;
 
-        List cardList = List();
+        List cardList = [];
         String cardListString = data[TTResponse.cardListString];
         if (cardListString != null) {
           cardList = convert.jsonDecode(cardListString);
@@ -997,7 +996,7 @@ class TTLock {
         break;
       case COMMAND_GET_ALL_VALID_FINGERPRINT:
         TTGetAllFingerprintsCallback getAllFingerprintsCallback = callBack;
-        List fingerprintList = List();
+        List fingerprintList = [];
         String fingerprintListString = data[TTResponse.fingerprintListString];
         if (fingerprintListString != null) {
           fingerprintList = convert.jsonDecode(fingerprintListString);
@@ -1007,7 +1006,7 @@ class TTLock {
       case COMMAND_GET_NB_AWAKE_TIMES:
         TTGetNbAwakeTimesCallback getNbAwakeTimesCallback = callBack;
         List<Map> nbAwakeTimeList = data[TTResponse.nbAwakeTimeList];
-        List<TTNbAwakeTimeModel> list = new List();
+        List<TTNbAwakeTimeModel> list = [];
 
         nbAwakeTimeList.forEach((element) {
           TTNbAwakeTimeModel model = new TTNbAwakeTimeModel();
@@ -1043,7 +1042,7 @@ class TTLock {
   }
 
   static void _progressCallback(String command, Map data) {
-    Object callBack;
+    dynamic callBack;
     for (var i = 0; i < _commandQueue.length; i++) {
       Map map = _commandQueue[i];
       String key = map.keys.first;
@@ -1073,7 +1072,7 @@ class TTLock {
           "The TTLock SDK can only communicate with one lock at a time";
     }
 
-    Object callBack;
+    dynamic callBack;
     int index = -1;
     for (var i = 0; i < _commandQueue.length; i++) {
       Map map = _commandQueue[i];
@@ -1105,14 +1104,14 @@ class TTLock {
   }
 
   // 数据接收
-  static void _onEvent(Object value) {
+  static void _onEvent(dynamic value) {
     if (printLog) {
       print('TTLock listen: $value');
     }
 
     Map map = value;
     String command = map[TTResponse.command];
-    Map data = map[TTResponse.data];
+    Map data = map[TTResponse.data] == null ? {} : map[TTResponse.data];
     int resultState = map[TTResponse.resultState];
 
     if (resultState == TTLockReuslt.fail.index) {
@@ -1206,24 +1205,24 @@ class TTResponse {
 }
 
 class TTLockScanModel {
-  String lockName;
-  String lockMac;
-  bool isInited;
-  bool isAllowUnlock;
-  bool isDfuMode;
-  int electricQuantity;
-  String lockVersion;
-  TTLockSwitchState lockSwitchState;
-  int rssi;
-  int oneMeterRssi;
-  int timestamp;
+  String lockName = '';
+  String lockMac = '';
+  bool isInited = true;
+  bool isAllowUnlock = false;
+  // bool isDfuMode;
+  int electricQuantity = -1;
+  String lockVersion = '';
+  TTLockSwitchState lockSwitchState = TTLockSwitchState.unknow;
+  int rssi = -1;
+  int oneMeterRssi = -1;
+  int timestamp = 0;
 
   TTLockScanModel(Map map) {
     this.lockName = map[TTResponse.lockName];
     this.lockMac = map[TTResponse.lockMac];
     this.isInited = map[TTResponse.isInited];
     this.isAllowUnlock = map[TTResponse.isAllowUnlock];
-    this.isDfuMode = map[TTResponse.isDfuMode];
+    // this.isDfuMode = map[TTResponse.isDfuMode];
     this.electricQuantity = map[TTResponse.electricQuantity];
     this.lockVersion = map[TTResponse.lockVersion];
     this.lockSwitchState =
@@ -1236,11 +1235,11 @@ class TTLockScanModel {
 
 class TTCycleModel {
   // weekDay  1-7,1 means Monday，2 means  Tuesday ,...,7 means Sunday
-  int weekDay;
+  int weekDay = 0;
   // startTime The time when it becomes valid (minutes from 0 clock)
-  int startTime;
+  int startTime = 0;
   // endTime  The time when it is expired (minutes from 0 clock)
-  int endTime;
+  int endTime = 0;
 
   /// jsonDecode(jsonStr) 方法中会调用实体类的这个方法。如果实体类中没有这个方法，会报错。
   Map toJson() {
@@ -1389,10 +1388,10 @@ typedef TTGetNbAwakeTimesCallback = void Function(
     List<TTNbAwakeTimeModel> list);
 
 class TTGatewayScanModel {
-  String gatewayName;
-  String gatewayMac;
-  int rssi;
-  bool isDfuMode;
+  String gatewayName = '';
+  String gatewayMac = '';
+  int rssi = -1;
+  bool isDfuMode = false;
 
   TTGatewayScanModel(Map map) {
     this.gatewayName = map["gatewayName"];
@@ -1403,8 +1402,8 @@ class TTGatewayScanModel {
 }
 
 class TTNbAwakeTimeModel {
-  TTNbAwakeTimeType type;
-  int minutes;
+  TTNbAwakeTimeType type = TTNbAwakeTimeType.point;
+  int minutes = 0;
 }
 
 enum TTGatewayError {

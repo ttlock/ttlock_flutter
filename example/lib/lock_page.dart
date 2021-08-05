@@ -3,7 +3,11 @@ import 'package:ttlock_flutter/ttlock.dart';
 import 'package:bmprogresshud/progresshud.dart';
 
 class LockPage extends StatefulWidget {
-  LockPage({Key key, this.title, this.lockData, this.lockMac})
+  LockPage(
+      {Key? key,
+      required this.title,
+      required this.lockData,
+      required this.lockMac})
       : super(key: key);
   final String title;
   final String lockData;
@@ -123,11 +127,11 @@ class _LockPageState extends State<LockPage> {
   String note =
       'Note: You need to reset the lock befor pop current page,otherwise the lock will can\'t be initialized again';
 
-  String lockData;
-  String lockMac;
-  String addCardNumber;
-  String addFingerprintNumber;
-  BuildContext _context;
+  String lockData = '';
+  String lockMac = '';
+  String? addCardNumber;
+  String? addFingerprintNumber;
+  BuildContext? _context;
 
   _LockPageState(String lockData, String lockMac) {
     super.initState();
@@ -136,15 +140,15 @@ class _LockPageState extends State<LockPage> {
   }
 
   void _showLoading(String text) {
-    ProgressHud.of(_context).showLoading(text: text);
+    ProgressHud.of(_context!).showLoading(text: text);
   }
 
   void _showSuccessAndDismiss(String text) {
-    ProgressHud.of(_context).showAndDismiss(ProgressHudType.success, text);
+    ProgressHud.of(_context!).showAndDismiss(ProgressHudType.success, text);
   }
 
   void _showErrorAndDismiss(TTLockError errorCode, String errorMsg) {
-    ProgressHud.of(_context).showAndDismiss(
+    ProgressHud.of(_context!).showAndDismiss(
         ProgressHudType.error, 'errorCode:$errorCode errorMessage:$errorMsg');
   }
 
@@ -307,15 +311,25 @@ class _LockPageState extends State<LockPage> {
         break;
 
       case Command.modifyCard:
+        if (addCardNumber == null) {
+          _showErrorAndDismiss(
+              TTLockError.cardNotExist, 'please add an ic card first');
+          return;
+        }
         TTLock.modifyCardValidityPeriod(
-            addCardNumber, null, startDate, endDate, lockData, () {
+            addCardNumber!, null, startDate, endDate, lockData, () {
           _showSuccessAndDismiss("Success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
         break;
       case Command.deleteCard:
-        TTLock.deleteCard(addCardNumber, lockData, () {
+        if (addCardNumber == null) {
+          _showErrorAndDismiss(
+              TTLockError.cardNotExist, 'please add an ic card first');
+          return;
+        }
+        TTLock.deleteCard(addCardNumber!, lockData, () {
           _showSuccessAndDismiss("Success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
@@ -343,15 +357,25 @@ class _LockPageState extends State<LockPage> {
         break;
 
       case Command.modifyFingerprint:
+        if (addFingerprintNumber == null) {
+          _showErrorAndDismiss(
+              TTLockError.fingerprintNotExist, 'please add fingerprint first');
+          return;
+        }
         TTLock.modifyFingerprintValidityPeriod(
-            addFingerprintNumber, null, startDate, endDate, lockData, () {
+            addFingerprintNumber!, null, startDate, endDate, lockData, () {
           _showSuccessAndDismiss("Success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
         break;
       case Command.deleteFingerprint:
-        TTLock.deleteFingerprint(addFingerprintNumber, lockData, () {
+        if (addFingerprintNumber == null) {
+          _showErrorAndDismiss(
+              TTLockError.fingerprintNotExist, 'please add fingerprint first');
+          return;
+        }
+        TTLock.deleteFingerprint(addFingerprintNumber!, lockData, () {
           _showSuccessAndDismiss("Success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
@@ -543,8 +567,7 @@ class _LockPageState extends State<LockPage> {
         },
         itemCount: _commandList.length,
         itemBuilder: (context, index) {
-          Object object = _commandList[index];
-          Map map = Map.from(object);
+          Map<String, Command> map = _commandList[index];
           String title = '${map.keys.first}';
           String subtitle = index == 0 ? note : '';
           return ListTile(
