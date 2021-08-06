@@ -35,7 +35,6 @@ class TTGateway {
     TTGatewayInitCallback callback,
     TTGatewayFailedCallback failedCallback,
   ) {
-    Map map = Map();
     map[TTResponse.addGatewayJsonStr] = convert.jsonEncode(map);
     TTLock.invoke(COMMAND_INIT_GATEWAY, map, callback, fail: failedCallback);
   }

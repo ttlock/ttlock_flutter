@@ -38,36 +38,34 @@ class _GatewayPageState extends State<GatewayPage> {
     }
 
     Map paramMap = Map();
-    paramMap["type"] = TTGatewayType.g2.index;
     paramMap["wifi"] = wifi;
     paramMap["wifiPassword"] = wifiPassword;
     _initGateway(paramMap);
   }
 
-  void _initGateway_3_4(TTGatewayType type) {
+  void _initGateway_3_4() {
     Map paramMap = Map();
-    paramMap["type"] = type.index;
     _initGateway(paramMap);
   }
 
   void _initGateway(Map paramMap) {
-    FocusScope.of(_context!).requestFocus(FocusNode());
-
+    paramMap["type"] = _type!.index;
     paramMap["gatewayName"] = Config.gatewayName;
     paramMap["ttlockUid"] = Config.ttlockUid;
     paramMap["ttlockLoginPassword"] = Config.ttlockLoginPassword;
 
     // test account.  ttlockUid = 17498, ttlockLoginPassword = "1111111"
-    if (Config.ttlockUid == 17498) {
-      String errorDesc =
-          "Please config ttlockUid and ttlockLoginPassword. Reference documentation ‘https://open.sciener.com/doc/api/v3/user/getUid’";
-      _showAndDismiss(ProgressHudType.error, errorDesc);
-      print(errorDesc);
-      return;
-    }
+    // if (Config.ttlockUid == 17498) {
+    //   String errorDesc =
+    //       "Please config ttlockUid and ttlockLoginPassword. Reference documentation ‘https://open.sciener.com/doc/api/v3/user/getUid’";
+    //   _showAndDismiss(ProgressHudType.error, errorDesc);
+    //   print(errorDesc);
+    //   return;
+    // }
 
     _showLoading();
     TTGateway.init(paramMap, (map) {
+      print("网关添加结果");
       print(map);
       _showAndDismiss(ProgressHudType.success, 'Init Gateway Success');
     }, (errorCode, errorMsg) {
@@ -97,33 +95,44 @@ class _GatewayPageState extends State<GatewayPage> {
   }
 
   Widget getChild() {
-    return Column(
-      children: <Widget>[
-        TextField(
-          textAlign: TextAlign.center,
-          controller: TextEditingController(text: _wifi),
-          enabled: false,
-        ),
-        TextField(
-          textAlign: TextAlign.center,
-          controller: TextEditingController(text: _wifiPassword),
-          decoration: InputDecoration(hintText: 'Input wifi password'),
-          onChanged: (String content) {
-            _wifiPassword = content;
-          },
-        ),
-        ElevatedButton(
-          child: Text('Init Gateway'),
-          onPressed: () {
-            //g2
-            if (_type == TTGatewayType.g2) {
-              _initGateway_2(_wifi, _wifiPassword);
-            } else {
-              _initGateway_3_4(_type!);
-            }
-          },
-        )
-      ],
+    TextField wifiTextField = TextField(
+      textAlign: TextAlign.center,
+      controller: TextEditingController(text: _wifi),
+      enabled: false,
     );
+
+    TextField wifiPasswordTextField = TextField(
+        textAlign: TextAlign.center,
+        controller: TextEditingController(text: _wifiPassword),
+        decoration: InputDecoration(hintText: 'Input wifi password'),
+        onChanged: (String content) {
+          _wifiPassword = content;
+        });
+
+    ElevatedButton initGatewayButton = ElevatedButton(
+      child: Text('Init Gateway'),
+      onPressed: () {
+        FocusScope.of(_context!).requestFocus(FocusNode());
+        //g2
+        if (_type == TTGatewayType.g2) {
+          _initGateway_2(_wifi, _wifiPassword);
+        } else {
+          //g3 g4
+          _initGateway_3_4();
+        }
+      },
+    );
+
+    if (_type == TTGatewayType.g2) {
+      return Column(
+        children: <Widget>[
+          wifiTextField,
+          wifiPasswordTextField,
+          initGatewayButton
+        ],
+      );
+    } else {
+      return Center(child: initGatewayButton);
+    }
   }
 }

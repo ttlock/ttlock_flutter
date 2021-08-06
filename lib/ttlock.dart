@@ -26,18 +26,27 @@ class TTLock {
   static const String COMMAND_DELETE_PASSCODE = "deletePasscode";
   static const String COMMAND_RESET_PASSCODE = "resetPasscodes";
   static const String COMMAND_GET_ALL_VALID_PASSCODE = "getAllValidPasscode";
+  static const String COMMAND_MODIFY_ADMIN_PASSCODE = "modifyAdminPasscode";
+  static const String COMMAND_GET_ADMIN_PASSCODE =
+      "getAdminPasscodeWithLockData";
+
+  static const String COMMAND_GET_PASSCODE_VERIFICATION_PARAMS =
+      "getPasscodeVerificationParamsWithLockData";
+  static const String COMMAND_RECOVER_PASSCODE =
+      "recoverPasscodeWithPasswordType";
 
   static const String COMMAND_ADD_CARD = "addCard";
   static const String COMMAND_MODIFY_CARD = "modifyIcCard";
   static const String COMMAND_DELETE_CARD = "deleteIcCard";
   static const String COMMAND_CLEAR_ALL_CARD = "clearAllIcCard";
   static const String COMMAND_GET_ALL_VALID_CARD = "getAllValidIcCard";
+  static const String COMMAND_RECOVER_CARD = "recoverCardWithCardType";
+  static const String COMMAND_REPORT_LOSS_CARD = "reportLossCard";
 
   static const String COMMAND_ADD_FINGERPRINT = "addFingerprint";
   static const String COMMAND_MODIFY_FINGERPRINT = "modifyFingerprint";
   static const String COMMAND_DELETE_FINGERPRINT = "deleteFingerprint";
   static const String COMMAND_CLEAR_ALL_FINGERPRINT = "clearAllFingerprint";
-  static const String COMMAND_MODIFY_ADMIN_PASSCODE = "modifyAdminPasscode";
   static const String COMMAND_GET_ALL_VALID_FINGERPRINT =
       "getAllValidFingerprint";
 
@@ -46,6 +55,8 @@ class TTLock {
   static const String COMMAND_GET_LOCK_OPERATE_RECORD = "getLockOperateRecord";
   static const String COMMAND_GET_LOCK_POWER = "getLockPower";
   static const String COMMAND_GET_LOCK_SWITCH_STATE = "getLockSwitchState";
+  static const String COMMAND_GET_LOCK_SYSTEM_INFO =
+      "getLockSystemInfoWithLockData";
 
   static const String COMMAND_GET_AUTOMATIC_LOCK_PERIODIC_TIME =
       "getLockAutomaticLockingPeriodicTime";
@@ -75,6 +86,7 @@ class TTLock {
   static const String COMMAND_SET_POWSER_SAVER_CONTROLABLE =
       "setPowerSaverControlable";
 
+  static const String COMMAND_SET_NB_ADDRESS = "command_set_nb_server_address";
   static const String COMMAND_SET_NB_AWAKE_MODES = "setNBAwakeModes";
   static const String COMMAND_GET_NB_AWAKE_MODES = "getNBAwakeModes";
   static const String COMMAND_SET_NB_AWAKE_TIMES = "setNBAwakeTimes";
@@ -245,14 +257,41 @@ class TTLock {
 
   // ignore: slash_for_doc_comments
 /**
- * Get all valid cards
+ * Get addmin passcode from lock 
  * 
  * lockData The lock data string used to operate lock
  */
+  static void getAdminPasscode(String lockData,
+      TTGetAdminPasscodeCallback callback, TTFailedCallback failedCallback) {
+    invoke(COMMAND_GET_ADMIN_PASSCODE, lockData, callback,
+        fail: failedCallback);
+  }
+
   static void getAllValidPasscode(String lockData,
       TTGetAllPasscodeCallback callback, TTFailedCallback failedCallback) {
     invoke(COMMAND_GET_ALL_VALID_PASSCODE, lockData, callback,
         fail: failedCallback);
+  }
+
+  static void recoverPasscode(
+      String passcode,
+      String passcodeNew,
+      TTPasscodeType type,
+      int startDate,
+      int endDate,
+      int cycleType,
+      String lockData,
+      TTSuccessCallback callback,
+      TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.passcode] = passcode;
+    map[TTResponse.passcodeNew] = passcodeNew;
+    map[TTResponse.type] = type.index;
+    map["cycleType"] = cycleType;
+    map[TTResponse.lockData] = lockData;
+    map[TTResponse.startDate] = startDate;
+    map[TTResponse.endDate] = endDate;
+    invoke(COMMAND_RECOVER_PASSCODE, map, callback, fail: failedCallback);
   }
 
   // ignore: slash_for_doc_comments
@@ -282,7 +321,7 @@ class TTLock {
       int endDate,
       String lockData,
       TTAddCardProgressCallback progressCallback,
-      TTAddCardCallback callback,
+      TTCardNumberCallback callback,
       TTFailedCallback failedCallback) {
     Map map = Map();
     map[TTResponse.startDate] = startDate;
@@ -360,6 +399,29 @@ class TTLock {
   static void clearAllCards(String lockData, TTSuccessCallback callback,
       TTFailedCallback failedCallback) {
     invoke(COMMAND_CLEAR_ALL_CARD, lockData, callback, fail: failedCallback);
+  }
+
+  static void recoverCard(
+      String cardNumber,
+      int startDate,
+      int endDate,
+      String lockData,
+      TTCardNumberCallback callback,
+      TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.cardNumber] = cardNumber;
+    map[TTResponse.lockData] = lockData;
+    map[TTResponse.startDate] = startDate;
+    map[TTResponse.endDate] = endDate;
+    invoke(COMMAND_RECOVER_CARD, map, callback, fail: failedCallback);
+  }
+
+  static void reportLossCard(String cardNumber, String lockData,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.cardNumber] = cardNumber;
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_REPORT_LOSS_CARD, map, callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -458,6 +520,12 @@ class TTLock {
         fail: failedCallback);
   }
 
+  static void getPasscodeVerificationParams(String lockData,
+      TTLockDataCallback callback, TTFailedCallback failedCallback) {
+    invoke(COMMAND_GET_PASSCODE_VERIFICATION_PARAMS, lockData, callback,
+        fail: failedCallback);
+  }
+
 // ignore: slash_for_doc_comments
 /**
  * Modify admin passcode
@@ -531,6 +599,12 @@ class TTLock {
       TTGetLockElectricQuantityCallback callback,
       TTFailedCallback failedCallback) {
     invoke(COMMAND_GET_LOCK_POWER, lockData, callback, fail: failedCallback);
+  }
+
+  static void getLockSystemInfo(String lockData,
+      TTGetLockSystemCallback callback, TTFailedCallback failedCallback) {
+    invoke(COMMAND_GET_LOCK_SYSTEM_INFO, lockData, callback,
+        fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -693,6 +767,19 @@ class TTLock {
     map[TTResponse.lockData] = lockData;
     invoke(COMMAND_SET_POWSER_SAVER_CONTROLABLE, map, callback,
         fail: failedCallback);
+  }
+
+  static void setLockNbAddress(
+      String ip,
+      String port,
+      String lockData,
+      TTGetLockElectricQuantityCallback callback,
+      TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.ip] = ip;
+    map[TTResponse.port] = port;
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_SET_NB_ADDRESS, map, callback, fail: failedCallback);
   }
 
   // static void setNbAwakeModes(List<TTNbAwakeMode> modes, String lockData,
@@ -909,16 +996,23 @@ class TTLock {
         switchStateCallback(data[TTResponse.isOn]);
         break;
 
+      case COMMAND_GET_LOCK_SYSTEM_INFO:
+        TTGetLockSystemCallback getLockSystemCallback = callBack;
+        getLockSystemCallback(TTLockSystemModel(data));
+        break;
+
       case COMMAND_INIT_LOCK:
       case COMMAND_RESET_EKEY:
       case COMMAND_RESET_PASSCODE:
       case COMMAND_SET_LOCK_REMOTE_UNLOCK_SWITCH_STATE:
+      case COMMAND_GET_PASSCODE_VERIFICATION_PARAMS:
         TTLockDataCallback lockDataCallback = callBack;
         lockDataCallback(data[TTResponse.lockData]);
         break;
 
       case COMMAND_CONTROL_LOCK:
       case COMMAND_ACTIVE_LIFT_FLOORS:
+      case COMMAND_SET_NB_ADDRESS:
         TTControlLockCallback controlLockCallback = callBack;
         controlLockCallback(data[TTResponse.lockTime],
             data[TTResponse.electricQuantity], data[TTResponse.uniqueId]);
@@ -935,8 +1029,14 @@ class TTLock {
         }
         break;
 
+      case COMMAND_GET_ADMIN_PASSCODE:
+        TTGetAdminPasscodeCallback lockDataCallback = callBack;
+        lockDataCallback(data[TTResponse.adminPasscode]);
+        break;
+
       case COMMAND_ADD_CARD:
-        TTAddCardCallback addCardCallback = callBack;
+      case COMMAND_RECOVER_CARD:
+        TTCardNumberCallback addCardCallback = callBack;
         addCardCallback(data[TTResponse.cardNumber]);
         break;
 
@@ -1116,7 +1216,9 @@ class TTLock {
 
     if (resultState == TTLockReuslt.fail.index) {
       int errorCode = map[TTResponse.errorCode];
-      String errorMessage = map[TTResponse.errorMessage];
+      String errorMessage = map[TTResponse.errorMessage] == null
+          ? ""
+          : map[TTResponse.errorMessage];
       _errorCallback(command, errorCode, errorMessage);
     } else if (resultState == TTLockReuslt.progress.index) {
       //中间状态的回调（��加 IC卡、指��）
@@ -1204,6 +1306,8 @@ class TTResponse {
   static const String fingerprintListString = "fingerprintListString";
 
   static const String addGatewayJsonStr = "addGatewayJsonStr";
+  static const String ip = "ip";
+  static const String port = "port";
 }
 
 class TTLockScanModel {
@@ -1262,6 +1366,29 @@ class TTCycleModel {
   }
 }
 
+class TTLockSystemModel {
+  String? modelNum;
+  String? hardwareRevision;
+  String? firmwareRevision;
+
+  // NB IOT LOCK
+  String? nbOperator;
+  String? nbNodeId;
+  String? nbCardNumber;
+  String? nbRssi;
+
+  // ignore: non_constant_identifier_names
+  TTLockSystemModel(Map map) {
+    this.modelNum = map["modelNum"];
+    this.hardwareRevision = map["hardwareRevision"];
+    this.firmwareRevision = map["firmwareRevision"];
+    this.nbOperator = map["nbOperator"];
+    this.nbNodeId = map["nbNodeId"];
+    this.nbCardNumber = map["nbCardNumber"];
+    this.nbRssi = map["nbRssi"];
+  }
+}
+
 enum TTBluetoothState {
   unknow,
   resetting,
@@ -1270,6 +1397,8 @@ enum TTBluetoothState {
   turnOff,
   turnOn
 }
+
+enum TTPasscodeType { once, permanent, period, cycle }
 
 enum TTOperateRecordType { latest, total }
 
@@ -1355,6 +1484,8 @@ typedef TTGetLockElectricQuantityCallback = void Function(int electricQuantity);
 typedef TTGetLockOperateRecordCallback = void Function(String records);
 typedef TTGetLockSpecialValueCallback = void Function(int specialValue);
 typedef TTGetLockTimeCallback = void Function(int timestamp);
+typedef TTGetLockSystemCallback = void Function(
+    TTLockSystemModel lockSystemModel);
 
 typedef TTGetLockPasscodeDataCallback = void Function(String passcodeData);
 typedef TTGetLockAutomaticLockingPeriodicTimeCallback = void Function(
@@ -1362,7 +1493,7 @@ typedef TTGetLockAutomaticLockingPeriodicTimeCallback = void Function(
 typedef TTGetAllPasscodeCallback = void Function(List passcodeList);
 
 typedef TTAddCardProgressCallback = void Function();
-typedef TTAddCardCallback = void Function(String cardNumber);
+typedef TTCardNumberCallback = void Function(String cardNumber);
 typedef TTGetAllCardsCallback = void Function(List cardList);
 
 typedef TTAddFingerprintProgressCallback = void Function(
@@ -1394,14 +1525,14 @@ class TTGatewayScanModel {
   String gatewayMac = '';
   int rssi = -1;
   bool isDfuMode = false;
-  TTGatewayType type = TTGatewayType.g2;
+  TTGatewayType? type;
 
   TTGatewayScanModel(Map map) {
     this.gatewayName = map["gatewayName"];
     this.gatewayMac = map["gatewayMac"];
     this.rssi = map["rssi"];
-    this.isDfuMode = map["isDfuMode"];
     this.type = TTGatewayType.values[map["type"]];
+    this.isDfuMode = map["isDfuMode"];
   }
 }
 

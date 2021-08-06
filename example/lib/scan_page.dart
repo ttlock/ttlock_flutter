@@ -206,7 +206,7 @@ class _ScanPageState extends State<ScanPage> {
                       } else {
                         TTGatewayScanModel scanModel = _gatewayList[index];
                         TTGateway.stopScan();
-                        _connectGateway(scanModel.gatewayMac, scanModel.type);
+                        _connectGateway(scanModel.gatewayMac, scanModel.type!);
                       }
                     },
                   );
