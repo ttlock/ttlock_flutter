@@ -495,13 +495,20 @@ typedef NS_ENUM(NSInteger, ResultState) {
         }];
     }else if ([command isEqualToString:command_init_gateway]) {
         NSMutableDictionary *dict = [self dictFromJsonStr:lockModel.addGatewayJsonStr];
+        
+        TTGatewayType gatewayType = [dict[@"type"] intValue] + 1;
+        
         dict[@"SSID"] = dict[@"wifi"];
         dict[@"wifiPwd"] = dict[@"wifiPassword"];
         dict[@"uid"] = dict[@"ttlockUid"];
         dict[@"userPwd"] = dict[@"ttlockLoginPassword"];
         dict[@"serverAddress"] = dict[@"serverIp"];
         dict[@"portNumber"] = dict[@"serverPort"];
-        dict[@"gatewayVersion"] = @([dict[@"type"] intValue] + 1);
+        dict[@"gatewayVersion"] = @(gatewayType);
+        if (gatewayType > TTGateWayTypeG2) {
+            dict[@"SSID"] = @"1";
+            dict[@"wifiPwd"] = @"1";
+        }
         [TTGateway initializeGatewayWithInfoDic:dict block:^(TTSystemInfoModel *systemInfoModel, TTGatewayStatus status) {
              if (status == TTGatewaySuccess) {
                  NSMutableDictionary *resultDict = @{}.mutableCopy;
