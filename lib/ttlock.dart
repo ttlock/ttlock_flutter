@@ -204,7 +204,7 @@ class TTLock {
  */
   static void modifyPasscode(
       String passcodeOrigin,
-      String passcodeNew,
+      String? passcodeNew,
       int startDate,
       int endDate,
       String lockData,
@@ -1202,6 +1202,8 @@ class TTResponse {
   static const String passcodeListString = "passcodeListString";
   static const String cardListString = "cardListString";
   static const String fingerprintListString = "fingerprintListString";
+
+  static const String addGatewayJsonStr = "addGatewayJsonStr";
 }
 
 class TTLockScanModel {
@@ -1392,12 +1394,14 @@ class TTGatewayScanModel {
   String gatewayMac = '';
   int rssi = -1;
   bool isDfuMode = false;
+  TTGatewayType type = TTGatewayType.g2;
 
   TTGatewayScanModel(Map map) {
     this.gatewayName = map["gatewayName"];
     this.gatewayMac = map["gatewayMac"];
     this.rssi = map["rssi"];
     this.isDfuMode = map["isDfuMode"];
+    this.type = TTGatewayType.values[map["type"]];
   }
 }
 
@@ -1418,6 +1422,8 @@ enum TTGatewayError {
   failConfigServer,
   failConfigAccount,
 }
+
+enum TTGatewayType { g1, g2, g3, g4 }
 
 enum TTGatewayConnectStatus { timeout, success, faile }
 

@@ -459,6 +459,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
             dict[@"gatewayName"] = model.gatewayName;
             dict[@"rssi"] = @(model.RSSI);
             dict[@"isDfuMode"] = @(model.isDfuMode);
+            dict[@"type"] = @(model.type-1);
             [weakSelf successCallbackCommand:command data:dict];
         }];
         
@@ -496,14 +497,16 @@ typedef NS_ENUM(NSInteger, ResultState) {
             [weakSelf successCallbackCommand:command data:nil];
         }];
     }else if ([command isEqualToString:command_init_gateway]) {
-        NSMutableDictionary *dict = @{}.mutableCopy;
-        dict[@"SSID"] = lockModel.wifi;
-        dict[@"wifiPwd"] = lockModel.wifiPassword;
-        dict[@"gatewayName"] = lockModel.gatewayName;
-        dict[@"uid"] = lockModel.ttlockUid;
-        dict[@"userPwd"] = lockModel.ttlockLoginPassword;
-        dict[@"serverAddress"] = lockModel.serverIp;
-        dict[@"portNumber"] = lockModel.serverPort;
+        NSDictionary *dict = [self objectFromJsonString:lockModel.addGatewayJsonStr];
+//        dict[@"SSID"] = lockModel.wifi;
+//        dict[@"wifiPwd"] = lockModel.wifiPassword;
+//        dict[@"gatewayName"] = lockModel.gatewayName;
+//        dict[@"uid"] = lockModel.ttlockUid;
+//        dict[@"userPwd"] = lockModel.ttlockLoginPassword;
+//        dict[@"serverAddress"] = lockModel.serverIp;
+//        dict[@"portNumber"] = lockModel.serverPort;
+//        dict[@"branchId"] = lockModel.serverPort;
+//        dict[@"companyId"] = lockModel.serverPort;
         [TTGateway initializeGatewayWithInfoDic:dict block:^(TTSystemInfoModel *systemInfoModel, TTGatewayStatus status) {
              if (status == TTGatewaySuccess) {
                  NSMutableDictionary *resultDict = @{}.mutableCopy;
@@ -741,7 +744,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
 
 
 #pragma private
-- (NSObject *)objectFromJsonString:(NSString *) jsonString{
+- (NSDictionary *)objectFromJsonString:(NSString *) jsonString{
     if (jsonString == nil) {
         return nil;
     }

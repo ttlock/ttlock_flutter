@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ttlock_flutter/ttlock.dart';
 import 'package:ttlock_flutter/ttgateway.dart';
+import 'package:ttlock_flutter/ttlock.dart';
+import 'package:ttlock_flutter_example/gateway_page.dart';
 import 'wifi_page.dart';
 import 'package:bmprogresshud/progresshud.dart';
 import 'lock_page.dart';
@@ -74,16 +75,21 @@ class _ScanPageState extends State<ScanPage> {
     });
   }
 
-  void _connectGateway(String mac) async {
+  void _connectGateway(String mac, TTGatewayType type) async {
     _showLoading();
     TTGateway.connect(mac, (status) {
       _dismissLoading();
       if (status == TTGatewayConnectStatus.success) {
+        StatefulWidget? widget;
+        if (type == TTGatewayType.g2) {
+          widget = WifiPage(mac: mac);
+        } else if (type == TTGatewayType.g3 || type == TTGatewayType.g4) {
+          widget = GatewayPage(type: type);
+        }
+
         Navigator.push(context,
             new MaterialPageRoute(builder: (BuildContext context) {
-          return WifiPage(
-            mac: mac,
-          );
+          return widget!;
         }));
       }
     });
@@ -200,7 +206,7 @@ class _ScanPageState extends State<ScanPage> {
                       } else {
                         TTGatewayScanModel scanModel = _gatewayList[index];
                         TTGateway.stopScan();
-                        _connectGateway(scanModel.gatewayMac);
+                        _connectGateway(scanModel.gatewayMac, scanModel.type);
                       }
                     },
                   );
