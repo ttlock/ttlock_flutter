@@ -269,7 +269,7 @@ class TTLock {
         fail: failedCallback);
   }
 
-  static void setAdminErasePasscode(String erasePasscode, String lockData,
+  static void setErasePasscode(String erasePasscode, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     Map map = new Map();
     map[TTResponse.erasePasscode] = erasePasscode;
@@ -1024,9 +1024,9 @@ class TTLock {
       case COMMAND_CONTROL_LOCK:
       case COMMAND_ACTIVE_LIFT_FLOORS:
       case COMMAND_SET_NB_ADDRESS:
-        TTControlLockCallback controlLockCallback = callBack;
-        controlLockCallback(data[TTResponse.lockTime],
-            data[TTResponse.electricQuantity], data[TTResponse.uniqueId]);
+        TTGetLockElectricQuantityCallback getLockElectricQuantityCallback =
+            callBack;
+        getLockElectricQuantityCallback(data[TTResponse.electricQuantity]);
         break;
 
       case COMMAND_RESET_PASSCODE:
