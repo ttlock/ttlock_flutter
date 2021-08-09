@@ -1022,11 +1022,15 @@ class TTLock {
         break;
 
       case COMMAND_CONTROL_LOCK:
+        TTControlLockCallback controlLockCallback = callBack;
+        controlLockCallback(data[TTResponse.lockTime],
+            data[TTResponse.electricQuantity], data[TTResponse.uniqueId]);
+        break;
+
       case COMMAND_ACTIVE_LIFT_FLOORS:
-      case COMMAND_SET_NB_ADDRESS:
-        TTGetLockElectricQuantityCallback getLockElectricQuantityCallback =
+        TTLiftCallback liftCallback =
             callBack;
-        getLockElectricQuantityCallback(data[TTResponse.electricQuantity]);
+        liftCallback(data[TTResponse.lockTime],data[TTResponse.electricQuantity],data[TTResponse.uniqueId])
         break;
 
       case COMMAND_RESET_PASSCODE:
@@ -1073,6 +1077,7 @@ class TTLock {
         break;
 
       case COMMAND_GET_LOCK_POWER:
+    case COMMAND_SET_NB_ADDRESS:
         TTGetLockElectricQuantityCallback getLockElectricQuantityCallback =
             callBack;
         getLockElectricQuantityCallback(data[TTResponse.electricQuantity]);
