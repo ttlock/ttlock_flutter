@@ -29,6 +29,8 @@ class TTLock {
   static const String COMMAND_MODIFY_ADMIN_PASSCODE = "modifyAdminPasscode";
   static const String COMMAND_GET_ADMIN_PASSCODE =
       "getAdminPasscodeWithLockData";
+  static const String COMMAND_SET_ADMIN_ERASE_PASSCODE =
+      "setAdminErasePasscode";
 
   static const String COMMAND_GET_PASSCODE_VERIFICATION_PARAMS =
       "getPasscodeVerificationParamsWithLockData";
@@ -86,7 +88,7 @@ class TTLock {
   static const String COMMAND_SET_POWSER_SAVER_CONTROLABLE =
       "setPowerSaverControlable";
 
-  static const String COMMAND_SET_NB_ADDRESS = "command_set_nb_server_address";
+  static const String COMMAND_SET_NB_ADDRESS = "setNBServerAddress";
   static const String COMMAND_SET_NB_AWAKE_MODES = "setNBAwakeModes";
   static const String COMMAND_GET_NB_AWAKE_MODES = "getNBAwakeModes";
   static const String COMMAND_SET_NB_AWAKE_TIMES = "setNBAwakeTimes";
@@ -264,6 +266,15 @@ class TTLock {
   static void getAdminPasscode(String lockData,
       TTGetAdminPasscodeCallback callback, TTFailedCallback failedCallback) {
     invoke(COMMAND_GET_ADMIN_PASSCODE, lockData, callback,
+        fail: failedCallback);
+  }
+
+  static void setAdminErasePasscode(String erasePasscode, String lockData,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+    Map map = new Map();
+    map[TTResponse.erasePasscode] = erasePasscode;
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_SET_ADMIN_ERASE_PASSCODE, map, callback,
         fail: failedCallback);
   }
 

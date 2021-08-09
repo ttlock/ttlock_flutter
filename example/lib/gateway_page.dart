@@ -40,20 +40,23 @@ class _GatewayPageState extends State<GatewayPage> {
     Map paramMap = Map();
     paramMap["wifi"] = wifi;
     paramMap["wifiPassword"] = wifiPassword;
+    paramMap["type"] = _type!.index;
+    paramMap["gatewayName"] = Config.gatewayName;
+    paramMap["ttlockUid"] = Config.ttlockUid;
+    paramMap["ttlockLoginPassword"] = Config.ttlockLoginPassword;
     _initGateway(paramMap);
   }
 
   void _initGateway_3_4() {
     Map paramMap = Map();
-    _initGateway(paramMap);
-  }
-
-  void _initGateway(Map paramMap) {
     paramMap["type"] = _type!.index;
     paramMap["gatewayName"] = Config.gatewayName;
     paramMap["ttlockUid"] = Config.ttlockUid;
     paramMap["ttlockLoginPassword"] = Config.ttlockLoginPassword;
+    _initGateway(paramMap);
+  }
 
+  void _initGateway(Map paramMap) {
     // test account.  ttlockUid = 17498, ttlockLoginPassword = "1111111"
     // if (Config.ttlockUid == 17498) {
     //   String errorDesc =

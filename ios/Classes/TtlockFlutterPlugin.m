@@ -748,6 +748,15 @@ typedef NS_ENUM(NSInteger, ResultState) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
     }
+    else if ([command isEqualToString:command_set_v2_lock_admin_erase_passcode]) {
+        [TTLock setAdminErasePasscode:lockModel.erasePasscode lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }
+    
+    
 }
 
 - (void)successCallbackCommand:(NSString *)command data:(NSObject *)data {
@@ -838,7 +847,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
  
         } else {
             //model
-            [dic setObject:[self dicFromObject:value] forKey:name];
+            [dic setObject:value forKey:name];
         }
     }
  
