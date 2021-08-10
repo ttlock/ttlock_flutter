@@ -1187,6 +1187,9 @@ class TTLock {
       errorMessage =
           "The TTLock SDK can only communicate with one lock at a time";
     }
+    if (errorCode > TTLockError.sdkIsBusy.index){
+      errorCode = TTLockError.fail.index;
+    }
 
     dynamic callBack;
     int index = -1;
