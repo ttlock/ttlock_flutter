@@ -1028,9 +1028,9 @@ class TTLock {
         break;
 
       case COMMAND_ACTIVE_LIFT_FLOORS:
-        TTLiftCallback liftCallback =
-            callBack;
-        liftCallback(data[TTResponse.lockTime],data[TTResponse.electricQuantity],data[TTResponse.uniqueId])
+        TTLiftCallback liftCallback = callBack;
+        liftCallback(data[TTResponse.lockTime],
+            data[TTResponse.electricQuantity], data[TTResponse.uniqueId]);
         break;
 
       case COMMAND_RESET_PASSCODE:
@@ -1077,7 +1077,7 @@ class TTLock {
         break;
 
       case COMMAND_GET_LOCK_POWER:
-    case COMMAND_SET_NB_ADDRESS:
+      case COMMAND_SET_NB_ADDRESS:
         TTGetLockElectricQuantityCallback getLockElectricQuantityCallback =
             callBack;
         getLockElectricQuantityCallback(data[TTResponse.electricQuantity]);
@@ -1187,7 +1187,7 @@ class TTLock {
       errorMessage =
           "The TTLock SDK can only communicate with one lock at a time";
     }
-    if (errorCode > TTLockError.sdkIsBusy.index){
+    if (errorCode > TTLockError.sdkIsBusy.index) {
       errorCode = TTLockError.fail.index;
     }
 
