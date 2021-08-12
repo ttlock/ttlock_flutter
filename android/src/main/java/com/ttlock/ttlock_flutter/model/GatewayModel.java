@@ -17,6 +17,8 @@ public class GatewayModel {
     public String serverIp;
     public String serverPort;
     public int type;
+    public int companyId;
+    public int branchId;
 
     public GatewayModel toObject(Map<String, Object> params) {
         if (params == null) {

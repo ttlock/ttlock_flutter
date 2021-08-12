@@ -361,6 +361,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     configureGatewayInfo.uid = gatewayModel.ttlockUid;
     configureGatewayInfo.userPwd = gatewayModel.ttlockLoginPassword;
     configureGatewayInfo.plugVersion = gatewayModel.type + 1;
+    configureGatewayInfo.companyId = gatewayModel.companyId;
+    configureGatewayInfo.branchId = gatewayModel.branchId;
+
 
     if (!TextUtils.isEmpty(gatewayModel.serverIp)) {
       configureGatewayInfo.server = gatewayModel.serverIp;
