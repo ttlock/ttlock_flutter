@@ -1106,7 +1106,7 @@ class TTLock {
         break;
 
       case COMMAND_GET_LOCK_POWER:
-    case COMMAND_SET_NB_ADDRESS:
+      case COMMAND_SET_NB_ADDRESS:
         TTGetLockElectricQuantityCallback getLockElectricQuantityCallback =
             callBack;
         getLockElectricQuantityCallback(data[TTResponse.electricQuantity]);
@@ -1231,7 +1231,7 @@ class TTLock {
       errorMessage =
           "The TTLock SDK can only communicate with one lock at a time";
     }
-    if (errorCode > TTLockError.sdkIsBusy.index){
+    if (errorCode > TTLockError.sdkIsBusy.index) {
       errorCode = TTLockError.fail.index;
     }
 
