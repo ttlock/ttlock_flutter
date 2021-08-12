@@ -18,6 +18,8 @@
 @property (nonatomic, strong) NSString *passcodeNew;
 @property (nonatomic, strong) NSNumber *startDate;
 @property (nonatomic, strong) NSNumber *endDate;
+@property (nonatomic, strong) NSNumber * passcodeType;
+@property (nonatomic, strong) NSNumber * cycleType;
 
 // 0、null - 读取最近的操作记录,  1-读取锁内存中的全部操作记录
 @property (nonatomic, strong) NSNumber *logType;
@@ -30,13 +32,15 @@
 @property (nonatomic, strong) NSString *cycleJsonList;
 @property (nonatomic, strong) NSNumber *lockConfig;
 
-@property (nonatomic, strong) NSString *wifi;
-@property (nonatomic, strong) NSString *wifiPassword;
-@property (nonatomic, strong) NSString *ttlockLoginPassword;
-@property (nonatomic, strong) NSString *ttlockUid;
-@property (nonatomic, strong) NSString *serverIp;
-@property (nonatomic, strong) NSString *serverPort;
-@property (nonatomic, strong) NSString *gatewayName;
+@property (nonatomic, strong) NSString *addGatewayJsonStr;
+
+//@property (nonatomic, strong) NSString *wifi;
+//@property (nonatomic, strong) NSString *wifiPassword;
+//@property (nonatomic, strong) NSString *ttlockLoginPassword;
+//@property (nonatomic, strong) NSString *ttlockUid;
+@property (nonatomic, strong) NSString *ip;
+@property (nonatomic, strong) NSString *port;
+//@property (nonatomic, strong) NSString *gatewayName;
 @property (nonatomic, strong) NSNumber *supportFunction;
 @property (nonatomic, strong) NSNumber *isSupport;
 

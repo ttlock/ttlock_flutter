@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:ttlock_flutter/ttlock.dart';
 import 'gateway_page.dart';
 import 'package:ttlock_flutter/ttgateway.dart';
 import 'package:bmprogresshud/progresshud.dart';
 
 class WifiPage extends StatefulWidget {
-  WifiPage({this.mac}) : super();
+  WifiPage({required this.mac}) : super();
   final String mac;
   @override
   _WifiPageState createState() => _WifiPageState();
 }
 
 class _WifiPageState extends State<WifiPage> {
-  List _wifiList = List();
+  List _wifiList = [];
   // BuildContext _context;
 
   _WifiPageState() {
@@ -32,9 +33,7 @@ class _WifiPageState extends State<WifiPage> {
   void _pushGatewayPage(String wifi) {
     Navigator.push(context,
         new MaterialPageRoute(builder: (BuildContext context) {
-      return GatewayPage(
-        wifi: wifi,
-      );
+      return GatewayPage(type: TTGatewayType.g2, wifi: wifi);
     }));
   }
 

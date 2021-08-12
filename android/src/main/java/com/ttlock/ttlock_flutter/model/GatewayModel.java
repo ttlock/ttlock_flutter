@@ -16,6 +16,7 @@ public class GatewayModel {
     public String ttlockLoginPassword;
     public String serverIp;
     public String serverPort;
+    public int type;
 
     public GatewayModel toObject(Map<String, Object> params) {
         if (params == null) {

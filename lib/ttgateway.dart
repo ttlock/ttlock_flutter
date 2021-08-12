@@ -1,4 +1,5 @@
 import 'package:ttlock_flutter/ttlock.dart';
+import 'dart:convert' as convert;
 
 class TTGateway {
   static const String COMMAND_START_SCAN_GATEWAY = "startScanGateway";
@@ -34,6 +35,7 @@ class TTGateway {
     TTGatewayInitCallback callback,
     TTGatewayFailedCallback failedCallback,
   ) {
+    map[TTResponse.addGatewayJsonStr] = convert.jsonEncode(map);
     TTLock.invoke(COMMAND_INIT_GATEWAY, map, callback, fail: failedCallback);
   }
 

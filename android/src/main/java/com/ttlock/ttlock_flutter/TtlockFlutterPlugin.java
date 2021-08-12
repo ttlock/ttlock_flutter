@@ -47,6 +47,8 @@ import com.ttlock.bl.sdk.callback.ModifyAdminPasscodeCallback;
 import com.ttlock.bl.sdk.callback.ModifyFingerprintPeriodCallback;
 import com.ttlock.bl.sdk.callback.ModifyICCardPeriodCallback;
 import com.ttlock.bl.sdk.callback.ModifyPasscodeCallback;
+import com.ttlock.bl.sdk.callback.RecoverLockDataCallback;
+import com.ttlock.bl.sdk.callback.ReportLossCardCallback;
 import com.ttlock.bl.sdk.callback.ResetKeyCallback;
 import com.ttlock.bl.sdk.callback.ResetLockCallback;
 import com.ttlock.bl.sdk.callback.ResetPasscodeCallback;
@@ -66,6 +68,7 @@ import com.ttlock.bl.sdk.callback.SetPowerSaverControlableLockCallback;
 import com.ttlock.bl.sdk.callback.SetPowerSaverWorkModeCallback;
 import com.ttlock.bl.sdk.callback.SetRemoteUnlockSwitchCallback;
 import com.ttlock.bl.sdk.constant.LogType;
+import com.ttlock.bl.sdk.constant.RecoveryData;
 import com.ttlock.bl.sdk.entity.ActivateLiftFloorsResult;
 import com.ttlock.bl.sdk.entity.ControlLockResult;
 import com.ttlock.bl.sdk.entity.CyclicConfig;
@@ -77,6 +80,7 @@ import com.ttlock.bl.sdk.entity.NBAwakeTime;
 import com.ttlock.bl.sdk.entity.PassageModeConfig;
 import com.ttlock.bl.sdk.entity.PassageModeType;
 import com.ttlock.bl.sdk.entity.PowerSaverWorkMode;
+import com.ttlock.bl.sdk.entity.RecoveryDataType;
 import com.ttlock.bl.sdk.entity.TTLiftWorkMode;
 import com.ttlock.bl.sdk.entity.TTLockConfigType;
 import com.ttlock.bl.sdk.entity.ValidityInfo;
@@ -153,6 +157,16 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
    * time out: 30s
    */
   private static final long COMMAND_TIME_OUT = 30 * 1000;
+
+  /**
+   * 2000.2.1 00:00:00
+   */
+  public static final long INVALID_START_DATE = 949334400000L;
+  /**
+   * 2000.2.1 01:00:00
+   */
+  public static final long INVALID_END_DATE = 949338000000L;
+
   private Runnable commandTimeOutRunable = new Runnable() {
     @Override
     public void run() {
@@ -258,6 +272,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     successCallbackCommand(TTLockCommand.COMMAND_SUPPORT_FEATURE, ttlockModel.toMap());
   }
 
+  //enum TTGatewayType { g1, g2, g3, g4 }
   public void startScanGateway() {
     GatewayClient.getDefault().prepareBTService(activity);
     GatewayClient.getDefault().startScanGateway(new ScanGatewayCallback() {
@@ -268,6 +283,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         ttGatewayScanModel.gatewayName = device.getName();
         ttGatewayScanModel.isDfuMode = device.isDfuMode();
         ttGatewayScanModel.rssi = device.getRssi();
+        ttGatewayScanModel.type = device.getGatewayType() - 1;//对应flutter编号
         successCallbackCommand(GatewayCommand.COMMAND_START_SCAN_GATEWAY, ttGatewayScanModel.toMap());
       }
 
@@ -344,6 +360,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     configureGatewayInfo.wifiPwd = gatewayModel.wifiPassword;
     configureGatewayInfo.uid = gatewayModel.ttlockUid;
     configureGatewayInfo.userPwd = gatewayModel.ttlockLoginPassword;
+    configureGatewayInfo.plugVersion = gatewayModel.type + 1;
 
     if (!TextUtils.isEmpty(gatewayModel.serverIp)) {
       configureGatewayInfo.server = gatewayModel.serverIp;
@@ -527,6 +544,15 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         break;
       case TTLockCommand.COMMAND_GET_PASSCODE_VERIFICATION_PARAMS:
         getPasscodeVerificationParams(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_REPORT_LOSS_CARD:
+        reportLossICCard(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_RECOVER_CARD:
+        recoveryCard(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_RECOVER_PASSCODE:
+        recoveryPasscode(ttlockModel);
         break;
       case TTLockCommand.COMMAND_SET_ADMIN_ERASE_PASSCODE:
 
@@ -886,9 +912,41 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void deleteICCard(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().deleteICCard(ttlockModel.cardNumber, ttlockModel.lockData, ttlockModel.lockMac, new DeleteICCardCallback() {
+    //删除改成修改无效有效期
+    ValidityInfo validityInfo = new ValidityInfo();
+    validityInfo.setModeType(ValidityInfo.TIMED);
+    validityInfo.setStartDate(INVALID_START_DATE);
+    validityInfo.setEndDate(INVALID_END_DATE);
+
+    TTLockClient.getDefault().modifyICCardValidityPeriod(validityInfo, ttlockModel.cardNumber, ttlockModel.lockData, new ModifyICCardPeriodCallback() {
       @Override
-      public void onDeleteICCardSuccess() {
+      public void onModifyICCardPeriodSuccess() {
+        apiSuccess(ttlockModel);
+      }
+
+      @Override
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
+      }
+    });
+//    TTLockClient.getDefault().deleteICCard(ttlockModel.cardNumber, ttlockModel.lockData, ttlockModel.lockMac, new DeleteICCardCallback() {
+//      @Override
+//      public void onDeleteICCardSuccess() {
+//        apiSuccess(ttlockModel);
+//      }
+//
+//      @Override
+//      public void onFail(LockError lockError) {
+//        apiFail(lockError);
+//      }
+//    });
+  }
+
+  public void reportLossICCard(final TtlockModel ttlockModel) {
+    TTLockClient.getDefault().reportLossCard(ttlockModel.cardNumber, ttlockModel.lockData, new ReportLossCardCallback() {
+
+      @Override
+      public void onReportLossCardSuccess() {
         apiSuccess(ttlockModel);
       }
 
@@ -903,6 +961,52 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().clearAllICCard(ttlockModel.lockData, ttlockModel.lockMac, new ClearAllICCardCallback() {
       @Override
       public void onClearAllICCardSuccess() {
+        apiSuccess(ttlockModel);
+      }
+
+      @Override
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
+      }
+    });
+  }
+
+  public void recoveryCard(final TtlockModel ttlockModel) {
+    RecoveryData recoveryData = new RecoveryData();
+    recoveryData.cardNumber = ttlockModel.cardNumber;
+    recoveryData.startDate = ttlockModel.startDate;
+    recoveryData.endDate = ttlockModel.endDate;
+    List<RecoveryData> recoveryDataList = new ArrayList<>();
+    recoveryDataList.add(recoveryData);
+
+    TTLockClient.getDefault().recoverLockData(GsonUtil.toJson(recoveryDataList), RecoveryDataType.IC, ttlockModel.lockData, ttlockModel.lockMac, new RecoverLockDataCallback() {
+      @Override
+      public void onRecoveryDataSuccess(int type) {
+        apiSuccess(ttlockModel);
+      }
+
+      @Override
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
+      }
+    });
+  }
+
+
+//  enum TTPasscodeType { once, permanent, period, cycle }
+  public void recoveryPasscode(final TtlockModel ttlockModel) {
+    RecoveryData recoveryData = new RecoveryData();
+    recoveryData.keyboardPwd = ttlockModel.passcode;
+    recoveryData.startDate = ttlockModel.startDate;
+    recoveryData.endDate = ttlockModel.endDate;
+    recoveryData.cycleType = ttlockModel.cycleType;
+    recoveryData.keyboardPwdType = ttlockModel.type + 1;
+    List<RecoveryData> recoveryDataList = new ArrayList<>();
+    recoveryDataList.add(recoveryData);
+
+    TTLockClient.getDefault().recoverLockData(GsonUtil.toJson(recoveryDataList), RecoveryDataType.PASSCODE, ttlockModel.lockData, ttlockModel.lockMac, new RecoverLockDataCallback() {
+      @Override
+      public void onRecoveryDataSuccess(int type) {
         apiSuccess(ttlockModel);
       }
 
@@ -1008,6 +1112,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       }
     });
   }
+
 
   public void getBattery(final TtlockModel ttlockModel) {
     TTLockClient.getDefault().getBatteryLevel(ttlockModel.lockData, ttlockModel.lockMac, new GetBatteryLevelCallback() {
@@ -1439,10 +1544,11 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void setNBServerInfo(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().setNBServerInfo((short) ttlockModel.nbServerPort, ttlockModel.nbServerAddress, ttlockModel.lockData, new SetNBServerCallback() {
+    TTLockClient.getDefault().setNBServerInfo(Integer.valueOf(ttlockModel.port).shortValue() , ttlockModel.ip, ttlockModel.lockData, new SetNBServerCallback() {
       @Override
       public void onSetNBServerSuccess(int battery) {
-          apiSuccess(ttlockModel);
+        ttlockModel.electricQuantity = battery;
+        apiSuccess(ttlockModel);
       }
 
       @Override
@@ -1456,7 +1562,11 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().getLockSystemInfo(ttlockModel.lockData, null, new GetLockSystemInfoCallback() {
       @Override
       public void onGetLockSystemInfoSuccess(com.ttlock.bl.sdk.entity.DeviceInfo deviceInfo) {
-          apiSuccess(Utils.object2Map(deviceInfo));
+        Map<String, Object> map = Utils.object2Map(deviceInfo);
+        if (map.containsKey("nbRssi")) {//flutter 用的string类型
+          map.put("nbRssi", String.valueOf(map.get("nbRssi")));
+        }
+        apiSuccess(map);
       }
 
       @Override
