@@ -342,16 +342,15 @@ typedef NS_ENUM(NSInteger, ResultState) {
         
     }else if ([command isEqualToString:command_get_lock_version]) {
         NSString *lockMac = (NSString *)arguments;
-        [TTLock getLockVersionWithWithLockMac:lockMac success:^(NSDictionary *lockVersion) {
+        [TTLock getLockVersionWithLockMac:lockMac success:^(NSDictionary *lockVersion) {
             [weakSelf successCallbackCommand:command data:lockVersion];
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
-        
     }else if ([command isEqualToString:command_get_lock_switch_state]) {
-        [TTLock getLockSwitchStateWithLockData:lockModel.lockData success:^(TTLockSwitchState state) {
+        [TTLock getLockSwitchStateWithLockData:lockModel.lockData success:^(TTLockSwitchState lockSwitchState, TTDoorSensorState doorSensorState) {
             TtlockModel *data = [TtlockModel new];
-            data.lockSwitchState = @(state);
+            data.lockSwitchState = @(lockSwitchState);
             [weakSelf successCallbackCommand:command data:data];
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
@@ -776,7 +775,6 @@ typedef NS_ENUM(NSInteger, ResultState) {
 }
 
 - (void)errorCallbackCommand:(NSString *)command code:(NSInteger)code details:(NSString *)errorMessage {
-
     [self callbackCommand:command
                resultState:ResultStateFail
                      data:nil
