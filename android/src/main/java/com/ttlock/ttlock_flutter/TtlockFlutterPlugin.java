@@ -976,6 +976,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
   public void recoveryCard(final TtlockModel ttlockModel) {
     RecoveryData recoveryData = new RecoveryData();
+    recoveryData.cardType = 1;
     recoveryData.cardNumber = ttlockModel.cardNumber;
     recoveryData.startDate = ttlockModel.startDate;
     recoveryData.endDate = ttlockModel.endDate;

@@ -422,7 +422,7 @@ class TTLock {
       int startDate,
       int endDate,
       String lockData,
-      TTCardNumberCallback callback,
+      TTSuccessCallback callback,
       TTFailedCallback failedCallback) {
     Map map = Map();
     map[TTResponse.cardNumber] = cardNumber;
@@ -1079,7 +1079,6 @@ class TTLock {
         break;
 
       case COMMAND_ADD_CARD:
-      case COMMAND_RECOVER_CARD:
         TTCardNumberCallback addCardCallback = callBack;
         addCardCallback(data[TTResponse.cardNumber]);
         break;
