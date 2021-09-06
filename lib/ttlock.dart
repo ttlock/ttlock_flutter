@@ -87,7 +87,7 @@ class TTLock {
   static const String COMMAND_SET_HOTLE_CARD_SECTOR = "setHotelCardSector";
   static const String COMMAND_SET_HOTLE_INOF = "setHotelInfo";
 
-  static List _commandQueue = List();
+  static List _commandQueue = [];
 
   static bool printLog = true;
 
@@ -799,7 +799,7 @@ class TTLock {
     //开始、停止扫描的时候  清空之前所有的扫描回调
     scanCommandList.forEach((scanCommand) {
       if (command.compareTo(scanCommand) == 0) {
-        List removeMapList = new List();
+        List removeMapList = [];
         _commandQueue.forEach((map) {
           String key = map.keys.first;
           if (key.compareTo(COMMAND_START_SCAN_LOCK) == 0 ||
@@ -977,7 +977,7 @@ class TTLock {
         break;
       case COMMAND_GET_ALL_VALID_PASSCODE:
         TTGetAllPasscodeCallback getAllPasscodeCallback = callBack;
-        List passcodeList = List();
+        List passcodeList = [];
         String passcodeListString = data[TTResponse.passcodeListString];
         if (passcodeListString != null) {
           passcodeList = convert.jsonDecode(passcodeListString);
@@ -987,7 +987,7 @@ class TTLock {
       case COMMAND_GET_ALL_VALID_CARD:
         TTGetAllCardsCallback getAllCardsCallback = callBack;
 
-        List cardList = List();
+        List cardList = [];
         String cardListString = data[TTResponse.cardListString];
         if (cardListString != null) {
           cardList = convert.jsonDecode(cardListString);
@@ -996,7 +996,7 @@ class TTLock {
         break;
       case COMMAND_GET_ALL_VALID_FINGERPRINT:
         TTGetAllFingerprintsCallback getAllFingerprintsCallback = callBack;
-        List fingerprintList = List();
+        List fingerprintList = [];
         String fingerprintListString = data[TTResponse.fingerprintListString];
         if (fingerprintListString != null) {
           fingerprintList = convert.jsonDecode(fingerprintListString);
@@ -1006,7 +1006,7 @@ class TTLock {
       case COMMAND_GET_NB_AWAKE_TIMES:
         TTGetNbAwakeTimesCallback getNbAwakeTimesCallback = callBack;
         List<Map> nbAwakeTimeList = data[TTResponse.nbAwakeTimeList];
-        List<TTNbAwakeTimeModel> list = new List();
+        List<TTNbAwakeTimeModel> list = [];
 
         nbAwakeTimeList.forEach((element) {
           TTNbAwakeTimeModel model = new TTNbAwakeTimeModel();

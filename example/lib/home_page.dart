@@ -36,11 +36,11 @@ class _HomePageState extends State<HomePage> {
 
   Widget getChild() {
     return Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-      RaisedButton(
+      ElevatedButton(
         child: Text('Lock', style: TextStyle(fontWeight: FontWeight.w600)),
         onPressed: _startScanLock,
       ),
-      RaisedButton(
+      ElevatedButton(
         child: Text('Gateway', style: TextStyle(fontWeight: FontWeight.w600)),
         onPressed: _startScanGateway,
       )

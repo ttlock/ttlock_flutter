@@ -91,7 +91,7 @@ class _ScanPageState extends State<ScanPage> {
   }
 
   void _startScanLock() async {
-    _lockList = List();
+    _lockList = [];
     TTLock.startScanLock((scanModel) {
       bool contain = false;
       bool initStateChanged = false;
@@ -118,7 +118,7 @@ class _ScanPageState extends State<ScanPage> {
   }
 
   void _startScanGateway() {
-    _gatewayList = List();
+    _gatewayList = [];
     TTGateway.startScan((scanModel) {
       bool contain = false;
       for (TTGatewayScanModel model in _gatewayList) {

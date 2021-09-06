@@ -11,7 +11,7 @@ class WifiPage extends StatefulWidget {
 }
 
 class _WifiPageState extends State<WifiPage> {
-  List _wifiList = List();
+  List _wifiList = [];
   // BuildContext _context;
 
   _WifiPageState() {

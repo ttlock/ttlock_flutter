@@ -99,7 +99,7 @@ class _GatewayPageState extends State<GatewayPage> {
             _wifiPassword = content;
           },
         ),
-        RaisedButton(
+        ElevatedButton(
           child: Text('Init Gateway'),
           onPressed: () {
             if (_wifiPassword.length > 0) {
