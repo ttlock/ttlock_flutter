@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:ttlock_flutter/ttlock.dart';
 import 'package:bmprogresshud/progresshud.dart';
 
-
 class LockPage extends StatefulWidget {
   LockPage(
       {Key? key,
@@ -133,7 +132,7 @@ class _LockPageState extends State<LockPage> {
     {"Get Admin Passcode": Command.getAdminPasscode},
     {"Get Lock System Info": Command.getLockSystemInfo},
     {"Get Passcode Verification Param": Command.getPasscodeVerificationParams},
-    {"Recovery Card Data" : Command.recoveryCard}
+    {"Recovery Card Data": Command.recoveryCard}
   ];
 
   String note =
@@ -156,12 +155,14 @@ class _LockPageState extends State<LockPage> {
   }
 
   void _showSuccessAndDismiss(String text) {
-    ProgressHud.of(_context!).showAndDismiss(ProgressHudType.success, text);
+    ProgressHud.of(_context!).showSuccessAndDismiss(text: "");
+    print(text);
   }
 
   void _showErrorAndDismiss(TTLockError errorCode, String errorMsg) {
-    ProgressHud.of(_context!).showAndDismiss(
-        ProgressHudType.error, 'errorCode:$errorCode errorMessage:$errorMsg');
+    ProgressHud.of(_context!).showErrorAndDismiss(text: "");
+
+    print('errorCode:$errorCode errorMessage:$errorMsg');
   }
 
   @override
@@ -581,8 +582,8 @@ class _LockPageState extends State<LockPage> {
         TTLock.getAdminPasscode(lockData, (adminPasscode) {
           _showSuccessAndDismiss("AdminPasscode: $adminPasscode");
         }, (errorCode, errorMsg) {
-              _showErrorAndDismiss(errorCode, errorMsg);
-            });
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
         break;
       case Command.getLockSystemInfo:
         TTLock.getLockSystemInfo(lockData, (lockSystemInfoModel) {
@@ -601,7 +602,8 @@ class _LockPageState extends State<LockPage> {
       case Command.recoveryCard:
         String cardNumber = "123458970";
         int startDate = DateTime.now().millisecondsSinceEpoch;
-        int endDate =   DateTime.now().millisecondsSinceEpoch + 24 * 60 * 60 * 1000;
+        int endDate =
+            DateTime.now().millisecondsSinceEpoch + 24 * 60 * 60 * 1000;
         TTLock.recoverCard(cardNumber, startDate, endDate, lockData, () {
           _showSuccessAndDismiss("success:$cardNumber");
         }, (errorCode, errorMsg) {

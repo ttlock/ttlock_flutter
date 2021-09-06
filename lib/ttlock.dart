@@ -1057,9 +1057,9 @@ class TTLock {
         break;
 
       case COMMAND_ACTIVE_LIFT_FLOORS:
-        TTLiftCallback liftCallback =
-            callBack;
-        liftCallback(data[TTResponse.lockTime],data[TTResponse.electricQuantity],data[TTResponse.uniqueId]);
+        TTLiftCallback liftCallback = callBack;
+        liftCallback(data[TTResponse.lockTime],
+            data[TTResponse.electricQuantity], data[TTResponse.uniqueId]);
         break;
 
       case COMMAND_RESET_PASSCODE:
@@ -1122,7 +1122,7 @@ class TTLock {
       case COMMAND_GET_ALL_VALID_PASSCODE:
         TTGetAllPasscodeCallback getAllPasscodeCallback = callBack;
         List passcodeList = [];
-        String passcodeListString = data[TTResponse.passcodeListString];
+        String? passcodeListString = data[TTResponse.passcodeListString];
         if (passcodeListString != null) {
           passcodeList = convert.jsonDecode(passcodeListString);
         }
@@ -1132,7 +1132,7 @@ class TTLock {
         TTGetAllCardsCallback getAllCardsCallback = callBack;
 
         List cardList = [];
-        String cardListString = data[TTResponse.cardListString];
+        String? cardListString = data[TTResponse.cardListString];
         if (cardListString != null) {
           cardList = convert.jsonDecode(cardListString);
         }
@@ -1141,7 +1141,7 @@ class TTLock {
       case COMMAND_GET_ALL_VALID_FINGERPRINT:
         TTGetAllFingerprintsCallback getAllFingerprintsCallback = callBack;
         List fingerprintList = [];
-        String fingerprintListString = data[TTResponse.fingerprintListString];
+        String? fingerprintListString = data[TTResponse.fingerprintListString];
         if (fingerprintListString != null) {
           fingerprintList = convert.jsonDecode(fingerprintListString);
         }
@@ -1251,13 +1251,13 @@ class TTLock {
 
     if (command == TTGateway.COMMAND_GET_SURROUND_WIFI ||
         command == TTGateway.COMMAND_INIT_GATEWAY) {
-      TTGatewayFailedCallback failedCallback = callBack;
+      TTGatewayFailedCallback? failedCallback = callBack;
       TTGatewayError error = TTGatewayError.values[errorCode];
       if (failedCallback != null) {
         failedCallback(error, errorMessage);
       }
     } else {
-      TTFailedCallback failedCallback = callBack;
+      TTFailedCallback? failedCallback = callBack;
       TTLockError error = TTLockError.values[errorCode];
       if (failedCallback != null) {
         failedCallback(error, errorMessage);
@@ -1646,7 +1646,6 @@ class TTGatewayScanModel {
     this.type = TTGatewayType.values[map["type"]];
     this.isDfuMode = map["isDfuMode"];
   }
-
 }
 
 class TTNbAwakeTimeModel {
