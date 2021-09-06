@@ -155,14 +155,12 @@ class _LockPageState extends State<LockPage> {
   }
 
   void _showSuccessAndDismiss(String text) {
-    ProgressHud.of(_context!).showSuccessAndDismiss(text: "");
-    print(text);
+    ProgressHud.of(_context!).showSuccessAndDismiss(text: text);
   }
 
   void _showErrorAndDismiss(TTLockError errorCode, String errorMsg) {
-    ProgressHud.of(_context!).showErrorAndDismiss(text: "");
-
-    print('errorCode:$errorCode errorMessage:$errorMsg');
+    ProgressHud.of(_context!).showErrorAndDismiss(
+        text: 'errorCode:$errorCode errorMessage:$errorMsg');
   }
 
   @override

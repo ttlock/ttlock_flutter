@@ -1,10 +1,6 @@
-## 0.0.8
+## 0.0.9
 
-    Add method
+    1. Add some new methods
     
-    1. Get valid passcode from lock
-
-    2. Get valid cards from lock
-
-    3. Get valid fingerprints from lock
+    2. Compatible with null safety
 
