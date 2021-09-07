@@ -13,7 +13,7 @@ class _HomePageState extends State<HomePage> {
   BuildContext? _context;
 
   void _startScanGateway() {
-    if (Config.ttlockUid == 0 || Config.ttlockLoginPassword.length == 0) {
+    if (Config.uid == 0 || Config.ttlockLoginPassword.length == 0) {
       String text = 'Please config the ttlockUid and the ttlockLoginPassword';
       ProgressHud.of(_context!).showAndDismiss(ProgressHudType.error, text);
       return;
