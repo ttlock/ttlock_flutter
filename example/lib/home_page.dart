@@ -10,12 +10,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  BuildContext _context;
+  BuildContext? _context;
 
   void _startScanGateway() {
-    if (Config.ttlockUid == 0 || Config.ttlockLoginPassword.length == 0) {
-      String text = 'Please config the ttlockUid and the ttlockLoginPassword';
-      ProgressHud.of(_context).showAndDismiss(ProgressHudType.error, text);
+    if (Config.gatewayServerIp.length == 0 ||
+        Config.gatewayServerPort.length == 0) {
+      String text =
+          'Please config the gatewayServerIp and the gatewayServerPort';
+      ProgressHud.of(_context!).showAndDismiss(ProgressHudType.error, text);
       return;
     }
     _startScan(ScanType.gateway);

@@ -131,10 +131,10 @@
       "name": "ttlock_premise_flutter",
       "rootUri": "../",
       "packageUri": "lib/",
-      "languageVersion": "2.7"
+      "languageVersion": "2.12"
     }
   ],
-  "generated": "2021-09-06T03:12:10.400753Z",
+  "generated": "2021-09-07T03:30:10.217006Z",
   "generator": "pub",
   "generatorVersion": "2.13.4"
 }
