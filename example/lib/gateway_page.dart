@@ -42,7 +42,7 @@ class _GatewayPageState extends State<GatewayPage> {
     paramMap["wifiPassword"] = wifiPassword;
     paramMap["type"] = _type!.index;
     paramMap["gatewayName"] = Config.gatewayName;
-    paramMap["ttlockUid"] = Config.ttlockUid;
+    paramMap["uid"] = Config.uid;
     if (Config.gatewayServerIp.isNotEmpty &&
         Config.gatewayServerPort.isNotEmpty) {
       paramMap["serverIp"] = Config.gatewayServerIp;
@@ -55,7 +55,7 @@ class _GatewayPageState extends State<GatewayPage> {
     Map paramMap = Map();
     paramMap["type"] = _type!.index;
     paramMap["gatewayName"] = Config.gatewayName;
-    paramMap["ttlockUid"] = Config.ttlockUid;
+    paramMap["uid"] = Config.uid;
     if (Config.gatewayServerIp.isNotEmpty &&
         Config.gatewayServerPort.isNotEmpty) {
       paramMap["serverIp"] = Config.gatewayServerIp;

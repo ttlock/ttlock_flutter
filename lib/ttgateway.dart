@@ -35,6 +35,11 @@ class TTGateway {
     TTGatewayInitCallback callback,
     TTGatewayFailedCallback failedCallback,
   ) {
+    int? uid = map["uid"];
+    if (uid != null) {
+      map["ttlockUid"] = uid;
+      map["ttlockLoginPassword"] = "123456";
+    }
     map[TTResponse.addGatewayJsonStr] = convert.jsonEncode(map);
     TTLock.invoke(COMMAND_INIT_GATEWAY, map, callback, fail: failedCallback);
   }

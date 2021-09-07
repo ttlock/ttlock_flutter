@@ -13,10 +13,8 @@ class _HomePageState extends State<HomePage> {
   BuildContext? _context;
 
   void _startScanGateway() {
-    if (Config.gatewayServerIp.length == 0 ||
-        Config.gatewayServerPort.length == 0) {
-      String text =
-          'Please config the gatewayServerIp and the gatewayServerPort';
+    if (Config.uid == 0) {
+      String text = 'Please set your uid in config.dart';
       ProgressHud.of(_context!).showAndDismiss(ProgressHudType.error, text);
       return;
     }

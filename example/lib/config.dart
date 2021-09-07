@@ -1,6 +1,6 @@
 class Config {
-  //test account ttlock uid,  https://api.ttlock.com/v3/user/getUid
-  static int ttlockUid = 2;
+  //ttlock uid,  https://api.ttlock.com/v3/user/getUid
+  static int uid = 0;
 
   // custom gateway name
   static String gatewayName = 'My gateway 1';
