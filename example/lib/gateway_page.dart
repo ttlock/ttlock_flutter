@@ -25,7 +25,7 @@ class _GatewayPageState extends State<GatewayPage> {
   }
 
   void _showLoading() {
-    ProgressHud.of(_context!).showLoading(text: '');
+    ProgressHud.of(_context!).showLoading();
   }
 
   void _showAndDismiss(ProgressHudType type, String text) {
