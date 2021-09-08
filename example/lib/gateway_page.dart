@@ -25,7 +25,7 @@ class _GatewayPageState extends State<GatewayPage> {
   }
 
   void _showLoading() {
-    ProgressHud.of(_context!).showLoading(text: '');
+    ProgressHud.of(_context!).showLoading();
   }
 
   void _showAndDismiss(ProgressHudType type, String text) {
@@ -76,7 +76,6 @@ class _GatewayPageState extends State<GatewayPage> {
 
     _showLoading();
     TTGateway.init(paramMap, (map) {
-      print("网关添加结果");
       print(map);
       _showAndDismiss(ProgressHudType.success, 'Init Gateway Success');
     }, (errorCode, errorMsg) {
