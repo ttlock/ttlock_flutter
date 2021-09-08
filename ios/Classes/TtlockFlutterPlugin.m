@@ -505,6 +505,8 @@ typedef NS_ENUM(NSInteger, ResultState) {
         paramDict[@"serverAddress"] = dict[@"serverIp"];
         paramDict[@"portNumber"] = dict[@"serverPort"];
         paramDict[@"gatewayVersion"] = @(gatewayType);
+        paramDict[@"companyId"] = dict[@"companyId"];
+        paramDict[@"branchId"] = dict[@"branchId"];
         if (gatewayType > TTGateWayTypeG2) {
             paramDict[@"SSID"] = @"1";
             paramDict[@"wifiPwd"] = @"1";
