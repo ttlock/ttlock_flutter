@@ -356,11 +356,14 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   public void initGateway(final GatewayModel gatewayModel) {
     ConfigureGatewayInfo configureGatewayInfo = new ConfigureGatewayInfo();
     configureGatewayInfo.plugName = gatewayModel.gatewayName;
-    configureGatewayInfo.ssid = gatewayModel.wifi;
-    configureGatewayInfo.wifiPwd = gatewayModel.wifiPassword;
+    configureGatewayInfo.plugVersion = gatewayModel.type + 1;
+    if (configureGatewayInfo.plugVersion == 2) {
+      configureGatewayInfo.ssid = gatewayModel.wifi;
+      configureGatewayInfo.wifiPwd = gatewayModel.wifiPassword;
+    }
     configureGatewayInfo.uid = gatewayModel.ttlockUid;
     configureGatewayInfo.userPwd = gatewayModel.ttlockLoginPassword;
-    configureGatewayInfo.plugVersion = gatewayModel.type + 1;
+
     configureGatewayInfo.companyId = gatewayModel.companyId;
     configureGatewayInfo.branchId = gatewayModel.branchId;
 
