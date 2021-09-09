@@ -25,7 +25,7 @@ class _GatewayPageState extends State<GatewayPage> {
   }
 
   void _showLoading() {
-    ProgressHud.of(_context!).showLoading(text: '');
+    ProgressHud.of(_context!).showLoading();
   }
 
   void _showAndDismiss(ProgressHudType type, String text) {
@@ -42,7 +42,7 @@ class _GatewayPageState extends State<GatewayPage> {
     paramMap["wifiPassword"] = wifiPassword;
     paramMap["type"] = _type!.index;
     paramMap["gatewayName"] = Config.gatewayName;
-    paramMap["ttlockUid"] = Config.ttlockUid;
+    paramMap["uid"] = Config.uid;
     paramMap["ttlockLoginPassword"] = Config.ttlockLoginPassword;
     _initGateway(paramMap);
   }
@@ -51,7 +51,7 @@ class _GatewayPageState extends State<GatewayPage> {
     Map paramMap = Map();
     paramMap["type"] = _type!.index;
     paramMap["gatewayName"] = Config.gatewayName;
-    paramMap["ttlockUid"] = Config.ttlockUid;
+    paramMap["uid"] = Config.uid;
     paramMap["ttlockLoginPassword"] = Config.ttlockLoginPassword;
     _initGateway(paramMap);
   }

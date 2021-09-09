@@ -497,18 +497,21 @@ typedef NS_ENUM(NSInteger, ResultState) {
         
         TTGatewayType gatewayType = [dict[@"type"] intValue] + 1;
         
-        dict[@"SSID"] = dict[@"wifi"];
-        dict[@"wifiPwd"] = dict[@"wifiPassword"];
-        dict[@"uid"] = dict[@"ttlockUid"];
-        dict[@"userPwd"] = dict[@"ttlockLoginPassword"];
-        dict[@"serverAddress"] = dict[@"serverIp"];
-        dict[@"portNumber"] = dict[@"serverPort"];
-        dict[@"gatewayVersion"] = @(gatewayType);
+        NSMutableDictionary *paramDict = @{}.mutableCopy;
+        paramDict[@"SSID"] = dict[@"wifi"];
+        paramDict[@"wifiPwd"] = dict[@"wifiPassword"];
+        paramDict[@"uid"] = dict[@"ttlockUid"];
+        paramDict[@"userPwd"] = dict[@"ttlockLoginPassword"];
+        paramDict[@"serverAddress"] = dict[@"serverIp"];
+        paramDict[@"portNumber"] = dict[@"serverPort"];
+        paramDict[@"gatewayVersion"] = @(gatewayType);
+        paramDict[@"companyId"] = dict[@"companyId"];
+        paramDict[@"branchId"] = dict[@"branchId"];
         if (gatewayType > TTGateWayTypeG2) {
-            dict[@"SSID"] = @"1";
-            dict[@"wifiPwd"] = @"1";
+            paramDict[@"SSID"] = @"1";
+            paramDict[@"wifiPwd"] = @"1";
         }
-        [TTGateway initializeGatewayWithInfoDic:dict block:^(TTSystemInfoModel *systemInfoModel, TTGatewayStatus status) {
+        [TTGateway initializeGatewayWithInfoDic:paramDict block:^(TTSystemInfoModel *systemInfoModel, TTGatewayStatus status) {
              if (status == TTGatewaySuccess) {
                  NSMutableDictionary *resultDict = @{}.mutableCopy;
                  resultDict[@"modelNum"] = systemInfoModel.modelNum;
