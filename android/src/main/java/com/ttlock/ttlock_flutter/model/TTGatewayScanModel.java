@@ -12,6 +12,7 @@ public class TTGatewayScanModel {
     public String gatewayMac;
     public int rssi;
     public boolean isDfuMode;
+    public int type;
 
     public TTGatewayScanModel toObject(Map<String, Object> params) {
         Field[] fields = this.getClass().getDeclaredFields();

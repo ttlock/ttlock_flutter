@@ -66,7 +66,7 @@ public class TtlockModel {
     public int lockSwitchState;
     public int rssi;
     public int oneMeterRssi;//todo:
-    public Long timestamp;
+    public long timestamp;
     public boolean isOn;
 
 
@@ -118,6 +118,13 @@ public class TtlockModel {
     public String passcodeListString;
     public String cardListString;
     public String fingerprintListString;
+
+    public String ip;
+    public String port;
+
+    public int cycleType;
+
+    public int type;
 
     @Override
     public String toString() {

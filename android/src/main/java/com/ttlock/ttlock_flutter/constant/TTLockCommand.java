@@ -33,7 +33,7 @@ public class TTLockCommand {
     public static final String COMMAND_MODIFY_FINGERPRINT = "modifyFingerprint";
     public static final String COMMAND_DELETE_FINGERPRINT = "deleteFingerprint";
     public static final String COMMAND_CLEAR_ALL_FINGERPRINT = "clearAllFingerprint";
-    public static final String COMMAND_GET_ADMIN_PASSCODE = "getAdminPasscode";
+    public static final String COMMAND_GET_ADMIN_PASSCODE = "getAdminPasscodeWithLockData";
     public static final String COMMAND_MODIFY_ADMIN_PASSCODE = "modifyAdminPasscode";
     public static final String COMMAND_SET_ADMIN_ERASE_PASSCODE =
             "setAdminErasePasscode";
@@ -88,10 +88,20 @@ public class TTLockCommand {
     public static final String COMMAND_GET_DOOR_SENSOR_SWITCH = "getDoorSensorSwitch";
     public static final String COMMAND_GET_DOOR_SENSOR_STATE = "getDoorSensorState";
 
-    public static final String COMMAND_SET_HOTLE_CARD_SECTOR = "setHotelCardSector";
-    public static final String COMMAND_SET_HOTLE_INFO = "setHotelInfo";
+    public static final String COMMAND_SET_HOTEL_CARD_SECTOR = "setHotelCardSector";
+    public static final String COMMAND_SET_HOTEL_INFO = "setHotelInfo";
 
     public static final String COMMAND_GET_ALL_VALID_PASSCODE = "getAllValidPasscode";;
     public static final String COMMAND_GET_ALL_VALID_CARD = "getAllValidIcCard";
     public static final String COMMAND_GET_ALL_VALID_FINGERPRINT = "getAllValidFingerprint";
+
+    public static final String COMMAND_SET_NB_SERVER_INFO = "setNBServerAddress";
+    public static final String COMMAND_GET_LOCK_SYSTEM_INFO = "getLockSystemInfoWithLockData";
+    public static final String COMMAND_GET_PASSCODE_VERIFICATION_PARAMS = "getPasscodeVerificationParamsWithLockData";
+
+    public static final String COMMAND_REPORT_LOSS_CARD = "reportLossCard";
+
+    public static final String COMMAND_RECOVER_PASSCODE = "recoverPasscodeWithPasswordType";
+
+    public static final String COMMAND_RECOVER_CARD = "recoverCardWithCardType";
 }
