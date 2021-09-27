@@ -1,12 +1,12 @@
 name: ttlock_premise_flutter
 description: The ttLock flutter plugin that used to controle smart lock and gateway.
-version: 0.0.2
+version: 0.0.3
 author: ttlock-developers-email-list@googlegroups.com
 homepage: https://github.com/ttlock/ttlock_flutter.git
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
-  flutter: ">=1.17.5 <2.0.0"
+  sdk: ">=2.12.0 <3.0.0"
+  flutter: ">=1.17.5"
 
 dependencies:
   flutter:

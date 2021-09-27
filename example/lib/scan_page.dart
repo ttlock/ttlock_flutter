@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ttlock_premise_flutter/ttlock.dart';
 import 'package:ttlock_premise_flutter/ttgateway.dart';
+import 'package:ttlock_premise_flutter/ttlock.dart';
+import 'package:ttlock_flutter_example/gateway_page.dart';
 import 'wifi_page.dart';
 import 'package:bmprogresshud/progresshud.dart';
 import 'lock_page.dart';
@@ -8,15 +9,15 @@ import 'lock_page.dart';
 enum ScanType { lock, gateway }
 
 class ScanPage extends StatefulWidget {
-  ScanPage({this.scanType}) : super();
+  ScanPage({required this.scanType}) : super();
   final ScanType scanType;
   @override
   _ScanPageState createState() => _ScanPageState(scanType);
 }
 
 class _ScanPageState extends State<ScanPage> {
-  ScanType scanType;
-  BuildContext _context;
+  ScanType? scanType;
+  BuildContext? _context;
 
   _ScanPageState(ScanType scanType) {
     super.initState();
@@ -32,10 +33,9 @@ class _ScanPageState extends State<ScanPage> {
     }
   }
 
-  List<TTLockScanModel> _lockList;
-  List<TTGatewayScanModel> _gatewayList;
+  List<TTLockScanModel> _lockList = [];
+  List<TTGatewayScanModel> _gatewayList = [];
 
-  @override
   void dispose() {
     if (scanType == ScanType.lock) {
       TTLock.stopScanLock();
@@ -46,11 +46,11 @@ class _ScanPageState extends State<ScanPage> {
   }
 
   void _showLoading() {
-    ProgressHud.of(_context).showLoading(text: '');
+    ProgressHud.of(_context!).showLoading(text: '');
   }
 
   void _dismissLoading() {
-    ProgressHud.of(_context).dismiss();
+    ProgressHud.of(_context!).dismiss();
   }
 
   void _initLock(TTLockScanModel scanModel) async {
@@ -75,23 +75,28 @@ class _ScanPageState extends State<ScanPage> {
     });
   }
 
-  void _connectGateway(String mac) async {
+  void _connectGateway(String mac, TTGatewayType type) async {
     _showLoading();
     TTGateway.connect(mac, (status) {
       _dismissLoading();
       if (status == TTGatewayConnectStatus.success) {
+        StatefulWidget? widget;
+        if (type == TTGatewayType.g2) {
+          widget = WifiPage(mac: mac);
+        } else if (type == TTGatewayType.g3 || type == TTGatewayType.g4) {
+          widget = GatewayPage(type: type);
+        }
+
         Navigator.push(context,
             new MaterialPageRoute(builder: (BuildContext context) {
-          return WifiPage(
-            mac: mac,
-          );
+          return widget!;
         }));
       }
     });
   }
 
   void _startScanLock() async {
-    _lockList = List();
+    _lockList = [];
     TTLock.startScanLock((scanModel) {
       bool contain = false;
       bool initStateChanged = false;
@@ -118,7 +123,7 @@ class _ScanPageState extends State<ScanPage> {
   }
 
   void _startScanGateway() {
-    _gatewayList = List();
+    _gatewayList = [];
     TTGateway.startScan((scanModel) {
       bool contain = false;
       for (TTGatewayScanModel model in _gatewayList) {
@@ -201,7 +206,7 @@ class _ScanPageState extends State<ScanPage> {
                       } else {
                         TTGatewayScanModel scanModel = _gatewayList[index];
                         TTGateway.stopScan();
-                        _connectGateway(scanModel.gatewayMac);
+                        _connectGateway(scanModel.gatewayMac, scanModel.type!);
                       }
                     },
                   );
