@@ -101,6 +101,8 @@ class TTLock {
   static const String COMMAND_SET_HOTEL_CARD_SECTOR = "setHotelCardSector";
   static const String COMMAND_SET_HOTEL_INFO = "setHotelInfo";
 
+  static const String COMMAND_GET_LOCK_VERSION = "getLockVersion";
+
   // static const String COMMAND_SET_NB_SERVER_INFO = "setNBServerInfo";
   // static const String COMMAND_GET_ADMIN_PASSCODE = "getAdminPasscode";
   // static const String COMMAND_GET_LOCK_SYSTEM_INFO = "getLockSystemInfo";
@@ -882,6 +884,14 @@ class TTLock {
         fail: failedCallback);
   }
 
+  static void getLockVersion(String lockMac,
+      TTGetLockVersionCallback callback, TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.lockMac] = lockMac;
+    invoke(COMMAND_GET_LOCK_VERSION, map, callback,
+        fail: failedCallback);
+  }
+
   // static void setNBServerInfo(String nbServerAddress, int nbServerPort, String lockData,
   //     TTSuccessCallback callback, TTFailedCallback failedCallback) {
   //   Map map = Map();
@@ -1164,6 +1174,10 @@ class TTLock {
       case COMMAND_GET_ADMIN_PASSCODE:
         TTGetAdminPasscodeCallback getAdminPasscodeCallback = callBack;
         getAdminPasscodeCallback(data[TTResponse.adminPasscode]);
+        break;
+      case COMMAND_GET_LOCK_VERSION:
+        TTGetLockVersionCallback getLockVersionCallback = callBack;
+        getLockVersionCallback(data[TTResponse.lockVersion]);
         break;
 
       // case COMMAND_GET_LOCK_SYSTEM_INFO:
@@ -1628,6 +1642,8 @@ typedef TTLiftCallback = void Function(
 typedef TTGetNbAwakeModesCallback = void Function(List<TTNbAwakeMode> list);
 typedef TTGetNbAwakeTimesCallback = void Function(
     List<TTNbAwakeTimeModel> list);
+
+typedef TTGetLockVersionCallback = void Function(String lockVersion);
 
 // typedef TTGetLockSystemInfoCallback = void Function(TTLockSystemInfoModel lockSystemInfoModel);
 // typedef TTGetPasscodeVerificationParamsCallback = void Function(String lockData);

@@ -37,6 +37,7 @@ import com.ttlock.bl.sdk.callback.GetLockConfigCallback;
 import com.ttlock.bl.sdk.callback.GetLockStatusCallback;
 import com.ttlock.bl.sdk.callback.GetLockSystemInfoCallback;
 import com.ttlock.bl.sdk.callback.GetLockTimeCallback;
+import com.ttlock.bl.sdk.callback.GetLockVersionCallback;
 import com.ttlock.bl.sdk.callback.GetNBAwakeModesCallback;
 import com.ttlock.bl.sdk.callback.GetNBAwakeTimesCallback;
 import com.ttlock.bl.sdk.callback.GetOperationLogCallback;
@@ -559,6 +560,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         break;
       case TTLockCommand.COMMAND_RECOVER_PASSCODE:
         recoveryPasscode(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_GET_LOCK_VERSION:
+        getLockVersion(ttlockModel);
         break;
       case TTLockCommand.COMMAND_SET_ADMIN_ERASE_PASSCODE:
 
@@ -1588,6 +1592,21 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       @Override
       public void onGetInfoSuccess(String lockData) {
         ttlockModel.lockData = lockData;
+        apiSuccess(ttlockModel);
+      }
+
+      @Override
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
+      }
+    });
+  }
+
+  public void getLockVersion(final TtlockModel ttlockModel) {
+    TTLockClient.getDefault().getLockVersion(ttlockModel.lockMac, new GetLockVersionCallback() {
+      @Override
+      public void onGetLockVersionSuccess(String lockVersion) {
+        ttlockModel.lockVersion = lockVersion;
         apiSuccess(ttlockModel);
       }
 

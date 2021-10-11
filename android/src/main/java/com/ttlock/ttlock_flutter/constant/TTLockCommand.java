@@ -104,4 +104,6 @@ public class TTLockCommand {
     public static final String COMMAND_RECOVER_PASSCODE = "recoverPasscodeWithPasswordType";
 
     public static final String COMMAND_RECOVER_CARD = "recoverCardWithCardType";
+
+    public static final String COMMAND_GET_LOCK_VERSION = "getLockVersion";
 }

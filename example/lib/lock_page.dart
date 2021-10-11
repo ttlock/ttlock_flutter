@@ -70,6 +70,7 @@ enum Command {
   getLockSystemInfo,
   getPasscodeVerificationParams,
   recoveryCard,
+  getLockVersion,
 }
 
 class _LockPageState extends State<LockPage> {
@@ -132,7 +133,8 @@ class _LockPageState extends State<LockPage> {
     {"Get Admin Passcode": Command.getAdminPasscode},
     {"Get Lock System Info": Command.getLockSystemInfo},
     {"Get Passcode Verification Param": Command.getPasscodeVerificationParams},
-    {"Recovery Card Data": Command.recoveryCard}
+    {"Recovery Card Data": Command.recoveryCard},
+    {"Get LockVersion": Command.getLockVersion}
   ];
 
   String note =
@@ -604,6 +606,13 @@ class _LockPageState extends State<LockPage> {
             DateTime.now().millisecondsSinceEpoch + 24 * 60 * 60 * 1000;
         TTLock.recoverCard(cardNumber, startDate, endDate, lockData, () {
           _showSuccessAndDismiss("success:$cardNumber");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+      case Command.getLockVersion:
+        TTLock.getLockVersion(lockMac, (lockVersion) {
+          _showSuccessAndDismiss("Get LockVersion success:$lockVersion");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
