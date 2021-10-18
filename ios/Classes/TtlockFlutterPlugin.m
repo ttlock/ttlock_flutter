@@ -757,7 +757,19 @@ typedef NS_ENUM(NSInteger, ResultState) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
     }
-    
+    else if ([command isEqualToString:command_get_lock_version]) {
+        [TTLock getLockVersionWithLockMac:lockModel.lockMac success:^(NSDictionary *lockVersion) {
+            NSError *parseError;
+            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:lockVersion options:NSJSONWritingPrettyPrinted error:&parseError];
+            NSString * str = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+            
+            TtlockModel *data = [TtlockModel new];
+            data.lockVersion = str;
+            [weakSelf successCallbackCommand:command data:data];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }
     
 }
 

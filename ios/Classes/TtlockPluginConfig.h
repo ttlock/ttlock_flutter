@@ -21,6 +21,8 @@
 #define command_get_bluetooth_state @"getBluetoothState"
 #define command_get_blutetooth_scan_state @"getBluetoothScanState"
 
+#define command_get_lock_version @"getLockVersion"
+
 
 #define command_init_lock @"initLock"
 #define command_reset_lock @"resetLock"
