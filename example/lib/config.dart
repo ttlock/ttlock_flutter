@@ -4,5 +4,5 @@ class Config {
   //test account ttlock login password
   static String ttlockLoginPassword = '111111';
   // custom gateway name
-  static String gatewayName = 'My gateway 1';
+  static String gatewayName = 'Gateway No 1';
 }

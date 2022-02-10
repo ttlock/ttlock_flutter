@@ -126,4 +126,8 @@
 #define command_report_loss_card @"reportLossCard"
 
 
+#define command_enter_upgrade_mode @"enterUpgradeMode"
+#define command_upgrade_lock @"upgradeLock"
+
+
 
