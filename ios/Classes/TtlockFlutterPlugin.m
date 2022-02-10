@@ -3,7 +3,6 @@
 #import <TTLock/TTLock.h>
 #import <TTLock/TTGateway.h>
 #import <objc/runtime.h>
-#import <TTLockDFU/TTLockDFU.h>
 
 typedef NS_ENUM(NSInteger, ResultState) {
     ResultStateSuccess,
@@ -769,24 +768,6 @@ typedef NS_ENUM(NSInteger, ResultState) {
             [weakSelf successCallbackCommand:command data:data];
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
-        }];
-    }else if ([command isEqualToString:command_enter_upgrade_mode]) {
-        [TTLock enterUpgradeModeWithLockData:lockModel.lockData success:^{
-            [weakSelf successCallbackCommand:command data:NULL];
-        } failure:^(TTError errorCode, NSString *errorMsg) {
-            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
-        }];
-    }else if ([command isEqualToString:command_upgrade_lock]) {
-        
-//        [TTLockDFU startDfuWithClientId];
-    }else if ([command isEqualToString:command_upgrade_gateway]) {
-        [TTGateway upgradeGatewayWithGatewayMac:lockModel.mac block:^(TTGatewayStatus status) {
-            if (status == TTGatewaySuccess) {
-                [weakSelf successCallbackCommand:command data:NULL];
-            }else{
-                NSInteger errorCode = [self getTTGatewayErrorCode:status];
-                [weakSelf errorCallbackCommand:command code:errorCode details:nil];
-            }
         }];
     }
     

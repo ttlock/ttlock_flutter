@@ -103,9 +103,6 @@ class TTLock {
 
   static const String COMMAND_GET_LOCK_VERSION = "getLockVersion";
 
-  static const String COMMAND_SET_LOCK_ENTER_UPGRADE_MODE = "enterUpgradeMode";
-  static const String COMMAND_UPGRADE_LOCK = "upgradeLock";
-
   // static const String COMMAND_SET_NB_SERVER_INFO = "setNBServerInfo";
   // static const String COMMAND_GET_ADMIN_PASSCODE = "getAdminPasscode";
   // static const String COMMAND_GET_LOCK_SYSTEM_INFO = "getLockSystemInfo";
@@ -887,25 +884,12 @@ class TTLock {
         fail: failedCallback);
   }
 
-  static void getLockVersion(String lockMac, TTGetLockVersionCallback callback,
-      TTFailedCallback failedCallback) {
+  static void getLockVersion(String lockMac,
+      TTGetLockVersionCallback callback, TTFailedCallback failedCallback) {
     Map map = Map();
     map[TTResponse.lockMac] = lockMac;
-    invoke(COMMAND_GET_LOCK_VERSION, map, callback, fail: failedCallback);
-  }
-
-  static void enterUpgradeMode(String lockData, TTSuccessCallback callback,
-      TTFailedCallback failedCallback) {
-    invoke(COMMAND_SET_LOCK_ENTER_UPGRADE_MODE, lockData, callback,
+    invoke(COMMAND_GET_LOCK_VERSION, map, callback,
         fail: failedCallback);
-  }
-
-  static void upgrade(String lockData, String ttlockToken,
-      TTSuccessCallback callback, TTFailedCallback failedCallback) {
-    Map map = Map();
-    map[TTResponse.lockData] = lockData;
-    map[TTResponse.ttlockToken] = ttlockToken;
-    invoke(COMMAND_UPGRADE_LOCK, map, callback, fail: failedCallback);
   }
 
   // static void setNBServerInfo(String nbServerAddress, int nbServerPort, String lockData,
@@ -1411,7 +1395,6 @@ class TTResponse {
   static const String addGatewayJsonStr = "addGatewayJsonStr";
   static const String ip = "ip";
   static const String port = "port";
-  static const String ttlockToken = "ttlockToken";
 }
 
 class TTLockScanModel {

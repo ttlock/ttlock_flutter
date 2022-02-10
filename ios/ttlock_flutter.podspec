@@ -18,7 +18,6 @@ A new flutter plugin project.
   s.dependency 'Flutter'
   s.platform = :ios, '9.0'
   s.dependency 'TTLock', '3.1.9'
-  s.dependency 'TTLockDFU', '3.1.9'
   s.static_framework = true
 
   # Flutter.framework does not contain a i386 slice. Only x86_64 simulators are supported.
