@@ -506,6 +506,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
         paramDict[@"userPwd"] = dict[@"ttlockLoginPassword"];
         paramDict[@"serverAddress"] = dict[@"serverIp"];
         paramDict[@"portNumber"] = dict[@"serverPort"];
+        paramDict[@"gatewayName"] = dict[@"gatewayName"];
         paramDict[@"gatewayVersion"] = @(gatewayType);
         paramDict[@"companyId"] = dict[@"companyId"];
         paramDict[@"branchId"] = dict[@"branchId"];
