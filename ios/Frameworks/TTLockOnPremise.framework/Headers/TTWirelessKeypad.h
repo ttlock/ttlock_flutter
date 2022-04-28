@@ -1,7 +1,7 @@
 
 
 #import <Foundation/Foundation.h>
-#import <TTLockOnPremise/TTWirelessKeypadScanModel.h>
+#import "TTWirelessKeypadScanModel.h"
 
 typedef enum {
     TTKeypadSuccess = 0,

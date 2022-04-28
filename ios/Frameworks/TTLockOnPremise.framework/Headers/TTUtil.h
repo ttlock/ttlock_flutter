@@ -1,7 +1,7 @@
 
 
 #import <Foundation/Foundation.h>
-#import <TTLockOnPremise/TTMacros.h>
+#import "TTMacros.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

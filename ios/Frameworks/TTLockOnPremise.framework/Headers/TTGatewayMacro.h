@@ -1,8 +1,8 @@
 
 
 #import <Foundation/Foundation.h>
-#import <TTLockOnPremise/TTGatewayScanModel.h>
-#import <TTLockOnPremise/TTSystemInfoModel.h>
+#import "TTGatewayScanModel.h"
+#import "TTSystemInfoModel.h"
 
 @interface TTGatewayMacro : NSObject
 
