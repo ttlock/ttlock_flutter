@@ -1,5 +1,5 @@
 
-//  version:1.1.6
+//  version:1.1.9
 
 #import <Foundation/Foundation.h>
 #import <TTLockOnPremise/TTBlocks.h>
@@ -13,7 +13,8 @@
 #import <TTLockOnPremise/TTUtil.h>
 #import <TTLockOnPremise/TTWirelessKeypad.h>
 #import <TTLockOnPremise/TTWirelessKeypadScanModel.h>
-
+#import <TTLockOnPremise/TTWirelessKeyFob.h>
+#import <TTLockOnPremise/TTWirelessKeyFobScanModel.h>
 
 @interface TTLock : NSObject
 /**
@@ -331,6 +332,41 @@ Set Lock Config
 									 success:(TTGetAccessoryElectricQuantitySuccessdBlock)success
 									 failure:(TTFailedBlock)failure;
 
+/**
+ Set Lock Sound
+ @param soundVolume TTSoundVolume
+ @param lockData The lock data string used to operate lock
+ @param success A block invoked when the operation succeeds
+ @param failure A block invoked when the operation fails
+*/
++ (void)setLockSoundWithSoundVolume:(TTSoundVolume)soundVolume
+						   lockData:(NSString *)lockData
+							success:(TTSucceedBlock)success
+							failure:(TTFailedBlock)failure;
+
+/**
+ Get Lock Sound
+ @param lockData The lock data string used to operate lock
+ @param success A block invoked when the operation succeeds
+ @param failure A block invoked when the operation fails
+*/
++ (void)getLockSoundWithLockData:(NSString *)lockData
+						 success:(TTGetLockSoundSuccessdBlock)success
+						 failure:(TTFailedBlock)failure;
+
+#pragma mark - Lock upgrade
+
+/**
+ Activate the lock into upgrade mode
+
+ @param lockData The lock data string used to operate lock
+ @param success A block invoked when the lock is activated
+ @param failure A block invoked when the operation fails
+ */
++ (void)enterUpgradeModeWithLockData:(NSString *)lockData
+                             success:(TTSucceedBlock)success
+                             failure:(TTFailedBlock)failure;
+
 
 #pragma mark - Ekey
 
@@ -474,7 +510,7 @@ Set Lock Config
 						  failure:(TTFailedBlock)failure;
 
 /**
- Modify cyclic IC card valid date
+ Modify  IC card valid date
 
  @param cyclicConfig cyclicConfig.count ==0 ,means no cyclic
                      weekDay  1~7,1 means Monday，2 means  Tuesday ,...,7 means Sunday
@@ -546,7 +582,7 @@ Set Lock Config
  @param startDate The time when it becomes valid
  @param endDate The time when it is expired
  @param lockData The lock data string used to operate lock
- @param progress A block invoked when card is adding
+ @param progress A block invoked when  adding
   currentCount == -1 || totalCount  == -1 means unknown,continue adding.
  @param success A block invoked when fingerprint is added
  @param failure A block invoked when the operation fails
@@ -560,7 +596,7 @@ Set Lock Config
 							   failure:(TTFailedBlock)failure;
 
 /**
- Modify cyclic fingerprint valid date
+ Modify  fingerprint valid date
 
  @param cyclicConfig  cyclicConfig.count ==0 ,means no cyclic
                      weekDay  1~7,1 means Monday，2 means  Tuesday ,...,7 means Sunday
@@ -619,6 +655,78 @@ Set Lock Config
                                     success:(TTGetAllFingerprintsSucceedBlock)success
                                     failure:(TTFailedBlock)failure;
 
+#pragma mark - Key Fob
+
+/**
+ Add Wireless Key Fob
+
+ @param cyclicConfig cyclicConfig.count ==0 ,means no cyclic
+                     weekDay  1~7,1 means Monday，2 means  Tuesday ,...,7 means Sunday
+                     startTime The time when it becomes valid (minutes from 0 clock)
+                     endTime  The time when it is expired (minutes from 0 clock)
+                     such as @[@{@"weekDay":@1,@"startTime":@10,@"endTime":@100},@{@"weekDay":@2,@"startTime":@10,@"endTime":@100}]
+ @param keyFobMac key Fob Mac
+ @param startDate The time when it becomes valid
+ @param endDate The time when it is expired
+ @param lockData The lock data string used to operate lock
+ @param success A block invoked when the operation succeeds
+ @param failure A block invoked when the operation fails
+ */
++ (void)addWirelessKeyFobWithCyclicConfig:(NSArray <NSDictionary *> *)cyclicConfig
+                                keyFobMac:(NSString *)keyFobMac
+                                startDate:(long long)startDate
+                                  endDate:(long long)endDate
+                                 lockData:(NSString *)lockData
+                                  success:(TTSucceedBlock)success
+                                  failure:(TTFailedBlock)failure;
+
+/**
+ Modify  Wireless Key Fob valid date
+
+ @param cyclicConfig  cyclicConfig.count ==0 ,means no cyclic
+                     weekDay  1~7,1 means Monday，2 means  Tuesday ,...,7 means Sunday
+                     startTime The time when it becomes valid (minutes from 0 clock)
+                     endTime  The time when it is expired (minutes from 0 clock)
+                     such as @[@{@"weekDay":@1,@"startTime":@10,@"endTime":@100},@{@"weekDay":@2,@"startTime":@10,@"endTime":@100}]
+ @param keyFobMac key Fob Mac
+ @param startDate The time when it becomes valid
+ @param endDate The time when it is expired
+ @param lockData The lock data string used to operate lock
+ @param success A block invoked when the operation succeeds
+ @param failure A block invoked when the operation fails
+ */
++ (void)modifyWirelessKeyFobValidityPeriodWithCyclicConfig:(NSArray <NSDictionary *> *)cyclicConfig
+                                                 keyFobMac:(NSString *)keyFobMac
+                                                 startDate:(long long)startDate
+                                                   endDate:(long long)endDate
+                                                  lockData:(NSString *)lockData
+                                                   success:(TTSucceedBlock)success
+                                                   failure:(TTFailedBlock)failure;
+
+/**
+ Delete Wireless Key Fob
+
+ @param keyFobMac key Fob Mac
+ @param lockData The lock data string used to operate lock
+ @param success A block invoked when the operation succeeds
+ @param failure A block invoked when the operation fails
+ */
++ (void)deleteWirelessKeyFobWithKeyFobMac:(NSString *)keyFobMac
+                                 lockData:(NSString *)lockData
+                                  success:(TTSucceedBlock)success
+                                  failure:(TTFailedBlock)failure;
+
+
+/**
+ Clear  Wireless Key Fobs
+
+ @param lockData The lock data string used to operate lock
+ @param success A block invoked when the operation succeeds
+ @param failure A block invoked when the operation fails
+ */
++ (void)clearWirelessKeyFobsWithLockData:(NSString *)lockData
+                                 success:(TTSucceedBlock)success
+                                 failure:(TTFailedBlock)failure;
 
 
 #pragma mark - NB-IoT
