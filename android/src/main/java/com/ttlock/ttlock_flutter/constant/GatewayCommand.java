@@ -15,6 +15,8 @@ public class GatewayCommand {
     public static final String COMMAND_INIT_GATEWAY = "initGateway";
     public static final String COMMAND_UPGRADE_GATEWAY = "upgradeGateway";
 
+    public static final String COMMAND_CONFIG_IP = "gatewayConfigIp";
+
     public static boolean isGatewayCommand(String command) {
         Field[] fields = GatewayCommand.class.getDeclaredFields();
         try {

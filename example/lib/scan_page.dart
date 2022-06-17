@@ -80,6 +80,8 @@ class _ScanPageState extends State<ScanPage> {
     TTGateway.connect(mac, (status) {
       _dismissLoading();
       if (status == TTGatewayConnectStatus.success) {
+        //for test
+        _configIp(mac);
         StatefulWidget? widget;
         if (type == TTGatewayType.g2) {
           widget = WifiPage(mac: mac);
@@ -92,6 +94,25 @@ class _ScanPageState extends State<ScanPage> {
           return widget!;
         }));
       }
+    });
+  }
+
+  void _configIp(String mac) {
+    Map paramMap = Map();
+    paramMap["mac"] = mac;
+    paramMap["type"] = TTIpSettingType.DHCP.index;
+    //for static ip setting
+    // paramMap["type"] = TTIpSettingType.STATIC_IP.index;
+    // paramMap["ipAddress"] = "192.168.1.100";
+    // paramMap["subnetMask"] = "255.255.255.0";
+    // paramMap["router"] = "192.168.1.1";
+    // paramMap["preferredDns"] = "xxx.xxx.xxx.xxx";
+    // paramMap["alternateDns"] = "xxx.xxx.xxx.xxx";
+
+    TTGateway.configIp(paramMap, () {
+      print("config ip success");
+    }, (errorCode, errorMsg) {
+      print('config ip errorCode:$errorCode msg:$errorMsg');
     });
   }
 

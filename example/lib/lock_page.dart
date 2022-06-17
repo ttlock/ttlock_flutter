@@ -71,6 +71,11 @@ enum Command {
   getPasscodeVerificationParams,
   recoveryCard,
   getLockVersion,
+  scanWifi,
+  configWifi,
+  configServer,
+  getWifiInfo,
+  configIp
 }
 
 class _LockPageState extends State<LockPage> {
@@ -134,7 +139,12 @@ class _LockPageState extends State<LockPage> {
     {"Get Lock System Info": Command.getLockSystemInfo},
     {"Get Passcode Verification Param": Command.getPasscodeVerificationParams},
     {"Recovery Card Data": Command.recoveryCard},
-    {"Get LockVersion": Command.getLockVersion}
+    {"Get LockVersion": Command.getLockVersion},
+    {"Wifi lock scan nearby wifi": Command.scanWifi},
+    {"Wifi lock config wifi": Command.configWifi},
+    {"Wifi lock config server": Command.configServer},
+    {"Wifi lock get wifi info": Command.getWifiInfo},
+    {"Wifi lock config ip": Command.configIp}
   ];
 
   String note =
@@ -613,6 +623,51 @@ class _LockPageState extends State<LockPage> {
       case Command.getLockVersion:
         TTLock.getLockVersion(lockMac, (lockVersion) {
           _showSuccessAndDismiss("Get LockVersion success:$lockVersion");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+      case Command.scanWifi:
+          TTLock.scanWifi(lockData, (finished, wifiList) {
+            _showSuccessAndDismiss("scan wifi");
+          }, (errorCode, errorMsg) {
+            _showErrorAndDismiss(errorCode, errorMsg);
+          });
+        break;
+      case Command.configWifi:
+          TTLock.configWifi("sciener", "sciener.com", lockData, () {
+            _showSuccessAndDismiss("Config wifi success");
+          }, (errorCode, errorMsg) {
+            _showErrorAndDismiss(errorCode, errorMsg);
+          });
+        break;
+      case Command.configServer:
+        TTLock.configServer("wifilock.ttlock.com", "4999", lockData, () {
+          _showSuccessAndDismiss("Config server success");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+      case Command.getWifiInfo:
+        TTLock.getWifiInfo(lockData, (wifiInfo) {
+          _showSuccessAndDismiss(wifiInfo.toString());
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+      case Command.configIp:
+        Map paramMap = Map();
+        paramMap["type"] = TTIpSettingType.DHCP.index;
+        //for static ip setting
+        // paramMap["type"] = TTIpSettingType.STATIC_IP.index;
+        // paramMap["ipAddress"] = "192.168.1.100";
+        // paramMap["subnetMask"] = "255.255.255.0";
+        // paramMap["router"] = "192.168.1.1";
+        // paramMap["preferredDns"] = "xxx.xxx.xxx.xxx";
+        // paramMap["alternateDns"] = "xxx.xxx.xxx.xxx";
+
+        TTLock.configIp(paramMap, lockData, () {
+          _showSuccessAndDismiss("config ip success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });

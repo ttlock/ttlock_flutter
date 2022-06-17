@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -22,6 +23,8 @@ import com.ttlock.bl.sdk.callback.AddICCardCallback;
 import com.ttlock.bl.sdk.callback.ClearAllFingerprintCallback;
 import com.ttlock.bl.sdk.callback.ClearAllICCardCallback;
 import com.ttlock.bl.sdk.callback.ClearPassageModeCallback;
+import com.ttlock.bl.sdk.callback.ConfigServerCallback;
+import com.ttlock.bl.sdk.callback.ConfigWifiCallback;
 import com.ttlock.bl.sdk.callback.ControlLockCallback;
 import com.ttlock.bl.sdk.callback.CreateCustomPasscodeCallback;
 import com.ttlock.bl.sdk.callback.DeleteFingerprintCallback;
@@ -43,6 +46,7 @@ import com.ttlock.bl.sdk.callback.GetNBAwakeTimesCallback;
 import com.ttlock.bl.sdk.callback.GetOperationLogCallback;
 import com.ttlock.bl.sdk.callback.GetPasscodeVerificationInfoCallback;
 import com.ttlock.bl.sdk.callback.GetRemoteUnlockStateCallback;
+import com.ttlock.bl.sdk.callback.GetWifiInfoCallback;
 import com.ttlock.bl.sdk.callback.InitLockCallback;
 import com.ttlock.bl.sdk.callback.ModifyAdminPasscodeCallback;
 import com.ttlock.bl.sdk.callback.ModifyFingerprintPeriodCallback;
@@ -54,6 +58,7 @@ import com.ttlock.bl.sdk.callback.ResetKeyCallback;
 import com.ttlock.bl.sdk.callback.ResetLockCallback;
 import com.ttlock.bl.sdk.callback.ResetPasscodeCallback;
 import com.ttlock.bl.sdk.callback.ScanLockCallback;
+import com.ttlock.bl.sdk.callback.ScanWifiCallback;
 import com.ttlock.bl.sdk.callback.SetAutoLockingPeriodCallback;
 import com.ttlock.bl.sdk.callback.SetHotelCardSectorCallback;
 import com.ttlock.bl.sdk.callback.SetHotelDataCallback;
@@ -74,6 +79,7 @@ import com.ttlock.bl.sdk.entity.ActivateLiftFloorsResult;
 import com.ttlock.bl.sdk.entity.ControlLockResult;
 import com.ttlock.bl.sdk.entity.CyclicConfig;
 import com.ttlock.bl.sdk.entity.HotelData;
+import com.ttlock.bl.sdk.entity.IpSetting;
 import com.ttlock.bl.sdk.entity.LockError;
 import com.ttlock.bl.sdk.entity.LockVersion;
 import com.ttlock.bl.sdk.entity.NBAwakeMode;
@@ -85,7 +91,9 @@ import com.ttlock.bl.sdk.entity.RecoveryDataType;
 import com.ttlock.bl.sdk.entity.TTLiftWorkMode;
 import com.ttlock.bl.sdk.entity.TTLockConfigType;
 import com.ttlock.bl.sdk.entity.ValidityInfo;
+import com.ttlock.bl.sdk.entity.WifiLockInfo;
 import com.ttlock.bl.sdk.gateway.api.GatewayClient;
+import com.ttlock.bl.sdk.gateway.callback.ConfigIpCallback;
 import com.ttlock.bl.sdk.gateway.callback.ConnectCallback;
 import com.ttlock.bl.sdk.gateway.callback.InitGatewayCallback;
 import com.ttlock.bl.sdk.gateway.callback.ScanGatewayCallback;
@@ -260,8 +268,8 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       case GatewayCommand.COMMAND_INIT_GATEWAY:
         initGateway(gatewayModel);
         break;
-      case GatewayCommand.COMMAND_UPGRADE_GATEWAY:
-
+      case GatewayCommand.COMMAND_CONFIG_IP:
+        gatewayConfigIp(gatewayModel);
         break;
     }
   }
@@ -320,8 +328,24 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     successCallbackCommand(GatewayCommand.COMMAND_DISCONNECT_GATEWAY, null);
   }
 
-  public void gatewayUpgrade() {
+  public void gatewayConfigIp(final GatewayModel gatewayModel) {
+    String ipSettingJson = gatewayModel.ipSettingJsonStr;
+    if (TextUtils.isEmpty(ipSettingJson)) {
+      errorCallbackCommand(GatewayCommand.COMMAND_CONFIG_IP, GatewayError.DATA_FORMAT_ERROR);
+      return;
+    }
+     IpSetting ipSetting = GsonUtil.toObject(ipSettingJson, IpSetting.class);
+     GatewayClient.getDefault().configIp(gatewayModel.mac, ipSetting, new ConfigIpCallback() {
+       @Override
+       public void onConfigIpSuccess() {
+         successCallbackCommand(GatewayCommand.COMMAND_CONFIG_IP, null);
+       }
 
+       @Override
+       public void onFail(GatewayError gatewayError) {
+         errorCallbackCommand(GatewayCommand.COMMAND_CONFIG_IP, gatewayError);
+       }
+     });
   }
 
   public void getSurroundWifi(final GatewayModel gatewayModel) {
@@ -563,6 +587,21 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         break;
       case TTLockCommand.COMMAND_GET_LOCK_VERSION:
         getLockVersion(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_SCAN_WIFI:
+        wifiLockGetNearbyWifi(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_CONFIG_WIFI:
+        configWifi(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_CONFIG_SERVER:
+        configServer(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_GET_WIFI_INFO:
+        getWifiInfo(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_CONFIG_IP:
+        configIp(ttlockModel);
         break;
       case TTLockCommand.COMMAND_SET_ADMIN_ERASE_PASSCODE:
 
@@ -1607,6 +1646,98 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       @Override
       public void onGetLockVersionSuccess(String lockVersion) {
         ttlockModel.lockVersion = lockVersion;
+        apiSuccess(ttlockModel);
+      }
+
+      @Override
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
+      }
+    });
+  }
+
+  public void wifiLockGetNearbyWifi(final TtlockModel ttlockModel) {
+    final HashMap<String, Object> resultMap = new HashMap<>();
+    TTLockClient.getDefault().scanWifi(ttlockModel.lockData, new ScanWifiCallback() {
+      @Override
+      public void onScanWifi(List<WiFi> wiFis, int status) {
+        List<HashMap<String, Object>> mapList = new ArrayList<HashMap<String, Object>>();
+        for (WiFi wiFi : wiFis) {
+          HashMap<String, Object> wifiMap = new HashMap<>();
+          wifiMap.put("wifi", wiFi.ssid);
+          wifiMap.put("rssi", wiFi.rssi);
+          mapList.add(wifiMap);
+        }
+        resultMap.put("finished", status == 1);
+        resultMap.put("wifiList", mapList);
+
+        successCallbackCommand(TTLockCommand.COMMAND_SCAN_WIFI, resultMap);
+      }
+
+      @Override
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
+      }
+    });
+  }
+
+  public void configWifi(final TtlockModel ttlockModel) {
+    TTLockClient.getDefault().configWifi(ttlockModel.wifiName, ttlockModel.wifiPassword, ttlockModel.lockData, new ConfigWifiCallback() {
+      @Override
+      public void onConfigWifiSuccess() {
+        apiSuccess(ttlockModel);
+      }
+
+      @Override
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
+      }
+    });
+  }
+
+  public void configServer(final TtlockModel ttlockModel) {
+    if (TextUtils.isEmpty(ttlockModel.ip) || TextUtils.isEmpty(ttlockModel.port)) {
+      ttlockModel.ip = "wifilock.ttlock.com";
+      ttlockModel.port = "4999";
+    }
+    TTLockClient.getDefault().configServer(ttlockModel.ip, Integer.valueOf(ttlockModel.port), ttlockModel.lockData, new ConfigServerCallback() {
+      @Override
+      public void onConfigServerSuccess() {
+        apiSuccess(ttlockModel);
+      }
+
+      @Override
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
+      }
+    });
+  }
+
+  public void getWifiInfo(final TtlockModel ttlockModel) {
+    TTLockClient.getDefault().getWifiInfo(ttlockModel.lockData, new GetWifiInfoCallback() {
+      @Override
+      public void onGetWiFiInfoSuccess(WifiLockInfo wifiLockInfo) {
+        Map<String, Object> map = Utils.object2Map(wifiLockInfo);
+        apiSuccess(map);
+      }
+
+      @Override
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
+      }
+    });
+  }
+
+  public void configIp(final TtlockModel ttlockModel) {
+    String ipSettingJson = ttlockModel.ipSettingJsonStr;
+    if (TextUtils.isEmpty(ipSettingJson)) {
+      errorCallbackCommand(TTLockCommand.COMMAND_CONFIG_IP, GatewayError.DATA_FORMAT_ERROR);
+      return;
+    }
+    IpSetting ipSetting = GsonUtil.toObject(ipSettingJson, IpSetting.class);
+    TTLockClient.getDefault().configIp(ipSetting, ttlockModel.lockData, new com.ttlock.bl.sdk.callback.ConfigIpCallback() {
+      @Override
+      public void onConfigIpSuccess() {
         apiSuccess(ttlockModel);
       }
 

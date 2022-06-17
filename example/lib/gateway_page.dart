@@ -22,6 +22,7 @@ class _GatewayPageState extends State<GatewayPage> {
     super.initState();
     _wifi = wifi;
     _type = type;
+
   }
 
   void _showLoading() {

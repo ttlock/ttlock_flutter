@@ -103,6 +103,12 @@ class TTLock {
 
   static const String COMMAND_GET_LOCK_VERSION = "getLockVersion";
 
+  static const String COMMAND_SCAN_WIFI = "scanWifi";
+  static const String COMMAND_CONFIG_WIFI = "configWifi";
+  static const String COMMAND_CONFIG_SERVER = "configServer";
+  static const String COMMAND_GET_WIFI_INFO = "getWifiInfo";
+  static const String COMMAND_CONFIG_IP = "configIp";
+
   // static const String COMMAND_SET_NB_SERVER_INFO = "setNBServerInfo";
   // static const String COMMAND_GET_ADMIN_PASSCODE = "getAdminPasscode";
   // static const String COMMAND_GET_LOCK_SYSTEM_INFO = "getLockSystemInfo";
@@ -892,6 +898,52 @@ class TTLock {
         fail: failedCallback);
   }
 
+  static void scanWifi(String lockData,
+      TTWifiLockScanWifiCallback callback,
+      TTFailedCallback failedCallback) {
+      invoke(COMMAND_SCAN_WIFI, lockData, callback,
+        fail: failedCallback);
+  }
+
+  static void configWifi(String wifiName, String wifiPassword,
+      String lockData, TTSuccessCallback callback,
+      TTFailedCallback failedCallback) {
+      Map map = Map();
+      map[TTResponse.wifiName] = wifiName;
+      map[TTResponse.wifiPassword] = wifiPassword;
+      map[TTResponse.lockData] = lockData;
+      invoke(COMMAND_CONFIG_WIFI, map, callback,
+        fail: failedCallback);
+  }
+
+  static void configServer(String ip, String port,
+      String lockData, TTSuccessCallback callback,
+      TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.ip] = ip;
+    map[TTResponse.port] = port;
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_CONFIG_SERVER, map, callback,
+        fail: failedCallback);
+  }
+
+  static void getWifiInfo(String lockData, TTWifiLockGetWifiInfoCallback callback,
+      TTFailedCallback failedCallback) {
+      invoke(COMMAND_GET_WIFI_INFO, lockData, callback,
+        fail: failedCallback);
+  }
+
+  static void configIp(
+      Map map,
+      String lockData,
+      TTSuccessCallback callback,
+      TTFailedCallback failedCallback,
+      ) {
+    map[TTResponse.lockData] = lockData;
+    map[TTResponse.ipSettingJsonStr] = convert.jsonEncode(map);
+    TTLock.invoke(COMMAND_CONFIG_IP, map, callback, fail: failedCallback);
+  }
+
   // static void setNBServerInfo(String nbServerAddress, int nbServerPort, String lockData,
   //     TTSuccessCallback callback, TTFailedCallback failedCallback) {
   //   Map map = Map();
@@ -1179,6 +1231,16 @@ class TTLock {
         TTGetLockVersionCallback getLockVersionCallback = callBack;
         getLockVersionCallback(data[TTResponse.lockVersion]);
         break;
+      case COMMAND_SCAN_WIFI:
+        TTWifiLockScanWifiCallback scanWifiCallback = callBack;
+        bool finished = data[TTResponse.finished];
+        List wifiList = data[TTResponse.wifiList];
+        scanWifiCallback(finished, wifiList);
+        break;
+      case COMMAND_GET_WIFI_INFO:
+        TTWifiLockGetWifiInfoCallback getWifiInfoCallback = callBack;
+        getWifiInfoCallback(TTWifiInfoModel(data));
+        break;
 
       // case COMMAND_GET_LOCK_SYSTEM_INFO:
       //   TTGetLockSystemInfoCallback getLockSystemInfoCallback = callBack;
@@ -1395,6 +1457,10 @@ class TTResponse {
   static const String addGatewayJsonStr = "addGatewayJsonStr";
   static const String ip = "ip";
   static const String port = "port";
+
+  static const String ipSettingJsonStr = "ipSettingJsonStr";
+  static const String wifiName = "wifiName";
+  static const String wifiPassword = "wifiPassword";
 }
 
 class TTLockScanModel {
@@ -1539,7 +1605,8 @@ enum TTLockConfig {
   freeze,
   tamperAlert,
   resetButton,
-  privacyLock
+  privacyLock,
+  wifiLockPowerSavingMode
 }
 
 enum TTLockError {
@@ -1645,6 +1712,11 @@ typedef TTGetNbAwakeTimesCallback = void Function(
 
 typedef TTGetLockVersionCallback = void Function(String lockVersion);
 
+typedef TTWifiLockScanWifiCallback = void Function(
+    bool finished, List wifiList);
+
+typedef TTWifiLockGetWifiInfoCallback = void Function(TTWifiInfoModel wifiInfo);
+
 // typedef TTGetLockSystemInfoCallback = void Function(TTLockSystemInfoModel lockSystemInfoModel);
 // typedef TTGetPasscodeVerificationParamsCallback = void Function(String lockData);
 
@@ -1669,6 +1741,16 @@ class TTNbAwakeTimeModel {
   int minutes = 0;
 }
 
+class TTWifiInfoModel {
+  String wifiMac = '';
+  int wifiRssi = -127;
+  // ignore: non_constant_identifier_names
+  TTWifiInfoModel(Map map) {
+    this.wifiMac = map["wifiMac"];
+    this.wifiRssi = map["wifiRssi"];
+  }
+}
+
 enum TTGatewayError {
   fail,
   wrongWifi,
@@ -1683,6 +1765,8 @@ enum TTGatewayError {
 }
 
 enum TTGatewayType { g1, g2, g3, g4 }
+
+enum TTIpSettingType {STATIC_IP, DHCP}
 
 enum TTGatewayConnectStatus { timeout, success, faile }
 

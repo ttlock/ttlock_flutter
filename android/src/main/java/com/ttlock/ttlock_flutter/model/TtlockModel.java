@@ -42,6 +42,10 @@ public class TtlockModel {
     public ArrayList<Integer> weekly;
     public ArrayList<Integer> monthly;
 
+    public String wifiName;
+    public String wifiPassword;
+
+    public String ipSettingJsonStr;
 
 /*************      返回值     ****************/
 

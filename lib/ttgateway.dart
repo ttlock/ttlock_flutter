@@ -10,6 +10,8 @@ class TTGateway {
   static const String COMMAND_INIT_GATEWAY = "initGateway";
   static const String COMMAND_UPGRADE_GATEWAY = "upgradeGateway";
 
+  static const String COMMAND_CONFIG_IP = "gatewayConfigIp";
+
   static void startScan(TTGatewayScanCallback scanCallback) {
     TTLock.invoke(COMMAND_START_SCAN_GATEWAY, null, scanCallback);
   }
@@ -44,6 +46,15 @@ class TTGateway {
 
     map[TTResponse.addGatewayJsonStr] = convert.jsonEncode(map);
     TTLock.invoke(COMMAND_INIT_GATEWAY, map, callback, fail: failedCallback);
+  }
+
+  static void configIp(
+      Map map,
+      TTSuccessCallback callback,
+      TTGatewayFailedCallback failedCallback,
+      ) {
+      map[TTResponse.ipSettingJsonStr] = convert.jsonEncode(map);
+      TTLock.invoke(COMMAND_CONFIG_IP, map, callback, fail: failedCallback);
   }
 
   // static void upgrade(String mac, TTSuccessCallback callback,
