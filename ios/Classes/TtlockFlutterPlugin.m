@@ -771,6 +771,49 @@ typedef NS_ENUM(NSInteger, ResultState) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
     }
+    else if ([command isEqualToString:command_scan_wifi]) {
+        [TTLock scanWifiWithLockData:lockModel.lockData success:^(BOOL isFinished, NSArray *wifiArr) {
+            NSMutableDictionary *dict = @{}.mutableCopy;
+            dict[@"wifiList"] = wifiArr;
+            dict[@"finished"] = @(isFinished);
+            [weakSelf successCallbackCommand:command data:dict];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:command_config_lock_wifi]) {
+        [TTLock configWifiWithSSID:lockModel.wifiName wifiPassword:lockModel.wifiPassword lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:command_config_lock_wifi_server]) {
+        [TTLock configServerWithServerAddress:lockModel.ip portNumber:lockModel.port lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:command_get_lock_wifi_info]) {
+        [TTLock getWifiInfoWithLockData:lockModel.lockData success:^(NSString *wifiMac, NSInteger wifiRssi) {
+            NSMutableDictionary *dict = @{}.mutableCopy;
+            dict[@"wifiMac"] = wifiMac;
+            dict[@"wifiRssi"] = @(wifiRssi);
+            [weakSelf successCallbackCommand:command data:dict];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }
+    
+    else if ([command isEqualToString:command_config_lock_server_ip]) {
+        NSDictionary *infoDict = [self dictFromJsonStr:lockModel.ipSettingJsonStr];
+        [TTLock configIpWithInfo:infoDict lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }
     
 }
 

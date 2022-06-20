@@ -34,9 +34,9 @@
 
 @property (nonatomic, strong) NSString *addGatewayJsonStr;
 
-//@property (nonatomic, strong) NSString *wifi;
-//@property (nonatomic, strong) NSString *wifiPassword;
-//@property (nonatomic, strong) NSString *ttlockLoginPassword;
+@property (nonatomic, strong) NSString *wifiName;
+@property (nonatomic, strong) NSString *wifiPassword;
+@property (nonatomic, strong) NSString *ipSettingJsonStr;
 //@property (nonatomic, strong) NSString *ttlockUid;
 @property (nonatomic, strong) NSString *ip;
 @property (nonatomic, strong) NSString *port;

@@ -1,9 +1,9 @@
 PODS:
   - Flutter (1.0.0)
-  - TTLock (3.1.9)
+  - TTLock (3.2.0)
   - ttlock_flutter (0.0.1):
     - Flutter
-    - TTLock (= 3.1.9)
+    - TTLock (= 3.2.0)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
@@ -21,9 +21,9 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
-  TTLock: a8a0db90d25e776ce5217c514fe6af1afda85de0
-  ttlock_flutter: e8338ea1b404935fed5e6326b811d6a08e9447f4
+  TTLock: 8eb887bd7033c95e20b7e533f3accb3a5e7c0947
+  ttlock_flutter: 8db5145e25ab614e9a376c5011da05f826ce520a
 
-PODFILE CHECKSUM: 8e679eca47255a8ca8067c4c67aab20e64cb974d
+PODFILE CHECKSUM: b1f7a399522c118a74b177b13c01eca692aa7e6d
 
 COCOAPODS: 1.10.1

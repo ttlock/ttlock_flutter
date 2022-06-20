@@ -99,6 +99,14 @@
 #define command_set_nb_awake_times @"setNBAwakeTimes"
 #define command_get_nb_awake_times @"getNBAwakeTimes"
 
+#pragma mark - WIFI锁
+#define command_scan_wifi @"scanWifi"
+#define command_config_lock_wifi @"configWifi"
+#define command_config_lock_wifi_server @"configServer"
+#define command_get_lock_wifi_info @"getWifiInfo"
+#define command_config_lock_server_ip @"configIp"
+
+
 #pragma mark - 门禁
 #define command_set_door_sensor_switch @"setDoorSensorSwitch"
 #define command_get_door_sensor_switch @"getDoorSensorSwitch"
