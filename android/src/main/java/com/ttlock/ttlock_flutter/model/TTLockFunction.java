@@ -46,11 +46,33 @@ public enum TTLockFunction {
     nbAwake,
     recoverCyclePasscode,
     wirelessKeyFob,
-    getAccessoryElectricQuantity;
+    getAccessoryElectricQuantity,
+    sound_volume_and_language_setting,
+    qr_code,
+    door_sensor,
+    passage_mode_auto_unlock_setting,
+    fingerprint_distribution,
+    zhong_zheng,
+    syno,
+    wireless_door_sensor,
+    door_not_lock_alarm,
+    //52
+    face_3d,
+    //54
+    cpu_card,
+    wifi_lock,
+    //57
+    wifi_lock_ip_setting;
 
     public static int flutter2Native(int index) {
         int supportFunction = index;
-        if (supportFunction > 30) {
+        if (supportFunction > 48) {
+            supportFunction += 9;
+        } else if (supportFunction > 46) {
+            supportFunction += 8;
+        } else if (supportFunction == 46) {
+            supportFunction += 7;
+        } else if (supportFunction > 30) {
             supportFunction += 6;
         } else if (supportFunction > 29) {
             supportFunction += 4;
