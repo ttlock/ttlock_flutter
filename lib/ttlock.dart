@@ -1598,6 +1598,7 @@ enum TTLockConfig {
   tamperAlert,
   resetButton,
   privacyLock,
+  passageModeAutoUnlock,
   wifiLockPowerSavingMode
 }
 
