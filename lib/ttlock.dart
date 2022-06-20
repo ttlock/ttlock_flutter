@@ -890,55 +890,47 @@ class TTLock {
         fail: failedCallback);
   }
 
-  static void getLockVersion(String lockMac,
-      TTGetLockVersionCallback callback, TTFailedCallback failedCallback) {
+  static void getLockVersion(String lockMac, TTGetLockVersionCallback callback,
+      TTFailedCallback failedCallback) {
     Map map = Map();
     map[TTResponse.lockMac] = lockMac;
-    invoke(COMMAND_GET_LOCK_VERSION, map, callback,
-        fail: failedCallback);
+    invoke(COMMAND_GET_LOCK_VERSION, map, callback, fail: failedCallback);
   }
 
-  static void scanWifi(String lockData,
-      TTWifiLockScanWifiCallback callback,
+  static void scanWifi(String lockData, TTWifiLockScanWifiCallback callback,
       TTFailedCallback failedCallback) {
-      invoke(COMMAND_SCAN_WIFI, lockData, callback,
-        fail: failedCallback);
+    invoke(COMMAND_SCAN_WIFI, lockData, callback, fail: failedCallback);
   }
 
-  static void configWifi(String wifiName, String wifiPassword,
-      String lockData, TTSuccessCallback callback,
-      TTFailedCallback failedCallback) {
-      Map map = Map();
-      map[TTResponse.wifiName] = wifiName;
-      map[TTResponse.wifiPassword] = wifiPassword;
-      map[TTResponse.lockData] = lockData;
-      invoke(COMMAND_CONFIG_WIFI, map, callback,
-        fail: failedCallback);
+  static void configWifi(String wifiName, String wifiPassword, String lockData,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.wifiName] = wifiName;
+    map[TTResponse.wifiPassword] = wifiPassword;
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_CONFIG_WIFI, map, callback, fail: failedCallback);
   }
 
-  static void configServer(String ip, String port,
-      String lockData, TTSuccessCallback callback,
-      TTFailedCallback failedCallback) {
+  static void configServer(String ip, String port, String lockData,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
     Map map = Map();
     map[TTResponse.ip] = ip;
     map[TTResponse.port] = port;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_CONFIG_SERVER, map, callback,
-        fail: failedCallback);
+    invoke(COMMAND_CONFIG_SERVER, map, callback, fail: failedCallback);
   }
 
-  static void getWifiInfo(String lockData, TTWifiLockGetWifiInfoCallback callback,
-      TTFailedCallback failedCallback) {
-      invoke(COMMAND_GET_WIFI_INFO, lockData, callback,
-        fail: failedCallback);
+  static void getWifiInfo(String lockData,
+      TTWifiLockGetWifiInfoCallback callback, TTFailedCallback failedCallback) {
+    invoke(COMMAND_GET_WIFI_INFO, lockData, callback, fail: failedCallback);
   }
 
   static void configIp(
-      Map map,
-      String lockData,
-      TTSuccessCallback callback,
-      TTFailedCallback failedCallback,
-      ) {
+    Map map,
+    String lockData,
+    TTSuccessCallback callback,
+    TTFailedCallback failedCallback,
+  ) {
     map[TTResponse.lockData] = lockData;
     map[TTResponse.ipSettingJsonStr] = convert.jsonEncode(map);
     TTLock.invoke(COMMAND_CONFIG_IP, map, callback, fail: failedCallback);
@@ -1762,11 +1754,12 @@ enum TTGatewayError {
   failConfigRouter,
   failConfigServer,
   failConfigAccount,
+  noSim,
 }
 
 enum TTGatewayType { g1, g2, g3, g4 }
 
-enum TTIpSettingType {STATIC_IP, DHCP}
+enum TTIpSettingType { STATIC_IP, DHCP }
 
 enum TTGatewayConnectStatus { timeout, success, faile }
 

@@ -536,7 +536,14 @@ typedef NS_ENUM(NSInteger, ResultState) {
     }else if ([command isEqualToString:command_function_support]) {
         NSInteger supportFunction = lockModel.supportFunction.integerValue;
         
-        if (supportFunction > 30) {
+        if (supportFunction > 48) {
+            supportFunction += 9;
+        }
+        else if (supportFunction > 46) {
+            supportFunction += 8;
+        }else if (supportFunction > 45) {
+            supportFunction += 7;
+        }else if (supportFunction > 30) {
             supportFunction += 6;
         }else if (supportFunction > 29) {
             supportFunction += 4;
@@ -925,6 +932,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
         @(-5):@7,
         @(-6):@8,
         @(-7):@9,
+        @(8):@10,
     };
     return [codeMap[@(status)] integerValue];
 }

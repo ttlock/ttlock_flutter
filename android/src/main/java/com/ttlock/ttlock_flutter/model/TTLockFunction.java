@@ -55,14 +55,14 @@ public enum TTLockFunction {
     zhong_zheng,
     syno,
     wireless_door_sensor,
-    door_not_lock_alarm,
+    door_not_lock_alarm, // 45
     //52
-    face_3d,
+    face_3d, //46
     //54
     cpu_card,
-    wifi_lock,
+    wifi_lock, //48
     //57
-    wifi_lock_ip_setting;
+    wifi_lock_ip_setting;// 49
 
     public static int flutter2Native(int index) {
         int supportFunction = index;
