@@ -13,6 +13,7 @@ public enum  TTLockConfigConverter {
     tamperAlert,
     resetButton,
     privacyLock,
+    passageModeAutoUnlock,
     wifiLockPowerSavingMode;
 
     public static TTLockConfigType flutter2Native(int index) {
@@ -36,6 +37,8 @@ public enum  TTLockConfigConverter {
                 return TTLockConfigType.RESET_BUTTON;
             case tamperAlert:
                 return TTLockConfigType.TAMPER_ALERT;
+            case passageModeAutoUnlock:
+                return TTLockConfigType.PASSAGE_MODE_AUTO_UNLOCK_SETTING;
             case wifiLockPowerSavingMode:
                 return TTLockConfigType.WIFI_LOCK_POWER_SAVING_MODE;
         }
@@ -56,6 +59,8 @@ public enum  TTLockConfigConverter {
                 return resetButton.ordinal();
             case PRIVACY_LOCK:
                 return privacyLock.ordinal();
+            case PASSAGE_MODE_AUTO_UNLOCK_SETTING:
+                return passageModeAutoUnlock.ordinal();
             case WIFI_LOCK_POWER_SAVING_MODE:
                 return wifiLockPowerSavingMode.ordinal();
         }

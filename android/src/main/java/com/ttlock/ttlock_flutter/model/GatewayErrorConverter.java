@@ -15,7 +15,8 @@ public enum GatewayErrorConverter {
     disconnect,
     failConfigRouter,
     failConfigServer,
-    failConfigAccount;
+    failConfigAccount,
+    noSim;
 
     public static int native2Flutter(GatewayError error) {
         switch (error) {
@@ -34,6 +35,8 @@ public enum GatewayErrorConverter {
                 return failConfigRouter.ordinal();
             case COMMUNICATION_DISCONNECTED:
                 return disconnect.ordinal();
+            case NO_SIM_CARD:
+                return noSim.ordinal();
         }
         return fail.ordinal();
     }

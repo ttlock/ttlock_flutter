@@ -1672,6 +1672,14 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         resultMap.put("wifiList", mapList);
 
         successCallbackCommand(TTLockCommand.COMMAND_SCAN_WIFI, resultMap);
+
+        if (status == 1) {
+          removeCommandTimeOutRunable();
+          commandQue.poll();
+          tryAgain = true;
+          doNextCommandAction();
+        }
+
       }
 
       @Override
