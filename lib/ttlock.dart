@@ -1038,6 +1038,9 @@ class TTLock {
       if (command == COMMAND_START_SCAN_LOCK) {
         reomveCommand = false;
       }
+      if (command == COMMAND_SCAN_WIFI && data[TTResponse.finished] == false) {
+        reomveCommand = false;
+      }
       if (command == TTGateway.COMMAND_START_SCAN_GATEWAY) {
         reomveCommand = false;
       }
