@@ -1086,6 +1086,8 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         removeCommandTimeOutRunable();
         commandTimeOutCheck();
         ttlockModel.totalCount = totalCount;
+        ttlockModel.currentCount = 0;
+        progressCallbackCommand(commandQue.peek(), ttlockModel.toMap());
       }
 
       @Override
