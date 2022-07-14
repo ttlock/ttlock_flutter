@@ -182,7 +182,8 @@ typedef NS_ENUM(NSInteger, ResultState) {
                 [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
             }];
         }else{
-            [TTLock addICCardStartDate:lockModel.startDate.longLongValue
+            
+            [TTLock addICCardWithCyclicConfig:nil startDate:lockModel.startDate.longLongValue
                                endDate:lockModel.endDate.longLongValue
                               lockData:lockModel.lockData
                               progress:^(TTAddICState state) {
@@ -198,25 +199,14 @@ typedef NS_ENUM(NSInteger, ResultState) {
         }
     }else if ([command isEqualToString:command_modify_ic_card]) {
         NSArray *cycleConfigArray = (NSArray *)[self dictFromJsonStr:lockModel.cycleJsonList];
-        if (cycleConfigArray.count) {
-            [TTLock modifyICCardValidityPeriodWithCyclicConfig:cycleConfigArray cardNumber:lockModel.cardNumber
-                                                     startDate:lockModel.startDate.longLongValue
-                                                     endDate:lockModel.endDate.longLongValue
-                                                    lockData:lockModel.lockData success:^{
-                [weakSelf successCallbackCommand:command data:nil];
-            } failure:^(TTError errorCode, NSString *errorMsg) {
-                [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
-            }];
-        }else{
-            [TTLock modifyICCardValidityPeriodWithCardNumber:lockModel.cardNumber
-                                                          startDate:lockModel.startDate.longLongValue
-                                                            endDate:lockModel.endDate.longLongValue
-                                                           lockData:lockModel.lockData success:^{
-                       [weakSelf successCallbackCommand:command data:nil];
-                   } failure:^(TTError errorCode, NSString *errorMsg) {
-                       [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
-                   }];
-        }
+        [TTLock modifyICCardValidityPeriodWithCyclicConfig:cycleConfigArray cardNumber:lockModel.cardNumber
+                                                 startDate:lockModel.startDate.longLongValue
+                                                 endDate:lockModel.endDate.longLongValue
+                                                lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
     }else if ([command isEqualToString:command_delete_ic_card]) {
         [TTLock deleteICCardNumber:lockModel.cardNumber lockData:lockModel.lockData success:^{
             [weakSelf successCallbackCommand:command data:nil];
@@ -254,7 +244,8 @@ typedef NS_ENUM(NSInteger, ResultState) {
                  [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
             }];
         }else{
-            [TTLock addFingerprintStartDate:lockModel.startDate.longLongValue
+            
+            [TTLock addFingerprintWithCyclicConfig:nil startDate:lockModel.startDate.longLongValue
                                     endDate:lockModel.endDate.longLongValue
                                    lockData:lockModel.lockData progress:^(int currentCount, int totalCount) {
                 TtlockModel *progressData = [TtlockModel new];
@@ -270,20 +261,12 @@ typedef NS_ENUM(NSInteger, ResultState) {
             }];
         }
     }else if ([command isEqualToString:command_modify_fingerprint]) {
-          NSArray *cycleConfigArray = (NSArray *)[self dictFromJsonStr:lockModel.cycleJsonList];
-          if (cycleConfigArray.count) {
-              [TTLock modifyFingerprintValidityPeriodWithCyclicConfig:cycleConfigArray fingerprintNumber:lockModel.fingerprintNumber startDate:lockModel.startDate.longLongValue endDate:lockModel.endDate.longLongValue lockData:lockModel.lockData success:^{
-                  [weakSelf successCallbackCommand:command data:nil];
-              } failure:^(TTError errorCode, NSString *errorMsg) {
-                  [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
-              }];
-          }else{
-              [TTLock modifyFingerprintValidityPeriodWithFingerprintNumber:lockModel.fingerprintNumber startDate:lockModel.startDate.longLongValue endDate:lockModel.endDate.longLongValue lockData:lockModel.lockData success:^{
-                  [weakSelf successCallbackCommand:command data:nil];
-              } failure:^(TTError errorCode, NSString *errorMsg) {
-                  [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
-              }];
-          }
+        NSArray *cycleConfigArray = (NSArray *)[self dictFromJsonStr:lockModel.cycleJsonList];
+        [TTLock modifyFingerprintValidityPeriodWithCyclicConfig:cycleConfigArray fingerprintNumber:lockModel.fingerprintNumber startDate:lockModel.startDate.longLongValue endDate:lockModel.endDate.longLongValue lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
     }else if ([command isEqualToString:command_delete_fingerprint]) {
         [TTLock deleteFingerprintNumber:lockModel.fingerprintNumber lockData:lockModel.lockData success:^{
             [weakSelf successCallbackCommand:command data:nil];
