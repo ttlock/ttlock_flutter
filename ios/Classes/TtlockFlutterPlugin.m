@@ -735,7 +735,9 @@ typedef NS_ENUM(NSInteger, ResultState) {
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
-    }else if ([command isEqualToString:command_recover_card]) {
+    }*/
+     
+     else if ([command isEqualToString:command_recover_card]) {
         [TTLock recoverICCardNumber:lockModel.cardNumber
                           startDate:lockModel.startDate.longLongValue endDate:lockModel.endDate.longLongValue
                            lockData:lockModel.lockData success:^(NSString *cardNumber) {
@@ -746,7 +748,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
     }
-     else if ([command isEqualToString:command_set_v2_lock_admin_erase_passcode]) {
+    /* else if ([command isEqualToString:command_set_v2_lock_admin_erase_passcode]) {
          [TTLock setAdminErasePasscode:lockModel.erasePasscode lockData:lockModel.lockData success:^{
              [weakSelf successCallbackCommand:command data:nil];
          } failure:^(TTError errorCode, NSString *errorMsg) {

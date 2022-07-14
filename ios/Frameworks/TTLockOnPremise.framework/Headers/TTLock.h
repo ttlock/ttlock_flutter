@@ -568,6 +568,12 @@ Set Lock Config
                                success:(TTGetAllICCardsSucceedBlock)success
                                failure:(TTFailedBlock)failure;
 
++ (void)recoverICCardNumber:(NSString *)cardNumber
+                  startDate:(long long)startDate
+                    endDate:(long long)endDate
+                   lockData:(NSString *)lockData
+                    success:(TTAddICSucceedBlock)success
+                    failure:(TTFailedBlock)failure;
 
 #pragma mark - Fingerprint
 

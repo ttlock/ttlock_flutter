@@ -417,20 +417,20 @@ class TTLock {
     invoke(COMMAND_CLEAR_ALL_CARD, lockData, callback, fail: failedCallback);
   }
 
-  // static void recoverCard(
-  //     String cardNumber,
-  //     int startDate,
-  //     int endDate,
-  //     String lockData,
-  //     TTSuccessCallback callback,
-  //     TTFailedCallback failedCallback) {
-  //   Map map = Map();
-  //   map[TTResponse.cardNumber] = cardNumber;
-  //   map[TTResponse.lockData] = lockData;
-  //   map[TTResponse.startDate] = startDate;
-  //   map[TTResponse.endDate] = endDate;
-  //   invoke(COMMAND_RECOVER_CARD, map, callback, fail: failedCallback);
-  // }
+  static void recoverCard(
+      String cardNumber,
+      int startDate,
+      int endDate,
+      String lockData,
+      TTSuccessCallback callback,
+      TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.cardNumber] = cardNumber;
+    map[TTResponse.lockData] = lockData;
+    map[TTResponse.startDate] = startDate;
+    map[TTResponse.endDate] = endDate;
+    invoke(COMMAND_RECOVER_CARD, map, callback, fail: failedCallback);
+  }
 
   // static void reportLossCard(String cardNumber, String lockData,
   //     TTSuccessCallback callback, TTFailedCallback failedCallback) {
