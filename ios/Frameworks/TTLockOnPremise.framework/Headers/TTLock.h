@@ -1,5 +1,5 @@
 
-//  version:1.2.1
+//  version:1.2.3
 
 #import <Foundation/Foundation.h>
 #import <TTLockOnPremise/TTBlocks.h>
@@ -568,6 +568,9 @@ Set Lock Config
                                success:(TTGetAllICCardsSucceedBlock)success
                                failure:(TTFailedBlock)failure;
 
+/**
+ Recover  IC card
+ */
 + (void)recoverICCardNumber:(NSString *)cardNumber
                   startDate:(long long)startDate
                     endDate:(long long)endDate
