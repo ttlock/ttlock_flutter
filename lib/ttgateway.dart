@@ -47,6 +47,12 @@ class TTGateway {
   }
 
   ///[map] {"type":x, "ipAddress": "xxx", "subnetMask": xxx"", "router": "xxx", "preferredDns": "xxx", "alternateDns": "xxx"}
+  //type  0 means manual, 1 means automatic
+  //  ipAddress (option)  such as 0.0.0.0
+  //  subnetMask (option)  such as 255.255.0.0
+  //  router (option)  such as 0.0.0.0
+  //  preferredDns (option)  such as 0.0.0.0
+  //  alternateDns (option)  such as 0.0.0.0
   static void configIp(
     Map map,
     TTSuccessCallback callback,

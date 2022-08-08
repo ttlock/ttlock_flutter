@@ -1251,7 +1251,8 @@ class TTLock {
     }
 
     if (command == TTGateway.COMMAND_GET_SURROUND_WIFI ||
-        command == TTGateway.COMMAND_INIT_GATEWAY) {
+        command == TTGateway.COMMAND_INIT_GATEWAY ||
+        command == TTGateway.COMMAND_CONFIG_IP) {
       TTGatewayFailedCallback? failedCallback = callBack;
       TTGatewayError error = TTGatewayError.values[errorCode];
       if (failedCallback != null) {
