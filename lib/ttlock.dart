@@ -1382,6 +1382,7 @@ class TTResponse {
   static const String addGatewayJsonStr = "addGatewayJsonStr";
   static const String ip = "ip";
   static const String port = "port";
+  static const String ipSettingJsonStr = "ipSettingJsonStr";
 }
 
 class TTLockScanModel {
