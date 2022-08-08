@@ -28,6 +28,8 @@ typedef NS_ENUM(NSInteger, TTGatewayStatus){
     TTGatewayFailConfigRouter = -5,
     TTGatewayFailConfigServer = -6,
     TTGatewayFailConfigAccount = -7,
+    TTGatewayFailConfigIP = -8,
+    TTGatewayFailInvaildIP = -9,
 };
 
 typedef void(^TTGatewayScanBlock)(TTGatewayScanModel *model);
