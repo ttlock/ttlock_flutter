@@ -856,6 +856,26 @@ typedef NS_ENUM(NSInteger, ResultState) {
 
 - (NSInteger)getTTGatewayErrorCode:(TTGatewayStatus) status{
 //    NSLog(@"Native errorCode:%d",status);
+//
+//
+//    TTGatewaySuccess = 0,
+//    TTGatewayFail = 1,
+//    TTGatewayWrongSSID = 3,
+//    TTGatewayWrongWifiPassword = 4,
+//    TTGatewayInvalidCommand = 6,
+//    TTGatewayTimeout = 7,
+//    TTGatewayNoSIM = 8,
+//    TTGatewayNoPlugCable = 9,
+//    TTGatewayWrongCRC = -1,
+//    TTGatewayWrongAeskey = -2,
+//    TTGatewayNotConnect = -3,
+//    TTGatewayDisconnect = -4,
+//    TTGatewayFailConfigRouter = -5,
+//    TTGatewayFailConfigServer = -6,
+//    TTGatewayFailConfigAccount = -7,
+//    TTGatewayFailConfigIP = -8,
+//    TTGatewayFailInvaildIP = -9,
+    
     NSDictionary *codeMap = @{
         @(1):@0,
         @(3):@1,
@@ -866,8 +886,8 @@ typedef NS_ENUM(NSInteger, ResultState) {
         @(-4):@6,
         @(-5):@7,
         @(-6):@8,
-        @(-7):@9,
-        @(6):@10,
+        @(-7):@10,
+        @(6):@11,
     };
     return [codeMap[@(status)] integerValue];
 }
