@@ -473,13 +473,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
             [weakSelf successCallbackCommand:command data:dict];
         }];
     }else if ([command isEqualToString:command_config_gateway_ip]) {
-        NSMutableDictionary *dict = @{}.mutableCopy;
-        dict[@"type"] = lockModel.type;
-        dict[@"ipAddress"] = lockModel.ip;
-        dict[@"subnetMask"] = lockModel.subnetMask;
-        dict[@"router"] = lockModel.router;
-        dict[@"preferredDns"] = lockModel.preferredDns;
-        dict[@"alternateDns"] = lockModel.alternateDns;
+        NSMutableDictionary *dict = [self dictFromJsonStr:lockModel.ipSettingJsonStr];
         [TTGateway configIpWithInfo:dict block:^(TTGatewayStatus status) {
             if (status == TTGatewaySuccess) {
                 [weakSelf successCallbackCommand:command data:nil];
