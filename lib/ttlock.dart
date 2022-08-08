@@ -1660,7 +1660,6 @@ enum TTGatewayError {
   fail,
   wrongWifi,
   wrongWifiPassword,
-  invalidCommand,
   wrongCRC,
   wrongAeskey,
   notConnect,
@@ -1668,6 +1667,7 @@ enum TTGatewayError {
   failConfigRouter,
   failConfigServer,
   failConfigAccount,
+  invalidCommand,
 }
 
 enum TTGatewayType { g1, g2, g3, g4 }

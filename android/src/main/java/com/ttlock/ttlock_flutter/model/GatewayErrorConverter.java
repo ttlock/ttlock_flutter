@@ -9,14 +9,14 @@ public enum GatewayErrorConverter {
     fail,
     wrongWifi,
     wrongWifiPassword,
-    invalidCommand,
     wrongCRC,
     wrongAeskey,
     notConnect,
     disconnect,
     failConfigRouter,
     failConfigServer,
-    failConfigAccount;
+    failConfigAccount,
+    invalidCommand;
 
     public static int native2Flutter(GatewayError error) {
         switch (error) {
