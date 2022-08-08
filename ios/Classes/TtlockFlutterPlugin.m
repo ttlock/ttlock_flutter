@@ -182,7 +182,6 @@ typedef NS_ENUM(NSInteger, ResultState) {
                 [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
             }];
         }else{
-            
             [TTLock addICCardWithCyclicConfig:nil startDate:lockModel.startDate.longLongValue
                                endDate:lockModel.endDate.longLongValue
                               lockData:lockModel.lockData
@@ -472,6 +471,22 @@ typedef NS_ENUM(NSInteger, ResultState) {
             NSMutableDictionary *dict = @{}.mutableCopy;
             dict[@"status"] = @(connectStatus);
             [weakSelf successCallbackCommand:command data:dict];
+        }];
+    }else if ([command isEqualToString:command_config_gateway_ip]) {
+        NSMutableDictionary *dict = @{}.mutableCopy;
+        dict[@"type"] = lockModel.type;
+        dict[@"ipAddress"] = lockModel.ip;
+        dict[@"subnetMask"] = lockModel.subnetMask;
+        dict[@"router"] = lockModel.router;
+        dict[@"preferredDns"] = lockModel.preferredDns;
+        dict[@"alternateDns"] = lockModel.alternateDns;
+        [TTGateway configIpWithInfo:dict block:^(TTGatewayStatus status) {
+            if (status == TTGatewaySuccess) {
+                [weakSelf successCallbackCommand:command data:nil];
+            }else{
+               NSInteger errorCode = [self getTTGatewayErrorCode:status];
+               [weakSelf errorCallbackCommand:command code:errorCode details:nil];
+            }
         }];
     }else if ([command isEqualToString:command_disconnect_gateway]) {
         [TTGateway disconnectGatewayWithGatewayMac:lockModel.mac block:^(TTGatewayStatus status) {

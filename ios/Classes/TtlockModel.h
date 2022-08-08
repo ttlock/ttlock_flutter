@@ -115,6 +115,17 @@
 @property (nonatomic, strong) NSString *fingerprintListString;
 @property (nonatomic, strong) NSString *cardListString;
 
+
+@property (nonatomic, strong) NSNumber *type;
+@property (nonatomic, strong) NSString *ipAddress;
+@property (nonatomic, strong) NSString *subnetMask;
+@property (nonatomic, strong) NSString *router;
+@property (nonatomic, strong) NSString *preferredDns;
+@property (nonatomic, strong) NSString *alternateDns;
+
+
+
+
 + (TtlockModel *)modelWithDict:(NSDictionary *)dict;
 - (NSDictionary *)toDictionary;
 @end
