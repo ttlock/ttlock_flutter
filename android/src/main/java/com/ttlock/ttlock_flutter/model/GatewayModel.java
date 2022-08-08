@@ -20,6 +20,8 @@ public class GatewayModel {
     public int companyId;
     public int branchId;
 
+    public String ipSettingJsonStr;
+
     public GatewayModel toObject(Map<String, Object> params) {
         if (params == null) {
             return this;

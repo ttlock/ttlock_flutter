@@ -71,6 +71,7 @@ import com.ttlock.bl.sdk.entity.ActivateLiftFloorsResult;
 import com.ttlock.bl.sdk.entity.ControlLockResult;
 import com.ttlock.bl.sdk.entity.CyclicConfig;
 import com.ttlock.bl.sdk.entity.HotelData;
+import com.ttlock.bl.sdk.entity.IpSetting;
 import com.ttlock.bl.sdk.entity.LockError;
 import com.ttlock.bl.sdk.entity.LockVersion;
 import com.ttlock.bl.sdk.entity.NBAwakeMode;
@@ -83,6 +84,7 @@ import com.ttlock.bl.sdk.entity.TTLiftWorkMode;
 import com.ttlock.bl.sdk.entity.TTLockConfigType;
 import com.ttlock.bl.sdk.entity.ValidityInfo;
 import com.ttlock.bl.sdk.gateway.api.GatewayClient;
+import com.ttlock.bl.sdk.gateway.callback.ConfigIpCallback;
 import com.ttlock.bl.sdk.gateway.callback.ConnectCallback;
 import com.ttlock.bl.sdk.gateway.callback.InitGatewayCallback;
 import com.ttlock.bl.sdk.gateway.callback.ScanGatewayCallback;
@@ -247,6 +249,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       case GatewayCommand.COMMAND_INIT_GATEWAY:
         initGateway(gatewayModel);
         break;
+      case GatewayCommand.COMMAND_CONFIG_IP:
+        gatewayConfigIp(gatewayModel);
+        break;
       case GatewayCommand.COMMAND_UPGRADE_GATEWAY:
 
         break;
@@ -304,6 +309,26 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   public void disconnectGateway() {//todo:
     GatewayClient.getDefault().disconnectGateway();
     successCallbackCommand(GatewayCommand.COMMAND_DISCONNECT_GATEWAY, null);
+  }
+
+  public void gatewayConfigIp(final GatewayModel gatewayModel) {
+    String ipSettingJson = gatewayModel.ipSettingJsonStr;
+    if (TextUtils.isEmpty(ipSettingJson)) {
+      errorCallbackCommand(GatewayCommand.COMMAND_CONFIG_IP, GatewayError.DATA_FORMAT_ERROR);
+      return;
+    }
+    IpSetting ipSetting = GsonUtil.toObject(ipSettingJson, IpSetting.class);
+    GatewayClient.getDefault().configIp(gatewayModel.mac, ipSetting, new ConfigIpCallback() {
+      @Override
+      public void onConfigIpSuccess() {
+        successCallbackCommand(GatewayCommand.COMMAND_CONFIG_IP, null);
+      }
+
+      @Override
+      public void onFail(GatewayError gatewayError) {
+        errorCallbackCommand(GatewayCommand.COMMAND_CONFIG_IP, gatewayError);
+      }
+    });
   }
 
   public void gatewayUpgrade() {
