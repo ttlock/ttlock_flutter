@@ -46,6 +46,7 @@ class TTGateway {
     TTLock.invoke(COMMAND_INIT_GATEWAY, map, callback, fail: failedCallback);
   }
 
+  ///map {"type":x, "ipAddress": "xxx", "subnetMask": xxx"", "router": "xxx", "preferredDns": "xxx", "alternateDns": "xxx"}
   static void configIp(
     Map map,
     TTSuccessCallback callback,
