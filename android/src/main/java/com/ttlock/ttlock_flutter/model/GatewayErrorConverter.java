@@ -9,6 +9,7 @@ public enum GatewayErrorConverter {
     fail,
     wrongWifi,
     wrongWifiPassword,
+    invalidCommand,
     wrongCRC,
     wrongAeskey,
     notConnect,
@@ -26,6 +27,8 @@ public enum GatewayErrorConverter {
                 return wrongWifi.ordinal();
             case BAD_WIFI_PASSWORD:
                 return wrongWifiPassword.ordinal();
+            case INVALID_COMMAND:
+                return invalidCommand.ordinal();
             case FAILED_TO_CONFIGURE_ACCOUNT:
                 return failConfigAccount.ordinal();
             case FAILED_TO_CONFIGURE_SERVER:
