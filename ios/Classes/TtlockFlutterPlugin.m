@@ -867,6 +867,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
         @(-5):@7,
         @(-6):@8,
         @(-7):@9,
+        @(6):@10,
     };
     return [codeMap[@(status)] integerValue];
 }
