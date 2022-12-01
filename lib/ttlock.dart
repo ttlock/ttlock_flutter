@@ -1158,7 +1158,7 @@ class TTLock {
 
       case COMMAND_GET_LOCK_OPERATE_RECORD:
         TTGetLockOperateRecordCallback getLockOperateRecordCallback = callBack;
-        getLockOperateRecordCallback(data[TTResponse.records]);
+        getLockOperateRecordCallback(data[TTResponse.records] ?? "");
         break;
 
       case COMMAND_GET_LOCK_POWER:
