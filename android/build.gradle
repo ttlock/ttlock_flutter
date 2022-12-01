@@ -3,6 +3,7 @@ version '1.0'
 
 buildscript {
     repositories {
+        mavenCentral()
         google()
         jcenter()
     }
@@ -14,6 +15,7 @@ buildscript {
 
 rootProject.allprojects {
     repositories {
+        mavenCentral()
         google()
         jcenter()
         flatDir {
@@ -36,7 +38,7 @@ android {
 }
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-//    implementation 'com.ttlock:ttlock:3.2.3'
+    implementation 'com.ttlock:ttlock:3.2.6'
     implementation 'com.google.code.gson:gson:2.6.2'
-    implementation(name: 'ttlock-release', ext: 'aar')
+//    implementation(name: 'ttlock-release', ext: 'aar')
 }
