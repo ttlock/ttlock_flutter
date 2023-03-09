@@ -35,6 +35,7 @@ typedef NS_ENUM(NSInteger, TTGatewayStatus){
 
 typedef void(^TTGatewayScanBlock)(TTGatewayScanModel *model);
 typedef void(^TTGatewayConnectBlock)(TTGatewayConnectStatus connectStatus);
+//wifiArr: [{"SSID":"ssid"}]
 typedef void(^TTGatewayScanWiFiBlock)(BOOL isFinished, NSArray *WiFiArr,TTGatewayStatus status);
 typedef void(^TTGatewayBlock)(TTGatewayStatus status);
 typedef void(^TTInitializeGatewayBlock)(TTSystemInfoModel *systemInfoModel,TTGatewayStatus status);

@@ -36,6 +36,8 @@ UIKIT_EXTERN NSString * const  TTErrorMessageInFreezeMode;
 UIKIT_EXTERN NSString * const  TTErrorMessageInvalidClientPara;
 UIKIT_EXTERN NSString * const  TTErrorMessageLockIsLocked;
 UIKIT_EXTERN NSString * const  TTErrorMessageRecordNotExist;
+UIKIT_EXTERN NSString * const  TTErrorMessageWrongSSID;
+UIKIT_EXTERN NSString * const  TTErrorMessageWrongWifiPassword;
 UIKIT_EXTERN NSString * const  TTErrorMessageBluetoothPoweredOff;
 UIKIT_EXTERN NSString * const  TTErrorMessageConnectionTimeout;
 UIKIT_EXTERN NSString * const  TTErrorMessageDisconnection;
@@ -87,6 +89,8 @@ typedef NS_ENUM(NSInteger, TTError)
     TTErrorInvalidClientPara = 0x1D,
     TTErrorLockIsLocked = 0x1E,
     TTErrorRecordNotExist = 0x1F,
+    TTErrorWrongSSID = 0x25,
+    TTErrorWrongWifiPassword = 0x26,
     
     TTErrorBluetoothPoweredOff = 0x61,
     TTErrorConnectionTimeout = 0x62,
@@ -351,7 +355,6 @@ typedef NS_ENUM(NSInteger,TTLockFeatureValue) {
     TTLockFeatureValueGatewayUnlock = 10,
     TTLockFeatureValueLockFreeze = 11,
     TTLockFeatureValueCyclePassword = 12,
-    TTLockFeatureValueDoorSensor = 13,
     TTLockFeatureValueRemoteUnlockSwicth = 14,
     TTLockFeatureValueAudioSwitch = 15,
     TTLockFeatureValueNBIoT = 16,
@@ -380,7 +383,13 @@ typedef NS_ENUM(NSInteger,TTLockFeatureValue) {
 	TTLockFeatureValueQRCode = 44,
 	TTLockFeatureValueSensorState = 45,
 	TTLockFeatureValuePassageModeAutoUnlock = 46,
+    TTLockFeatureValueDoorSensor = 50,
+    TTLockFeatureValueDoorSensorAlert = 51,
+    TTLockFeatureValueSensitivity = 52,
+    TTLockFeatureValueFace = 53,
     TTLockFeatureValueCpuCard = 55,
+    TTLockFeatureValueWifiLock = 56,
+    TTLockFeatureValueWifiLockStaticIP = 58,
 };
 
 typedef NS_ENUM(NSInteger ,TTLockConfigType) {
@@ -390,7 +399,8 @@ typedef NS_ENUM(NSInteger ,TTLockConfigType) {
     TTTamperAlert,
     TTResetButton,
     TTPrivacyLock,
-	TTPassageModeAutoUnlock
+	TTPassageModeAutoUnlock,
+    TTWifiPowerSavingMode
 };
 
 /*!

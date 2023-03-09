@@ -1,5 +1,5 @@
 
-//  version:1.2.3
+//  version:1.3.3
 
 #import <Foundation/Foundation.h>
 #import <TTLockOnPremise/TTBlocks.h>
@@ -9,7 +9,6 @@
 #import <TTLockOnPremise/TTSystemInfoModel.h>
 #import <TTLockOnPremise/TTMacros.h>
 #import <TTLockOnPremise/TTScanModel.h>
-#import <TTLockOnPremise/TTSystemInfoModel.h>
 #import <TTLockOnPremise/TTUtil.h>
 #import <TTLockOnPremise/TTWirelessKeypad.h>
 #import <TTLockOnPremise/TTWirelessKeypadScanModel.h>
@@ -354,6 +353,28 @@ Set Lock Config
 						 success:(TTGetLockSoundSuccessdBlock)success
 						 failure:(TTFailedBlock)failure;
 
+/**
+ Get the lock feature value
+
+ @param lockData The lock data string used to operate lock
+ @param success A block invoked when the lock feature value is got
+ @param failure A block invoked when the operation fails
+ */
++ (void)getLockFeatureValueWithLockData:(NSString *)lockData
+                                success:(TTGetFeatureValueSucceedBlock)success
+                                failure:(TTFailedBlock)failure;
+
+/**
+ Get the lock system infomation
+
+ @param lockData The lock data string used to operate lock
+ @param success A block invoked when the lock system infomation is got
+ @param failure A block invoked when the operation fails
+ */
++ (void)getLockSystemInfoWithLockData:(NSString*)lockData
+                              success:(TTGetLockSystemSucceedBlock)success
+                              failure:(TTFailedBlock)failure;
+
 #pragma mark - Lock upgrade
 
 /**
@@ -473,6 +494,29 @@ Set Lock Config
                            failure:(TTFailedBlock)failure;
 
 /**
+ Recover passcode
+
+ @param passcode Old Passcode
+ @param newPasscode New Passcode is limited to 4 - 9 digits
+ @param passcodeType Passcode Type
+ @param startDate The time when it becomes valid
+ @param endDate The time when it is expired. If passwordType != TTPasscodeTypePeriod ,can set 0
+ @param cycleType Cycle Type , if passwordType != TTPasscodeTypeCycle ,can set any value
+ @param lockData The lock data string used to operate lock
+ @param success A block invoked when passcode is recovered
+ @param failure A block invoked when the operation fails
+ */
++ (void)recoverPasscode:(NSString *)passcode
+            newPasscode:(NSString *)newPasscode
+           passcodeType:(TTPasscodeType)passcodeType
+              startDate:(long long)startDate
+                endDate:(long long)endDate
+              cycleType:(int)cycleType
+               lockData:(NSString *)lockData
+                success:(TTSucceedBlock)success
+                failure:(TTFailedBlock)failure;
+
+/**
  Get all valid passcode
 
  @param lockData The lock data string used to operate lock
@@ -489,7 +533,7 @@ Set Lock Config
 /**
  Add cyclic IC card
 
- @param cyclicConfig  cyclicConfig.count ==0 ,means no cyclic
+ @param cyclicConfig  null array @[] , means no cyclic
                      weekDay  1~7,1 means Monday，2 means  Tuesday ,...,7 means Sunday
 					 startTime The time when it becomes valid (minutes from 0 clock)
 					 endTime  The time when it is expired (minutes from 0 clock)
@@ -512,7 +556,7 @@ Set Lock Config
 /**
  Modify  IC card valid date
 
- @param cyclicConfig cyclicConfig.count ==0 ,means no cyclic
+ @param cyclicConfig null array @[] , means no cyclic
                      weekDay  1~7,1 means Monday，2 means  Tuesday ,...,7 means Sunday
 					 startTime The time when it becomes valid (minutes from 0 clock)
 					 endTime  The time when it is expired (minutes from 0 clock)
@@ -569,21 +613,34 @@ Set Lock Config
                                failure:(TTFailedBlock)failure;
 
 /**
- Recover  IC card
+ Recover IC card
+
+ @param cyclicConfig  null array @[] , means no cyclic
+                     weekDay  1~7,1 means Monday，2 means  Tuesday ,...,7 means Sunday
+                     startTime The time when it becomes valid (minutes from 0 clock)
+                     endTime  The time when it is expired (minutes from 0 clock)
+                     such as @[@{@"weekDay":@1,@"startTime":@10,@"endTime":@100},@{@"weekDay":@2,@"startTime":@10,@"endTime":@100}]
+ @param cardNumber The card number you want to recover
+ @param startDate The time when it becomes valid, If it's a permanent key, set 0
+ @param endDate The time when it is expired, If it's a permanent key, set 0
+ @param lockData The lock data string used to operate lock
+ @param success A block invoked when card is recovered
+ @param failure A block invoked when the operation fails
  */
-+ (void)recoverICCardNumber:(NSString *)cardNumber
-                  startDate:(long long)startDate
-                    endDate:(long long)endDate
-                   lockData:(NSString *)lockData
-                    success:(TTAddICSucceedBlock)success
-                    failure:(TTFailedBlock)failure;
++ (void)recoverICCardWithCyclicConfig:(NSArray <NSDictionary *> *)cyclicConfig
+                           cardNumber:(NSString *)cardNumber
+                            startDate:(long long)startDate
+                              endDate:(long long)endDate
+                             lockData:(NSString *)lockData
+                              success:(TTAddICSucceedBlock)success
+                              failure:(TTFailedBlock)failure;
 
 #pragma mark - Fingerprint
 
 /**
  Add  fingerprint by pressing finger on the lock
 
- @param cyclicConfig cyclicConfig.count ==0 ,means no cyclic
+ @param cyclicConfig null array @[] , means no cyclic
                      weekDay  1~7,1 means Monday，2 means  Tuesday ,...,7 means Sunday
 					 startTime The time when it becomes valid (minutes from 0 clock)
 					 endTime  The time when it is expired (minutes from 0 clock)
@@ -607,7 +664,7 @@ Set Lock Config
 /**
  Modify  fingerprint valid date
 
- @param cyclicConfig  cyclicConfig.count ==0 ,means no cyclic
+ @param cyclicConfig  null array @[] , means no cyclic
                      weekDay  1~7,1 means Monday，2 means  Tuesday ,...,7 means Sunday
 					 startTime The time when it becomes valid (minutes from 0 clock)
 					 endTime  The time when it is expired (minutes from 0 clock)
@@ -664,12 +721,35 @@ Set Lock Config
                                     success:(TTGetAllFingerprintsSucceedBlock)success
                                     failure:(TTFailedBlock)failure;
 
+/**
+ Recover Fingerprint
+
+ @param cyclicConfig  null array @[] , means no cyclic
+                     weekDay  1~7,1 means Monday，2 means  Tuesday ,...,7 means Sunday
+                     startTime The time when it becomes valid (minutes from 0 clock)
+                     endTime  The time when it is expired (minutes from 0 clock)
+                     such as @[@{@"weekDay":@1,@"startTime":@10,@"endTime":@100},@{@"weekDay":@2,@"startTime":@10,@"endTime":@100}]
+ @param fingerprintNumber The fingerprint number you want to recover
+ @param startDate The time when it becomes valid
+ @param endDate The time when it is expired
+ @param lockData The lock data string used to operate lock
+ @param success A block invoked when fingerprint is recovered
+ @param failure A block invoked when the operation fails
+ */
++ (void)recoverFingerprintWithCyclicConfig:(NSArray <NSDictionary *> *)cyclicConfig
+                         fingerprintNumber:(NSString *)fingerprintNumber
+                                 startDate:(long long)startDate
+                                   endDate:(long long)endDate
+                                  lockData:(NSString *)lockData
+                                   success:(TTAddFingerprintSucceedBlock)success
+                                   failure:(TTFailedBlock)failure;
+
 #pragma mark - Key Fob
 
 /**
  Add Wireless Key Fob
 
- @param cyclicConfig cyclicConfig.count ==0 ,means no cyclic
+ @param cyclicConfig null array @[] , means no cyclic
                      weekDay  1~7,1 means Monday，2 means  Tuesday ,...,7 means Sunday
                      startTime The time when it becomes valid (minutes from 0 clock)
                      endTime  The time when it is expired (minutes from 0 clock)
@@ -692,7 +772,7 @@ Set Lock Config
 /**
  Modify  Wireless Key Fob valid date
 
- @param cyclicConfig  cyclicConfig.count ==0 ,means no cyclic
+ @param cyclicConfig  null array @[] , means no cyclic
                      weekDay  1~7,1 means Monday，2 means  Tuesday ,...,7 means Sunday
                      startTime The time when it becomes valid (minutes from 0 clock)
                      endTime  The time when it is expired (minutes from 0 clock)
@@ -902,6 +982,73 @@ Set Power Saver Controlable Lock
 										success:(TTSucceedBlock)success
 										failure:(TTFailedBlock)failure;
 
+#pragma mark - Wifi Lock
+
+/**
+Scan Wifi
+ 
+@param lockData The lock data string used to operate lock
+@param success A block invoked when the operation succeeds
+@param failure A block invoked when the operation fails
+*/
++ (void)scanWifiWithLockData:(NSString *)lockData
+                     success:(TTScanWifiSuccessdBlock)success
+                     failure:(TTFailedBlock)failure;
+
+/**
+Config Wifi
+@param SSID wifi name
+@param wifiPassword wifi password
+@param lockData The lock data string used to operate lock
+@param success A block invoked when the operation succeeds
+@param failure A block invoked when the operation fails
+*/
++ (void)configWifiWithSSID:(NSString *)SSID
+              wifiPassword:(NSString *)wifiPassword
+                  lockData:(NSString *)lockData
+                   success:(TTSucceedBlock)success
+                   failure:(TTFailedBlock)failure;
+/**
+Config Server
+@param serverAddress set @"" if you use our default server @"wifilock.ttlock.com"
+@param portNumber set @"" if you use our default server @"4999"
+@param lockData The lock data string used to operate lock
+@param success A block invoked when the operation succeeds
+@param failure A block invoked when the operation fails
+*/
++ (void)configServerWithServerAddress:(NSString *)serverAddress
+                           portNumber:(NSString *)portNumber
+                             lockData:(NSString *)lockData
+                              success:(TTSucceedBlock)success
+                              failure:(TTFailedBlock)failure;
+/**
+Config Ip
+@param info @{@"type":@(x), @"ipAddress": xxx, @"subnetMask": xxx, @"router": xxx, @"preferredDns": xxx, @"alternateDns": xxx}
+ type  @(0) means manual, @(1) means automatic
+ ipAddress (option)  such as 0.0.0.0
+ subnetMask (option)  such as 255.255.0.0
+ router (option)  such as 0.0.0.0
+ preferredDns (option)  such as 0.0.0.0
+ alternateDns (option)  such as 0.0.0.0
+@param lockData The lock data string used to operate lock
+@param success A block invoked when the operation succeeds
+@param failure A block invoked when the operation fails
+*/
++ (void)configIpWithInfo:(NSDictionary *)info
+                lockData:(NSString *)lockData
+                 success:(TTSucceedBlock)success
+                 failure:(TTFailedBlock)failure;
+/**
+ Get Wifi Info
+@param lockData The lock data string used to operate lock
+@param success A block invoked when the operation succeeds
+@param failure A block invoked when the operation fails
+*/
++ (void)getWifiInfoWithLockData:(NSString *)lockData
+                        success:(TTGetWifiInfoSuccessdBlock)success
+                        failure:(TTFailedBlock)failure;
+
+
 #pragma mark - deprecated
 
 + (void)addFingerprintStartDate:(long long)startDate
@@ -931,6 +1078,13 @@ Set Power Saver Controlable Lock
 										lockData:(NSString *)lockData
 										 success:(TTSucceedBlock)success
 										 failure:(TTFailedBlock)failure __attribute__((deprecated("SDK1.0.4,modifyICCardValidityPeriodWithCyclicConfig")));
+
++ (void)recoverICCardNumber:(NSString *)cardNumber
+                  startDate:(long long)startDate
+                    endDate:(long long)endDate
+                   lockData:(NSString *)lockData
+                    success:(TTAddICSucceedBlock)success
+                    failure:(TTFailedBlock)failure DEPRECATED_MSG_ATTRIBUTE("SDK1.3.0,recoverICCardWithCyclicConfig");
 
 @end
 
