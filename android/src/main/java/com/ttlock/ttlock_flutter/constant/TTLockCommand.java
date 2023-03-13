@@ -104,4 +104,14 @@ public class TTLockCommand {
     public static final String COMMAND_RECOVER_PASSCODE = "recoverPasscodeWithPasswordType";
 
     public static final String COMMAND_RECOVER_CARD = "recoverCardWithCardType";
+
+    public static final String COMMAND_GET_LOCK_VERSION = "getLockVersion";
+
+
+    public static final String COMMAND_SCAN_WIFI = "scanWifi";
+    public static final String COMMAND_CONFIG_WIFI = "configWifi";
+    public static final String COMMAND_CONFIG_SERVER = "configServer";
+    public static final String COMMAND_GET_WIFI_INFO = "getWifiInfo";
+    public static final String COMMAND_CONFIG_IP = "configIp";
+
 }
