@@ -439,6 +439,16 @@ typedef NS_ENUM(NSInteger, ResultState) {
             dict[@"status"] = @(connectStatus);
             [weakSelf successCallbackCommand:command data:dict];
         }];
+    }else if ([command isEqualToString:command_config_gateway_ip]) {
+        NSMutableDictionary *dict = [self dictFromJsonStr:lockModel.ipSettingJsonStr];
+        [TTGateway configIpWithInfo:dict block:^(TTGatewayStatus status) {
+            if (status == TTGatewaySuccess) {
+                [weakSelf successCallbackCommand:command data:nil];
+            }else{
+               NSInteger errorCode = [self getTTGatewayErrorCode:status];
+               [weakSelf errorCallbackCommand:command code:errorCode details:nil];
+            }
+        }];
     }else if ([command isEqualToString:command_disconnect_gateway]) {
         [TTGateway disconnectGatewayWithGatewayMac:lockModel.mac block:^(TTGatewayStatus status) {
             [weakSelf successCallbackCommand:command data:nil];
