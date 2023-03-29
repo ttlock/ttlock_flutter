@@ -109,6 +109,9 @@ class TTLock {
   static const String COMMAND_GET_WIFI_INFO = "getWifiInfo";
   static const String COMMAND_CONFIG_IP = "configIp";
 
+  static const String COMMAND_SET_LOCK_SOUND_WITH_SOUND_VOLUME = "setLockSoundWithSoundVolume";
+  static const String COMMAND_GET_LOCK_SOUND_WITH_SOUND_VOLUME = "getLockSoundWithSoundVolume";
+
   // static const String COMMAND_SET_NB_SERVER_INFO = "setNBServerInfo";
   // static const String COMMAND_GET_ADMIN_PASSCODE = "getAdminPasscode";
   // static const String COMMAND_GET_LOCK_SYSTEM_INFO = "getLockSystemInfo";
@@ -936,6 +939,20 @@ class TTLock {
     TTLock.invoke(COMMAND_CONFIG_IP, map, callback, fail: failedCallback);
   }
 
+  static void setLockSoundWithSoundVolume(TTSoundVolumeType type, String lockData,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+    Map map = Map();
+    map["soundVolumeType"] = type.index;
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_SET_LOCK_SOUND_WITH_SOUND_VOLUME, map, callback,
+        fail: failedCallback);
+  }
+
+  static void getLockSoundWithSoundVolume(String lockData,
+      TTGetLockSoundWithSoundVolumeCallback callback, TTFailedCallback failedCallback) {
+    invoke(COMMAND_GET_LOCK_SOUND_WITH_SOUND_VOLUME, lockData, callback, fail: failedCallback);
+  }
+
   // static void setNBServerInfo(String nbServerAddress, int nbServerPort, String lockData,
   //     TTSuccessCallback callback, TTFailedCallback failedCallback) {
   //   Map map = Map();
@@ -1236,7 +1253,13 @@ class TTLock {
         TTWifiLockGetWifiInfoCallback getWifiInfoCallback = callBack;
         getWifiInfoCallback(TTWifiInfoModel(data));
         break;
+      case COMMAND_GET_LOCK_SOUND_WITH_SOUND_VOLUME:
+        int soundVolumeValue = data[TTResponse.soundVolumeType];
+        TTSoundVolumeType type = TTSoundVolumeType.values[soundVolumeValue];
 
+        TTGetLockSoundWithSoundVolumeCallback getLockSoundCallback = callBack;
+        getLockSoundCallback(type);
+        break;
       // case COMMAND_GET_LOCK_SYSTEM_INFO:
       //   TTGetLockSystemInfoCallback getLockSystemInfoCallback = callBack;
       //   getLockSystemInfoCallback(TTLockSystemInfoModel(data));
@@ -1456,6 +1479,8 @@ class TTResponse {
   static const String ipSettingJsonStr = "ipSettingJsonStr";
   static const String wifiName = "wifiName";
   static const String wifiPassword = "wifiPassword";
+
+  static const String soundVolumeType = "soundVolumeType";
 }
 
 class TTLockScanModel {
@@ -1605,6 +1630,16 @@ enum TTLockConfig {
   wifiLockPowerSavingMode
 }
 
+enum TTSoundVolumeType {
+  firstLevel,
+  secondLevel,
+  thirdLevel,
+  fouthLevel,
+  fifthLevel,
+  off,
+  on
+}
+
 enum TTLockError {
   reseted, //0
   crcError, //1
@@ -1713,6 +1748,7 @@ typedef TTWifiLockScanWifiCallback = void Function(
 
 typedef TTWifiLockGetWifiInfoCallback = void Function(TTWifiInfoModel wifiInfo);
 
+typedef TTGetLockSoundWithSoundVolumeCallback = void Function(TTSoundVolumeType ttLocksoundVolumeType);
 // typedef TTGetLockSystemInfoCallback = void Function(TTLockSystemInfoModel lockSystemInfoModel);
 // typedef TTGetPasscodeVerificationParamsCallback = void Function(String lockData);
 

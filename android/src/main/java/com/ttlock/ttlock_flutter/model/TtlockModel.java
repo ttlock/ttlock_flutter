@@ -130,6 +130,8 @@ public class TtlockModel {
 
     public int type;
 
+    public int soundVolumeType;
+
     @Override
     public String toString() {
         return "TtlockModel{" +
