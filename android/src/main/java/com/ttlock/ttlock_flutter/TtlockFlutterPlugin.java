@@ -1509,7 +1509,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 //  }
 
   public void getLockSystemInfo(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().getLockSystemInfo(null, new GetLockSystemInfoCallback() {
+    TTLockClient.getDefault().getLockSystemInfo(ttlockModel.lockData, new GetLockSystemInfoCallback() {
       @Override
       public void onGetLockSystemInfoSuccess(com.ttlock.bl.sdk.entity.DeviceInfo deviceInfo) {
         Map<String, Object> map = Utils.object2Map(deviceInfo);
