@@ -297,26 +297,26 @@ class TTLock {
         fail: failedCallback);
   }
 
-  // static void recoverPasscode(
-  //     String passcode,
-  //     String passcodeNew,
-  //     TTPasscodeType type,
-  //     int startDate,
-  //     int endDate,
-  //     int cycleType,
-  //     String lockData,
-  //     TTSuccessCallback callback,
-  //     TTFailedCallback failedCallback) {
-  //   Map map = Map();
-  //   map[TTResponse.passcode] = passcode;
-  //   map[TTResponse.passcodeNew] = passcodeNew;
-  //   map[TTResponse.type] = type.index;
-  //   map["cycleType"] = cycleType;
-  //   map[TTResponse.lockData] = lockData;
-  //   map[TTResponse.startDate] = startDate;
-  //   map[TTResponse.endDate] = endDate;
-  //   invoke(COMMAND_RECOVER_PASSCODE, map, callback, fail: failedCallback);
-  // }
+  static void recoverPasscode(
+      String passcode,
+      String passcodeNew,
+      TTPasscodeType type,
+      int startDate,
+      int endDate,
+      int cycleType,
+      String lockData,
+      TTSuccessCallback callback,
+      TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.passcode] = passcode;
+    map[TTResponse.passcodeNew] = passcodeNew;
+    map[TTResponse.type] = type.index;
+    map["cycleType"] = cycleType;
+    map[TTResponse.lockData] = lockData;
+    map[TTResponse.startDate] = startDate;
+    map[TTResponse.endDate] = endDate;
+    invoke(COMMAND_RECOVER_PASSCODE, map, callback, fail: failedCallback);
+  }
 
   // ignore: slash_for_doc_comments
 /**
