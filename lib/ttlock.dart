@@ -109,8 +109,10 @@ class TTLock {
   static const String COMMAND_GET_WIFI_INFO = "getWifiInfo";
   static const String COMMAND_CONFIG_IP = "configIp";
 
-  static const String COMMAND_SET_LOCK_SOUND_WITH_SOUND_VOLUME = "setLockSoundWithSoundVolume";
-  static const String COMMAND_GET_LOCK_SOUND_WITH_SOUND_VOLUME = "getLockSoundWithSoundVolume";
+  static const String COMMAND_SET_LOCK_SOUND_WITH_SOUND_VOLUME =
+      "setLockSoundWithSoundVolume";
+  static const String COMMAND_GET_LOCK_SOUND_WITH_SOUND_VOLUME =
+      "getLockSoundWithSoundVolume";
 
   // static const String COMMAND_SET_NB_SERVER_INFO = "setNBServerInfo";
   // static const String COMMAND_GET_ADMIN_PASSCODE = "getAdminPasscode";
@@ -939,8 +941,11 @@ class TTLock {
     TTLock.invoke(COMMAND_CONFIG_IP, map, callback, fail: failedCallback);
   }
 
-  static void setLockSoundWithSoundVolume(TTSoundVolumeType type, String lockData,
-      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+  static void setLockSoundWithSoundVolume(
+      TTSoundVolumeType type,
+      String lockData,
+      TTSuccessCallback callback,
+      TTFailedCallback failedCallback) {
     Map map = Map();
     map["soundVolumeType"] = type.index;
     map[TTResponse.lockData] = lockData;
@@ -948,9 +953,12 @@ class TTLock {
         fail: failedCallback);
   }
 
-  static void getLockSoundWithSoundVolume(String lockData,
-      TTGetLockSoundWithSoundVolumeCallback callback, TTFailedCallback failedCallback) {
-    invoke(COMMAND_GET_LOCK_SOUND_WITH_SOUND_VOLUME, lockData, callback, fail: failedCallback);
+  static void getLockSoundWithSoundVolume(
+      String lockData,
+      TTGetLockSoundWithSoundVolumeCallback callback,
+      TTFailedCallback failedCallback) {
+    invoke(COMMAND_GET_LOCK_SOUND_WITH_SOUND_VOLUME, lockData, callback,
+        fail: failedCallback);
   }
 
   // static void setNBServerInfo(String nbServerAddress, int nbServerPort, String lockData,
@@ -1748,7 +1756,8 @@ typedef TTWifiLockScanWifiCallback = void Function(
 
 typedef TTWifiLockGetWifiInfoCallback = void Function(TTWifiInfoModel wifiInfo);
 
-typedef TTGetLockSoundWithSoundVolumeCallback = void Function(TTSoundVolumeType ttLocksoundVolumeType);
+typedef TTGetLockSoundWithSoundVolumeCallback = void Function(
+    TTSoundVolumeType ttLocksoundVolumeType);
 // typedef TTGetLockSystemInfoCallback = void Function(TTLockSystemInfoModel lockSystemInfoModel);
 // typedef TTGetPasscodeVerificationParamsCallback = void Function(String lockData);
 

@@ -48,6 +48,8 @@ enum Command {
   setLockRemoteUnlockSwitchState,
   getLockAudioSwitchState,
   setLockAudioSwitchState,
+  getLockSoundVolumeType,
+  setLockSoundVolumeType,
   addPassageMode,
   clearAllPassageModes,
 
@@ -122,6 +124,8 @@ class _LockPageState extends State<LockPage> {
     },
     {"Get Lock Audio Switch State": Command.getLockAudioSwitchState},
     {"Set Lock Audio Switch State": Command.setLockAudioSwitchState},
+    {"Get Lock Sound Volume Type": Command.getLockSoundVolumeType},
+    {"Set Lock Sound Volume Type": Command.setLockSoundVolumeType},
     {"Add Passage Mode": Command.addPassageMode},
     {"Clear All Passage Mode": Command.clearAllPassageModes},
     {"Activate Lift Floors": Command.activateLiftFloors},
@@ -463,6 +467,23 @@ class _LockPageState extends State<LockPage> {
         });
         break;
 
+      case Command.setLockSoundVolumeType:
+        TTLock.setLockSoundWithSoundVolume(
+            TTSoundVolumeType.fouthLevel, lockData, () {
+          _showSuccessAndDismiss("Success");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+
+      case Command.getLockSoundVolumeType:
+        TTLock.getLockSoundWithSoundVolume(lockData, (ttLocksoundVolumeType) {
+          _showSuccessAndDismiss("sound volume type: $ttLocksoundVolumeType");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+
       case Command.addPassageMode:
         int startTime = 8 * 60; //8:00 am
         int endTime = 17 * 60; //17:00 pm
@@ -597,7 +618,7 @@ class _LockPageState extends State<LockPage> {
         break;
       case Command.getLockSystemInfo:
         TTLock.getLockSystemInfo(lockData, (lockSystemInfoModel) {
-          _showSuccessAndDismiss(lockSystemInfoModel.toString());
+          _showSuccessAndDismiss(lockSystemInfoModel.modelNum!);
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
@@ -628,18 +649,18 @@ class _LockPageState extends State<LockPage> {
         });
         break;
       case Command.scanWifi:
-          TTLock.scanWifi(lockData, (finished, wifiList) {
-            _showSuccessAndDismiss("scan wifi");
-          }, (errorCode, errorMsg) {
-            _showErrorAndDismiss(errorCode, errorMsg);
-          });
+        TTLock.scanWifi(lockData, (finished, wifiList) {
+          _showSuccessAndDismiss("scan wifi");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
         break;
       case Command.configWifi:
-          TTLock.configWifi("sciener", "sciener.com", lockData, () {
-            _showSuccessAndDismiss("Config wifi success");
-          }, (errorCode, errorMsg) {
-            _showErrorAndDismiss(errorCode, errorMsg);
-          });
+        TTLock.configWifi("sciener", "sciener.com", lockData, () {
+          _showSuccessAndDismiss("Config wifi success");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
         break;
       case Command.configServer:
         TTLock.configServer("wifilock.ttlock.com", "4999", lockData, () {

@@ -57,6 +57,9 @@
 #define command_get_lock_version @"getLockVersion"
 #define command_get_lock_switch_state @"getLockSwitchState"
 
+#define command_get_lock_sound_value @"getLockSoundWithSoundVolume"
+#define command_set_lock_sound_value @"setLockSoundWithSoundVolume"
+
 
 #define command_get_lock_automatic_locking_periodic_time @"getLockAutomaticLockingPeriodicTime"
 #define command_set_lock_automatic_locking_periodic_time @"setLockAutomaticLockingPeriodicTime"

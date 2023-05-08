@@ -768,6 +768,36 @@ typedef NS_ENUM(NSInteger, ResultState) {
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
+    }else if ([command isEqualToString:command_get_lock_sound_value]) {
+        NSDictionary *typeMap = @{@(TTSoundVolumeFirstLevel):@0,
+                                    @(TTSoundVolumeSecondLevel):@1,
+                                    @(TTSoundVolumeThirdLevel):@2,
+                                    @(TTSoundVolumeFourthLevel):@3,
+                                    @(TTSoundVolumeFifthLevel):@4,
+                                    @(TTSoundVolumeOff):@5,
+                                    @(TTSoundVolumeOn):@6};
+        
+        [TTLock getLockSoundWithLockData:lockModel.lockData success:^(TTSoundVolume soundVolume) {
+            NSMutableDictionary *dict = @{}.mutableCopy;
+            dict[@"soundVolumeType"] = typeMap[@(soundVolume)];
+            [weakSelf successCallbackCommand:command data:dict];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }else if ([command isEqualToString:command_set_lock_sound_value]) {
+        NSDictionary *typeMap = @{@0:@(TTSoundVolumeFirstLevel),
+                                     @1:@(TTSoundVolumeSecondLevel),
+                                     @2:@(TTSoundVolumeThirdLevel),
+                                     @3:@(TTSoundVolumeFourthLevel),
+                                     @4:@(TTSoundVolumeFifthLevel),
+                                     @5:@(TTSoundVolumeOff),
+                                     @6:@(TTSoundVolumeOn)};
+        NSNumber * type = typeMap[lockModel.soundVolumeType];
+        [TTLock setLockSoundWithSoundVolume:type.intValue lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
     }
     
 }
