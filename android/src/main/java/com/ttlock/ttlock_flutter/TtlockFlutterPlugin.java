@@ -1825,11 +1825,11 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     if (tryAgain && lockError == LockError.LOCK_IS_BUSY) {
         tryAgain = false;
         TTLockClient.getDefault().clearAllCallback();
-        doNextCommandAction();
     } else {
       errorCallbackCommand(commandQue.poll(), lockError);
-      clearCommand();
+//      clearCommand();
     }
+    doNextCommandAction();
   }
 
   public void dataError() {
