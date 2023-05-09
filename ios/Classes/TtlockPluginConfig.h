@@ -84,6 +84,7 @@
 #define command_disconnect_gateway @"disconnectGateway"
 #define command_get_surround_wifi @"getSurroundWifi"
 #define command_init_gateway @"initGateway"
+#define command_config_gateway_ip @"gatewayConfigIp"
 #define command_upgrade_gateway @"upgradeGateway"
 
 
