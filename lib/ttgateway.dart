@@ -9,6 +9,7 @@ class TTGateway {
   static const String COMMAND_GET_SURROUND_WIFI = "getSurroundWifi";
   static const String COMMAND_INIT_GATEWAY = "initGateway";
   static const String COMMAND_UPGRADE_GATEWAY = "upgradeGateway";
+
   static const String COMMAND_CONFIG_IP = "gatewayConfigIp";
 
   static void startScan(TTGatewayScanCallback scanCallback) {
@@ -42,6 +43,7 @@ class TTGateway {
     if (map["ttlockLoginPassword"] == null) {
       map["ttlockLoginPassword"] = "123456";
     }
+
     map[TTResponse.addGatewayJsonStr] = convert.jsonEncode(map);
     TTLock.invoke(COMMAND_INIT_GATEWAY, map, callback, fail: failedCallback);
   }
@@ -61,6 +63,13 @@ class TTGateway {
     map[TTResponse.ipSettingJsonStr] = convert.jsonEncode(map);
     TTLock.invoke(COMMAND_CONFIG_IP, map, callback, fail: failedCallback);
   }
+
+  // static void upgrade(String mac, TTSuccessCallback callback,
+  //     TTGatewayFailedCallback failedCallback) {
+  //   Map map = Map();
+  //   map["mac"] = mac;
+  //   TTLock.invoke(COMMAND_UPGRADE_GATEWAY, map, callback, fail: failedCallback);
+  // }
 
   static void disconnect(String mac, TTSuccessCallback callback) {
     Map map = Map();

@@ -109,6 +109,11 @@ class TTLock {
   static const String COMMAND_GET_WIFI_INFO = "getWifiInfo";
   static const String COMMAND_CONFIG_IP = "configIp";
 
+  static const String COMMAND_SET_LOCK_SOUND_WITH_SOUND_VOLUME =
+      "setLockSoundWithSoundVolume";
+  static const String COMMAND_GET_LOCK_SOUND_WITH_SOUND_VOLUME =
+      "getLockSoundWithSoundVolume";
+
   // static const String COMMAND_SET_NB_SERVER_INFO = "setNBServerInfo";
   // static const String COMMAND_GET_ADMIN_PASSCODE = "getAdminPasscode";
   // static const String COMMAND_GET_LOCK_SYSTEM_INFO = "getLockSystemInfo";
@@ -269,18 +274,6 @@ class TTLock {
       TTFailedCallback failedCallback) {
     invoke(COMMAND_RESET_PASSCODE, lockData, callback, fail: failedCallback);
   }
-
-  // ignore: slash_for_doc_comments
-/**
- * Get addmin passcode from lock 
- * 
- * lockData The lock data string used to operate lock
- */
-  // static void getAdminPasscode(String lockData,
-  //     TTGetAdminPasscodeCallback callback, TTFailedCallback failedCallback) {
-  //   invoke(COMMAND_GET_ADMIN_PASSCODE, lockData, callback,
-  //       fail: failedCallback);
-  // }
 
   static void setErasePasscode(String erasePasscode, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
@@ -625,11 +618,11 @@ class TTLock {
     invoke(COMMAND_GET_LOCK_POWER, lockData, callback, fail: failedCallback);
   }
 
-  // static void getLockSystemInfo(String lockData,
-  //     TTGetLockSystemCallback callback, TTFailedCallback failedCallback) {
-  //   invoke(COMMAND_GET_LOCK_SYSTEM_INFO, lockData, callback,
-  //       fail: failedCallback);
-  // }
+  static void getLockSystemInfo(String lockData,
+      TTGetLockSystemCallback callback, TTFailedCallback failedCallback) {
+    invoke(COMMAND_GET_LOCK_SYSTEM_INFO, lockData, callback,
+        fail: failedCallback);
+  }
 
 // ignore: slash_for_doc_comments
 /**
@@ -936,6 +929,26 @@ class TTLock {
     TTLock.invoke(COMMAND_CONFIG_IP, map, callback, fail: failedCallback);
   }
 
+  static void setLockSoundWithSoundVolume(
+      TTSoundVolumeType type,
+      String lockData,
+      TTSuccessCallback callback,
+      TTFailedCallback failedCallback) {
+    Map map = Map();
+    map["soundVolumeType"] = type.index;
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_SET_LOCK_SOUND_WITH_SOUND_VOLUME, map, callback,
+        fail: failedCallback);
+  }
+
+  static void getLockSoundWithSoundVolume(
+      String lockData,
+      TTGetLockSoundWithSoundVolumeCallback callback,
+      TTFailedCallback failedCallback) {
+    invoke(COMMAND_GET_LOCK_SOUND_WITH_SOUND_VOLUME, lockData, callback,
+        fail: failedCallback);
+  }
+
   // static void setNBServerInfo(String nbServerAddress, int nbServerPort, String lockData,
   //     TTSuccessCallback callback, TTFailedCallback failedCallback) {
   //   Map map = Map();
@@ -945,11 +958,10 @@ class TTLock {
   //   invoke(COMMAND_SET_NB_SERVER_INFO, map, callback, fail: failedCallback);
   // }
 
-  static void getAdminPasscode(String lockData,
-      TTGetAdminPasscodeCallback callback, TTFailedCallback failedCallback) {
-    invoke(COMMAND_GET_ADMIN_PASSCODE, lockData, callback,
-        fail: failedCallback);
-  }
+  // static void getAdminPasscode(String lockData, TTGetAdminPasscodeCallback callback, TTFailedCallback failedCallback) {
+  //   invoke(COMMAND_GET_ADMIN_PASSCODE, lockData, callback,
+  //       fail: failedCallback);
+  // }
   //
   // static void getLockSystemInfo(String lockData, TTGetLockSystemInfoCallback callback, TTFailedCallback failedCallback) {
   //   invoke(COMMAND_GET_LOCK_SYSTEM_INFO, lockData, callback,
@@ -1223,7 +1235,6 @@ class TTLock {
         TTGetAdminPasscodeCallback getAdminPasscodeCallback = callBack;
         getAdminPasscodeCallback(data[TTResponse.adminPasscode]);
         break;
-
       case COMMAND_GET_LOCK_VERSION:
         TTGetLockVersionCallback getLockVersionCallback = callBack;
         getLockVersionCallback(data[TTResponse.lockVersion]);
@@ -1238,7 +1249,13 @@ class TTLock {
         TTWifiLockGetWifiInfoCallback getWifiInfoCallback = callBack;
         getWifiInfoCallback(TTWifiInfoModel(data));
         break;
+      case COMMAND_GET_LOCK_SOUND_WITH_SOUND_VOLUME:
+        int soundVolumeValue = data[TTResponse.soundVolumeType];
+        TTSoundVolumeType type = TTSoundVolumeType.values[soundVolumeValue];
 
+        TTGetLockSoundWithSoundVolumeCallback getLockSoundCallback = callBack;
+        getLockSoundCallback(type);
+        break;
       // case COMMAND_GET_LOCK_SYSTEM_INFO:
       //   TTGetLockSystemInfoCallback getLockSystemInfoCallback = callBack;
       //   getLockSystemInfoCallback(TTLockSystemInfoModel(data));
@@ -1323,8 +1340,8 @@ class TTLock {
     }
 
     if (command == TTGateway.COMMAND_GET_SURROUND_WIFI ||
-        command == TTGateway.COMMAND_INIT_GATEWAY
-    || command == TTGateway.COMMAND_CONFIG_IP) {
+        command == TTGateway.COMMAND_INIT_GATEWAY ||
+        command == TTGateway.COMMAND_CONFIG_IP) {
       TTGatewayFailedCallback? failedCallback = callBack;
       TTGatewayError error = TTGatewayError.values[errorCode];
       if (failedCallback != null) {
@@ -1455,9 +1472,12 @@ class TTResponse {
   static const String addGatewayJsonStr = "addGatewayJsonStr";
   static const String ip = "ip";
   static const String port = "port";
+
   static const String ipSettingJsonStr = "ipSettingJsonStr";
   static const String wifiName = "wifiName";
   static const String wifiPassword = "wifiPassword";
+
+  static const String soundVolumeType = "soundVolumeType";
 }
 
 class TTLockScanModel {
@@ -1607,6 +1627,16 @@ enum TTLockConfig {
   wifiLockPowerSavingMode
 }
 
+enum TTSoundVolumeType {
+  firstLevel,
+  secondLevel,
+  thirdLevel,
+  fouthLevel,
+  fifthLevel,
+  off,
+  on
+}
+
 enum TTLockError {
   reseted, //0
   crcError, //1
@@ -1715,6 +1745,8 @@ typedef TTWifiLockScanWifiCallback = void Function(
 
 typedef TTWifiLockGetWifiInfoCallback = void Function(TTWifiInfoModel wifiInfo);
 
+typedef TTGetLockSoundWithSoundVolumeCallback = void Function(
+    TTSoundVolumeType ttLocksoundVolumeType);
 // typedef TTGetLockSystemInfoCallback = void Function(TTLockSystemInfoModel lockSystemInfoModel);
 // typedef TTGetPasscodeVerificationParamsCallback = void Function(String lockData);
 
@@ -1760,10 +1792,12 @@ enum TTGatewayError {
   failConfigRouter,
   failConfigServer,
   failConfigAccount,
-  invalidCommand,
+  noSim,
 }
 
 enum TTGatewayType { g1, g2, g3, g4 }
+
+enum TTIpSettingType { STATIC_IP, DHCP }
 
 enum TTGatewayConnectStatus { timeout, success, faile }
 
