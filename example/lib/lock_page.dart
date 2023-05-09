@@ -60,9 +60,9 @@ enum Command {
   setPowerSaverWorkMode,
   setPowerSaverControlableLock,
 
-  setDoorSensorSwitch,
-  getDoorSensorSwitch,
-  getDoorSensorState,
+  // setDoorSensorSwitch,
+  // getDoorSensorSwitch,
+  // getDoorSensorState,
 
   setHotelCardSector,
   setHotelData,
@@ -135,9 +135,9 @@ class _LockPageState extends State<LockPage> {
     {"Set Lift Work Mode": Command.setLiftWorkMode},
     {"Set Power Saver Work Mode": Command.setPowerSaverWorkMode},
     {"Set Power Saver Controlable": Command.setPowerSaverControlableLock},
-    {"Set Door Sensor Switch": Command.setDoorSensorSwitch},
-    {"Get Door Sensor Switch": Command.getDoorSensorSwitch},
-    {"Get Door Sensor State": Command.getDoorSensorState},
+    // {"Set Door Sensor Switch": Command.setDoorSensorSwitch},
+    // {"Get Door Sensor Switch": Command.getDoorSensorSwitch},
+    // {"Get Door Sensor State": Command.getDoorSensorState},
     {"Set Hotel Card Sector": Command.setHotelCardSector},
     {"Set Hotel Data": Command.setHotelData},
     {"Get Lock System Info": Command.getLockSystemInfo},
@@ -543,27 +543,27 @@ class _LockPageState extends State<LockPage> {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
         break;
-      case Command.setDoorSensorSwitch:
-        TTLock.setDoorSensorLockingSwitchState(true, lockData, () {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.getDoorSensorSwitch:
-        TTLock.getDoorSensorLockingSwitchState(lockData, (isOn) {
-          _showSuccessAndDismiss(isOn.toString());
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.getDoorSensorState:
-        TTLock.getDoorSensorState(lockData, (isOn) {
-          _showSuccessAndDismiss(isOn.toString());
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
+      // case Command.setDoorSensorSwitch:
+      //   TTLock.setDoorSensorLockingSwitchState(true, lockData, () {
+      //     _showSuccessAndDismiss("Success");
+      //   }, (errorCode, errorMsg) {
+      //     _showErrorAndDismiss(errorCode, errorMsg);
+      //   });
+      //   break;
+      // case Command.getDoorSensorSwitch:
+      //   TTLock.getDoorSensorLockingSwitchState(lockData, (isOn) {
+      //     _showSuccessAndDismiss(isOn.toString());
+      //   }, (errorCode, errorMsg) {
+      //     _showErrorAndDismiss(errorCode, errorMsg);
+      //   });
+      //   break;
+      // case Command.getDoorSensorState:
+      //   TTLock.getDoorSensorState(lockData, (isOn) {
+      //     _showSuccessAndDismiss(isOn.toString());
+      //   }, (errorCode, errorMsg) {
+      //     _showErrorAndDismiss(errorCode, errorMsg);
+      //   });
+      //   break;
       case Command.setHotelCardSector:
         TTLock.setHotelCardSector("1,4", lockData, () {
           _showSuccessAndDismiss("Success");
