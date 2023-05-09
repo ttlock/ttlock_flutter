@@ -67,9 +67,11 @@ enum Command {
   setHotelCardSector,
   setHotelData,
 
+  getLockSystemInfo,
+
   setNBServerInfo,
   getAdminPasscode,
-  getLockSystemInfo,
+
   getPasscodeVerificationParams,
   recoveryCard,
   getLockVersion,
@@ -138,9 +140,9 @@ class _LockPageState extends State<LockPage> {
     {"Get Door Sensor State": Command.getDoorSensorState},
     {"Set Hotel Card Sector": Command.setHotelCardSector},
     {"Set Hotel Data": Command.setHotelData},
+    {"Get Lock System Info": Command.getLockSystemInfo},
     {"Set Nb Server Info": Command.setNBServerInfo},
     {"Get Admin Passcode": Command.getAdminPasscode},
-    {"Get Lock System Info": Command.getLockSystemInfo},
     {"Get Passcode Verification Param": Command.getPasscodeVerificationParams},
     {"Recovery Card Data": Command.recoveryCard},
     {"Get LockVersion": Command.getLockVersion},
@@ -600,6 +602,13 @@ class _LockPageState extends State<LockPage> {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
         break;
+      case Command.getLockSystemInfo:
+        TTLock.getLockSystemInfo(lockData, (lockSystemInfoModel) {
+          _showSuccessAndDismiss(lockSystemInfoModel.modelNum!);
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
       case Command.setNBServerInfo:
         String port = "5683";
         String ip = "117.60.157.137";
@@ -612,13 +621,6 @@ class _LockPageState extends State<LockPage> {
       case Command.getAdminPasscode:
         TTLock.getAdminPasscode(lockData, (adminPasscode) {
           _showSuccessAndDismiss("AdminPasscode: $adminPasscode");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.getLockSystemInfo:
-        TTLock.getLockSystemInfo(lockData, (lockSystemInfoModel) {
-          _showSuccessAndDismiss(lockSystemInfoModel.modelNum!);
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });

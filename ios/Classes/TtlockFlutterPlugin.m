@@ -634,7 +634,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
     }
-    else if ([command isEqualToString:command_set_door_sensor_switch]) {
+    /*else if ([command isEqualToString:command_set_door_sensor_switch]) {
         [TTLock setDoorSensorLockingSwitchOn:lockModel.isOn.boolValue lockData:lockModel.lockData success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTError errorCode, NSString *errorMsg) {
@@ -656,7 +656,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
-    }
+    }*/
    else if ([command isEqualToString:command_get_admin_passcode_by_lockdata]) {
         [TTLock getAdminPasscodeWithLockData:lockModel.lockData success:^(NSString *adminPasscode) {
             TtlockModel *data = [TtlockModel new];
