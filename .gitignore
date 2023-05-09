@@ -2,3 +2,5 @@
 .DS_Store
 .vscode/launch.json
 .idea
+.packages
+.dart_tool/package_config.json

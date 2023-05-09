@@ -21,6 +21,8 @@
 #define command_get_bluetooth_state @"getBluetoothState"
 #define command_get_blutetooth_scan_state @"getBluetoothScanState"
 
+#define command_get_lock_version @"getLockVersion"
+
 
 #define command_init_lock @"initLock"
 #define command_reset_lock @"resetLock"
@@ -54,6 +56,9 @@
 #define command_get_lock_power @"getLockPower"
 #define command_get_lock_version @"getLockVersion"
 #define command_get_lock_switch_state @"getLockSwitchState"
+
+#define command_get_lock_sound_value @"getLockSoundWithSoundVolume"
+#define command_set_lock_sound_value @"setLockSoundWithSoundVolume"
 
 
 #define command_get_lock_automatic_locking_periodic_time @"getLockAutomaticLockingPeriodicTime"
@@ -104,6 +109,7 @@
 #define command_config_lock_wifi_server @"configServer"
 #define command_get_lock_wifi_info @"getWifiInfo"
 #define command_config_lock_server_ip @"configIp"
+
 
 #pragma mark - 门禁
 #define command_set_door_sensor_switch @"setDoorSensorSwitch"

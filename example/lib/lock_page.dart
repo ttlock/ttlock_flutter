@@ -48,6 +48,8 @@ enum Command {
   setLockRemoteUnlockSwitchState,
   getLockAudioSwitchState,
   setLockAudioSwitchState,
+  getLockSoundVolumeType,
+  setLockSoundVolumeType,
   addPassageMode,
   clearAllPassageModes,
 
@@ -58,12 +60,26 @@ enum Command {
   setPowerSaverWorkMode,
   setPowerSaverControlableLock,
 
-  setDoorSensorSwitch,
-  getDoorSensorSwitch,
-  getDoorSensorState,
+  // setDoorSensorSwitch,
+  // getDoorSensorSwitch,
+  // getDoorSensorState,
 
   setHotelCardSector,
   setHotelData,
+
+  getLockSystemInfo,
+
+  // setNBServerInfo,
+  // getAdminPasscode,
+
+  // getPasscodeVerificationParams,
+  // recoveryCard,
+  // getLockVersion,
+  // scanWifi,
+  // configWifi,
+  // configServer,
+  // getWifiInfo,
+  configIp
 }
 
 class _LockPageState extends State<LockPage> {
@@ -110,6 +126,8 @@ class _LockPageState extends State<LockPage> {
     },
     {"Get Lock Audio Switch State": Command.getLockAudioSwitchState},
     {"Set Lock Audio Switch State": Command.setLockAudioSwitchState},
+    {"Get Lock Sound Volume Type": Command.getLockSoundVolumeType},
+    {"Set Lock Sound Volume Type": Command.setLockSoundVolumeType},
     {"Add Passage Mode": Command.addPassageMode},
     {"Clear All Passage Mode": Command.clearAllPassageModes},
     {"Activate Lift Floors": Command.activateLiftFloors},
@@ -117,11 +135,22 @@ class _LockPageState extends State<LockPage> {
     {"Set Lift Work Mode": Command.setLiftWorkMode},
     {"Set Power Saver Work Mode": Command.setPowerSaverWorkMode},
     {"Set Power Saver Controlable": Command.setPowerSaverControlableLock},
-    {"Set Door Sensor Switch": Command.setDoorSensorSwitch},
-    {"Get Door Sensor Switch": Command.getDoorSensorSwitch},
-    {"Get Door Sensor State": Command.getDoorSensorState},
+    // {"Set Door Sensor Switch": Command.setDoorSensorSwitch},
+    // {"Get Door Sensor Switch": Command.getDoorSensorSwitch},
+    // {"Get Door Sensor State": Command.getDoorSensorState},
     {"Set Hotel Card Sector": Command.setHotelCardSector},
-    {"Set Hotel Data": Command.setHotelData}
+    {"Set Hotel Data": Command.setHotelData},
+    {"Get Lock System Info": Command.getLockSystemInfo},
+    // {"Set Nb Server Info": Command.setNBServerInfo},
+    // {"Get Admin Passcode": Command.getAdminPasscode},
+    // {"Get Passcode Verification Param": Command.getPasscodeVerificationParams},
+    // {"Recovery Card Data": Command.recoveryCard},
+    // {"Get LockVersion": Command.getLockVersion},
+    // {"Wifi lock scan nearby wifi": Command.scanWifi},
+    // {"Wifi lock config wifi": Command.configWifi},
+    // {"Wifi lock config server": Command.configServer},
+    // {"Wifi lock get wifi info": Command.getWifiInfo},
+    {"Wifi lock config ip": Command.configIp}
   ];
 
   String note =
@@ -224,13 +253,13 @@ class _LockPageState extends State<LockPage> {
         });
         break;
 
-      case Command.modifyAdminPasscode:
-        TTLock.modifyAdminPasscode('1234', lockData, (newLockData) {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
+      // case Command.modifyAdminPasscode:
+      //   TTLock.modifyAdminPasscode('1234', lockData, () {
+      //     _showSuccessAndDismiss("Success");
+      //   }, (errorCode, errorMsg) {
+      //     _showErrorAndDismiss(errorCode, errorMsg);
+      //   });
+      //   break;
 
       case Command.getLockSwitchState:
         TTLock.getLockSwitchState(lockData, (state) {
@@ -440,6 +469,23 @@ class _LockPageState extends State<LockPage> {
         });
         break;
 
+      case Command.setLockSoundVolumeType:
+        TTLock.setLockSoundWithSoundVolume(
+            TTSoundVolumeType.fouthLevel, lockData, () {
+          _showSuccessAndDismiss("Success");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+
+      case Command.getLockSoundVolumeType:
+        TTLock.getLockSoundWithSoundVolume(lockData, (ttLocksoundVolumeType) {
+          _showSuccessAndDismiss("sound volume type: $ttLocksoundVolumeType");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+
       case Command.addPassageMode:
         int startTime = 8 * 60; //8:00 am
         int endTime = 17 * 60; //17:00 pm
@@ -497,27 +543,27 @@ class _LockPageState extends State<LockPage> {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
         break;
-      case Command.setDoorSensorSwitch:
-        TTLock.setDoorSensorLockingSwitchState(true, lockData, () {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.getDoorSensorSwitch:
-        TTLock.getDoorSensorLockingSwitchState(lockData, (isOn) {
-          _showSuccessAndDismiss(isOn.toString());
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.getDoorSensorState:
-        TTLock.getDoorSensorState(lockData, (isOn) {
-          _showSuccessAndDismiss(isOn.toString());
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
+      // case Command.setDoorSensorSwitch:
+      //   TTLock.setDoorSensorLockingSwitchState(true, lockData, () {
+      //     _showSuccessAndDismiss("Success");
+      //   }, (errorCode, errorMsg) {
+      //     _showErrorAndDismiss(errorCode, errorMsg);
+      //   });
+      //   break;
+      // case Command.getDoorSensorSwitch:
+      //   TTLock.getDoorSensorLockingSwitchState(lockData, (isOn) {
+      //     _showSuccessAndDismiss(isOn.toString());
+      //   }, (errorCode, errorMsg) {
+      //     _showErrorAndDismiss(errorCode, errorMsg);
+      //   });
+      //   break;
+      // case Command.getDoorSensorState:
+      //   TTLock.getDoorSensorState(lockData, (isOn) {
+      //     _showSuccessAndDismiss(isOn.toString());
+      //   }, (errorCode, errorMsg) {
+      //     _showErrorAndDismiss(errorCode, errorMsg);
+      //   });
+      //   break;
       case Command.setHotelCardSector:
         TTLock.setHotelCardSector("1,4", lockData, () {
           _showSuccessAndDismiss("Success");
@@ -552,6 +598,99 @@ class _LockPageState extends State<LockPage> {
       case Command.getAllValidFingerprint:
         TTLock.getAllValidFingerprints(lockData, (fingerprintList) {
           _showSuccessAndDismiss(fingerprintList.toString());
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+      case Command.getLockSystemInfo:
+        TTLock.getLockSystemInfo(lockData, (lockSystemInfoModel) {
+          _showSuccessAndDismiss(lockSystemInfoModel.modelNum!);
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+      // case Command.setNBServerInfo:
+      //   String port = "5683";
+      //   String ip = "117.60.157.137";
+      //   TTLock.setLockNbAddress(ip, port, lockData, (electricQuantity) {
+      //     _showSuccessAndDismiss("electricQuantity: $electricQuantity");
+      //   }, (errorCode, errorMsg) {
+      //     _showErrorAndDismiss(errorCode, errorMsg);
+      //   });
+      //   break;
+      // case Command.getAdminPasscode:
+      //   TTLock.getAdminPasscode(lockData, (adminPasscode) {
+      //     _showSuccessAndDismiss("AdminPasscode: $adminPasscode");
+      //   }, (errorCode, errorMsg) {
+      //     _showErrorAndDismiss(errorCode, errorMsg);
+      //   });
+      //   break;
+      // case Command.getPasscodeVerificationParams:
+      //   TTLock.getPasscodeVerificationParams(lockData, (lockData) {
+      //     _showSuccessAndDismiss("Get Passcode Verification Params success");
+      //   }, (errorCode, errorMsg) {
+      //     _showErrorAndDismiss(errorCode, errorMsg);
+      //   });
+      //   break;
+      // case Command.recoveryCard:
+      //   String cardNumber = "123458970";
+      //   int startDate = DateTime.now().millisecondsSinceEpoch;
+      //   int endDate =
+      //       DateTime.now().millisecondsSinceEpoch + 24 * 60 * 60 * 1000;
+      //   TTLock.recoverCard(cardNumber, startDate, endDate, lockData, () {
+      //     _showSuccessAndDismiss("success:$cardNumber");
+      //   }, (errorCode, errorMsg) {
+      //     _showErrorAndDismiss(errorCode, errorMsg);
+      //   });
+      //   break;
+      // case Command.getLockVersion:
+      //   TTLock.getLockVersion(lockMac, (lockVersion) {
+      //     _showSuccessAndDismiss("Get LockVersion success:$lockVersion");
+      //   }, (errorCode, errorMsg) {
+      //     _showErrorAndDismiss(errorCode, errorMsg);
+      //   });
+      //   break;
+      // case Command.scanWifi:
+      //   TTLock.scanWifi(lockData, (finished, wifiList) {
+      //     _showSuccessAndDismiss("scan wifi");
+      //   }, (errorCode, errorMsg) {
+      //     _showErrorAndDismiss(errorCode, errorMsg);
+      //   });
+      //   break;
+      // case Command.configWifi:
+      //   TTLock.configWifi("sciener", "sciener.com", lockData, () {
+      //     _showSuccessAndDismiss("Config wifi success");
+      //   }, (errorCode, errorMsg) {
+      //     _showErrorAndDismiss(errorCode, errorMsg);
+      //   });
+      //   break;
+      // case Command.configServer:
+      //   TTLock.configServer("wifilock.ttlock.com", "4999", lockData, () {
+      //     _showSuccessAndDismiss("Config server success");
+      //   }, (errorCode, errorMsg) {
+      //     _showErrorAndDismiss(errorCode, errorMsg);
+      //   });
+      //   break;
+      // case Command.getWifiInfo:
+      //   TTLock.getWifiInfo(lockData, (wifiInfo) {
+      //     _showSuccessAndDismiss(wifiInfo.toString());
+      //   }, (errorCode, errorMsg) {
+      //     _showErrorAndDismiss(errorCode, errorMsg);
+      //   });
+      //   break;
+      case Command.configIp:
+        Map paramMap = Map();
+        paramMap["type"] = TTIpSettingType.DHCP.index;
+        //for static ip setting
+        // paramMap["type"] = TTIpSettingType.STATIC_IP.index;
+        // paramMap["ipAddress"] = "192.168.1.100";
+        // paramMap["subnetMask"] = "255.255.255.0";
+        // paramMap["router"] = "192.168.1.1";
+        // paramMap["preferredDns"] = "xxx.xxx.xxx.xxx";
+        // paramMap["alternateDns"] = "xxx.xxx.xxx.xxx";
+
+        TTLock.configIp(paramMap, lockData, () {
+          _showSuccessAndDismiss("config ip success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
