@@ -852,19 +852,19 @@ class TTLock {
   //       fail: failedCallback);
   // }
 
-  static void setDoorSensorLockingSwitchState(bool isOn, String lockData,
-      TTSuccessCallback callback, TTFailedCallback failedCallback) {
-    Map map = Map();
-    map[TTResponse.isOn] = isOn;
-    map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_SET_DOOR_SENSOR_SWITCH, map, callback, fail: failedCallback);
-  }
+  // static void setDoorSensorLockingSwitchState(bool isOn, String lockData,
+  //     TTSuccessCallback callback, TTFailedCallback failedCallback) {
+  //   Map map = Map();
+  //   map[TTResponse.isOn] = isOn;
+  //   map[TTResponse.lockData] = lockData;
+  //   invoke(COMMAND_SET_DOOR_SENSOR_SWITCH, map, callback, fail: failedCallback);
+  // }
 
-  static void getDoorSensorLockingSwitchState(String lockData,
-      TTGetSwitchStateCallback callback, TTFailedCallback failedCallback) {
-    invoke(COMMAND_GET_DOOR_SENSOR_SWITCH, lockData, callback,
-        fail: failedCallback);
-  }
+  // static void getDoorSensorLockingSwitchState(String lockData,
+  //     TTGetSwitchStateCallback callback, TTFailedCallback failedCallback) {
+  //   invoke(COMMAND_GET_DOOR_SENSOR_SWITCH, lockData, callback,
+  //       fail: failedCallback);
+  // }
 
   static void setHotel(
       String hotelInfo,
@@ -889,11 +889,11 @@ class TTLock {
     invoke(COMMAND_SET_HOTEL_CARD_SECTOR, map, callback, fail: failedCallback);
   }
 
-  static void getDoorSensorState(String lockData,
-      TTGetSwitchStateCallback callback, TTFailedCallback failedCallback) {
-    invoke(COMMAND_GET_DOOR_SENSOR_STATE, lockData, callback,
-        fail: failedCallback);
-  }
+  // static void getDoorSensorState(String lockData,
+  //     TTGetSwitchStateCallback callback, TTFailedCallback failedCallback) {
+  //   invoke(COMMAND_GET_DOOR_SENSOR_STATE, lockData, callback,
+  //       fail: failedCallback);
+  // }
 
   static void getLockVersion(String lockMac, TTGetLockVersionCallback callback,
       TTFailedCallback failedCallback) {
