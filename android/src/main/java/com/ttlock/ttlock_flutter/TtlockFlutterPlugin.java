@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
+import android.src.main.java.com.ttlock.ttlock_flutter.model.SoundVolumeConverter;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -35,6 +36,7 @@ import com.ttlock.bl.sdk.callback.GetAllValidPasscodeCallback;
 import com.ttlock.bl.sdk.callback.GetAutoLockingPeriodCallback;
 import com.ttlock.bl.sdk.callback.GetBatteryLevelCallback;
 import com.ttlock.bl.sdk.callback.GetLockConfigCallback;
+import com.ttlock.bl.sdk.callback.GetLockSoundWithSoundVolumeCallback;
 import com.ttlock.bl.sdk.callback.GetLockStatusCallback;
 import com.ttlock.bl.sdk.callback.GetLockSystemInfoCallback;
 import com.ttlock.bl.sdk.callback.GetLockTimeCallback;
@@ -63,6 +65,7 @@ import com.ttlock.bl.sdk.callback.SetHotelDataCallback;
 import com.ttlock.bl.sdk.callback.SetLiftControlableFloorsCallback;
 import com.ttlock.bl.sdk.callback.SetLiftWorkModeCallback;
 import com.ttlock.bl.sdk.callback.SetLockConfigCallback;
+import com.ttlock.bl.sdk.callback.SetLockSoundWithSoundVolumeCallback;
 import com.ttlock.bl.sdk.callback.SetLockTimeCallback;
 import com.ttlock.bl.sdk.callback.SetNBAwakeModesCallback;
 import com.ttlock.bl.sdk.callback.SetNBAwakeTimesCallback;
@@ -85,6 +88,7 @@ import com.ttlock.bl.sdk.entity.PassageModeConfig;
 import com.ttlock.bl.sdk.entity.PassageModeType;
 import com.ttlock.bl.sdk.entity.PowerSaverWorkMode;
 import com.ttlock.bl.sdk.entity.RecoveryDataType;
+import com.ttlock.bl.sdk.entity.SoundVolume;
 import com.ttlock.bl.sdk.entity.TTLiftWorkMode;
 import com.ttlock.bl.sdk.entity.TTLockConfigType;
 import com.ttlock.bl.sdk.entity.ValidityInfo;
@@ -595,6 +599,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         break;
       case TTLockCommand.COMMAND_CONFIG_IP:
         configIp(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_SET_LOCK_SOUND_WITH_SOUND_VOLUME:
+        setLockSoundWithSoundVolume(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_GET_LOCK_SOUND_WITH_SOUND_VOLUME:
+        getLockSoundWithSoundVolume(ttlockModel);
         break;
       case TTLockCommand.COMMAND_SET_ADMIN_ERASE_PASSCODE:
 
@@ -1708,6 +1718,40 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().configIp(ipSetting, ttlockModel.lockData, new com.ttlock.bl.sdk.callback.ConfigIpCallback() {
       @Override
       public void onConfigIpSuccess() {
+        apiSuccess(ttlockModel);
+      }
+
+      @Override
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
+      }
+    });
+  }
+
+  public void setLockSoundWithSoundVolume(final TtlockModel ttlockModel) {
+    SoundVolume soundVolume = SoundVolumeConverter.flutter2Native(ttlockModel.soundVolumeType);
+    TTLockClient.getDefault().setLockSoundWithSoundVolume(soundVolume, ttlockModel.lockData, new SetLockSoundWithSoundVolumeCallback() {
+      @Override
+      public void onSetLockSoundSuccess() {
+        apiSuccess(ttlockModel);
+      }
+
+      @Override
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
+      }
+    });
+  }
+
+  public void getLockSoundWithSoundVolume(final TtlockModel ttlockModel) {
+    TTLockClient.getDefault().getLockSoundWithSoundVolume(ttlockModel.lockData, new GetLockSoundWithSoundVolumeCallback() {
+      @Override
+      public void onGetLockSoundSuccess(boolean enable, SoundVolume soundVolume) {
+        if (enable) {
+          ttlockModel.soundVolumeType = android.src.main.java.com.ttlock.ttlock_flutter.model.SoundVolumeConverter.native2Flutter(soundVolume);
+        } else {
+          ttlockModel.soundVolumeType = android.src.main.java.com.ttlock.ttlock_flutter.model.SoundVolumeConverter.off.ordinal();
+        }
         apiSuccess(ttlockModel);
       }
 
