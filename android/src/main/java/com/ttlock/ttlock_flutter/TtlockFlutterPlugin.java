@@ -30,6 +30,7 @@ import com.ttlock.bl.sdk.callback.CreateCustomPasscodeCallback;
 import com.ttlock.bl.sdk.callback.DeleteFingerprintCallback;
 import com.ttlock.bl.sdk.callback.DeleteICCardCallback;
 import com.ttlock.bl.sdk.callback.DeletePasscodeCallback;
+import com.ttlock.bl.sdk.callback.GetAdminPasscodeCallback;
 import com.ttlock.bl.sdk.callback.GetAllValidFingerprintCallback;
 import com.ttlock.bl.sdk.callback.GetAllValidICCardCallback;
 import com.ttlock.bl.sdk.callback.GetAllValidPasscodeCallback;
@@ -138,6 +139,8 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
+
+import static com.ttlock.ttlock_flutter.model.TTLockFunction.getAdminPasscode;
 
 /** TtlockFlutterPlugin */
 public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware, EventChannel.StreamHandler {
@@ -465,9 +468,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       case TTLockCommand.COMMAND_MODIFY_ADMIN_PASSCODE:
         setAdminPasscode(ttlockModel);
         break;
-//      case TTLockCommand.COMMAND_GET_ADMIN_PASSCODE:
-//        getAdminPasscode(ttlockModel);
-//        break;
+      case TTLockCommand.COMMAND_GET_ADMIN_PASSCODE:
+        getAdminPasscode(ttlockModel);
+        break;
       case TTLockCommand.COMMAND_ADD_CARD:
         addICCard(ttlockModel);
         break;
@@ -1752,6 +1755,21 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         } else {
           ttlockModel.soundVolumeType = android.src.main.java.com.ttlock.ttlock_flutter.model.SoundVolumeConverter.off.ordinal();
         }
+        apiSuccess(ttlockModel);
+      }
+
+      @Override
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
+      }
+    });
+  }
+
+  public void getAdminPasscode(final TtlockModel ttlockModel) {
+    TTLockClient.getDefault().getAdminPasscode(ttlockModel.lockData, new GetAdminPasscodeCallback() {
+      @Override
+      public void onGetAdminPasscodeSuccess(String passcode) {
+        ttlockModel.adminPasscode = passcode;
         apiSuccess(ttlockModel);
       }
 

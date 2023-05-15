@@ -786,6 +786,24 @@ class TTLock {
         fail: failedCallback);
   }
 
+  static void removeCallBack(String command)
+  {
+    //COMMAND_CONTROL_LOCK
+    int index = -1;
+    for (var i = 0; i < _commandQueue.length; i++) {
+      Map map = _commandQueue[i];
+      String key = map.keys.first;
+      if (key.compareTo(command) == 0) {
+        index = i;
+        break;
+      }
+    }
+    if (index>-1) {
+      _commandQueue.removeAt(index);
+    }
+
+  }
+
   // static void setLockNbAddress(
   //     String ip,
   //     String port,
@@ -958,10 +976,10 @@ class TTLock {
   //   invoke(COMMAND_SET_NB_SERVER_INFO, map, callback, fail: failedCallback);
   // }
 
-  // static void getAdminPasscode(String lockData, TTGetAdminPasscodeCallback callback, TTFailedCallback failedCallback) {
-  //   invoke(COMMAND_GET_ADMIN_PASSCODE, lockData, callback,
-  //       fail: failedCallback);
-  // }
+  static void getAdminPasscode(String lockData, TTGetAdminPasscodeCallback callback, TTFailedCallback failedCallback) {
+    invoke(COMMAND_GET_ADMIN_PASSCODE, lockData, callback,
+        fail: failedCallback);
+  }
   //
   // static void getLockSystemInfo(String lockData, TTGetLockSystemInfoCallback callback, TTFailedCallback failedCallback) {
   //   invoke(COMMAND_GET_LOCK_SYSTEM_INFO, lockData, callback,
@@ -1229,11 +1247,6 @@ class TTLock {
           list.add(model);
         });
         getNbAwakeTimesCallback(list);
-        break;
-
-      case COMMAND_GET_ADMIN_PASSCODE:
-        TTGetAdminPasscodeCallback getAdminPasscodeCallback = callBack;
-        getAdminPasscodeCallback(data[TTResponse.adminPasscode]);
         break;
       case COMMAND_GET_LOCK_VERSION:
         TTGetLockVersionCallback getLockVersionCallback = callBack;
