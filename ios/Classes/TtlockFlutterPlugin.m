@@ -636,6 +636,20 @@ typedef NS_ENUM(NSInteger, ResultState) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
     }
+    else if ([command isEqualToString:command_recover_password]) {
+        [TTLock recoverPasscode:lockModel.passcode
+                    newPasscode:lockModel.passcodeNew
+                   passcodeType:lockModel.passcodeType.intValue + 1
+                      startDate:lockModel.startDate.longLongValue
+                        endDate:lockModel.endDate.longLongValue
+                      cycleType:lockModel.cycleType.intValue
+                       lockData:lockModel.lockData
+                        success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }
     /*else if ([command isEqualToString:command_set_door_sensor_switch]) {
         [TTLock setDoorSensorLockingSwitchOn:lockModel.isOn.boolValue lockData:lockModel.lockData success:^{
             [weakSelf successCallbackCommand:command data:nil];
@@ -684,19 +698,6 @@ typedef NS_ENUM(NSInteger, ResultState) {
             TtlockModel *data = [TtlockModel new];
             data.electricQuantity = @(electricQuantity);
             [weakSelf successCallbackCommand:command data:data];
-        } failure:^(TTError errorCode, NSString *errorMsg) {
-            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
-        }];
-    }else if ([command isEqualToString:command_recover_password]) {
-        [TTLock recoverPasscode:lockModel.passcode
-                    newPasscode:lockModel.passcodeNew
-                   passcodeType:lockModel.passcodeType.intValue + 1
-                      startDate:lockModel.startDate.longLongValue
-                        endDate:lockModel.endDate.longLongValue
-                      cycleType:lockModel.cycleType.intValue
-                       lockData:lockModel.lockData
-                        success:^{
-            [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
