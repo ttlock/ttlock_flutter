@@ -650,6 +650,15 @@ typedef NS_ENUM(NSInteger, ResultState) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
     }
+    else if ([command isEqualToString:command_get_admin_passcode_by_lockdata]) {
+         [TTLock getAdminPasscodeWithLockData:lockModel.lockData success:^(NSString *adminPasscode) {
+             TtlockModel *data = [TtlockModel new];
+             data.adminPasscode = adminPasscode;
+             [weakSelf successCallbackCommand:command data:data];
+         } failure:^(TTError errorCode, NSString *errorMsg) {
+             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+         }];
+     }
     /*else if ([command isEqualToString:command_set_door_sensor_switch]) {
         [TTLock setDoorSensorLockingSwitchOn:lockModel.isOn.boolValue lockData:lockModel.lockData success:^{
             [weakSelf successCallbackCommand:command data:nil];
@@ -673,15 +682,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
     }
-   else if ([command isEqualToString:command_get_admin_passcode_by_lockdata]) {
-        [TTLock getAdminPasscodeWithLockData:lockModel.lockData success:^(NSString *adminPasscode) {
-            TtlockModel *data = [TtlockModel new];
-            data.adminPasscode = adminPasscode;
-            [weakSelf successCallbackCommand:command data:data];
-        } failure:^(TTError errorCode, NSString *errorMsg) {
-            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
-        }];
-    }else if ([command isEqualToString:command_get_passcode_verification_param]) {
+     else if ([command isEqualToString:command_get_passcode_verification_param]) {
         [TTLock getPasscodeVerificationParamsWithLockData:lockModel.lockData success:^(NSString *lockData) {
             TtlockModel *data = [TtlockModel new];
             data.lockData = lockData;
@@ -949,3 +950,4 @@ typedef NS_ENUM(NSInteger, ResultState) {
 }
 
 @end
+

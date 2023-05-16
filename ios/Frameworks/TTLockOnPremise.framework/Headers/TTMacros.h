@@ -307,6 +307,7 @@ typedef NS_ENUM(NSInteger,TTDeviceInfoType) {
     TTDeviceInfoTypeOfNbNodeId = 8,
     TTDeviceInfoTypeOfNbCardNumber = 9,
     TTDeviceInfoTypeOfNbRssi = 10,
+    TTDeviceInfoTypeOfPasscodeKeyNumber = 12,
 };
 
 typedef NS_ENUM(long long, TTLockSpecialFunction)
@@ -390,6 +391,7 @@ typedef NS_ENUM(NSInteger,TTLockFeatureValue) {
     TTLockFeatureValueCpuCard = 55,
     TTLockFeatureValueWifiLock = 56,
     TTLockFeatureValueWifiLockStaticIP = 58,
+    TTLockFeatureValuePasscodeKeyNumber = 60,
 };
 
 typedef NS_ENUM(NSInteger ,TTLockConfigType) {
@@ -441,7 +443,8 @@ typedef NS_ENUM(int, TTUnlockDirection) {
 
 typedef NS_ENUM(int, TTAccessoryType) {
 	TTAccessoryTypeWirelessKeypad = 1,
-	TTAccessoryTypeWirelessKeyFob
+	TTAccessoryTypeWirelessKeyFob,
+    TTAccessoryTypeDoorSensor
 };
 
 typedef NS_ENUM(int, TTSoundVolume) {

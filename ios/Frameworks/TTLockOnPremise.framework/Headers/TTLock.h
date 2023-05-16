@@ -1,5 +1,5 @@
 
-//  version:1.3.7
+//  version:1.4.2
 
 #import <Foundation/Foundation.h>
 #import <TTLockOnPremise/TTBlocks.h>
@@ -430,6 +430,17 @@ Set Lock Config
                    lockData:(NSString *)lockData
                     success:(TTModifyAdminPasscodeSucceedBlock)success
                     failure:(TTFailedBlock)failure;
+
+/**
+ Get admin passcode
+
+ @param lockData The lock data string used to operate lock
+ @param success A block invoked when admin passcode is got
+ @param failure A block invoked when the operation fails
+ */
++ (void)getAdminPasscodeWithLockData:(NSString *)lockData
+                             success:(TTGetAdminPasscodeSucceedBlock)success
+                             failure:(TTFailedBlock)failure;
 
 /**
  Create custom passcode
@@ -1048,6 +1059,39 @@ Config Ip
                         success:(TTGetWifiInfoSuccessdBlock)success
                         failure:(TTFailedBlock)failure;
 
+/**
+ Add Door Sensor
+@param doorSensorMac door Sensor Mac
+@param lockData The lock data string used to operate lock
+@param success A block invoked when the operation succeeds
+@param failure A block invoked when the operation fails
+*/
++ (void)addDoorSensorWithDoorSensorMac:(NSString *)doorSensorMac
+                              lockData:(NSString *)lockData
+                               success:(TTSucceedBlock)success
+                               failure:(TTFailedBlock)failure;
+
+/**
+ Clear Door Sensor
+@param lockData The lock data string used to operate lock
+@param success A block invoked when the operation succeeds
+@param failure A block invoked when the operation fails
+*/
++ (void)clearDoorSensorWithLockData:(NSString *)lockData
+                            success:(TTSucceedBlock)success
+                            failure:(TTFailedBlock)failure;
+
+/**
+ Set Door Sensor Alert Time
+@param time  Alert Time
+@param lockData The lock data string used to operate lock
+@param success A block invoked when the operation succeeds
+@param failure A block invoked when the operation fails
+*/
++ (void)setDoorSensorAlertTime:(int)time
+                      lockData:(NSString *)lockData
+                       success:(TTSucceedBlock)success
+                       failure:(TTFailedBlock)failure;
 
 #pragma mark - deprecated
 
