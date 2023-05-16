@@ -589,7 +589,15 @@ typedef NS_ENUM(NSInteger, ResultState) {
         }];
     }else if ([command isEqualToString:command_get_lock_system_info]) {
         [TTLock getLockSystemInfoWithLockData:lockModel.lockData success:^(TTSystemInfoModel *systemModel) {
-            [weakSelf successCallbackCommand:command data:[self dicFromObject:systemModel]];
+            [weakSelf successCallbackCommand:command data:[weakSelf dicFromObject:systemModel]];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }else if ([command isEqualToString:command_get_lock_feature_value]) {
+        [TTLock getLockFeatureValueWithLockData:lockModel.lockData success:^(NSString *lockData) {
+            TtlockModel *data = [TtlockModel new];
+            data.lockData = lockData;
+            [weakSelf successCallbackCommand:command data:data];
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];

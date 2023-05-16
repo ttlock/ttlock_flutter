@@ -59,6 +59,7 @@ class TTLock {
   static const String COMMAND_GET_LOCK_SWITCH_STATE = "getLockSwitchState";
   static const String COMMAND_GET_LOCK_SYSTEM_INFO =
       "getLockSystemInfoWithLockData";
+  static const String COMMAND_GET_LOCK_FRETURE_VALUE = "getLockFreatureValue";
 
   static const String COMMAND_GET_AUTOMATIC_LOCK_PERIODIC_TIME =
       "getLockAutomaticLockingPeriodicTime";
@@ -624,6 +625,12 @@ class TTLock {
         fail: failedCallback);
   }
 
+  static void getLockFeatureValue(String lockData, TTLockDataCallback callback,
+      TTFailedCallback failedCallback) {
+    invoke(COMMAND_GET_LOCK_FRETURE_VALUE, lockData, callback,
+        fail: failedCallback);
+  }
+
 // ignore: slash_for_doc_comments
 /**
  * Get the lock automatic locking periodic time
@@ -786,8 +793,7 @@ class TTLock {
         fail: failedCallback);
   }
 
-  static void removeCallBack(String command)
-  {
+  static void removeCallBack(String command) {
     //COMMAND_CONTROL_LOCK
     int index = -1;
     for (var i = 0; i < _commandQueue.length; i++) {
@@ -798,10 +804,9 @@ class TTLock {
         break;
       }
     }
-    if (index>-1) {
+    if (index > -1) {
       _commandQueue.removeAt(index);
     }
-
   }
 
   // static void setLockNbAddress(
@@ -976,7 +981,8 @@ class TTLock {
   //   invoke(COMMAND_SET_NB_SERVER_INFO, map, callback, fail: failedCallback);
   // }
 
-  static void getAdminPasscode(String lockData, TTGetAdminPasscodeCallback callback, TTFailedCallback failedCallback) {
+  static void getAdminPasscode(String lockData,
+      TTGetAdminPasscodeCallback callback, TTFailedCallback failedCallback) {
     invoke(COMMAND_GET_ADMIN_PASSCODE, lockData, callback,
         fail: failedCallback);
   }
@@ -1269,6 +1275,12 @@ class TTLock {
         TTGetLockSoundWithSoundVolumeCallback getLockSoundCallback = callBack;
         getLockSoundCallback(type);
         break;
+
+      case COMMAND_GET_LOCK_FRETURE_VALUE:
+        TTLockDataCallback lockDataCallback = callBack;
+        lockDataCallback(data[TTResponse.lockData]);
+        break;
+
       // case COMMAND_GET_LOCK_SYSTEM_INFO:
       //   TTGetLockSystemInfoCallback getLockSystemInfoCallback = callBack;
       //   getLockSystemInfoCallback(TTLockSystemInfoModel(data));
