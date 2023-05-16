@@ -131,6 +131,7 @@
 #define command_get_admin_passcode_by_lockdata @"getAdminPasscodeWithLockData"
 #define command_set_v2_lock_admin_erase_passcode @"setAdminErasePasscode"
 #define command_get_lock_system_info @"getLockSystemInfoWithLockData"
+#define command_get_lock_feature_value @"getLockFreatureValue"
 #define command_get_passcode_verification_param @"getPasscodeVerificationParamsWithLockData"
 #define command_set_nb_server_address @"setNBServerAddress"
 #define command_recover_password @"recoverPasscodeWithPasswordType"

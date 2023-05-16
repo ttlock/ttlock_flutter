@@ -59,6 +59,7 @@ class TTLock {
   static const String COMMAND_GET_LOCK_SWITCH_STATE = "getLockSwitchState";
   static const String COMMAND_GET_LOCK_SYSTEM_INFO =
       "getLockSystemInfoWithLockData";
+  static const String COMMAND_GET_LOCK_FRETURE_VALUE = "getLockFreatureValue";
 
   static const String COMMAND_GET_AUTOMATIC_LOCK_PERIODIC_TIME =
       "getLockAutomaticLockingPeriodicTime";
@@ -633,6 +634,12 @@ class TTLock {
   static void getLockSystemInfo(String lockData,
       TTGetLockSystemCallback callback, TTFailedCallback failedCallback) {
     invoke(COMMAND_GET_LOCK_SYSTEM_INFO, lockData, callback,
+        fail: failedCallback);
+  }
+
+  static void getLockFeatureValue(String lockData, TTLockDataCallback callback,
+      TTFailedCallback failedCallback) {
+    invoke(COMMAND_GET_LOCK_FRETURE_VALUE, lockData, callback,
         fail: failedCallback);
   }
 
@@ -1268,6 +1275,12 @@ class TTLock {
         TTGetLockSoundWithSoundVolumeCallback getLockSoundCallback = callBack;
         getLockSoundCallback(type);
         break;
+
+      case COMMAND_GET_LOCK_FRETURE_VALUE:
+        TTLockDataCallback lockDataCallback = callBack;
+        lockDataCallback(data[TTResponse.lockData]);
+        break;
+
       // case COMMAND_GET_LOCK_SYSTEM_INFO:
       //   TTGetLockSystemInfoCallback getLockSystemInfoCallback = callBack;
       //   getLockSystemInfoCallback(TTLockSystemInfoModel(data));
