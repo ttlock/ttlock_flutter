@@ -115,6 +115,9 @@ class TTLock {
   static const String COMMAND_GET_LOCK_SOUND_WITH_SOUND_VOLUME =
       "getLockSoundWithSoundVolume";
 
+  static const String COMMAND_SET_LOCK_ENTER_UPGRADE_MODE =
+      "setLockEnterUpgradeMode";
+
   // static const String COMMAND_SET_NB_SERVER_INFO = "setNBServerInfo";
   // static const String COMMAND_GET_ADMIN_PASSCODE = "getAdminPasscode";
   // static const String COMMAND_GET_LOCK_SYSTEM_INFO = "getLockSystemInfo";
@@ -991,6 +994,12 @@ class TTLock {
   //   invoke(COMMAND_GET_PASSCODE_VERIFICATION_PARAMS, lockData, callback,
   //       fail: failedCallback);
   // }
+
+  static void setLockEnterUpgradeMode(String lockData,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+    invoke(COMMAND_SET_LOCK_ENTER_UPGRADE_MODE, lockData, callback,
+        fail: failedCallback);
+  }
 
   static bool isListenEvent = false;
   static var scanCommandList = [
