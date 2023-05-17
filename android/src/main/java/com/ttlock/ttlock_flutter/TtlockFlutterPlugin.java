@@ -1521,6 +1521,21 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 //    });
 //  }
 
+  public void getFeatureValue(final TtlockModel ttlockModel) {
+    TTLockClient.getDefault().getLockSystemInfo(ttlockModel.lockData, new GetLockSystemInfoCallback() {
+      @Override
+      public void onGetLockSystemInfoSuccess(com.ttlock.bl.sdk.entity.DeviceInfo deviceInfo) {
+        ttlockModel.lockData = deviceInfo.getLockData()
+        apiSuccess(ttlockModel);
+      }
+
+      @Override
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
+      }
+    });
+  }
+
   public void getLockSystemInfo(final TtlockModel ttlockModel) {
     TTLockClient.getDefault().getLockSystemInfo(ttlockModel.lockData, new GetLockSystemInfoCallback() {
       @Override

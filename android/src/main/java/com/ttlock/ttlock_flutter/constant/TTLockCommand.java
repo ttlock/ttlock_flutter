@@ -117,4 +117,6 @@ public class TTLockCommand {
     public static final String COMMAND_SET_LOCK_SOUND_WITH_SOUND_VOLUME = "setLockSoundWithSoundVolume";
     public static final String COMMAND_GET_LOCK_SOUND_WITH_SOUND_VOLUME = "getLockSoundWithSoundVolume";
 
+    public static final String  COMMAND_GET_LOCK_FRETURE_VALUE = "getLockFreatureValue";
+
 }
