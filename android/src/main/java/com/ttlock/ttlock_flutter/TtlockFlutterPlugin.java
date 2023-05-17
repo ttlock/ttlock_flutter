@@ -609,6 +609,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       case TTLockCommand.COMMAND_GET_LOCK_SOUND_WITH_SOUND_VOLUME:
         getLockSoundWithSoundVolume(ttlockModel);
         break;
+      case TTLockCommand.COMMAND_GET_LOCK_FRETURE_VALUE:
+        getFeatureValue(ttlockModel);
+        break;
       case TTLockCommand.COMMAND_SET_ADMIN_ERASE_PASSCODE:
 
         break;
@@ -1525,7 +1528,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().getLockSystemInfo(ttlockModel.lockData, new GetLockSystemInfoCallback() {
       @Override
       public void onGetLockSystemInfoSuccess(com.ttlock.bl.sdk.entity.DeviceInfo deviceInfo) {
-        ttlockModel.lockData = deviceInfo.getLockData()
+        ttlockModel.lockData = deviceInfo.getLockData();
         apiSuccess(ttlockModel);
       }
 
