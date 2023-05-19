@@ -824,6 +824,12 @@ typedef NS_ENUM(NSInteger, ResultState) {
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
+    }else if ([command isEqualToString:command_set_lock_enter_upgrade_mode]) {
+        [TTLock enterUpgradeModeWithLockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
     }
     
 }
