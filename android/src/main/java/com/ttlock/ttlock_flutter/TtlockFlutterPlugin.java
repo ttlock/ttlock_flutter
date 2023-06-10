@@ -787,7 +787,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   public void getOperationLog(final TtlockModel ttlockModel) {
     //long period operation
     removeCommandTimeOutRunable();
-    commandTimeOutCheck(4 * COMMAND_TIME_OUT);
+//    commandTimeOutCheck(4 * COMMAND_TIME_OUT);
 
     TTLockClient.getDefault().getOperationLog(ttlockModel.logType == 0 ? LogType.NEW : LogType.ALL, ttlockModel.lockData, ttlockModel.lockMac, new GetOperationLogCallback() {
       @Override
