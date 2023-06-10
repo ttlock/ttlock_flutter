@@ -57,6 +57,9 @@
 #define command_get_lock_version @"getLockVersion"
 #define command_get_lock_switch_state @"getLockSwitchState"
 
+#define command_get_lock_sound_value @"getLockSoundWithSoundVolume"
+#define command_set_lock_sound_value @"setLockSoundWithSoundVolume"
+
 
 #define command_get_lock_automatic_locking_periodic_time @"getLockAutomaticLockingPeriodicTime"
 #define command_set_lock_automatic_locking_periodic_time @"setLockAutomaticLockingPeriodicTime"
@@ -74,6 +77,8 @@
 
 #define command_function_support @"functionSupport"
 
+#define command_set_lock_enter_upgrade_mode @"setLockEnterUpgradeMode"
+
 #pragma mark - 网关指令
 #define command_start_scan_gateway @"startScanGateway"
 #define command_stop_scan_gateway @"stopScanGateway"
@@ -81,6 +86,7 @@
 #define command_disconnect_gateway @"disconnectGateway"
 #define command_get_surround_wifi @"getSurroundWifi"
 #define command_init_gateway @"initGateway"
+#define command_config_gateway_ip @"gatewayConfigIp"
 #define command_upgrade_gateway @"upgradeGateway"
 
 
@@ -127,6 +133,7 @@
 #define command_get_admin_passcode_by_lockdata @"getAdminPasscodeWithLockData"
 #define command_set_v2_lock_admin_erase_passcode @"setAdminErasePasscode"
 #define command_get_lock_system_info @"getLockSystemInfoWithLockData"
+#define command_get_lock_feature_value @"getLockFreatureValue"
 #define command_get_passcode_verification_param @"getPasscodeVerificationParamsWithLockData"
 #define command_set_nb_server_address @"setNBServerAddress"
 #define command_recover_password @"recoverPasscodeWithPasswordType"

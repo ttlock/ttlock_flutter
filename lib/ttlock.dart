@@ -59,6 +59,7 @@ class TTLock {
   static const String COMMAND_GET_LOCK_SWITCH_STATE = "getLockSwitchState";
   static const String COMMAND_GET_LOCK_SYSTEM_INFO =
       "getLockSystemInfoWithLockData";
+  static const String COMMAND_GET_LOCK_FRETURE_VALUE = "getLockFreatureValue";
 
   static const String COMMAND_GET_AUTOMATIC_LOCK_PERIODIC_TIME =
       "getLockAutomaticLockingPeriodicTime";
@@ -109,8 +110,13 @@ class TTLock {
   static const String COMMAND_GET_WIFI_INFO = "getWifiInfo";
   static const String COMMAND_CONFIG_IP = "configIp";
 
-  static const String COMMAND_SET_LOCK_SOUND_WITH_SOUND_VOLUME = "setLockSoundWithSoundVolume";
-  static const String COMMAND_GET_LOCK_SOUND_WITH_SOUND_VOLUME = "getLockSoundWithSoundVolume";
+  static const String COMMAND_SET_LOCK_SOUND_WITH_SOUND_VOLUME =
+      "setLockSoundWithSoundVolume";
+  static const String COMMAND_GET_LOCK_SOUND_WITH_SOUND_VOLUME =
+      "getLockSoundWithSoundVolume";
+
+  static const String COMMAND_SET_LOCK_ENTER_UPGRADE_MODE =
+      "setLockEnterUpgradeMode";
 
   // static const String COMMAND_SET_NB_SERVER_INFO = "setNBServerInfo";
   // static const String COMMAND_GET_ADMIN_PASSCODE = "getAdminPasscode";
@@ -634,6 +640,12 @@ class TTLock {
         fail: failedCallback);
   }
 
+  static void getLockFeatureValue(String lockData, TTLockDataCallback callback,
+      TTFailedCallback failedCallback) {
+    invoke(COMMAND_GET_LOCK_FRETURE_VALUE, lockData, callback,
+        fail: failedCallback);
+  }
+
 // ignore: slash_for_doc_comments
 /**
  * Get the lock automatic locking periodic time
@@ -850,19 +862,19 @@ class TTLock {
   //       fail: failedCallback);
   // }
 
-  static void setDoorSensorLockingSwitchState(bool isOn, String lockData,
-      TTSuccessCallback callback, TTFailedCallback failedCallback) {
-    Map map = Map();
-    map[TTResponse.isOn] = isOn;
-    map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_SET_DOOR_SENSOR_SWITCH, map, callback, fail: failedCallback);
-  }
+  // static void setDoorSensorLockingSwitchState(bool isOn, String lockData,
+  //     TTSuccessCallback callback, TTFailedCallback failedCallback) {
+  //   Map map = Map();
+  //   map[TTResponse.isOn] = isOn;
+  //   map[TTResponse.lockData] = lockData;
+  //   invoke(COMMAND_SET_DOOR_SENSOR_SWITCH, map, callback, fail: failedCallback);
+  // }
 
-  static void getDoorSensorLockingSwitchState(String lockData,
-      TTGetSwitchStateCallback callback, TTFailedCallback failedCallback) {
-    invoke(COMMAND_GET_DOOR_SENSOR_SWITCH, lockData, callback,
-        fail: failedCallback);
-  }
+  // static void getDoorSensorLockingSwitchState(String lockData,
+  //     TTGetSwitchStateCallback callback, TTFailedCallback failedCallback) {
+  //   invoke(COMMAND_GET_DOOR_SENSOR_SWITCH, lockData, callback,
+  //       fail: failedCallback);
+  // }
 
   static void setHotel(
       String hotelInfo,
@@ -887,11 +899,11 @@ class TTLock {
     invoke(COMMAND_SET_HOTEL_CARD_SECTOR, map, callback, fail: failedCallback);
   }
 
-  static void getDoorSensorState(String lockData,
-      TTGetSwitchStateCallback callback, TTFailedCallback failedCallback) {
-    invoke(COMMAND_GET_DOOR_SENSOR_STATE, lockData, callback,
-        fail: failedCallback);
-  }
+  // static void getDoorSensorState(String lockData,
+  //     TTGetSwitchStateCallback callback, TTFailedCallback failedCallback) {
+  //   invoke(COMMAND_GET_DOOR_SENSOR_STATE, lockData, callback,
+  //       fail: failedCallback);
+  // }
 
   static void getLockVersion(String lockMac, TTGetLockVersionCallback callback,
       TTFailedCallback failedCallback) {
@@ -939,8 +951,11 @@ class TTLock {
     TTLock.invoke(COMMAND_CONFIG_IP, map, callback, fail: failedCallback);
   }
 
-  static void setLockSoundWithSoundVolume(TTSoundVolumeType type, String lockData,
-      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+  static void setLockSoundWithSoundVolume(
+      TTSoundVolumeType type,
+      String lockData,
+      TTSuccessCallback callback,
+      TTFailedCallback failedCallback) {
     Map map = Map();
     map["soundVolumeType"] = type.index;
     map[TTResponse.lockData] = lockData;
@@ -948,9 +963,12 @@ class TTLock {
         fail: failedCallback);
   }
 
-  static void getLockSoundWithSoundVolume(String lockData,
-      TTGetLockSoundWithSoundVolumeCallback callback, TTFailedCallback failedCallback) {
-    invoke(COMMAND_GET_LOCK_SOUND_WITH_SOUND_VOLUME, lockData, callback, fail: failedCallback);
+  static void getLockSoundWithSoundVolume(
+      String lockData,
+      TTGetLockSoundWithSoundVolumeCallback callback,
+      TTFailedCallback failedCallback) {
+    invoke(COMMAND_GET_LOCK_SOUND_WITH_SOUND_VOLUME, lockData, callback,
+        fail: failedCallback);
   }
 
   // static void setNBServerInfo(String nbServerAddress, int nbServerPort, String lockData,
@@ -976,6 +994,12 @@ class TTLock {
   //   invoke(COMMAND_GET_PASSCODE_VERIFICATION_PARAMS, lockData, callback,
   //       fail: failedCallback);
   // }
+
+  static void setLockEnterUpgradeMode(String lockData,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+    invoke(COMMAND_SET_LOCK_ENTER_UPGRADE_MODE, lockData, callback,
+        fail: failedCallback);
+  }
 
   static bool isListenEvent = false;
   static var scanCommandList = [
@@ -1260,6 +1284,12 @@ class TTLock {
         TTGetLockSoundWithSoundVolumeCallback getLockSoundCallback = callBack;
         getLockSoundCallback(type);
         break;
+
+      case COMMAND_GET_LOCK_FRETURE_VALUE:
+        TTLockDataCallback lockDataCallback = callBack;
+        lockDataCallback(data[TTResponse.lockData]);
+        break;
+
       // case COMMAND_GET_LOCK_SYSTEM_INFO:
       //   TTGetLockSystemInfoCallback getLockSystemInfoCallback = callBack;
       //   getLockSystemInfoCallback(TTLockSystemInfoModel(data));
@@ -1344,7 +1374,8 @@ class TTLock {
     }
 
     if (command == TTGateway.COMMAND_GET_SURROUND_WIFI ||
-        command == TTGateway.COMMAND_INIT_GATEWAY) {
+        command == TTGateway.COMMAND_INIT_GATEWAY ||
+        command == TTGateway.COMMAND_CONFIG_IP) {
       TTGatewayFailedCallback? failedCallback = callBack;
       TTGatewayError error = TTGatewayError.values[errorCode];
       if (failedCallback != null) {
@@ -1748,7 +1779,8 @@ typedef TTWifiLockScanWifiCallback = void Function(
 
 typedef TTWifiLockGetWifiInfoCallback = void Function(TTWifiInfoModel wifiInfo);
 
-typedef TTGetLockSoundWithSoundVolumeCallback = void Function(TTSoundVolumeType ttLocksoundVolumeType);
+typedef TTGetLockSoundWithSoundVolumeCallback = void Function(
+    TTSoundVolumeType ttLocksoundVolumeType);
 // typedef TTGetLockSystemInfoCallback = void Function(TTLockSystemInfoModel lockSystemInfoModel);
 // typedef TTGetPasscodeVerificationParamsCallback = void Function(String lockData);
 

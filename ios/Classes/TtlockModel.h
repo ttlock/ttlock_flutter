@@ -115,6 +115,8 @@
 @property (nonatomic, strong) NSString *fingerprintListString;
 @property (nonatomic, strong) NSString *cardListString;
 
+@property (nonatomic, strong) NSNumber *soundVolumeType;
+
 + (TtlockModel *)modelWithDict:(NSDictionary *)dict;
 - (NSDictionary *)toDictionary;
 @end
