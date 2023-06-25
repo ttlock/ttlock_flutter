@@ -1827,6 +1827,7 @@ enum TTGatewayError {
   failConfigServer,
   failConfigAccount,
   noSim,
+  invalidCommand
 }
 
 enum TTGatewayType { g1, g2, g3, g4 }
