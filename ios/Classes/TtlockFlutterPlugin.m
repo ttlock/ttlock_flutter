@@ -492,31 +492,64 @@ typedef NS_ENUM(NSInteger, ResultState) {
             }
         }];
     }else if ([command isEqualToString:command_function_support]) {
-        NSInteger supportFunction = lockModel.supportFunction.integerValue;
-        
-        if (supportFunction > 48) {
-            supportFunction += 9;
-        }
-        else if (supportFunction > 46) {
-            supportFunction += 8;
-        }else if (supportFunction > 45) {
-            supportFunction += 7;
-        }else if (supportFunction > 30) {
-            supportFunction += 6;
-        }else if (supportFunction > 29) {
-            supportFunction += 4;
-        }else if (supportFunction > 28) {
-            supportFunction += 3;
-        }else if (supportFunction > 15) {
-            supportFunction += 2;
-        }else if (supportFunction > 5) {
-            supportFunction += 1;
-        }
-        
-        bool isSupport = [TTUtil lockFeatureValue:lockModel.lockData suportFunction:supportFunction];
-        TtlockModel *data = [TtlockModel new];
-        data.isSupport = @(isSupport);
-        [weakSelf successCallbackCommand:command data:data];
+        NSInteger index = lockModel.supportFunction.integerValue;
+                NSArray *functionArray = @[
+                    @(TTLockFeatureValuePasscode),
+                            @(TTLockFeatureValueICCard),
+                            @(TTLockFeatureValueFingerprint),
+                            @(TTLockFeatureValueWristband),
+                            @(TTLockFeatureValueAutoLock),
+                            @(TTLockFeatureValueDeletePasscode),
+                            @(TTLockFeatureValueManagePasscode),
+                            @(TTLockFeatureValueLocking),
+                            @(TTLockFeatureValuePasscodeVisible),
+                            @(TTLockFeatureValueGatewayUnlock),
+                            @(TTLockFeatureValueLockFreeze),
+                            @(TTLockFeatureValueCyclePassword),
+                            @(TTLockFeatureValueRemoteUnlockSwicth),
+                            @(TTLockFeatureValueAudioSwitch),
+                            @(TTLockFeatureValueNBIoT),
+                            @(TTLockFeatureValueGetAdminPasscode),
+                            @(TTLockFeatureValueHotelCard),
+                            @(TTLockFeatureValueNoClock),
+                            @(TTLockFeatureValueNoBroadcastInNormal),
+                            @(TTLockFeatureValuePassageMode),
+                            @(TTLockFeatureValueTurnOffAutoLock),
+                            @(TTLockFeatureValueWirelessKeypad),
+                            @(TTLockFeatureValueLight),
+                            @(TTLockFeatureValueHotelCardBlacklist),
+                            @(TTLockFeatureValueIdentityCard),
+                            @(TTLockFeatureValueTamperAlert),
+                            @(TTLockFeatureValueResetButton),
+                            @(TTLockFeatureValuePrivacyLock),
+                            @(TTLockFeatureValueDeadLock),
+                            @(TTLockFeatureValueCyclicCardOrFingerprint),
+                            @(TTLockFeatureValueFingerVein),
+                            @(TTLockFeatureValueBle5G),
+                            @(TTLockFeatureValueNBAwake),
+                            @(TTLockFeatureValueRecoverCyclePasscode),
+                            @(TTLockFeatureValueWirelessKeyFob),
+                            @(TTLockFeatureValueGetAccessoryElectricQuantity),
+                            @(TTLockFeatureValueSoundVolume),
+                            @(TTLockFeatureValueQRCode),
+                            @(TTLockFeatureValueSensorState),
+                            @(TTLockFeatureValuePassageModeAutoUnlock),
+                            @(TTLockFeatureValueDoorSensor),
+                            @(TTLockFeatureValueDoorSensorAlert),
+                            @(TTLockFeatureValueSensitivity),
+                            @(TTLockFeatureValueFace),
+                            @(TTLockFeatureValueCpuCard),
+                            @(TTLockFeatureValueWifiLock),
+                            @(TTLockFeatureValueWifiLockStaticIP),
+                            @(TTLockFeatureValuePasscodeKeyNumber)
+                ];
+                
+                
+                TTLockFeatureValue featureValue = [functionArray[index] intValue];
+                bool isSupport = [TTUtil lockFeatureValue:lockModel.lockData suportFunction:featureValue];
+                TtlockModel *data = [TtlockModel new];
+                data.isSupport = @(isSupport);
+                [weakSelf successCallbackCommand:command data:data];
     }
     
     else if ([command isEqualToString:command_active_lift_floors]) {
