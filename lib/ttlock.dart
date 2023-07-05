@@ -1708,10 +1708,11 @@ enum TTLockError {
   bluetoothOff,
   bluetoothConnectTimeount,
   bluetoothDisconnection,
-  sdkIsBusy, //35
+  lockIsBusy, //35
   invalidLockData,
   invalidParameter,
-  lockIsBusy //38
+  wrongWifi, //38
+  wrongWifiPassword
 }
 
 enum TTLiftWorkActivateType { allFloors, specificFloors }
