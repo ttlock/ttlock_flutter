@@ -930,62 +930,81 @@ typedef NS_ENUM(NSInteger, ResultState) {
 }
 
 - (NSInteger)getTTGatewayErrorCode:(TTGatewayStatus) status{
-//    NSLog(@"Native errorCode:%d",status);
+    NSArray *codeArray =@[@(TTGatewayFail),
+                          @(TTGatewayWrongSSID),
+                          @(TTGatewayWrongWifiPassword),
+                          @(TTGatewayWrongCRC),
+                          @(TTGatewayWrongAeskey),
+                          @(TTGatewayNotConnect),
+                          @(TTGatewayDisconnect),
+                          @(TTGatewayFailConfigRouter),
+                          @(TTGatewayFailConfigServer),
+                          @(TTGatewayFailConfigAccount),
+                          @(TTGatewayNoSIM),
+                          @(TTGatewayInvalidCommand),
+                          @(TTGatewayFailConfigIP),
+                          @(TTGatewayFailInvaildIP)
     
+    ];
     
-//    TTGatewaySuccess = 0,
-//    TTGatewayFail = 1,
-//    TTGatewayWrongSSID = 3,
-//    TTGatewayWrongWifiPassword = 4,
-//    TTGatewayInvalidCommand = 6,
-//    TTGatewayTimeout = 7,
-//    TTGatewayNoSIM = 8,
-//    TTGatewayNoPlugCable = 9,
-//    TTGatewayWrongCRC = -1,
-//    TTGatewayWrongAeskey = -2,
-//    TTGatewayNotConnect = -3,
-//    TTGatewayDisconnect = -4,
-//    TTGatewayFailConfigRouter = -5,
-//    TTGatewayFailConfigServer = -6,
-//    TTGatewayFailConfigAccount = -7,
-//    TTGatewayFailConfigIP = -8,
-//    TTGatewayFailInvaildIP = -9,
-    
-    
-    
-    NSDictionary *codeMap = @{
-        @(1):@0,
-        @(3):@1,
-        @(4):@2,
-        @(-1):@3,
-        @(-2):@4,
-        @(-3):@5,
-        @(-4):@6,
-        @(-5):@7,
-        @(-6):@8,
-        @(-7):@9,
-        @(8):@10,
-        @(6):@11,
-        @(-8):@12,
-        @(-9):@13
-    };
-    return [codeMap[@(status)] integerValue];
+    NSInteger errorCode = TTGatewayFail;
+    for (int i = 0; codeArray.count; i++) {
+        if([codeArray[i] intValue] == status){
+            errorCode = i;
+        }
+    }
+    return errorCode;
 }
 
 
 - (NSNumber *)getTTLockErrorCode:(NSNumber *) code{
-//    NSLog(@"Native errorCode:%@",code);
+    NSInteger errorCode = TTErrorFail;
+    NSArray *codeArray =@[@(TTErrorHadReseted),
+                          @(TTErrorCRCError),
+                          @(TTErrorNoPermisstion),
+                          @(TTErrorWrongAdminCode),
+                          @(TTErrorLackOfStorageSpace),
+                          @(TTErrorInSettingMode),
+                          @(TTErrorNoAdmin),
+                          @(TTErrorNotInSettingMode),
+                          @(TTErrorWrongDynamicCode),
+                          @(TTErrorIsNoPower),
+                          @(TTErrorResetPasscode),
+                          @(TTErrorUpdatePasscodeIndex) ,
+                          @(TTErrorInvalidLockFlagPos),
+                          @(TTErrorEkeyExpired),
+                          @(TTErrorPasscodeLengthInvalid),
+                          @(TTErrorSamePasscodes),
+                          @(TTErrorEkeyInactive),
+                          @(TTErrorAesKey),
+                          @(TTErrorFail),
+                          @(TTErrorPasscodeExist),
+                          @(TTErrorPasscodeNotExist),
+                          @(TTErrorLackOfStorageSpaceWhenAddingPasscodes),
+                          @(TTErrorInvalidParaLength) ,
+                          @(TTErrorCardNotExist),
+                          @(TTErrorFingerprintDuplication),
+                          @(TTErrorFingerprintNotExist) ,
+                          @(TTErrorInvalidCommand),
+                          @(TTErrorInFreezeMode) ,
+                          @(TTErrorInvalidClientPara),
+                          @(TTErrorLockIsLocked),
+                          @(TTErrorRecordNotExist),
+                          @(TTErrorBluetoothPoweredOff),
+                          @(TTErrorConnectionTimeout),
+                          @(TTErrorDisconnection),
+                          @(TTErrorLockIsBusy) ,
+                          @(TTErrorWrongLockData),
+                          @(TTErrorInvalidParameter),
+                          @(TTErrorWrongSSID),
+                          @(TTErrorWrongWifiPassword)];
     
-    if (code == nil) {
-        return code;
+    for (int i = 0; codeArray.count; i++) {
+        if([codeArray[i] intValue] == code.intValue){
+            errorCode = i;
+        }
     }
-    
-    if (code.integerValue > TTErrorRecordNotExist) {
-        return @(code.integerValue - 65);
-    }else if(code.integerValue > TTErrorWrongDynamicCode){
-        return @(code.integerValue - 1);
-    }
-    return code;
+    return @(errorCode);
 }
 
 @end
