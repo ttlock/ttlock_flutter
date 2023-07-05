@@ -1350,11 +1350,11 @@ class TTLock {
 
   static void _errorCallback(
       String command, int errorCode, String errorMessage) {
-    if (errorCode == TTLockError.sdkIsBusy.index) {
+    if (errorCode == TTLockError.lockIsBusy.index) {
       errorMessage =
           "The TTLock SDK can only communicate with one lock at a time";
     }
-    if (errorCode > TTLockError.sdkIsBusy.index) {
+    if (errorCode > TTLockError.wrongWifiPassword.index) {
       errorCode = TTLockError.fail.index;
     }
 
