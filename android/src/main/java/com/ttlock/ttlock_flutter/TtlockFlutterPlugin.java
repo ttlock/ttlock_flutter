@@ -122,6 +122,7 @@ import com.ttlock.ttlock_flutter.model.TTLockConfigConverter;
 import com.ttlock.ttlock_flutter.model.TTLockErrorConverter;
 import com.ttlock.ttlock_flutter.model.TTLockFunction;
 import com.ttlock.ttlock_flutter.model.TtlockModel;
+import com.ttlock.ttlock_flutter.util.PermissionUtils;
 import com.ttlock.ttlock_flutter.util.Utils;
 
 import java.util.ArrayDeque;
@@ -225,9 +226,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         setupPlug(ttlockModel);
         break;
       case TTLockCommand.COMMAND_START_SCAN_LOCK:
-        if (initPermission()) {
+//        if (initPermission()) {
           startScan();
-        }
+//        }
         break;
       case TTLockCommand.COMMAND_STOP_SCAN_LOCK:
         stopScan();
@@ -251,9 +252,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     gatewayModel.toObject((Map<String, Object>) call.arguments);
     switch (command) {
       case GatewayCommand.COMMAND_START_SCAN_GATEWAY:
-        if (initPermission()) {
+//        if (initPermission()) {
           startScanGateway();
-        }
+//        }
         break;
       case GatewayCommand.COMMAND_STOP_SCAN_GATEWAY:
         stopScanGateway();
@@ -286,21 +287,27 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   //enum TTGatewayType { g1, g2, g3, g4 }
   public void startScanGateway() {
     GatewayClient.getDefault().prepareBTService(activity);
-    GatewayClient.getDefault().startScanGateway(new ScanGatewayCallback() {
-      @Override
-      public void onScanGatewaySuccess(ExtendedBluetoothDevice device) {
-        TTGatewayScanModel ttGatewayScanModel = new TTGatewayScanModel();
-        ttGatewayScanModel.gatewayMac = device.getAddress();
-        ttGatewayScanModel.gatewayName = device.getName();
-        ttGatewayScanModel.isDfuMode = device.isDfuMode();
-        ttGatewayScanModel.rssi = device.getRssi();
-        ttGatewayScanModel.type = device.getGatewayType() - 1;//对应flutter编号
-        successCallbackCommand(GatewayCommand.COMMAND_START_SCAN_GATEWAY, ttGatewayScanModel.toMap());
-      }
+    PermissionUtils.doWithScanPermission(activity, success -> {
+      if (success) {
+        GatewayClient.getDefault().startScanGateway(new ScanGatewayCallback() {
+          @Override
+          public void onScanGatewaySuccess(ExtendedBluetoothDevice device) {
+            TTGatewayScanModel ttGatewayScanModel = new TTGatewayScanModel();
+            ttGatewayScanModel.gatewayMac = device.getAddress();
+            ttGatewayScanModel.gatewayName = device.getName();
+            ttGatewayScanModel.isDfuMode = device.isDfuMode();
+            ttGatewayScanModel.rssi = device.getRssi();
+            ttGatewayScanModel.type = device.getGatewayType() - 1;//对应flutter编号
+            successCallbackCommand(GatewayCommand.COMMAND_START_SCAN_GATEWAY, ttGatewayScanModel.toMap());
+          }
 
-      @Override
-      public void onScanFailed(int errorCode) {
+          @Override
+          public void onScanFailed(int errorCode) {
 
+          }
+        });
+      } else {
+        LogUtil.d("no scan permission");
       }
     });
   }
@@ -311,16 +318,22 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
   public void connectGateway(final GatewayModel gatewayModel) {
     final HashMap<String, Object> resultMap = new HashMap<>();
-    GatewayClient.getDefault().connectGateway(gatewayModel.mac, new ConnectCallback() {
-      @Override
-      public void onConnectSuccess(ExtendedBluetoothDevice device) {
-        resultMap.put("status", TTGatewayConnectStatus.success);
-        successCallbackCommand(GatewayCommand.COMMAND_CONNECT_GATEWAY, resultMap);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        GatewayClient.getDefault().connectGateway(gatewayModel.mac, new ConnectCallback() {
+          @Override
+          public void onConnectSuccess(ExtendedBluetoothDevice device) {
+            resultMap.put("status", TTGatewayConnectStatus.success);
+            successCallbackCommand(GatewayCommand.COMMAND_CONNECT_GATEWAY, resultMap);
+          }
 
-      @Override
-      public void onDisconnected() {//todo:比ios少一个错误码
-        callbackCommand(GatewayCommand.COMMAND_CONNECT_GATEWAY, ResultStateFail, gatewayModel.toMap(), TTGatewayConnectStatus.timeout, "disconnect gateway");
+          @Override
+          public void onDisconnected() {//todo:比ios少一个错误码
+            callbackCommand(GatewayCommand.COMMAND_CONNECT_GATEWAY, ResultStateFail, gatewayModel.toMap(), TTGatewayConnectStatus.timeout, "disconnect gateway");
+          }
+        });
+      } else {
+        callbackCommand(GatewayCommand.COMMAND_CONNECT_GATEWAY, ResultStateFail, gatewayModel.toMap(), TTGatewayConnectStatus.faile, "no connect permission");
       }
     });
   }
@@ -330,6 +343,10 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     successCallbackCommand(GatewayCommand.COMMAND_DISCONNECT_GATEWAY, null);
   }
 
+  private void noConnectPermissionLog() {
+    LogUtil.d("no connect permission");
+  }
+
   public void gatewayConfigIp(final GatewayModel gatewayModel) {
     String ipSettingJson = gatewayModel.ipSettingJsonStr;
     if (TextUtils.isEmpty(ipSettingJson)) {
@@ -337,45 +354,59 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       return;
     }
      IpSetting ipSetting = GsonUtil.toObject(ipSettingJson, IpSetting.class);
-     GatewayClient.getDefault().configIp(gatewayModel.mac, ipSetting, new ConfigIpCallback() {
-       @Override
-       public void onConfigIpSuccess() {
-         successCallbackCommand(GatewayCommand.COMMAND_CONFIG_IP, null);
-       }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        GatewayClient.getDefault().configIp(gatewayModel.mac, ipSetting, new ConfigIpCallback() {
+          @Override
+          public void onConfigIpSuccess() {
+            successCallbackCommand(GatewayCommand.COMMAND_CONFIG_IP, null);
+          }
 
-       @Override
-       public void onFail(GatewayError gatewayError) {
-         errorCallbackCommand(GatewayCommand.COMMAND_CONFIG_IP, gatewayError);
-       }
-     });
+          @Override
+          public void onFail(GatewayError gatewayError) {
+            errorCallbackCommand(GatewayCommand.COMMAND_CONFIG_IP, gatewayError);
+          }
+        });
+      } else {
+        noConnectPermissionLog();
+        errorCallbackCommand(GatewayCommand.COMMAND_CONFIG_IP, GatewayError.FAILED);
+      }
+    });
   }
 
   public void getSurroundWifi(final GatewayModel gatewayModel) {
     final HashMap<String, Object> resultMap = new HashMap<>();
-    GatewayClient.getDefault().scanWiFiByGateway(gatewayModel.mac, new ScanWiFiByGatewayCallback() {
-      @Override
-      public void onScanWiFiByGateway(List<WiFi> wiFis) {
-        List<HashMap<String, Object>> mapList = new ArrayList<HashMap<String, Object>>();
-        for (WiFi wiFi : wiFis) {
-          HashMap<String, Object> wifiMap = new HashMap<>();
-          wifiMap.put("wifi", wiFi.ssid);
-          wifiMap.put("rssi", wiFi.rssi);
-          mapList.add(wifiMap);
-        }
-        resultMap.put("finished", false);
-        resultMap.put("wifiList", mapList);
-        successCallbackCommand(GatewayCommand.COMMAND_GET_SURROUND_WIFI, resultMap);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        GatewayClient.getDefault().scanWiFiByGateway(gatewayModel.mac, new ScanWiFiByGatewayCallback() {
+          @Override
+          public void onScanWiFiByGateway(List<WiFi> wiFis) {
+            List<HashMap<String, Object>> mapList = new ArrayList<HashMap<String, Object>>();
+            for (WiFi wiFi : wiFis) {
+              HashMap<String, Object> wifiMap = new HashMap<>();
+              wifiMap.put("wifi", wiFi.ssid);
+              wifiMap.put("rssi", wiFi.rssi);
+              mapList.add(wifiMap);
+            }
+            resultMap.put("finished", false);
+            resultMap.put("wifiList", mapList);
+            successCallbackCommand(GatewayCommand.COMMAND_GET_SURROUND_WIFI, resultMap);
+          }
 
-      @Override
-      public void onScanWiFiByGatewaySuccess() {
-        resultMap.put("finished", true);
-        successCallbackCommand(GatewayCommand.COMMAND_GET_SURROUND_WIFI, resultMap);
-      }
+          @Override
+          public void onScanWiFiByGatewaySuccess() {
+            resultMap.put("finished", true);
+            successCallbackCommand(GatewayCommand.COMMAND_GET_SURROUND_WIFI, resultMap);
+          }
 
-      @Override
-      public void onFail(GatewayError error) {
-        errorCallbackCommand(GatewayCommand.COMMAND_GET_SURROUND_WIFI, error);
+          @Override
+          public void onFail(GatewayError error) {
+            errorCallbackCommand(GatewayCommand.COMMAND_GET_SURROUND_WIFI, error);
+          }
+        });
+      } else {
+        noConnectPermissionLog();
+        errorCallbackCommand(GatewayCommand.COMMAND_GET_SURROUND_WIFI, GatewayError.FAILED);
       }
     });
   }
@@ -404,19 +435,25 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 //    configureGatewayInfo.uid = 8409;
 //    configureGatewayInfo.userPwd = "xtc123456";
 
-    GatewayClient.getDefault().initGateway(configureGatewayInfo, new InitGatewayCallback() {
-      @Override
-      public void onInitGatewaySuccess(DeviceInfo deviceInfo) {
-        HashMap<String, Object> gatewayInfoMap = new HashMap<>();
-        gatewayInfoMap.put("modelNum", deviceInfo.modelNum);
-        gatewayInfoMap.put("hardwareRevision", deviceInfo.hardwareRevision);
-        gatewayInfoMap.put("firmwareRevision", deviceInfo.firmwareRevision);
-        successCallbackCommand(GatewayCommand.COMMAND_INIT_GATEWAY, gatewayInfoMap);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        GatewayClient.getDefault().initGateway(configureGatewayInfo, new InitGatewayCallback() {
+          @Override
+          public void onInitGatewaySuccess(DeviceInfo deviceInfo) {
+            HashMap<String, Object> gatewayInfoMap = new HashMap<>();
+            gatewayInfoMap.put("modelNum", deviceInfo.modelNum);
+            gatewayInfoMap.put("hardwareRevision", deviceInfo.hardwareRevision);
+            gatewayInfoMap.put("firmwareRevision", deviceInfo.firmwareRevision);
+            successCallbackCommand(GatewayCommand.COMMAND_INIT_GATEWAY, gatewayInfoMap);
+          }
 
-      @Override
-      public void onFail(GatewayError error) {
-        errorCallbackCommand(GatewayCommand.COMMAND_INIT_GATEWAY, error);
+          @Override
+          public void onFail(GatewayError error) {
+            errorCallbackCommand(GatewayCommand.COMMAND_INIT_GATEWAY, error);
+          }
+        });
+      } else {
+        errorCallbackCommand(GatewayCommand.COMMAND_INIT_GATEWAY, GatewayError.FAILED);
       }
     });
   }
@@ -654,25 +691,31 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void startScan() {
-    TTLockClient.getDefault().startScanLock(new ScanLockCallback() {
-      @Override
-      public void onScanLockSuccess(ExtendedBluetoothDevice extendedBluetoothDevice) {
-        TtlockModel data = new TtlockModel();
-        data.electricQuantity = extendedBluetoothDevice.getBatteryCapacity();
-        data.lockName = extendedBluetoothDevice.getName();
-        data.lockMac = extendedBluetoothDevice.getAddress();
-        data.isInited = !extendedBluetoothDevice.isSettingMode();
-        data.isAllowUnlock = extendedBluetoothDevice.isTouch();
-        data.lockVersion = extendedBluetoothDevice.getLockVersionJson();
-        data.rssi = extendedBluetoothDevice.getRssi();
-        successCallbackCommand(TTLockCommand.COMMAND_START_SCAN_LOCK, data.toMap());
+    PermissionUtils.doWithScanPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().startScanLock(new ScanLockCallback() {
+          @Override
+          public void onScanLockSuccess(ExtendedBluetoothDevice extendedBluetoothDevice) {
+            TtlockModel data = new TtlockModel();
+            data.electricQuantity = extendedBluetoothDevice.getBatteryCapacity();
+            data.lockName = extendedBluetoothDevice.getName();
+            data.lockMac = extendedBluetoothDevice.getAddress();
+            data.isInited = !extendedBluetoothDevice.isSettingMode();
+            data.isAllowUnlock = extendedBluetoothDevice.isTouch();
+            data.lockVersion = extendedBluetoothDevice.getLockVersionJson();
+            data.rssi = extendedBluetoothDevice.getRssi();
+            successCallbackCommand(TTLockCommand.COMMAND_START_SCAN_LOCK, data.toMap());
 //              data.lockSwitchState = @(scanModel.lockSwitchState);
 //              data.oneMeterRssi = @(scanModel.oneMeterRSSI);
-      }
+          }
 
-      @Override
-      public void onFail(LockError lockError) {//todo:
-        LogUtil.d("lockError:" + lockError);
+          @Override
+          public void onFail(LockError lockError) {//todo:
+            LogUtil.d("lockError:" + lockError);
+          }
+        });
+      } else {
+        LogUtil.d("no scan permission");
       }
     });
   }
@@ -707,79 +750,109 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       extendedBluetoothDevice.setHotelData(hotelData);
     }
 
-    TTLockClient.getDefault().initLock(extendedBluetoothDevice, new InitLockCallback() {
-      @Override
-      public void onInitLockSuccess(String lockData) {
-        ttlockModel.lockData = lockData;
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().initLock(extendedBluetoothDevice, new InitLockCallback() {
+          @Override
+          public void onInitLockSuccess(String lockData) {
+            ttlockModel.lockData = lockData;
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void controlLock(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().controlLock(ttlockModel.getControlActionValue(), ttlockModel.lockData, ttlockModel.lockMac, new ControlLockCallback(){
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().controlLock(ttlockModel.getControlActionValue(), ttlockModel.lockData, ttlockModel.lockMac, new ControlLockCallback(){
 
-      @Override
-      public void onControlLockSuccess(ControlLockResult controlLockResult) {
-        ttlockModel.lockTime = controlLockResult.lockTime;
-        ttlockModel.controlAction = controlLockResult.controlAction;
-        ttlockModel.electricQuantity = controlLockResult.battery;
-        ttlockModel.uniqueId = controlLockResult.uniqueid;
-        apiSuccess(ttlockModel);
-      }
+          @Override
+          public void onControlLockSuccess(ControlLockResult controlLockResult) {
+            ttlockModel.lockTime = controlLockResult.lockTime;
+            ttlockModel.controlAction = controlLockResult.controlAction;
+            ttlockModel.electricQuantity = controlLockResult.battery;
+            ttlockModel.uniqueId = controlLockResult.uniqueid;
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void resetLock(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().resetLock(ttlockModel.lockData, ttlockModel.lockMac, new ResetLockCallback() {
-      @Override
-      public void onResetLockSuccess() {
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().resetLock(ttlockModel.lockData, ttlockModel.lockMac, new ResetLockCallback() {
+          @Override
+          public void onResetLockSuccess() {
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void getLockTime(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().getLockTime(ttlockModel.lockData, ttlockModel.lockMac, new GetLockTimeCallback() {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().getLockTime(ttlockModel.lockData, ttlockModel.lockMac, new GetLockTimeCallback() {
 
-      @Override
-      public void onGetLockTimeSuccess(long lockTimestamp) {
-        ttlockModel.timestamp = lockTimestamp;
-        apiSuccess(ttlockModel);
-      }
+          @Override
+          public void onGetLockTimeSuccess(long lockTimestamp) {
+            ttlockModel.timestamp = lockTimestamp;
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void setLockTime(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().setLockTime(ttlockModel.timestamp, ttlockModel.lockData, ttlockModel.lockMac, new SetLockTimeCallback() {
-      @Override
-      public void onSetTimeSuccess() {
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().setLockTime(ttlockModel.timestamp, ttlockModel.lockData, ttlockModel.lockMac, new SetLockTimeCallback() {
+          @Override
+          public void onSetTimeSuccess() {
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
@@ -789,119 +862,167 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     removeCommandTimeOutRunable();
 //    commandTimeOutCheck(4 * COMMAND_TIME_OUT);
 
-    TTLockClient.getDefault().getOperationLog(ttlockModel.logType == 0 ? LogType.NEW : LogType.ALL, ttlockModel.lockData, ttlockModel.lockMac, new GetOperationLogCallback() {
-      @Override
-      public void onGetLogSuccess(String log) {
-        ttlockModel.records = log;
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().getOperationLog(ttlockModel.logType == 0 ? LogType.NEW : LogType.ALL, ttlockModel.lockData, ttlockModel.lockMac, new GetOperationLogCallback() {
+          @Override
+          public void onGetLogSuccess(String log) {
+            ttlockModel.records = log;
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void getSwitchStatus(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().getLockStatus(ttlockModel.lockData, ttlockModel.lockMac, new GetLockStatusCallback() {
-      @Override
-      public void onGetLockStatusSuccess(int status) {
-        ttlockModel.lockSwitchState = status;
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().getLockStatus(ttlockModel.lockData, ttlockModel.lockMac, new GetLockStatusCallback() {
+          @Override
+          public void onGetLockStatusSuccess(int status) {
+            ttlockModel.lockSwitchState = status;
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void setAdminPasscode(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().modifyAdminPasscode(ttlockModel.adminPasscode, ttlockModel.lockData, ttlockModel.lockMac, new ModifyAdminPasscodeCallback() {
-      @Override
-      public void onModifyAdminPasscodeSuccess(String passcode) {
-        ttlockModel.adminPasscode = passcode;
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().modifyAdminPasscode(ttlockModel.adminPasscode, ttlockModel.lockData, ttlockModel.lockMac, new ModifyAdminPasscodeCallback() {
+          @Override
+          public void onModifyAdminPasscodeSuccess(String passcode) {
+            ttlockModel.adminPasscode = passcode;
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void getAdminPasscode(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().getAdminPasscode(ttlockModel.lockData, ttlockModel.lockMac, new GetAdminPasscodeCallback() {
-      @Override
-      public void onGetAdminPasscodeSuccess(String passcode) {
-        ttlockModel.adminPasscode = passcode;
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().getAdminPasscode(ttlockModel.lockData, ttlockModel.lockMac, new GetAdminPasscodeCallback() {
+          @Override
+          public void onGetAdminPasscodeSuccess(String passcode) {
+            ttlockModel.adminPasscode = passcode;
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void setCustomPasscode(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().createCustomPasscode(ttlockModel.passcode, ttlockModel.startDate, ttlockModel.endDate, ttlockModel.lockData, ttlockModel.lockMac, new CreateCustomPasscodeCallback() {
-      @Override
-      public void onCreateCustomPasscodeSuccess(String passcode) {
-        ttlockModel.passcode = passcode;
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().createCustomPasscode(ttlockModel.passcode, ttlockModel.startDate, ttlockModel.endDate, ttlockModel.lockData, ttlockModel.lockMac, new CreateCustomPasscodeCallback() {
+          @Override
+          public void onCreateCustomPasscodeSuccess(String passcode) {
+            ttlockModel.passcode = passcode;
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void modifyPasscode(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().modifyPasscode(ttlockModel.passcodeOrigin, ttlockModel.passcodeNew, ttlockModel.startDate, ttlockModel.endDate, ttlockModel.lockData, ttlockModel.lockMac, new ModifyPasscodeCallback() {
-      @Override
-      public void onModifyPasscodeSuccess() {
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().modifyPasscode(ttlockModel.passcodeOrigin, ttlockModel.passcodeNew, ttlockModel.startDate, ttlockModel.endDate, ttlockModel.lockData, ttlockModel.lockMac, new ModifyPasscodeCallback() {
+          @Override
+          public void onModifyPasscodeSuccess() {
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void deletePasscode(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().deletePasscode(ttlockModel.passcode, ttlockModel.lockData, ttlockModel.lockMac, new DeletePasscodeCallback() {
-      @Override
-      public void onDeletePasscodeSuccess() {
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().deletePasscode(ttlockModel.passcode, ttlockModel.lockData, ttlockModel.lockMac, new DeletePasscodeCallback() {
+          @Override
+          public void onDeletePasscodeSuccess() {
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void resetPasscodes(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().resetPasscode(ttlockModel.lockData, ttlockModel.lockMac, new ResetPasscodeCallback() {
-      @Override
-      public void onResetPasscodeSuccess(String lockData) {
-        ttlockModel.lockData = lockData;
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().resetPasscode(ttlockModel.lockData, ttlockModel.lockMac, new ResetPasscodeCallback() {
+          @Override
+          public void onResetPasscodeSuccess(String lockData) {
+            ttlockModel.lockData = lockData;
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
@@ -918,24 +1039,30 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       validityInfo.setCyclicConfigs(GsonUtil.toObject(ttlockModel.cycleJsonList, new TypeToken<List<CyclicConfig>>(){}));
       ttlockModel.cycleJsonList = null;//clear data
     }
-    TTLockClient.getDefault().addICCard(validityInfo, ttlockModel.lockData, new AddICCardCallback() {
-      @Override
-      public void onEnterAddMode() {
-        //重新设置超时时间
-        removeCommandTimeOutRunable();
-        commandTimeOutCheck();
-        progressCallbackCommand(commandQue.peek(), ttlockModel.toMap());
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().addICCard(validityInfo, ttlockModel.lockData, new AddICCardCallback() {
+          @Override
+          public void onEnterAddMode() {
+            //重新设置超时时间
+            removeCommandTimeOutRunable();
+            commandTimeOutCheck();
+            progressCallbackCommand(commandQue.peek(), ttlockModel.toMap());
+          }
 
-      @Override
-      public void onAddICCardSuccess(long cardNum) {
-        ttlockModel.cardNumber = String.valueOf(cardNum);
-        successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
-      }
+          @Override
+          public void onAddICCardSuccess(long cardNum) {
+            ttlockModel.cardNumber = String.valueOf(cardNum);
+            successCallbackCommand(commandQue.poll(), ttlockModel.toMap());
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
@@ -952,15 +1079,21 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       validityInfo.setCyclicConfigs(GsonUtil.toObject(ttlockModel.cycleJsonList, new TypeToken<List<CyclicConfig>>(){}));
       ttlockModel.cycleJsonList = null;//clear data
     }
-    TTLockClient.getDefault().modifyICCardValidityPeriod(validityInfo, ttlockModel.cardNumber, ttlockModel.lockData, new ModifyICCardPeriodCallback() {
-      @Override
-      public void onModifyICCardPeriodSuccess() {
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().modifyICCardValidityPeriod(validityInfo, ttlockModel.cardNumber, ttlockModel.lockData, new ModifyICCardPeriodCallback() {
+          @Override
+          public void onModifyICCardPeriodSuccess() {
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
@@ -972,55 +1105,62 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     validityInfo.setStartDate(INVALID_START_DATE);
     validityInfo.setEndDate(INVALID_END_DATE);
 
-    TTLockClient.getDefault().modifyICCardValidityPeriod(validityInfo, ttlockModel.cardNumber, ttlockModel.lockData, new ModifyICCardPeriodCallback() {
-      @Override
-      public void onModifyICCardPeriodSuccess() {
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().modifyICCardValidityPeriod(validityInfo, ttlockModel.cardNumber, ttlockModel.lockData, new ModifyICCardPeriodCallback() {
+          @Override
+          public void onModifyICCardPeriodSuccess() {
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
-//    TTLockClient.getDefault().deleteICCard(ttlockModel.cardNumber, ttlockModel.lockData, ttlockModel.lockMac, new DeleteICCardCallback() {
-//      @Override
-//      public void onDeleteICCardSuccess() {
-//        apiSuccess(ttlockModel);
-//      }
-//
-//      @Override
-//      public void onFail(LockError lockError) {
-//        apiFail(lockError);
-//      }
-//    });
   }
 
   public void reportLossICCard(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().reportLossCard(ttlockModel.cardNumber, ttlockModel.lockData, new ReportLossCardCallback() {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().reportLossCard(ttlockModel.cardNumber, ttlockModel.lockData, new ReportLossCardCallback() {
 
-      @Override
-      public void onReportLossCardSuccess() {
-        apiSuccess(ttlockModel);
-      }
+          @Override
+          public void onReportLossCardSuccess() {
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void clearICCard(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().clearAllICCard(ttlockModel.lockData, ttlockModel.lockMac, new ClearAllICCardCallback() {
-      @Override
-      public void onClearAllICCardSuccess() {
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().clearAllICCard(ttlockModel.lockData, ttlockModel.lockMac, new ClearAllICCardCallback() {
+          @Override
+          public void onClearAllICCardSuccess() {
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
@@ -1033,16 +1173,21 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     recoveryData.endDate = ttlockModel.endDate;
     List<RecoveryData> recoveryDataList = new ArrayList<>();
     recoveryDataList.add(recoveryData);
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().recoverLockData(GsonUtil.toJson(recoveryDataList), RecoveryDataType.IC, ttlockModel.lockData, ttlockModel.lockMac, new RecoverLockDataCallback() {
+          @Override
+          public void onRecoveryDataSuccess(int type) {
+            apiSuccess(ttlockModel);
+          }
 
-    TTLockClient.getDefault().recoverLockData(GsonUtil.toJson(recoveryDataList), RecoveryDataType.IC, ttlockModel.lockData, ttlockModel.lockMac, new RecoverLockDataCallback() {
-      @Override
-      public void onRecoveryDataSuccess(int type) {
-        apiSuccess(ttlockModel);
-      }
-
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
@@ -1059,15 +1204,21 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     List<RecoveryData> recoveryDataList = new ArrayList<>();
     recoveryDataList.add(recoveryData);
 
-    TTLockClient.getDefault().recoverLockData(GsonUtil.toJson(recoveryDataList), RecoveryDataType.PASSCODE, ttlockModel.lockData, ttlockModel.lockMac, new RecoverLockDataCallback() {
-      @Override
-      public void onRecoveryDataSuccess(int type) {
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().recoverLockData(GsonUtil.toJson(recoveryDataList), RecoveryDataType.PASSCODE, ttlockModel.lockData, ttlockModel.lockMac, new RecoverLockDataCallback() {
+          @Override
+          public void onRecoveryDataSuccess(int type) {
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
@@ -1084,35 +1235,41 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       validityInfo.setCyclicConfigs(GsonUtil.toObject(ttlockModel.cycleJsonList, new TypeToken<List<CyclicConfig>>(){}));
       ttlockModel.cycleJsonList = null;//clear data
     }
-    TTLockClient.getDefault().addFingerprint(validityInfo, ttlockModel.lockData, new AddFingerprintCallback() {
-      @Override
-      public void onEnterAddMode(int totalCount) {
-        //重新设置超时时间
-        removeCommandTimeOutRunable();
-        commandTimeOutCheck();
-        ttlockModel.totalCount = totalCount;
-        ttlockModel.currentCount = 0;
-        progressCallbackCommand(commandQue.peek(), ttlockModel.toMap());
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().addFingerprint(validityInfo, ttlockModel.lockData, new AddFingerprintCallback() {
+          @Override
+          public void onEnterAddMode(int totalCount) {
+            //重新设置超时时间
+            removeCommandTimeOutRunable();
+            commandTimeOutCheck();
+            ttlockModel.totalCount = totalCount;
+            ttlockModel.currentCount = 0;
+            progressCallbackCommand(commandQue.peek(), ttlockModel.toMap());
+          }
 
-      @Override
-      public void onCollectFingerprint(int currentCount) {
-        //重新设置超时时间
-        removeCommandTimeOutRunable();
-        commandTimeOutCheck();
-        ttlockModel.currentCount = currentCount;
-        progressCallbackCommand(commandQue.peek(), ttlockModel.toMap());
-      }
+          @Override
+          public void onCollectFingerprint(int currentCount) {
+            //重新设置超时时间
+            removeCommandTimeOutRunable();
+            commandTimeOutCheck();
+            ttlockModel.currentCount = currentCount;
+            progressCallbackCommand(commandQue.peek(), ttlockModel.toMap());
+          }
 
-      @Override
-      public void onAddFingerpintFinished(long fingerprintNum) {
-        ttlockModel.fingerprintNumber = String.valueOf(fingerprintNum);
-        apiSuccess(ttlockModel);
-      }
+          @Override
+          public void onAddFingerpintFinished(long fingerprintNum) {
+            ttlockModel.fingerprintNumber = String.valueOf(fingerprintNum);
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
@@ -1129,120 +1286,167 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       validityInfo.setCyclicConfigs(GsonUtil.toObject(ttlockModel.cycleJsonList, new TypeToken<List<CyclicConfig>>(){}));
       ttlockModel.cycleJsonList = null;//clear data
     }
-    TTLockClient.getDefault().modifyFingerprintValidityPeriod(validityInfo, ttlockModel.fingerprintNumber, ttlockModel.lockData, new ModifyFingerprintPeriodCallback() {
-      @Override
-      public void onModifyPeriodSuccess() {
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().modifyFingerprintValidityPeriod(validityInfo, ttlockModel.fingerprintNumber, ttlockModel.lockData, new ModifyFingerprintPeriodCallback() {
+          @Override
+          public void onModifyPeriodSuccess() {
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void deleteFingerPrint(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().deleteFingerprint(ttlockModel.fingerprintNumber, ttlockModel.lockData, ttlockModel.lockMac, new DeleteFingerprintCallback() {
-      @Override
-      public void onDeleteFingerprintSuccess() {
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().deleteFingerprint(ttlockModel.fingerprintNumber, ttlockModel.lockData, ttlockModel.lockMac, new DeleteFingerprintCallback() {
+          @Override
+          public void onDeleteFingerprintSuccess() {
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void clearFingerPrint(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().clearAllFingerprints(ttlockModel.lockData, ttlockModel.lockMac, new ClearAllFingerprintCallback() {
-      @Override
-      public void onClearAllFingerprintSuccess() {
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().clearAllFingerprints(ttlockModel.lockData, ttlockModel.lockMac, new ClearAllFingerprintCallback() {
+          @Override
+          public void onClearAllFingerprintSuccess() {
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
-
   public void getBattery(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().getBatteryLevel(ttlockModel.lockData, ttlockModel.lockMac, new GetBatteryLevelCallback() {
-      @Override
-      public void onGetBatteryLevelSuccess(int electricQuantity) {
-        ttlockModel.electricQuantity = electricQuantity;
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().getBatteryLevel(ttlockModel.lockData, ttlockModel.lockMac, new GetBatteryLevelCallback() {
+          @Override
+          public void onGetBatteryLevelSuccess(int electricQuantity) {
+            ttlockModel.electricQuantity = electricQuantity;
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void setAutoLockTime(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().setAutomaticLockingPeriod(ttlockModel.currentTime, ttlockModel.lockData, ttlockModel.lockMac, new SetAutoLockingPeriodCallback() {
-      @Override
-      public void onSetAutoLockingPeriodSuccess() {
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().setAutomaticLockingPeriod(ttlockModel.currentTime, ttlockModel.lockData, ttlockModel.lockMac, new SetAutoLockingPeriodCallback() {
+          @Override
+          public void onSetAutoLockingPeriodSuccess() {
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void getAutoLockTime(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().getAutomaticLockingPeriod(ttlockModel.lockData, new GetAutoLockingPeriodCallback() {
-      @Override
-      public void onGetAutoLockingPeriodSuccess(int currtentTime, int minTime, int maxTime) {
-        ttlockModel.currentTime = currtentTime;
-        ttlockModel.minTime = minTime;
-        ttlockModel.maxTime = maxTime;
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().getAutomaticLockingPeriod(ttlockModel.lockData, new GetAutoLockingPeriodCallback() {
+          @Override
+          public void onGetAutoLockingPeriodSuccess(int currtentTime, int minTime, int maxTime) {
+            ttlockModel.currentTime = currtentTime;
+            ttlockModel.minTime = minTime;
+            ttlockModel.maxTime = maxTime;
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void setRemoteUnlockSwitch(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().setRemoteUnlockSwitchState(ttlockModel.isOn, ttlockModel.lockData, ttlockModel.lockMac, new SetRemoteUnlockSwitchCallback() {
-      @Override
-      public void onSetRemoteUnlockSwitchSuccess(String lockData) {
-        ttlockModel.lockData = lockData;
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().setRemoteUnlockSwitchState(ttlockModel.isOn, ttlockModel.lockData, ttlockModel.lockMac, new SetRemoteUnlockSwitchCallback() {
+          @Override
+          public void onSetRemoteUnlockSwitchSuccess(String lockData) {
+            ttlockModel.lockData = lockData;
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void getRemoteUnlockSwitch(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().getRemoteUnlockSwitchState(ttlockModel.lockData, ttlockModel.lockMac, new GetRemoteUnlockStateCallback() {
-      @Override
-      public void onGetRemoteUnlockSwitchStateSuccess(boolean enabled) {
-        ttlockModel.isOn = enabled;
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().getRemoteUnlockSwitchState(ttlockModel.lockData, ttlockModel.lockMac, new GetRemoteUnlockStateCallback() {
+          @Override
+          public void onGetRemoteUnlockSwitchStateSuccess(boolean enabled) {
+            ttlockModel.isOn = enabled;
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
@@ -1259,29 +1463,41 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     passageModeConfig.setStartDate((int) ttlockModel.startDate);
     passageModeConfig.setEndDate((int) ttlockModel.endDate);
 
-    TTLockClient.getDefault().setPassageMode(passageModeConfig, ttlockModel.lockData, ttlockModel.lockMac, new SetPassageModeCallback() {
-      @Override
-      public void onSetPassageModeSuccess() {
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().setPassageMode(passageModeConfig, ttlockModel.lockData, ttlockModel.lockMac, new SetPassageModeCallback() {
+          @Override
+          public void onSetPassageModeSuccess() {
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void clearPassageMode(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().clearPassageMode(ttlockModel.lockData, ttlockModel.lockMac, new ClearPassageModeCallback() {
-      @Override
-      public void onClearPassageModeSuccess() {
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().clearPassageMode(ttlockModel.lockData, ttlockModel.lockMac, new ClearPassageModeCallback() {
+          @Override
+          public void onClearPassageModeSuccess() {
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
@@ -1295,17 +1511,23 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     }
 
     LogUtil.d("ttLockConfigType:" + ttLockConfigType);
-    TTLockClient.getDefault().setLockConfig(ttLockConfigType, ttlockModel.isOn, ttlockModel.lockData, new SetLockConfigCallback() {
-      @Override
-      public void onSetLockConfigSuccess(TTLockConfigType ttLockConfigType) {
-        LogUtil.d("ttLockConfigType:" + ttLockConfigType);
-        ttlockModel.lockConfig = TTLockConfigConverter.native2Flutter(ttLockConfigType);
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().setLockConfig(ttLockConfigType, ttlockModel.isOn, ttlockModel.lockData, new SetLockConfigCallback() {
+          @Override
+          public void onSetLockConfigSuccess(TTLockConfigType ttLockConfigType) {
+            LogUtil.d("ttLockConfigType:" + ttLockConfigType);
+            ttlockModel.lockConfig = TTLockConfigConverter.native2Flutter(ttLockConfigType);
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
@@ -1318,32 +1540,44 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       return;
     }
     LogUtil.d("ttLockConfigType:" + ttLockConfigType);
-    TTLockClient.getDefault().getLockConfig(ttLockConfigType, ttlockModel.lockData, new GetLockConfigCallback() {
-      @Override
-      public void onGetLockConfigSuccess(TTLockConfigType ttLockConfigType, boolean switchOn) {
-        ttlockModel.lockConfig = TTLockConfigConverter.native2Flutter(ttLockConfigType);
-        ttlockModel.isOn = switchOn;
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().getLockConfig(ttLockConfigType, ttlockModel.lockData, new GetLockConfigCallback() {
+          @Override
+          public void onGetLockConfigSuccess(TTLockConfigType ttLockConfigType, boolean switchOn) {
+            ttlockModel.lockConfig = TTLockConfigConverter.native2Flutter(ttLockConfigType);
+            ttlockModel.isOn = switchOn;
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void resetEKey(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().resetEkey(ttlockModel.lockData, ttlockModel.lockMac, new ResetKeyCallback() {
-      @Override
-      public void onResetKeySuccess(String lockData) {
-        ttlockModel.lockData = lockData;
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().resetEkey(ttlockModel.lockData, ttlockModel.lockMac, new ResetKeyCallback() {
+          @Override
+          public void onResetKeySuccess(String lockData) {
+            ttlockModel.lockData = lockData;
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
@@ -1355,18 +1589,24 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       return;
     }
     long currentTime = System.currentTimeMillis();//todo:暂时使用手机时间
-    TTLockClient.getDefault().activateLiftFloors(floorList, currentTime, ttlockModel.lockData, new ActivateLiftFloorsCallback() {
-      @Override
-      public void onActivateLiftFloorsSuccess(ActivateLiftFloorsResult activateLiftFloorsResult) {
-        ttlockModel.lockTime = activateLiftFloorsResult.deviceTime;
-        ttlockModel.uniqueId = activateLiftFloorsResult.uniqueid;
-        ttlockModel.electricQuantity = activateLiftFloorsResult.battery;
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().activateLiftFloors(floorList, currentTime, ttlockModel.lockData, new ActivateLiftFloorsCallback() {
+          @Override
+          public void onActivateLiftFloorsSuccess(ActivateLiftFloorsResult activateLiftFloorsResult) {
+            ttlockModel.lockTime = activateLiftFloorsResult.deviceTime;
+            ttlockModel.uniqueId = activateLiftFloorsResult.uniqueid;
+            ttlockModel.electricQuantity = activateLiftFloorsResult.battery;
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
@@ -1376,15 +1616,21 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       dataError();
       return;
     }
-    TTLockClient.getDefault().setLiftControlableFloors(ttlockModel.floors, ttlockModel.lockData, new SetLiftControlableFloorsCallback() {
-      @Override
-      public void onSetLiftControlableFloorsSuccess() {
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().setLiftControlableFloors(ttlockModel.floors, ttlockModel.lockData, new SetLiftControlableFloorsCallback() {
+          @Override
+          public void onSetLiftControlableFloorsSuccess() {
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
@@ -1395,15 +1641,21 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         dataError();
         return;
       }
-      TTLockClient.getDefault().setLiftWorkMode(ttLiftWorkMode, ttlockModel.lockData, new SetLiftWorkModeCallback() {
-        @Override
-        public void onSetLiftWorkModeSuccess() {
-           apiSuccess(ttlockModel);
-        }
+      PermissionUtils.doWithConnectPermission(activity, success -> {
+        if (success) {
+          TTLockClient.getDefault().setLiftWorkMode(ttLiftWorkMode, ttlockModel.lockData, new SetLiftWorkModeCallback() {
+            @Override
+            public void onSetLiftWorkModeSuccess() {
+              apiSuccess(ttlockModel);
+            }
 
-        @Override
-        public void onFail(LockError lockError) {
-            apiFail(lockError);
+            @Override
+            public void onFail(LockError lockError) {
+              apiFail(lockError);
+            }
+          });
+        } else {
+          apiFail(LockError.LOCK_NO_PERMISSION);
         }
       });
   }
@@ -1414,29 +1666,41 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
        dataError();
        return;
      }
-     TTLockClient.getDefault().setPowerSaverWorkMode(powerSaverWorkMode, ttlockModel.lockData, new SetPowerSaverWorkModeCallback() {
-       @Override
-       public void onSetPowerSaverWorkModeSuccess() {
-         apiSuccess(ttlockModel);
-       }
+     PermissionUtils.doWithConnectPermission(activity, success -> {
+       if (success) {
+         TTLockClient.getDefault().setPowerSaverWorkMode(powerSaverWorkMode, ttlockModel.lockData, new SetPowerSaverWorkModeCallback() {
+           @Override
+           public void onSetPowerSaverWorkModeSuccess() {
+             apiSuccess(ttlockModel);
+           }
 
-       @Override
-       public void onFail(LockError lockError) {
-        apiFail(lockError);
+           @Override
+           public void onFail(LockError lockError) {
+             apiFail(lockError);
+           }
+         });
+       } else {
+         apiFail(LockError.LOCK_NO_PERMISSION);
        }
      });
   }
 
   public void setPowerSaverControlableLock(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().setPowerSaverControlableLock(ttlockModel.lockMac, ttlockModel.lockData, new SetPowerSaverControlableLockCallback() {
-      @Override
-      public void onSetPowerSaverControlableLockSuccess() {
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().setPowerSaverControlableLock(ttlockModel.lockMac, ttlockModel.lockData, new SetPowerSaverControlableLockCallback() {
+          @Override
+          public void onSetPowerSaverControlableLockSuccess() {
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
@@ -1447,30 +1711,42 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       dataError();
       return;
     }
-    TTLockClient.getDefault().setNBAwakeModes(nbAwakeModeList, ttlockModel.lockData, new SetNBAwakeModesCallback() {
-      @Override
-      public void onSetNBAwakeModesSuccess() {
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().setNBAwakeModes(nbAwakeModeList, ttlockModel.lockData, new SetNBAwakeModesCallback() {
+          @Override
+          public void onSetNBAwakeModesSuccess() {
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void getNbAwakeModes(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().getNBAwakeModes(ttlockModel.lockData, new GetNBAwakeModesCallback() {
-      @Override
-      public void onGetNBAwakeModesSuccess(List<NBAwakeMode> list) {
-        ttlockModel.setNbAwakeModeList(list);
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().getNBAwakeModes(ttlockModel.lockData, new GetNBAwakeModesCallback() {
+          @Override
+          public void onGetNBAwakeModesSuccess(List<NBAwakeMode> list) {
+            ttlockModel.setNbAwakeModeList(list);
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
@@ -1481,30 +1757,42 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       dataError();
       return;
     }
-    TTLockClient.getDefault().setNBAwakeTimes(nbAwakeTimeList, ttlockModel.lockData, new SetNBAwakeTimesCallback() {
-      @Override
-      public void onSetNBAwakeTimesSuccess() {
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().setNBAwakeTimes(nbAwakeTimeList, ttlockModel.lockData, new SetNBAwakeTimesCallback() {
+          @Override
+          public void onSetNBAwakeTimesSuccess() {
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void getNbAwakeTimes(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().getNBAwakeTimes(ttlockModel.lockData, new GetNBAwakeTimesCallback() {
-      @Override
-      public void onGetNBAwakeTimesSuccess(List<NBAwakeTime> list) {
-        ttlockModel.setNbAwakeTimeList(list);
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().getNBAwakeTimes(ttlockModel.lockData, new GetNBAwakeTimesCallback() {
+          @Override
+          public void onGetNBAwakeTimesSuccess(List<NBAwakeTime> list) {
+            ttlockModel.setNbAwakeTimeList(list);
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
@@ -1518,15 +1806,21 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     hotelData.setHotelInfo(ttlockModel.hotelInfo);
     hotelData.setBuildingNumber(ttlockModel.buildingNumber);
     hotelData.setFloorNumber(ttlockModel.floorNumber);
-    TTLockClient.getDefault().setHotelData(hotelData, ttlockModel.lockData, new SetHotelDataCallback() {
-      @Override
-      public void onSetHotelDataSuccess() {
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().setHotelData(hotelData, ttlockModel.lockData, new SetHotelDataCallback() {
+          @Override
+          public void onSetHotelDataSuccess() {
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
@@ -1536,15 +1830,21 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       dataError();
       return;
     }
-    TTLockClient.getDefault().setHotelCardSector(ttlockModel.sector, ttlockModel.lockData, new SetHotelCardSectorCallback() {
-      @Override
-      public void onSetHotelCardSectorSuccess() {
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().setHotelCardSector(ttlockModel.sector, ttlockModel.lockData, new SetHotelCardSectorCallback() {
+          @Override
+          public void onSetHotelCardSectorSuccess() {
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
@@ -1556,156 +1856,210 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void getAllValidFingerPrints(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().getAllValidFingerprints(ttlockModel.lockData, ttlockModel.lockMac, new GetAllValidFingerprintCallback() {
-      @Override
-      public void onGetAllFingerprintsSuccess(String fingerprintStr) {
-        ttlockModel.fingerprintListString = fingerprintStr;
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().getAllValidFingerprints(ttlockModel.lockData, ttlockModel.lockMac, new GetAllValidFingerprintCallback() {
+          @Override
+          public void onGetAllFingerprintsSuccess(String fingerprintStr) {
+            ttlockModel.fingerprintListString = fingerprintStr;
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void getAllValidPasscodes(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().getAllValidPasscodes(ttlockModel.lockData, ttlockModel.lockMac, new GetAllValidPasscodeCallback() {
-      @Override
-      public void onGetAllValidPasscodeSuccess(String passcodeStr) {
-        ttlockModel.passcodeListString = passcodeStr;
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().getAllValidPasscodes(ttlockModel.lockData, ttlockModel.lockMac, new GetAllValidPasscodeCallback() {
+          @Override
+          public void onGetAllValidPasscodeSuccess(String passcodeStr) {
+            ttlockModel.passcodeListString = passcodeStr;
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void getAllValidCards(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().getAllValidICCards(ttlockModel.lockData, ttlockModel.lockMac, new GetAllValidICCardCallback() {
-      @Override
-      public void onGetAllValidICCardSuccess(String cardListStr) {
-        ttlockModel.cardListString = cardListStr;
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().getAllValidICCards(ttlockModel.lockData, ttlockModel.lockMac, new GetAllValidICCardCallback() {
+          @Override
+          public void onGetAllValidICCardSuccess(String cardListStr) {
+            ttlockModel.cardListString = cardListStr;
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void setNBServerInfo(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().setNBServerInfo(Integer.valueOf(ttlockModel.port).shortValue() , ttlockModel.ip, ttlockModel.lockData, new SetNBServerCallback() {
-      @Override
-      public void onSetNBServerSuccess(int battery) {
-        ttlockModel.electricQuantity = battery;
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().setNBServerInfo(Integer.valueOf(ttlockModel.port).shortValue() , ttlockModel.ip, ttlockModel.lockData, new SetNBServerCallback() {
+          @Override
+          public void onSetNBServerSuccess(int battery) {
+            ttlockModel.electricQuantity = battery;
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-          apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void getLockSystemInfo(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().getLockSystemInfo(ttlockModel.lockData, null, new GetLockSystemInfoCallback() {
-      @Override
-      public void onGetLockSystemInfoSuccess(com.ttlock.bl.sdk.entity.DeviceInfo deviceInfo) {
-        Map<String, Object> map = Utils.object2Map(deviceInfo);
-        if (map.containsKey("nbRssi")) {//flutter 用的string类型
-          map.put("nbRssi", String.valueOf(map.get("nbRssi")));
-        }
-        apiSuccess(map);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().getLockSystemInfo(ttlockModel.lockData, null, new GetLockSystemInfoCallback() {
+          @Override
+          public void onGetLockSystemInfoSuccess(com.ttlock.bl.sdk.entity.DeviceInfo deviceInfo) {
+            Map<String, Object> map = Utils.object2Map(deviceInfo);
+            if (map.containsKey("nbRssi")) {//flutter 用的string类型
+              map.put("nbRssi", String.valueOf(map.get("nbRssi")));
+            }
+            apiSuccess(map);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-          apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void getPasscodeVerificationParams(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().getPasscodeVerificationParams(ttlockModel.lockData, new GetPasscodeVerificationInfoCallback() {
-      @Override
-      public void onGetInfoSuccess(String lockData) {
-        ttlockModel.lockData = lockData;
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().getPasscodeVerificationParams(ttlockModel.lockData, new GetPasscodeVerificationInfoCallback() {
+          @Override
+          public void onGetInfoSuccess(String lockData) {
+            ttlockModel.lockData = lockData;
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void getLockVersion(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().getLockVersion(ttlockModel.lockMac, new GetLockVersionCallback() {
-      @Override
-      public void onGetLockVersionSuccess(String lockVersion) {
-        ttlockModel.lockVersion = lockVersion;
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().getLockVersion(ttlockModel.lockMac, new GetLockVersionCallback() {
+          @Override
+          public void onGetLockVersionSuccess(String lockVersion) {
+            ttlockModel.lockVersion = lockVersion;
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void wifiLockGetNearbyWifi(final TtlockModel ttlockModel) {
     final HashMap<String, Object> resultMap = new HashMap<>();
-    TTLockClient.getDefault().scanWifi(ttlockModel.lockData, new ScanWifiCallback() {
-      @Override
-      public void onScanWifi(List<WiFi> wiFis, int status) {
-        List<HashMap<String, Object>> mapList = new ArrayList<HashMap<String, Object>>();
-        for (WiFi wiFi : wiFis) {
-          HashMap<String, Object> wifiMap = new HashMap<>();
-          wifiMap.put("wifi", wiFi.ssid);
-          wifiMap.put("rssi", wiFi.rssi);
-          mapList.add(wifiMap);
-        }
-        resultMap.put("finished", status == 1);
-        resultMap.put("wifiList", mapList);
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().scanWifi(ttlockModel.lockData, new ScanWifiCallback() {
+          @Override
+          public void onScanWifi(List<WiFi> wiFis, int status) {
+            List<HashMap<String, Object>> mapList = new ArrayList<HashMap<String, Object>>();
+            for (WiFi wiFi : wiFis) {
+              HashMap<String, Object> wifiMap = new HashMap<>();
+              wifiMap.put("wifi", wiFi.ssid);
+              wifiMap.put("rssi", wiFi.rssi);
+              mapList.add(wifiMap);
+            }
+            resultMap.put("finished", status == 1);
+            resultMap.put("wifiList", mapList);
 
-        successCallbackCommand(TTLockCommand.COMMAND_SCAN_WIFI, resultMap);
+            successCallbackCommand(TTLockCommand.COMMAND_SCAN_WIFI, resultMap);
 
-        if (status == 1) {
-          removeCommandTimeOutRunable();
-          commandQue.poll();
-          tryAgain = true;
-          doNextCommandAction();
-        }
+            if (status == 1) {
+              removeCommandTimeOutRunable();
+              commandQue.poll();
+              tryAgain = true;
+              doNextCommandAction();
+            }
 
-      }
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void configWifi(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().configWifi(ttlockModel.wifiName, ttlockModel.wifiPassword, ttlockModel.lockData, new ConfigWifiCallback() {
-      @Override
-      public void onConfigWifiSuccess() {
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().configWifi(ttlockModel.wifiName, ttlockModel.wifiPassword, ttlockModel.lockData, new ConfigWifiCallback() {
+          @Override
+          public void onConfigWifiSuccess() {
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
@@ -1715,30 +2069,42 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       ttlockModel.ip = "wifilock.ttlock.com";
       ttlockModel.port = "4999";
     }
-    TTLockClient.getDefault().configServer(ttlockModel.ip, Integer.valueOf(ttlockModel.port), ttlockModel.lockData, new ConfigServerCallback() {
-      @Override
-      public void onConfigServerSuccess() {
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().configServer(ttlockModel.ip, Integer.valueOf(ttlockModel.port), ttlockModel.lockData, new ConfigServerCallback() {
+          @Override
+          public void onConfigServerSuccess() {
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void getWifiInfo(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().getWifiInfo(ttlockModel.lockData, new GetWifiInfoCallback() {
-      @Override
-      public void onGetWiFiInfoSuccess(WifiLockInfo wifiLockInfo) {
-        Map<String, Object> map = Utils.object2Map(wifiLockInfo);
-        apiSuccess(map);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().getWifiInfo(ttlockModel.lockData, new GetWifiInfoCallback() {
+          @Override
+          public void onGetWiFiInfoSuccess(WifiLockInfo wifiLockInfo) {
+            Map<String, Object> map = Utils.object2Map(wifiLockInfo);
+            apiSuccess(map);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
@@ -1750,49 +2116,67 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       return;
     }
     IpSetting ipSetting = GsonUtil.toObject(ipSettingJson, IpSetting.class);
-    TTLockClient.getDefault().configIp(ipSetting, ttlockModel.lockData, new com.ttlock.bl.sdk.callback.ConfigIpCallback() {
-      @Override
-      public void onConfigIpSuccess() {
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().configIp(ipSetting, ttlockModel.lockData, new com.ttlock.bl.sdk.callback.ConfigIpCallback() {
+          @Override
+          public void onConfigIpSuccess() {
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void setLockSoundWithSoundVolume(final TtlockModel ttlockModel) {
     SoundVolume soundVolume = SoundVolumeConverter.flutter2Native(ttlockModel.soundVolumeType);
-    TTLockClient.getDefault().setLockSoundWithSoundVolume(soundVolume, ttlockModel.lockData, new SetLockSoundWithSoundVolumeCallback() {
-      @Override
-      public void onSetLockSoundSuccess() {
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().setLockSoundWithSoundVolume(soundVolume, ttlockModel.lockData, new SetLockSoundWithSoundVolumeCallback() {
+          @Override
+          public void onSetLockSoundSuccess() {
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
 
   public void getLockSoundWithSoundVolume(final TtlockModel ttlockModel) {
-    TTLockClient.getDefault().getLockSoundWithSoundVolume(ttlockModel.lockData, new GetLockSoundWithSoundVolumeCallback() {
-      @Override
-      public void onGetLockSoundSuccess(boolean enable, SoundVolume soundVolume) {
-        if (enable) {
-          ttlockModel.soundVolumeType = SoundVolumeConverter.native2Flutter(soundVolume);
-        } else {
-          ttlockModel.soundVolumeType = SoundVolumeConverter.off.ordinal();
-        }
-        apiSuccess(ttlockModel);
-      }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().getLockSoundWithSoundVolume(ttlockModel.lockData, new GetLockSoundWithSoundVolumeCallback() {
+          @Override
+          public void onGetLockSoundSuccess(boolean enable, SoundVolume soundVolume) {
+            if (enable) {
+              ttlockModel.soundVolumeType = SoundVolumeConverter.native2Flutter(soundVolume);
+            } else {
+              ttlockModel.soundVolumeType = SoundVolumeConverter.off.ordinal();
+            }
+            apiSuccess(ttlockModel);
+          }
 
-      @Override
-      public void onFail(LockError lockError) {
-        apiFail(lockError);
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }
@@ -1804,26 +2188,26 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   /**
    * android 6.0
    */
-  private boolean initPermission() {
-    LogUtil.d("");
-    String permissions[] = {
-            Manifest.permission.ACCESS_FINE_LOCATION
-    };
-
-    ArrayList<String> toApplyList = new ArrayList<String>();
-
-    for (String perm : permissions) {
-      if (PackageManager.PERMISSION_GRANTED != ContextCompat.checkSelfPermission(activity, perm)) {
-        toApplyList.add(perm);
-      }
-    }
-    String tmpList[] = new String[toApplyList.size()];
-    if (!toApplyList.isEmpty()) {
-      ActivityCompat.requestPermissions(activity, toApplyList.toArray(tmpList), PERMISSIONS_REQUEST_CODE);
-      return false;
-    }
-    return true;
-  }
+//  private boolean initPermission() {
+//    LogUtil.d("");
+//    String permissions[] = {
+//            Manifest.permission.ACCESS_FINE_LOCATION
+//    };
+//
+//    ArrayList<String> toApplyList = new ArrayList<String>();
+//
+//    for (String perm : permissions) {
+//      if (PackageManager.PERMISSION_GRANTED != ContextCompat.checkSelfPermission(activity, perm)) {
+//        toApplyList.add(perm);
+//      }
+//    }
+//    String tmpList[] = new String[toApplyList.size()];
+//    if (!toApplyList.isEmpty()) {
+//      ActivityCompat.requestPermissions(activity, toApplyList.toArray(tmpList), PERMISSIONS_REQUEST_CODE);
+//      return false;
+//    }
+//    return true;
+//  }
 
   @Override
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {

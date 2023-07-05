@@ -1,3 +1,24 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
   package="com.ttlock.ttlock_flutter">
+    <!--
+ Needed only if your app looks for Bluetooth devices.
+         You must add an attribute to this permission, or declare the
+         ACCESS_FINE_LOCATION permission, depending on the results when you
+         check location usage in your app.
+    -->
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation"
+        tools:targetApi="s" />
+    <!--
+ Needed only if your app makes the device discoverable to Bluetooth
+         devices.
+    -->
+    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
+    <!--
+ Needed only if your app communicates with already-paired Bluetooth
+         devices.
+    -->
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 </manifest>
