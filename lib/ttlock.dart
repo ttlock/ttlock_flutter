@@ -1853,7 +1853,6 @@ enum TTLockFuction {
   gatewayUnlock,
   lockFreeze,
   cyclePassword,
-  doorSensor,
   unlockSwicth,
   audioSwitch,
   nbIoT, //15
@@ -1883,21 +1882,16 @@ enum TTLockFuction {
   recoverCyclePasscode,
   wirelessKeyFob,
   getAccessoryElectricQuantity,
-
-  sound_volume_and_language_setting,
-  qr_code,
-  door_sensor,
-  passage_mode_auto_unlock_setting,
-  fingerprint_distribution,
-  zhong_zheng,
-  syno,
-  wireless_door_sensor,
-  door_not_lock_alarm,
-  //52
-  face_3d,
-  //54
-  cpu_card,
-  wifi_lock,
-  //57
-  wifi_lock_ip_setting
+  soundVolumeAndLanguageSetting,
+  qrCode,
+  doorSensorState,
+  passageModeAutoUnlockSetting,
+  doorSensor, //50
+  doorSensorAlert,
+  sensitivity,
+  face,
+  cpuCard,
+  wifiLock,
+  wifiLockStaticIP,
+  passcodeKeyNumber
 }
