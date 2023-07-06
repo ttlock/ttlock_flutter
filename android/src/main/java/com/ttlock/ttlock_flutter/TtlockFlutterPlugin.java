@@ -7,6 +7,8 @@ import android.bluetooth.BluetoothDevice;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
+import com.ttlock.ttlock_flutter.model.TTLockFunction;
+
 import android.src.main.java.com.ttlock.ttlock_flutter.model.SoundVolumeConverter;
 import android.text.TextUtils;
 
@@ -120,7 +122,6 @@ import com.ttlock.ttlock_flutter.model.TTBluetoothState;
 import com.ttlock.ttlock_flutter.model.TTGatewayScanModel;
 import com.ttlock.ttlock_flutter.model.TTLockConfigConverter;
 import com.ttlock.ttlock_flutter.model.TTLockErrorConverter;
-import com.ttlock.ttlock_flutter.model.TTLockFunction;
 import com.ttlock.ttlock_flutter.model.TtlockModel;
 import com.ttlock.ttlock_flutter.util.Utils;
 
@@ -140,7 +141,6 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 
-import static com.ttlock.ttlock_flutter.model.TTLockFunction.getAdminPasscode;
 
 /** TtlockFlutterPlugin */
 public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware, EventChannel.StreamHandler {
