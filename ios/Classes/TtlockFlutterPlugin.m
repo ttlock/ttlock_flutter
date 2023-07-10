@@ -426,8 +426,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
                 dict[@"finished"] = @(isFinished);
                 [weakSelf successCallbackCommand:command data:dict];
             }else{
-                NSInteger errorCode = [self getTTGatewayErrorCode:status];
-                [weakSelf errorCallbackCommand:command code:errorCode details:nil];
+                [weakSelf errorCallbackCommand:command code:status details:nil];
             }
         }];
     }else if ([command isEqualToString:command_connect_gateway]) {
@@ -442,8 +441,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
             if (status == TTGatewaySuccess) {
                 [weakSelf successCallbackCommand:command data:nil];
             }else{
-               NSInteger errorCode = [self getTTGatewayErrorCode:status];
-               [weakSelf errorCallbackCommand:command code:errorCode details:nil];
+               [weakSelf errorCallbackCommand:command code:status details:nil];
             }
         }];
     }else if ([command isEqualToString:command_disconnect_gateway]) {
@@ -478,8 +476,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
                  resultDict[@"firmwareRevision"] = systemInfoModel.firmwareRevision;
                  [weakSelf successCallbackCommand:command data:resultDict];
              }else{
-                NSInteger errorCode = [self getTTGatewayErrorCode:status];
-                [weakSelf errorCallbackCommand:command code:errorCode details:nil];
+                [weakSelf errorCallbackCommand:command code:status details:nil];
              }
         }];
     }else if ([command isEqualToString:command_upgrade_gateway]) {
@@ -487,8 +484,8 @@ typedef NS_ENUM(NSInteger, ResultState) {
             if (status == TTGatewaySuccess) {
                 [weakSelf successCallbackCommand:command data:nil];
             }else{
-               NSInteger errorCode = [self getTTGatewayErrorCode:status];
-               [weakSelf errorCallbackCommand:command code:errorCode details:nil];
+
+               [weakSelf errorCallbackCommand:command code:status details:nil];
             }
         }];
     }else if ([command isEqualToString:command_function_support]) {
@@ -889,10 +886,32 @@ typedef NS_ENUM(NSInteger, ResultState) {
 }
 
 - (void)callbackCommand:(NSString *)command resultState:(ResultState)resultState data:(NSObject *)data errorCode:(NSNumber *)code errorMessage:(NSString *)errorMessage {
+    
+    NSArray *gatewayCommandArray = @[command_get_surround_wifi,
+                                    command_config_gateway_ip,
+                                    command_disconnect_gateway,
+                                    command_init_gateway,
+                                    command_upgrade_gateway
+    ];
+    
+    bool isGatewayStatus = false;
+    for (NSString *gatewayStatusCommand in gatewayCommandArray) {
+        if([command isEqual:gatewayStatusCommand]){
+            isGatewayStatus = true;
+            break;
+        }
+    }
+    NSNumber *errorCode = nil;
+    if(isGatewayStatus){
+        errorCode = @([self getTTGatewayErrorCode:[code integerValue]]);
+    }else{
+        errorCode = [self getTTLockErrorCode:code];
+    }
+    
     NSMutableDictionary *resultDict = @{}.mutableCopy;
     resultDict[@"command"] = command;
     resultDict[@"errorMessage"] = errorMessage;
-    resultDict[@"errorCode"] = [self getTTLockErrorCode:code];
+    resultDict[@"errorCode"] = errorCode;
     resultDict[@"resultState"] = @(resultState);
     if (data) {
         if ([data isKindOfClass:TtlockModel.class]) {
