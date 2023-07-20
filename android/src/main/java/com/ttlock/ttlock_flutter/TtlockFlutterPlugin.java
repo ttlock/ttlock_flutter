@@ -179,6 +179,8 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
    */
   public static final long INVALID_END_DATE = 949338000000L;
 
+  private boolean sdkIsInit;
+
   private Runnable commandTimeOutRunable = new Runnable() {
     @Override
     public void run() {
@@ -201,6 +203,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
+    if (!sdkIsInit) {
+      initSdk();
+    }
     if (GatewayCommand.isGatewayCommand(call.method)) {//gateway
       isGatewayCommand = true;
       gatewayCommand(call);
@@ -208,6 +213,11 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       isGatewayCommand = false;
       doorLockCommand(call);
     }
+  }
+
+  private void initSdk() {
+    TTLockClient.getDefault().prepareBTService(activity);
+    GatewayClient.getDefault().prepareBTService(activity);
   }
 
   public void doorLockCommand(MethodCall call) {
@@ -890,6 +900,11 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
           public void onGetLockStatusSuccess(int status) {
             ttlockModel.lockSwitchState = status;
             apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onGetDoorSensorStatusSuccess(int status) {
+
           }
 
           @Override
