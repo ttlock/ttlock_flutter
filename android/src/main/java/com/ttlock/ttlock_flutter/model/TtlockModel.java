@@ -132,6 +132,13 @@ public class TtlockModel {
 
     public int soundVolumeType;
 
+    public String remoteMac;
+
+    public String deviceMac;
+
+    public int accessoryBattery;
+    public long updateDate;
+
     @Override
     public String toString() {
         return "TtlockModel{" +

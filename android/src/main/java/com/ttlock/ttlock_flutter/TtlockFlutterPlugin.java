@@ -16,18 +16,23 @@ import androidx.core.content.ContextCompat;
 import com.google.gson.reflect.TypeToken;
 import com.ttlock.bl.sdk.api.ExtendedBluetoothDevice;
 import com.ttlock.bl.sdk.api.TTLockClient;
+import com.ttlock.bl.sdk.api.WirelessKeypadClient;
 import com.ttlock.bl.sdk.callback.ActivateLiftFloorsCallback;
 import com.ttlock.bl.sdk.callback.AddFingerprintCallback;
 import com.ttlock.bl.sdk.callback.AddICCardCallback;
+import com.ttlock.bl.sdk.callback.AddRemoteCallback;
 import com.ttlock.bl.sdk.callback.ClearAllFingerprintCallback;
 import com.ttlock.bl.sdk.callback.ClearAllICCardCallback;
 import com.ttlock.bl.sdk.callback.ClearPassageModeCallback;
+import com.ttlock.bl.sdk.callback.ClearRemoteCallback;
 import com.ttlock.bl.sdk.callback.ConfigServerCallback;
 import com.ttlock.bl.sdk.callback.ConfigWifiCallback;
 import com.ttlock.bl.sdk.callback.ControlLockCallback;
 import com.ttlock.bl.sdk.callback.CreateCustomPasscodeCallback;
 import com.ttlock.bl.sdk.callback.DeleteFingerprintCallback;
 import com.ttlock.bl.sdk.callback.DeletePasscodeCallback;
+import com.ttlock.bl.sdk.callback.DeleteRemoteCallback;
+import com.ttlock.bl.sdk.callback.GetAccessoryBatteryLevelCallback;
 import com.ttlock.bl.sdk.callback.GetAdminPasscodeCallback;
 import com.ttlock.bl.sdk.callback.GetAllValidFingerprintCallback;
 import com.ttlock.bl.sdk.callback.GetAllValidICCardCallback;
@@ -46,16 +51,19 @@ import com.ttlock.bl.sdk.callback.GetOperationLogCallback;
 import com.ttlock.bl.sdk.callback.GetPasscodeVerificationInfoCallback;
 import com.ttlock.bl.sdk.callback.GetRemoteUnlockStateCallback;
 import com.ttlock.bl.sdk.callback.GetWifiInfoCallback;
+import com.ttlock.bl.sdk.callback.InitKeypadCallback;
 import com.ttlock.bl.sdk.callback.InitLockCallback;
 import com.ttlock.bl.sdk.callback.ModifyAdminPasscodeCallback;
 import com.ttlock.bl.sdk.callback.ModifyFingerprintPeriodCallback;
 import com.ttlock.bl.sdk.callback.ModifyICCardPeriodCallback;
 import com.ttlock.bl.sdk.callback.ModifyPasscodeCallback;
+import com.ttlock.bl.sdk.callback.ModifyRemoteValidityPeriodCallback;
 import com.ttlock.bl.sdk.callback.RecoverLockDataCallback;
 import com.ttlock.bl.sdk.callback.ReportLossCardCallback;
 import com.ttlock.bl.sdk.callback.ResetKeyCallback;
 import com.ttlock.bl.sdk.callback.ResetLockCallback;
 import com.ttlock.bl.sdk.callback.ResetPasscodeCallback;
+import com.ttlock.bl.sdk.callback.ScanKeypadCallback;
 import com.ttlock.bl.sdk.callback.ScanLockCallback;
 import com.ttlock.bl.sdk.callback.ScanWifiCallback;
 import com.ttlock.bl.sdk.callback.SetAutoLockingPeriodCallback;
@@ -75,6 +83,10 @@ import com.ttlock.bl.sdk.callback.SetPowerSaverWorkModeCallback;
 import com.ttlock.bl.sdk.callback.SetRemoteUnlockSwitchCallback;
 import com.ttlock.bl.sdk.constant.LogType;
 import com.ttlock.bl.sdk.constant.RecoveryData;
+import com.ttlock.bl.sdk.device.Remote;
+import com.ttlock.bl.sdk.device.WirelessKeypad;
+import com.ttlock.bl.sdk.entity.AccessoryInfo;
+import com.ttlock.bl.sdk.entity.AccessoryType;
 import com.ttlock.bl.sdk.entity.ActivateLiftFloorsResult;
 import com.ttlock.bl.sdk.entity.ControlLockResult;
 import com.ttlock.bl.sdk.entity.CyclicConfig;
@@ -103,13 +115,21 @@ import com.ttlock.bl.sdk.gateway.model.ConfigureGatewayInfo;
 import com.ttlock.bl.sdk.gateway.model.DeviceInfo;
 import com.ttlock.bl.sdk.gateway.model.GatewayError;
 import com.ttlock.bl.sdk.gateway.model.WiFi;
+import com.ttlock.bl.sdk.remote.api.RemoteClient;
+import com.ttlock.bl.sdk.remote.callback.InitRemoteCallback;
+import com.ttlock.bl.sdk.remote.callback.ScanRemoteCallback;
+import com.ttlock.bl.sdk.remote.model.InitRemoteResult;
+import com.ttlock.bl.sdk.remote.model.RemoteError;
 import com.ttlock.bl.sdk.util.DigitUtil;
 import com.ttlock.bl.sdk.util.FeatureValueUtil;
 import com.ttlock.bl.sdk.util.GsonUtil;
 import com.ttlock.bl.sdk.util.LogUtil;
 import com.ttlock.ttlock_flutter.constant.GatewayCommand;
 import com.ttlock.ttlock_flutter.constant.TTGatewayConnectStatus;
+import com.ttlock.ttlock_flutter.constant.TTKeyPadCommand;
 import com.ttlock.ttlock_flutter.constant.TTLockCommand;
+import com.ttlock.ttlock_flutter.constant.TTParam;
+import com.ttlock.ttlock_flutter.constant.TTRemoteCommand;
 import com.ttlock.ttlock_flutter.model.CommandObj;
 import com.ttlock.ttlock_flutter.model.GatewayErrorConverter;
 import com.ttlock.ttlock_flutter.model.GatewayModel;
@@ -118,9 +138,11 @@ import com.ttlock.ttlock_flutter.model.PowerSaverWorkModeConverter;
 import com.ttlock.ttlock_flutter.model.SoundVolumeConverter;
 import com.ttlock.ttlock_flutter.model.TTBluetoothState;
 import com.ttlock.ttlock_flutter.model.TTGatewayScanModel;
+import com.ttlock.ttlock_flutter.model.TTKeyPadScanModel;
 import com.ttlock.ttlock_flutter.model.TTLockConfigConverter;
 import com.ttlock.ttlock_flutter.model.TTLockErrorConverter;
 import com.ttlock.ttlock_flutter.model.TTLockFunction;
+import com.ttlock.ttlock_flutter.model.TTRemoteScanModel;
 import com.ttlock.ttlock_flutter.model.TtlockModel;
 import com.ttlock.ttlock_flutter.util.PermissionUtils;
 import com.ttlock.ttlock_flutter.util.Utils;
@@ -159,6 +181,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   public static final int ResultStateProgress = 1;
   public static final int ResultStateFail = 2;
 
+  //todo:需要区分多类型
   private boolean isGatewayCommand;
   /**
    * lock is busy try
@@ -218,6 +241,8 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   private void initSdk() {
     TTLockClient.getDefault().prepareBTService(activity);
     GatewayClient.getDefault().prepareBTService(activity);
+    RemoteClient.getDefault().prepareBTService(activity);
+    WirelessKeypadClient.getDefault().prepareBTService(activity);
   }
 
   public void doorLockCommand(MethodCall call) {
@@ -294,9 +319,111 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     successCallbackCommand(TTLockCommand.COMMAND_SUPPORT_FEATURE, ttlockModel.toMap());
   }
 
+  /**--------------------------- keypad -------------------------- **/
+  public void startScanKeyPad() {
+    PermissionUtils.doWithScanPermission(activity, success -> {
+      if (success) {
+        WirelessKeypadClient.getDefault().startScanKeyboard(new ScanKeypadCallback() {
+          @Override
+          public void onScanKeyboardSuccess(WirelessKeypad wirelessKeypad) {
+            TTKeyPadScanModel ttKeyPadScanModel = new TTKeyPadScanModel();
+            ttKeyPadScanModel.keyPadMac = wirelessKeypad.getAddress();
+            ttKeyPadScanModel.keyPadName = wirelessKeypad.getName();
+            ttKeyPadScanModel.rssi = wirelessKeypad.getRssi();
+            successCallbackCommand(TTKeyPadCommand.COMMAND_START_SCAN_KEY_PAD, ttKeyPadScanModel.toMap());
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+
+          }
+        });
+      } else {
+        LogUtil.d("no scan permission");
+      }
+    });
+  }
+
+  public void stopScanKeyPad() {
+    WirelessKeypadClient.getDefault().stopScanKeyboard();
+  }
+
+  public void initKeyPad(Map<String, Object> params) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        BluetoothDevice device = BluetoothAdapter.getDefaultAdapter().getRemoteDevice((String) params.get(TTParam.MAC));
+        WirelessKeypad keypad = new WirelessKeypad(device);
+        WirelessKeypadClient.getDefault().initializeKeypad(keypad, (String) params.get(TTParam.LOCK_MAC), new InitKeypadCallback() {
+          @Override
+          public void onInitKeypadSuccess(int specialValue) {
+            params.put(TTParam.SPECIAL_VALUE, specialValue);
+            successCallbackCommand(TTKeyPadCommand.COMMAND_INIT_KEY_PAD, params);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            errorCallbackCommand(TTKeyPadCommand.COMMAND_INIT_KEY_PAD, lockError);
+          }
+        });
+      } else {
+        callbackCommand(TTKeyPadCommand.COMMAND_INIT_KEY_PAD, ResultStateFail, params, LockError.LOCK_NO_PERMISSION.getIntErrorCode(), "no connect permission");
+      }
+    });
+  }
+
+  /** ---------------------- remote ------------------------- **/
+
+  public void startScanRemote() {
+    PermissionUtils.doWithScanPermission(activity, success -> {
+      if (success) {
+        RemoteClient.getDefault().startScan(new ScanRemoteCallback() {
+          @Override
+          public void onScanRemote(Remote remote) {
+            TTRemoteScanModel ttRemoteScanModel = new TTRemoteScanModel();
+            ttRemoteScanModel.remoteMac = remote.getAddress();
+            ttRemoteScanModel.remoteName = remote.getName();
+            ttRemoteScanModel.rssi = remote.getRssi();
+            successCallbackCommand(TTRemoteCommand.COMMAND_START_SCAN_REMOTE, ttRemoteScanModel.toMap());
+          }
+        });
+      } else {
+        LogUtil.d("no scan permission");
+      }
+    });
+  }
+
+  public void stopScanRemote() {
+    RemoteClient.getDefault().stopScan();
+  }
+
+  public void initRemote(Map<String, Object> params) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        BluetoothDevice device = BluetoothAdapter.getDefaultAdapter().getRemoteDevice((String) params.get(TTParam.MAC));
+        Remote remote = new Remote(device);
+        RemoteClient.getDefault().initialize(remote, (String) params.get(TTParam.LOCK_DATA), new InitRemoteCallback() {
+          @Override
+          public void onInitSuccess(InitRemoteResult initRemoteResult) {
+            params.put(TTParam.BATTERY, initRemoteResult.getBatteryLevel());
+            params.put(TTParam.MODEL_NUM, initRemoteResult.getSystemInfo().getModelNum());
+            params.put(TTParam.FIRMWARE_REVISION, initRemoteResult.getSystemInfo().getFirmwareRevision());
+            params.put(TTParam.HARD_WARE_REVISION, initRemoteResult.getSystemInfo().getHardwareRevision());
+            successCallbackCommand(TTRemoteCommand.COMMAND_INIT_REMOTE, params);
+          }
+
+          @Override
+          public void onFail(RemoteError remoteError) {
+            errorCallbackCommand(TTRemoteCommand.COMMAND_INIT_REMOTE, remoteError);
+          }
+        });
+      } else {
+        callbackCommand(TTRemoteCommand.COMMAND_INIT_REMOTE, ResultStateFail, params, RemoteError.FAILED.getErrorCode(), "no connect permission");
+      }
+    });
+  }
+
   //enum TTGatewayType { g1, g2, g3, g4 }
   public void startScanGateway() {
-    GatewayClient.getDefault().prepareBTService(activity);
     PermissionUtils.doWithScanPermission(activity, success -> {
       if (success) {
         GatewayClient.getDefault().startScanGateway(new ScanGatewayCallback() {
@@ -325,6 +452,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   public void stopScanGateway() {
     GatewayClient.getDefault().stopScanGateway();
   }
+
 
   public void connectGateway(final GatewayModel gatewayModel) {
     final HashMap<String, Object> resultMap = new HashMap<>();
@@ -2196,6 +2324,137 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
+  public void addRemoteKey(final TtlockModel ttlockModel) {
+    ValidityInfo validityInfo = new ValidityInfo();
+    validityInfo.setStartDate(ttlockModel.startDate);
+    validityInfo.setEndDate(ttlockModel.endDate);
+
+    if (TextUtils.isEmpty(ttlockModel.cycleJsonList)) {
+      validityInfo.setModeType(ValidityInfo.TIMED);
+    } else {
+      validityInfo.setModeType(ValidityInfo.CYCLIC);
+      validityInfo.setCyclicConfigs(GsonUtil.toObject(ttlockModel.cycleJsonList, new TypeToken<List<CyclicConfig>>(){}));
+      ttlockModel.cycleJsonList = null;//clear data
+    }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().addRemote(ttlockModel.remoteMac, validityInfo, ttlockModel.lockData, new AddRemoteCallback() {
+          @Override
+          public void onAddSuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void modifyRemoteKey(final TtlockModel ttlockModel) {
+    ValidityInfo validityInfo = new ValidityInfo();
+    validityInfo.setStartDate(ttlockModel.startDate);
+    validityInfo.setEndDate(ttlockModel.endDate);
+
+    if (TextUtils.isEmpty(ttlockModel.cycleJsonList)) {
+      validityInfo.setModeType(ValidityInfo.TIMED);
+    } else {
+      validityInfo.setModeType(ValidityInfo.CYCLIC);
+      validityInfo.setCyclicConfigs(GsonUtil.toObject(ttlockModel.cycleJsonList, new TypeToken<List<CyclicConfig>>(){}));
+      ttlockModel.cycleJsonList = null;//clear data
+    }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().modifyRemoteValidityPeriod(ttlockModel.remoteMac, validityInfo, ttlockModel.lockData, new ModifyRemoteValidityPeriodCallback() {
+          @Override
+          public void onModifySuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void deleteRemoteKey(final TtlockModel ttlockModel) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().deleteRemote(ttlockModel.remoteMac, ttlockModel.lockData, new DeleteRemoteCallback() {
+          @Override
+          public void onDeleteSuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void clearAllRemoteKey(final TtlockModel ttlockModel) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().clearRemote(ttlockModel.lockData, new ClearRemoteCallback() {
+          @Override
+          public void onClearSuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void getAccessoryElectricQuantity(final TtlockModel ttlockModel) {
+    AccessoryInfo accessoryInfo = new AccessoryInfo();
+    accessoryInfo.setAccessoryType(AccessoryType.getInstance(ttlockModel.type + 1));
+    accessoryInfo.setAccessoryMac(ttlockModel.deviceMac);
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().getAccessoryBatteryLevel(accessoryInfo, ttlockModel.lockData, new GetAccessoryBatteryLevelCallback() {
+          @Override
+          public void onGetAccessoryBatteryLevelSuccess(AccessoryInfo accessoryInfo) {
+            ttlockModel.accessoryBattery = accessoryInfo.getAccessoryBattery();
+            ttlockModel.updateDate = accessoryInfo.getBatteryDate();
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  //---------------remote------------------------------
+
+
+
   public void setAdminErasePasscode(final TtlockModel ttlockModel) {
 
   }
@@ -2338,8 +2597,17 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     }
   }
 
+  public void errorCallbackCommand(String command, RemoteError remoteError) {
+    //todo:做转换
+    callbackCommand(command, ResultStateFail, null, remoteError.ordinal(), remoteError.getDescription());
+  }
+
   public void errorCallbackCommand(String command, GatewayError gatewayError) {
     callbackCommand(command, ResultStateFail, null, GatewayErrorConverter.native2Flutter(gatewayError), gatewayError.getDescription());
+  }
+
+  public void errorCallbackCommand(String command, LockError lockError) {
+    callbackCommand(command, ResultStateFail, null, TTLockErrorConverter.native2Flutter(lockError), lockError.getDescription());
   }
 
   public void errorCallbackCommand(CommandObj commandObj, LockError lockError) {

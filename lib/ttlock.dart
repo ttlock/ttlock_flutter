@@ -1785,6 +1785,23 @@ typedef TTGetLockSoundWithSoundVolumeCallback = void Function(
 // typedef TTGetLockSystemInfoCallback = void Function(TTLockSystemInfoModel lockSystemInfoModel);
 // typedef TTGetPasscodeVerificationParamsCallback = void Function(String lockData);
 
+typedef TTRemoteFailedCallback = void Function(
+    TTRemoteError errorCode, String errorMsg);
+typedef TTRemoteScanCallback = void Function(TTRemoteScanModel scanModel);
+typedef TTRemoteInitCallback = void Function(Map map);
+
+class TTRemoteScanModel {
+  String remoteName = '';
+  String remoteMac = '';
+  int rssi = -1;
+
+  TTGatewayScanModel(Map map) {
+    this.remoteName = map["remoteName"];
+    this.remoteMac = map["remoteMac"];
+    this.rssi = map["rssi"];
+  }
+}
+
 class TTGatewayScanModel {
   String gatewayName = '';
   String gatewayMac = '';
@@ -1838,6 +1855,11 @@ enum TTGatewayType { g1, g2, g3, g4 }
 enum TTIpSettingType { STATIC_IP, DHCP }
 
 enum TTGatewayConnectStatus { timeout, success, faile }
+
+enum TTRemoteError {
+  fail,
+  connectTimeout
+}
 
 enum TTLockFuction {
   passcode,
