@@ -20,11 +20,10 @@ typedef enum {
 @interface TTWirelessKeyFob : NSObject
 
 typedef void(^TTKeyFobScanBlock)(TTWirelessKeyFobScanModel *model);
-
-typedef void(^TTInitializeKeyFobBlock)(TTKeyFobStatus status,int electricQuantity);
-
+typedef void(^TTNewInitializeKeyFobBlock)(TTKeyFobStatus status,int electricQuantity,TTSystemInfoModel *systemModel);
 typedef void(^TTEnterUpgradeModeBlock)(TTKeyFobStatus status);
 
+typedef void(^TTInitializeKeyFobBlock)(TTKeyFobStatus status,int electricQuantity);
 typedef void(^TTGetLockSystemInfoBlock)(TTKeyFobStatus status,TTSystemInfoModel *systemModel);
 
 /**
@@ -38,15 +37,21 @@ typedef void(^TTGetLockSystemInfoBlock)(TTKeyFobStatus status,TTSystemInfoModel 
 /**
  initialize Keyfob
  */
-+ (void)initializeWithKeyFobMac:(NSString *)keyFobMac
-						lockData:(NSString*)lockData
-						  block:(TTInitializeKeyFobBlock)block;
-
++ (void)newInitializeWithKeyFobMac:(NSString *)keyFobMac
+                        lockData:(NSString*)lockData
+                          block:(TTNewInitializeKeyFobBlock)block;
+/**
+ Enter Upgrade Mode
+ */
 + (void)enterUpgradeModeWithKeyFobMac:(NSString *)keyFobMac
                              lockData:(NSString*)lockData
-								block:(TTEnterUpgradeModeBlock)block;
+                                block:(TTEnterUpgradeModeBlock)block;
+
++ (void)initializeWithKeyFobMac:(NSString *)keyFobMac
+						lockData:(NSString*)lockData
+                          block:(TTInitializeKeyFobBlock)block DEPRECATED_MSG_ATTRIBUTE("SDK3.2.6,Use newInitialize");
 
 + (void)getLockSystemInfoWithKeyFobMac:(NSString *)keyFobMac
-								 block:(TTGetLockSystemInfoBlock)block;
+                                 block:(TTGetLockSystemInfoBlock)block DEPRECATED_MSG_ATTRIBUTE("SDK3.2.6,Use newInitialize");
 
 @end

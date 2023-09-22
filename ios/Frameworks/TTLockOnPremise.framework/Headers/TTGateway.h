@@ -66,7 +66,7 @@
 + (void)upgradeGatewayWithGatewayMac:(NSString *)gatewayMac block:(TTGatewayBlock)block;
 
 /**
- Call tihis after connect gateway successfully
+ Call tihis after connect gateway successfully, only G2 & G3 have networkMac
  */
 + (NSString *)getNetworkMac;
 
