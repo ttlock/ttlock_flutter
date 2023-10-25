@@ -997,7 +997,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
     ];
     
     NSInteger errorCode = TTGatewayFail;
-    for (int i = 0; codeArray.count; i++) {
+    for (int i = 0; i < codeArray.count; i++) {
         if([codeArray[i] intValue] == status){
             errorCode = i;
         }
@@ -1048,7 +1048,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
                           @(TTErrorWrongSSID),
                           @(TTErrorWrongWifiPassword)];
     
-    for (int i = 0; codeArray.count; i++) {
+    for (int i = 0; i < codeArray.count; i++) {
         if([codeArray[i] intValue] == code.intValue){
             errorCode = i;
         }
