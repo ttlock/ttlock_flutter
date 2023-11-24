@@ -845,6 +845,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
             successCallbackCommand(TTLockCommand.COMMAND_START_SCAN_LOCK, data.toMap());
 //              data.lockSwitchState = @(scanModel.lockSwitchState);
 //              data.oneMeterRssi = @(scanModel.oneMeterRSSI);
+            if (extendedBluetoothDevice.isSettingMode()) {
+              LogUtil.d("lockVersion:" + extendedBluetoothDevice.getLockVersionJson());
+            }
           }
 
           @Override
@@ -875,7 +878,8 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     extendedBluetoothDevice.setScene(lockVersion.getScene());
 
     extendedBluetoothDevice.setSettingMode(!ttlockModel.isInited);
-
+    LogUtil.d("ttlockModel.lockVersion:" + ttlockModel.lockVersion);
+      LogUtil.d("lockVersion:" + GsonUtil.toJson(lockVersion));
     if (!TextUtils.isEmpty(ttlockModel.clientPara)) {
       extendedBluetoothDevice.setManufacturerId(ttlockModel.clientPara);
     }
