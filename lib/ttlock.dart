@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
-import 'package:ttlock_flutter/ttremotekey.dart';
+import 'package:ttlock_flutter/ttdoorSensor.dart';
+import 'package:ttlock_flutter/ttremoteKey.dart';
 import 'dart:convert' as convert;
 import 'ttgateway.dart';
 
@@ -125,6 +126,10 @@ class TTLock {
       "lockModifyRemoteKeyValidDate";
   static const String COMMAND_GET_LOCK_REMOTE_ACCESSORY_ELECTRIC_QUANTITY =
       "lockGetRemoteAccessoryElectricQuantity";
+
+  static const String COMMAND_SET_LOCK_DOOR_SENSORY_ALERT_TIME =
+      "lockSetDoorSensorAlertTime";
+
   // static const String COMMAND_GET_PASSCODE_VERIFICATION_PARAMS = "getPasscodeVerificationParams";
 
   static List _commandQueue = [];
@@ -1056,6 +1061,15 @@ class TTLock {
         fail: failedCallback);
   }
 
+  static void setDoorSensorAlertTime(String lockData, int alertTime,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+    Map map = new Map();
+    map[TTResponse.alertTime] = alertTime;
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_SET_LOCK_DOOR_SENSORY_ALERT_TIME, map, callback,
+        fail: failedCallback);
+  }
+
   static void setLockEnterUpgradeMode(String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     invoke(COMMAND_SET_LOCK_ENTER_UPGRADE_MODE, lockData, callback,
@@ -1068,6 +1082,8 @@ class TTLock {
     COMMAND_STOP_SCAN_LOCK,
     TTGateway.COMMAND_START_SCAN_GATEWAY,
     TTGateway.COMMAND_STOP_SCAN_GATEWAY,
+    TTDoorSensor.COMMAND_START_SCAN_DOOR_SENSOR,
+    TTDoorSensor.COMMAND_STOP_SCAN_DOOR_SENSOR,
     TTRemoteKey.COMMAND_START_SCAN_REMOTE_KEY,
     TTRemoteKey.COMMAND_STOP_SCAN_REMOTE_KEY
   ];
@@ -1089,7 +1105,8 @@ class TTLock {
           String key = map.keys.first;
           if (key.compareTo(COMMAND_START_SCAN_LOCK) == 0 ||
               key.compareTo(TTGateway.COMMAND_START_SCAN_GATEWAY) == 0 ||
-              key.compareTo(TTRemoteKey.COMMAND_START_SCAN_REMOTE_KEY) == 0) {
+              key.compareTo(TTRemoteKey.COMMAND_START_SCAN_REMOTE_KEY) == 0 ||
+              key.compareTo(TTDoorSensor.COMMAND_START_SCAN_DOOR_SENSOR) == 0) {
             removeMapList.add(map);
           }
         });
@@ -1101,8 +1118,8 @@ class TTLock {
 
     if (command == COMMAND_STOP_SCAN_LOCK ||
         command == TTGateway.COMMAND_STOP_SCAN_GATEWAY ||
-        command == TTRemoteKey.COMMAND_STOP_SCAN_REMOTE_KEY) {
-      //
+        command == TTRemoteKey.COMMAND_STOP_SCAN_REMOTE_KEY ||
+        command == TTDoorSensor.COMMAND_STOP_SCAN_DOOR_SENSOR) {
     } else {
       Map commandMap = new Map();
       Map callbackMap = new Map();
@@ -1142,20 +1159,17 @@ class TTLock {
     if (index == -1) {
       reomveCommand = false;
     } else {
-      if (command == COMMAND_START_SCAN_LOCK) {
+      if (command == COMMAND_START_SCAN_LOCK ||
+          command == TTGateway.COMMAND_START_SCAN_GATEWAY ||
+          command == TTRemoteKey.COMMAND_START_SCAN_REMOTE_KEY ||
+          command == TTDoorSensor.COMMAND_START_SCAN_DOOR_SENSOR) {
         reomveCommand = false;
       }
       if (command == COMMAND_SCAN_WIFI && data[TTResponse.finished] == false) {
         reomveCommand = false;
       }
-      if (command == TTGateway.COMMAND_START_SCAN_GATEWAY) {
-        reomveCommand = false;
-      }
       if (command == TTGateway.COMMAND_GET_SURROUND_WIFI &&
           data[TTResponse.finished] == false) {
-        reomveCommand = false;
-      }
-      if (command == TTRemoteKey.COMMAND_START_SCAN_REMOTE_KEY) {
         reomveCommand = false;
       }
     }
@@ -1189,6 +1203,7 @@ class TTLock {
         break;
 
       case TTRemoteKey.COMMAND_START_SCAN_REMOTE_KEY:
+      case TTDoorSensor.COMMAND_START_SCAN_DOOR_SENSOR:
         TTGetLockSystemCallback scanCallback = callBack;
         scanCallback(TTLockSystemModel(data));
         break;
@@ -1393,7 +1408,7 @@ class TTLock {
         gatewayInitCallback(data);
         break;
       case TTRemoteKey.COMMAND_INIT_REMOTE_KEY:
-        TTRemoteKeyInitCallback remoteKeyInitCallback = callBack;
+        TTGetLockSystemCallback remoteKeyInitCallback = callBack;
         remoteKeyInitCallback(TTLockSystemModel(data));
         break;
       case COMMAND_GET_LOCK_REMOTE_ACCESSORY_ELECTRIC_QUANTITY:
@@ -1465,9 +1480,10 @@ class TTLock {
       if (failedCallback != null) {
         failedCallback(error, errorMessage);
       }
-    } else if (command == TTRemoteKey.COMMAND_INIT_REMOTE_KEY) {
+    } else if (command == TTRemoteKey.COMMAND_INIT_REMOTE_KEY ||
+        command == TTDoorSensor.COMMAND_INIT_DOOR_SENSOR) {
       TTRemoteFailedCallback? failedCallback = callBack;
-      TTRemoteKeyError error = TTRemoteKeyError.values[errorCode];
+      TTRemoteAccessoryError error = TTRemoteAccessoryError.values[errorCode];
       if (failedCallback != null) {
         failedCallback(error, errorMessage);
       }
@@ -1608,6 +1624,7 @@ class TTResponse {
   static const String soundVolumeType = "soundVolumeType";
 
   static const String updateDate = "updateDate";
+  static const String alertTime = "alertTime";
 }
 
 class TTLockScanModel {
@@ -1849,20 +1866,31 @@ typedef TTGetLockSoundWithSoundVolumeCallback = void Function(
 // typedef TTGetPasscodeVerificationParamsCallback = void Function(String lockData);
 
 typedef TTRemoteFailedCallback = void Function(
-    TTRemoteKeyError errorCode, String errorMsg);
-typedef TTRemoteKeyScanCallback = void Function(TTRemoteKeyScanModel scanModel);
-typedef TTRemoteKeyInitCallback = void Function(
-    TTLockSystemModel lockSystemModel);
+    TTRemoteAccessoryError errorCode, String errorMsg);
+typedef TTRemoteKeyScanCallback = void Function(
+    TTRemoteAccessoryScanModel scanModel);
 
 typedef TTGetLockAccessoryElectricQuantity = void Function(
     int electricQuantity, int updateDate);
 
-class TTRemoteKeyScanModel {
+class TTRemoteAccessoryScanModel {
   String name = '';
   String mac = '';
   int rssi = -1;
 
-  TTRemoteKeyScanModel(Map map) {
+  TTRemoteAccessoryScanModel(Map map) {
+    this.name = map["name"];
+    this.mac = map["mac"];
+    this.rssi = map["rssi"];
+  }
+}
+
+class TTDoorSensorScanModel {
+  String name = '';
+  String mac = '';
+  int rssi = -1;
+
+  TTDoorSensorScanModel(Map map) {
     this.name = map["name"];
     this.mac = map["mac"];
     this.rssi = map["rssi"];
@@ -1923,7 +1951,7 @@ enum TTIpSettingType { STATIC_IP, DHCP }
 
 enum TTGatewayConnectStatus { timeout, success, faile }
 
-enum TTRemoteKeyError { fail, wrongCrc, connectTimeout }
+enum TTRemoteAccessoryError { fail, wrongCrc, connectTimeout }
 
 enum TTLockFuction {
   passcode,

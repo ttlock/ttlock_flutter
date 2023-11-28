@@ -908,7 +908,10 @@ typedef NS_ENUM(NSInteger, ResultState) {
     //门禁
     else if ([command isEqualToString:command_door_sensor_start_scan]) {
         [TTDoorSensor startScanWithSuccess:^(TTDoorSensorScanModel * _Nonnull model) {
-            NSMutableDictionary *dict = [weakSelf dicFromObject:model];
+            NSMutableDictionary *dict = @{}.mutableCopy;
+            dict[@"name"] = model.name;
+            dict[@"rssi"] = @(model.RSSI);
+            dict[@"mac"] = model.mac;
             [weakSelf successCallbackCommand:command data:dict];
         } failure:^(TTDoorSensorError error) {
             [weakSelf errorCallbackCommand:command code:error details:nil];
@@ -935,10 +938,15 @@ typedef NS_ENUM(NSInteger, ResultState) {
     }
     
     
+    
     //无线键盘
     else if ([command isEqualToString:command_remote_keypad_start_scan]) {
+        
         [TTWirelessKeypad startScanKeypadWithBlock:^(TTWirelessKeypadScanModel *model) {
-            NSMutableDictionary *dict = [weakSelf dicFromObject:model];
+            NSMutableDictionary *dict = @{}.mutableCopy;
+            dict[@"name"] = model.keypadName;
+            dict[@"rssi"] = @(model.RSSI);
+            dict[@"mac"] = model.keypadMac;
             [weakSelf successCallbackCommand:command data:dict];
         }];
     }
@@ -1037,6 +1045,32 @@ typedef NS_ENUM(NSInteger, ResultState) {
     return isRemoteKeyCommand;
 }
 
+- (Boolean) isRemoteKeypadCommand:(NSString *)command{
+    NSArray *remoteKeyCommandArray = @[command_remote_keypad_init];
+    
+    bool isRemoteKeyCommand = false;
+    for (NSString *remoteKeyCommand in remoteKeyCommandArray) {
+        if([command isEqual:remoteKeyCommand]){
+            isRemoteKeyCommand = true;
+            break;
+        }
+    }
+    return isRemoteKeyCommand;
+}
+
+- (Boolean) isDoorSensorCommand:(NSString *)command{
+    NSArray *remoteKeyCommandArray = @[command_door_sensor_init];
+    
+    bool isRemoteKeyCommand = false;
+    for (NSString *remoteKeyCommand in remoteKeyCommandArray) {
+        if([command isEqual:remoteKeyCommand]){
+            isRemoteKeyCommand = true;
+            break;
+        }
+    }
+    return isRemoteKeyCommand;
+}
+
 - (void)callbackCommand:(NSString *)command resultState:(ResultState)resultState data:(NSObject *)data errorCode:(NSNumber *)code errorMessage:(NSString *)errorMessage {
     
    
@@ -1045,6 +1079,10 @@ typedef NS_ENUM(NSInteger, ResultState) {
         errorCode = @([self getTTGatewayErrorCode:[code integerValue]]);
     }else if([self isRemoteKeyCommand:command]){
         errorCode = @([self getTTRemoteKeyErrorCode:[code intValue]]);
+    }else if([self isRemoteKeypadCommand:command]){
+        errorCode = @([self getTTRemoteKeypadErrorCode:[code intValue]]);
+    }else if([self isDoorSensorCommand:command]){
+        errorCode = @([self getTTDoorSensoryErrorCode:[code intValue]]);
     }else{
         errorCode = [self getTTLockErrorCode:code];
     }
@@ -1156,6 +1194,38 @@ typedef NS_ENUM(NSInteger, ResultState) {
     
     ];
     NSInteger errorCode = TTKeyFobFail;
+    for (int i = 0; i < codeArray.count; i++) {
+        if([codeArray[i] intValue] == status){
+            errorCode = i;
+        }
+    }
+    return errorCode;
+}
+
+- (NSInteger)getTTRemoteKeypadErrorCode:(TTKeypadStatus) status{
+    
+    NSArray *codeArray =@[@(TTKeypadFail),
+                          @(TTKeypadWrongCRC),
+                          @(TTKeypadConnectTimeout),
+    
+    ];
+    NSInteger errorCode = TTKeypadFail;
+    for (int i = 0; i < codeArray.count; i++) {
+        if([codeArray[i] intValue] == status){
+            errorCode = i;
+        }
+    }
+    return errorCode;
+}
+
+
+- (NSInteger)getTTDoorSensoryErrorCode:(TTDoorSensorError) status{
+    NSArray *codeArray =@[@(TTDoorSensorErrorFail),
+                          @(TTDoorSensorErrorWrongCRC),
+                          @(TTDoorSensorErrorConnectTimeout)
+    
+    ];
+    NSInteger errorCode = TTDoorSensorErrorFail;
     for (int i = 0; i < codeArray.count; i++) {
         if([codeArray[i] intValue] == status){
             errorCode = i;
