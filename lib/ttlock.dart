@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:ttlock_flutter/ttdoorSensor.dart';
 import 'package:ttlock_flutter/ttremoteKey.dart';
+import 'package:ttlock_flutter/ttremoteKeypad.dart';
 import 'dart:convert' as convert;
 import 'ttgateway.dart';
 
@@ -1085,7 +1086,9 @@ class TTLock {
     TTDoorSensor.COMMAND_START_SCAN_DOOR_SENSOR,
     TTDoorSensor.COMMAND_STOP_SCAN_DOOR_SENSOR,
     TTRemoteKey.COMMAND_START_SCAN_REMOTE_KEY,
-    TTRemoteKey.COMMAND_STOP_SCAN_REMOTE_KEY
+    TTRemoteKey.COMMAND_STOP_SCAN_REMOTE_KEY,
+    TTRemoteKeypad.COMMAND_START_SCAN_REMOTE_KEYPAD,
+    TTRemoteKeypad.COMMAND_STOP_SCAN_REMOTE_KEYPAD
   ];
 
   static void invoke(String command, Object? parameter, Object? success,
@@ -1106,6 +1109,8 @@ class TTLock {
           if (key.compareTo(COMMAND_START_SCAN_LOCK) == 0 ||
               key.compareTo(TTGateway.COMMAND_START_SCAN_GATEWAY) == 0 ||
               key.compareTo(TTRemoteKey.COMMAND_START_SCAN_REMOTE_KEY) == 0 ||
+              key.compareTo(TTRemoteKeypad.COMMAND_START_SCAN_REMOTE_KEYPAD) ==
+                  0 ||
               key.compareTo(TTDoorSensor.COMMAND_START_SCAN_DOOR_SENSOR) == 0) {
             removeMapList.add(map);
           }
@@ -1119,6 +1124,7 @@ class TTLock {
     if (command == COMMAND_STOP_SCAN_LOCK ||
         command == TTGateway.COMMAND_STOP_SCAN_GATEWAY ||
         command == TTRemoteKey.COMMAND_STOP_SCAN_REMOTE_KEY ||
+        command == TTRemoteKeypad.COMMAND_STOP_SCAN_REMOTE_KEYPAD ||
         command == TTDoorSensor.COMMAND_STOP_SCAN_DOOR_SENSOR) {
     } else {
       Map commandMap = new Map();
@@ -1162,6 +1168,7 @@ class TTLock {
       if (command == COMMAND_START_SCAN_LOCK ||
           command == TTGateway.COMMAND_START_SCAN_GATEWAY ||
           command == TTRemoteKey.COMMAND_START_SCAN_REMOTE_KEY ||
+          command == TTRemoteKeypad.COMMAND_START_SCAN_REMOTE_KEYPAD ||
           command == TTDoorSensor.COMMAND_START_SCAN_DOOR_SENSOR) {
         reomveCommand = false;
       }
@@ -1203,9 +1210,10 @@ class TTLock {
         break;
 
       case TTRemoteKey.COMMAND_START_SCAN_REMOTE_KEY:
+      case TTRemoteKeypad.COMMAND_START_SCAN_REMOTE_KEYPAD:
       case TTDoorSensor.COMMAND_START_SCAN_DOOR_SENSOR:
-        TTGetLockSystemCallback scanCallback = callBack;
-        scanCallback(TTLockSystemModel(data));
+        TTRemoteAccessoryScanCallback scanCallback = callBack;
+        scanCallback(TTRemoteAccessoryScanModel(data));
         break;
 
       case COMMAND_GET_AUTOMATIC_LOCK_PERIODIC_TIME:
@@ -1224,6 +1232,8 @@ class TTLock {
         break;
 
       case COMMAND_GET_LOCK_SYSTEM_INFO:
+      case TTRemoteKey.COMMAND_INIT_REMOTE_KEY:
+      case TTDoorSensor.COMMAND_INIT_DOOR_SENSOR:
         TTGetLockSystemCallback getLockSystemCallback = callBack;
         getLockSystemCallback(TTLockSystemModel(data));
         break;
@@ -1407,15 +1417,17 @@ class TTLock {
         TTGatewayInitCallback gatewayInitCallback = callBack;
         gatewayInitCallback(data);
         break;
-      case TTRemoteKey.COMMAND_INIT_REMOTE_KEY:
-        TTGetLockSystemCallback remoteKeyInitCallback = callBack;
-        remoteKeyInitCallback(TTLockSystemModel(data));
-        break;
       case COMMAND_GET_LOCK_REMOTE_ACCESSORY_ELECTRIC_QUANTITY:
         TTGetLockAccessoryElectricQuantity getLockAccessoryElectricQuantity =
             callBack;
         getLockAccessoryElectricQuantity(
             data[TTResponse.electricQuantity], data[TTResponse.updateDate]);
+        break;
+      case TTRemoteKeypad.COMMAND_INIT_REMOTE_KEYPAD:
+        TTRemoteKeypadInitSuccessCallback remoteKeypadInitSuccessCallback =
+            callBack;
+        remoteKeypadInitSuccessCallback(data[TTResponse.electricQuantity],
+            data[TTResponse.wirelessKeypadFeatureValue]);
         break;
       default:
         TTSuccessCallback successCallback = callBack;
@@ -1481,7 +1493,8 @@ class TTLock {
         failedCallback(error, errorMessage);
       }
     } else if (command == TTRemoteKey.COMMAND_INIT_REMOTE_KEY ||
-        command == TTDoorSensor.COMMAND_INIT_DOOR_SENSOR) {
+        command == TTDoorSensor.COMMAND_INIT_DOOR_SENSOR ||
+        command == TTRemoteKeypad.COMMAND_INIT_REMOTE_KEYPAD) {
       TTRemoteFailedCallback? failedCallback = callBack;
       TTRemoteAccessoryError error = TTRemoteAccessoryError.values[errorCode];
       if (failedCallback != null) {
@@ -1625,6 +1638,7 @@ class TTResponse {
 
   static const String updateDate = "updateDate";
   static const String alertTime = "alertTime";
+  static const String wirelessKeypadFeatureValue = "wirelessKeypadFeatureValue";
 }
 
 class TTLockScanModel {
@@ -1687,24 +1701,25 @@ class TTLockSystemModel {
   String? modelNum;
   String? hardwareRevision;
   String? firmwareRevision;
+  int? electricQuantity;
 
   // NB IOT LOCK
   String? nbOperator;
   String? nbNodeId;
   String? nbCardNumber;
   String? nbRssi;
-  int? electricQuantity;
 
   // ignore: non_constant_identifier_names
   TTLockSystemModel(Map map) {
     this.modelNum = map["modelNum"];
     this.hardwareRevision = map["hardwareRevision"];
     this.firmwareRevision = map["firmwareRevision"];
+    this.electricQuantity = map["electricQuantity"];
+
     this.nbOperator = map["nbOperator"];
     this.nbNodeId = map["nbNodeId"];
     this.nbCardNumber = map["nbCardNumber"];
     this.nbRssi = map["nbRssi"];
-    this.electricQuantity = map["electricQuantity"];
   }
 }
 
@@ -1867,11 +1882,14 @@ typedef TTGetLockSoundWithSoundVolumeCallback = void Function(
 
 typedef TTRemoteFailedCallback = void Function(
     TTRemoteAccessoryError errorCode, String errorMsg);
-typedef TTRemoteKeyScanCallback = void Function(
+typedef TTRemoteAccessoryScanCallback = void Function(
     TTRemoteAccessoryScanModel scanModel);
 
 typedef TTGetLockAccessoryElectricQuantity = void Function(
     int electricQuantity, int updateDate);
+
+typedef TTRemoteKeypadInitSuccessCallback = void Function(
+    int electricQuantity, String wirelessKeypadFeatureValue);
 
 class TTRemoteAccessoryScanModel {
   String name = '';
