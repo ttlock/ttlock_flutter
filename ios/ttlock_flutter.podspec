@@ -17,7 +17,7 @@ A new flutter plugin project.
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
   s.platform = :ios, '9.0'
-  s.dependency 'TTLock', '3.2.3'
+  s.dependency 'TTLock', '3.2.9'
   s.static_framework = true
 
   # Flutter.framework does not contain a i386 slice. Only x86_64 simulators are supported.

@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:ttlock_flutter/ttremotekey.dart';
 import 'dart:convert' as convert;
 import 'ttgateway.dart';
 
@@ -118,9 +119,12 @@ class TTLock {
   static const String COMMAND_SET_LOCK_ENTER_UPGRADE_MODE =
       "setLockEnterUpgradeMode";
 
-  // static const String COMMAND_SET_NB_SERVER_INFO = "setNBServerInfo";
-  // static const String COMMAND_GET_ADMIN_PASSCODE = "getAdminPasscode";
-  // static const String COMMAND_GET_LOCK_SYSTEM_INFO = "getLockSystemInfo";
+  static const String COMMAND_ADD_LOCK_REMOTE_KEY = "lockAddRemoteKey";
+  static const String COMMAND_DELETE_LOCK_REMOTE_KEY = "lockDeleteRemoteKey";
+  static const String COMMAND_SET_LOCK_REMOTE_KEY_VALID_DATE =
+      "lockModifyRemoteKeyValidDate";
+  static const String COMMAND_GET_LOCK_REMOTE_ACCESSORY_ELECTRIC_QUANTITY =
+      "lockGetRemoteAccessoryElectricQuantity";
   // static const String COMMAND_GET_PASSCODE_VERIFICATION_PARAMS = "getPasscodeVerificationParams";
 
   static List _commandQueue = [];
@@ -995,6 +999,63 @@ class TTLock {
   //       fail: failedCallback);
   // }
 
+  static void addRemoteKey(
+      String remoteKeyMac,
+      List<TTCycleModel>? cycleList,
+      int startDate,
+      int endDate,
+      String lockData,
+      TTSuccessCallback callback,
+      TTFailedCallback failedCallback) {
+    Map map = new Map();
+    map[TTResponse.mac] = remoteKeyMac;
+    map[TTResponse.cycleJsonList] = cycleList;
+    map[TTResponse.startDate] = startDate;
+    map[TTResponse.endDate] = endDate;
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_ADD_LOCK_REMOTE_KEY, map, callback, fail: failedCallback);
+  }
+
+  static void deleteRemoteKey(String remoteKeyMac, String lockData,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+    Map map = new Map();
+    map[TTResponse.mac] = remoteKeyMac;
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_DELETE_LOCK_REMOTE_KEY, map, callback, fail: failedCallback);
+  }
+
+  static void setRemoteKeyValidDate(
+      String remoteKeyMac,
+      List<TTCycleModel>? cycleList,
+      int startDate,
+      int endDate,
+      String lockData,
+      TTSuccessCallback callback,
+      TTFailedCallback failedCallback) {
+    Map map = new Map();
+    map[TTResponse.mac] = remoteKeyMac;
+    map[TTResponse.cycleJsonList] = cycleList;
+    map[TTResponse.startDate] = startDate;
+    map[TTResponse.endDate] = endDate;
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_SET_LOCK_REMOTE_KEY_VALID_DATE, map, callback,
+        fail: failedCallback);
+  }
+
+  static void getRemoteAccessoryElectricQuantity(
+      TTRemoteAccessory remoteAccessory,
+      String remoteAccessoryMac,
+      String lockData,
+      TTSuccessCallback callback,
+      TTFailedCallback failedCallback) {
+    Map map = new Map();
+    map[TTResponse.remoteAccessory] = remoteAccessory.index;
+    map[TTResponse.mac] = remoteAccessoryMac;
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_GET_LOCK_REMOTE_ACCESSORY_ELECTRIC_QUANTITY, map, callback,
+        fail: failedCallback);
+  }
+
   static void setLockEnterUpgradeMode(String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     invoke(COMMAND_SET_LOCK_ENTER_UPGRADE_MODE, lockData, callback,
@@ -1006,7 +1067,9 @@ class TTLock {
     COMMAND_START_SCAN_LOCK,
     COMMAND_STOP_SCAN_LOCK,
     TTGateway.COMMAND_START_SCAN_GATEWAY,
-    TTGateway.COMMAND_STOP_SCAN_GATEWAY
+    TTGateway.COMMAND_STOP_SCAN_GATEWAY,
+    TTRemoteKey.COMMAND_START_SCAN_REMOTE_KEY,
+    TTRemoteKey.COMMAND_STOP_SCAN_REMOTE_KEY
   ];
 
   static void invoke(String command, Object? parameter, Object? success,
@@ -1025,7 +1088,8 @@ class TTLock {
         _commandQueue.forEach((map) {
           String key = map.keys.first;
           if (key.compareTo(COMMAND_START_SCAN_LOCK) == 0 ||
-              key.compareTo(TTGateway.COMMAND_START_SCAN_GATEWAY) == 0) {
+              key.compareTo(TTGateway.COMMAND_START_SCAN_GATEWAY) == 0 ||
+              key.compareTo(TTRemoteKey.COMMAND_START_SCAN_REMOTE_KEY) == 0) {
             removeMapList.add(map);
           }
         });
@@ -1036,7 +1100,9 @@ class TTLock {
     });
 
     if (command == COMMAND_STOP_SCAN_LOCK ||
-        command == TTGateway.COMMAND_STOP_SCAN_GATEWAY) {
+        command == TTGateway.COMMAND_STOP_SCAN_GATEWAY ||
+        command == TTRemoteKey.COMMAND_STOP_SCAN_REMOTE_KEY) {
+      //
     } else {
       Map commandMap = new Map();
       Map callbackMap = new Map();
@@ -1089,6 +1155,9 @@ class TTLock {
           data[TTResponse.finished] == false) {
         reomveCommand = false;
       }
+      if (command == TTRemoteKey.COMMAND_START_SCAN_REMOTE_KEY) {
+        reomveCommand = false;
+      }
     }
     if (reomveCommand) {
       _commandQueue.removeAt(index);
@@ -1117,6 +1186,11 @@ class TTLock {
       case TTGateway.COMMAND_START_SCAN_GATEWAY:
         TTGatewayScanCallback scanCallback = callBack;
         scanCallback(TTGatewayScanModel(data));
+        break;
+
+      case TTRemoteKey.COMMAND_START_SCAN_REMOTE_KEY:
+        TTGetLockSystemCallback scanCallback = callBack;
+        scanCallback(TTLockSystemModel(data));
         break;
 
       case COMMAND_GET_AUTOMATIC_LOCK_PERIODIC_TIME:
@@ -1318,6 +1392,16 @@ class TTLock {
         TTGatewayInitCallback gatewayInitCallback = callBack;
         gatewayInitCallback(data);
         break;
+      case TTRemoteKey.COMMAND_INIT_REMOTE_KEY:
+        TTRemoteKeyInitCallback remoteKeyInitCallback = callBack;
+        remoteKeyInitCallback(TTLockSystemModel(data));
+        break;
+      case COMMAND_GET_LOCK_REMOTE_ACCESSORY_ELECTRIC_QUANTITY:
+        TTGetLockAccessoryElectricQuantity getLockAccessoryElectricQuantity =
+            callBack;
+        getLockAccessoryElectricQuantity(
+            data[TTResponse.electricQuantity], data[TTResponse.updateDate]);
+        break;
       default:
         TTSuccessCallback successCallback = callBack;
         successCallback();
@@ -1381,6 +1465,12 @@ class TTLock {
       if (failedCallback != null) {
         failedCallback(error, errorMessage);
       }
+    } else if (command == TTRemoteKey.COMMAND_INIT_REMOTE_KEY) {
+      TTRemoteFailedCallback? failedCallback = callBack;
+      TTRemoteKeyError error = TTRemoteKeyError.values[errorCode];
+      if (failedCallback != null) {
+        failedCallback(error, errorMessage);
+      }
     } else {
       TTFailedCallback? failedCallback = callBack;
       TTLockError error = TTLockError.values[errorCode];
@@ -1408,7 +1498,7 @@ class TTLock {
           : map[TTResponse.errorMessage];
       _errorCallback(command, errorCode, errorMessage);
     } else if (resultState == TTLockReuslt.progress.index) {
-      //中间状态的回调（��加 IC卡、指��）
+      //中间状态的回调（添加 IC卡、指纹）
       _progressCallback(command, data);
     } else {
       //成功的回调
@@ -1511,7 +1601,13 @@ class TTResponse {
   static const String wifiName = "wifiName";
   static const String wifiPassword = "wifiPassword";
 
+  static const String mac = "mac";
+
+  static const String remoteAccessory = "remoteAccessory";
+
   static const String soundVolumeType = "soundVolumeType";
+
+  static const String updateDate = "updateDate";
 }
 
 class TTLockScanModel {
@@ -1542,42 +1638,6 @@ class TTLockScanModel {
     this.timestamp = map[TTResponse.timestamp];
   }
 }
-
-// class TTLockSystemInfoModel {
-//   String modelNum;
-//   String hardwareRevision;
-//   String firmwareRevision;
-//
-//   /**
-//    * NB lock IMEI
-//    */
-//   String nbNodeId;
-//   String nbOperator;
-//   String nbCardNumber;
-//   int nbRssi;
-//
-//   TTLockSystemInfoModel(Map map) {
-//     this.modelNum = map[TTResponse.modelNum];
-//     this.firmwareRevision = map[TTResponse.firmwareRevision];
-//     this.hardwareRevision = map[TTResponse.hardwareRevision];
-//     this.nbNodeId = map[TTResponse.nbNodeId];
-//     this.nbOperator = map[TTResponse.nbOperator];
-//     this.nbCardNumber = map[TTResponse.nbCardNumber];
-//     this.nbRssi = map[TTResponse.nbRssi];
-//   }
-//
-//   @override
-//   String toString() {
-//     return "modelNum:" + modelNum
-//           + "\nhardwareRevision:" + hardwareRevision
-//           + "\nfirmwareRevision:" + firmwareRevision;
-//           // + "\nnbNodeId:" + nbNodeId
-//           // + "\nnbOperator:" + nbOperator
-//           // + "\nnbCardNumber:" + nbCardNumber
-//           // + "\nnbRssi:" + nbRssi.toString();
-//   }
-//
-// }
 
 class TTCycleModel {
   // weekDay  1-7,1 means Monday，2 means  Tuesday ,...,7 means Sunday
@@ -1616,6 +1676,7 @@ class TTLockSystemModel {
   String? nbNodeId;
   String? nbCardNumber;
   String? nbRssi;
+  int? electricQuantity;
 
   // ignore: non_constant_identifier_names
   TTLockSystemModel(Map map) {
@@ -1626,6 +1687,7 @@ class TTLockSystemModel {
     this.nbNodeId = map["nbNodeId"];
     this.nbCardNumber = map["nbCardNumber"];
     this.nbRssi = map["nbRssi"];
+    this.electricQuantity = map["electricQuantity"];
   }
 }
 
@@ -1723,6 +1785,8 @@ enum TTNbAwakeMode { keypad, card, fingerprint }
 
 enum TTNbAwakeTimeType { point, interval }
 
+enum TTRemoteAccessory { remoteKey, remoteKeypad, doorSensor }
+
 typedef TTSuccessCallback = void Function();
 typedef TTFailedCallback = void Function(
     TTLockError errorCode, String errorMsg);
@@ -1782,22 +1846,25 @@ typedef TTWifiLockGetWifiInfoCallback = void Function(TTWifiInfoModel wifiInfo);
 
 typedef TTGetLockSoundWithSoundVolumeCallback = void Function(
     TTSoundVolumeType ttLocksoundVolumeType);
-// typedef TTGetLockSystemInfoCallback = void Function(TTLockSystemInfoModel lockSystemInfoModel);
 // typedef TTGetPasscodeVerificationParamsCallback = void Function(String lockData);
 
 typedef TTRemoteFailedCallback = void Function(
-    TTRemoteError errorCode, String errorMsg);
-typedef TTRemoteScanCallback = void Function(TTRemoteScanModel scanModel);
-typedef TTRemoteInitCallback = void Function(Map map);
+    TTRemoteKeyError errorCode, String errorMsg);
+typedef TTRemoteKeyScanCallback = void Function(TTRemoteKeyScanModel scanModel);
+typedef TTRemoteKeyInitCallback = void Function(
+    TTLockSystemModel lockSystemModel);
 
-class TTRemoteScanModel {
-  String remoteName = '';
-  String remoteMac = '';
+typedef TTGetLockAccessoryElectricQuantity = void Function(
+    int electricQuantity, int updateDate);
+
+class TTRemoteKeyScanModel {
+  String name = '';
+  String mac = '';
   int rssi = -1;
 
-  TTGatewayScanModel(Map map) {
-    this.remoteName = map["remoteName"];
-    this.remoteMac = map["remoteMac"];
+  TTRemoteKeyScanModel(Map map) {
+    this.name = map["name"];
+    this.mac = map["mac"];
     this.rssi = map["rssi"];
   }
 }
@@ -1856,10 +1923,7 @@ enum TTIpSettingType { STATIC_IP, DHCP }
 
 enum TTGatewayConnectStatus { timeout, success, faile }
 
-enum TTRemoteError {
-  fail,
-  connectTimeout
-}
+enum TTRemoteKeyError { fail, wrongCrc, connectTimeout }
 
 enum TTLockFuction {
   passcode,
