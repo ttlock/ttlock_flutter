@@ -8,8 +8,8 @@ import java.util.Map;
  * Created by TTLock on 2020/9/10.
  */
 public class TTKeyPadScanModel {
-    public String keyPadName;
-    public String keyPadMac;
+    public String name;
+    public String mac;
     public int rssi;
 
     public TTKeyPadScanModel toObject(Map<String, Object> params) {

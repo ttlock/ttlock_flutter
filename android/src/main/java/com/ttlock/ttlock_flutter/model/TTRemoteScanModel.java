@@ -8,8 +8,8 @@ import java.util.Map;
  * Created by TTLock on 2020/9/10.
  */
 public class TTRemoteScanModel {
-    public String remoteName;
-    public String remoteMac;
+    public String name;
+    public String mac;
     public int rssi;
 
     public TTRemoteScanModel toObject(Map<String, Object> params) {

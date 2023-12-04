@@ -117,4 +117,18 @@ public class TTLockCommand {
     public static final String COMMAND_SET_LOCK_SOUND_WITH_SOUND_VOLUME = "setLockSoundWithSoundVolume";
     public static final String COMMAND_GET_LOCK_SOUND_WITH_SOUND_VOLUME = "getLockSoundWithSoundVolume";
 
+    public static final String COMMAND_ADD_LOCK_DOOR_SENSORY =
+            "lockAddDoorSensor";
+    public static final String COMMAND_DELETE_LOCK_DOOR_SENSORY =
+            "lockDeleteDoorSensor";
+    public static final String COMMAND_SET_LOCK_DOOR_SENSORY_ALERT_TIME =
+            "lockSetDoorSensorAlertTime";
+
+    public static final String COMMAND_ADD_LOCK_REMOTE_KEY = "lockAddRemoteKey";
+    public static final String COMMAND_DELETE_LOCK_REMOTE_KEY = "lockDeleteRemoteKey";
+    public static final String COMMAND_SET_LOCK_REMOTE_KEY_VALID_DATE =
+            "lockModifyRemoteKeyValidDate";
+    public static final String COMMAND_GET_LOCK_REMOTE_ACCESSORY_ELECTRIC_QUANTITY =
+            "lockGetRemoteAccessoryElectricQuantity";
+
 }

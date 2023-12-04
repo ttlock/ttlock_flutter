@@ -16,8 +16,8 @@ import androidx.core.content.ContextCompat;
 import com.google.gson.reflect.TypeToken;
 import com.ttlock.bl.sdk.api.ExtendedBluetoothDevice;
 import com.ttlock.bl.sdk.api.TTLockClient;
-import com.ttlock.bl.sdk.api.WirelessKeypadClient;
 import com.ttlock.bl.sdk.callback.ActivateLiftFloorsCallback;
+import com.ttlock.bl.sdk.callback.AddDoorSensorCallback;
 import com.ttlock.bl.sdk.callback.AddFingerprintCallback;
 import com.ttlock.bl.sdk.callback.AddICCardCallback;
 import com.ttlock.bl.sdk.callback.AddRemoteCallback;
@@ -29,6 +29,7 @@ import com.ttlock.bl.sdk.callback.ConfigServerCallback;
 import com.ttlock.bl.sdk.callback.ConfigWifiCallback;
 import com.ttlock.bl.sdk.callback.ControlLockCallback;
 import com.ttlock.bl.sdk.callback.CreateCustomPasscodeCallback;
+import com.ttlock.bl.sdk.callback.DeleteDoorSensorCallback;
 import com.ttlock.bl.sdk.callback.DeleteFingerprintCallback;
 import com.ttlock.bl.sdk.callback.DeletePasscodeCallback;
 import com.ttlock.bl.sdk.callback.DeleteRemoteCallback;
@@ -51,7 +52,6 @@ import com.ttlock.bl.sdk.callback.GetOperationLogCallback;
 import com.ttlock.bl.sdk.callback.GetPasscodeVerificationInfoCallback;
 import com.ttlock.bl.sdk.callback.GetRemoteUnlockStateCallback;
 import com.ttlock.bl.sdk.callback.GetWifiInfoCallback;
-import com.ttlock.bl.sdk.callback.InitKeypadCallback;
 import com.ttlock.bl.sdk.callback.InitLockCallback;
 import com.ttlock.bl.sdk.callback.ModifyAdminPasscodeCallback;
 import com.ttlock.bl.sdk.callback.ModifyFingerprintPeriodCallback;
@@ -63,10 +63,10 @@ import com.ttlock.bl.sdk.callback.ReportLossCardCallback;
 import com.ttlock.bl.sdk.callback.ResetKeyCallback;
 import com.ttlock.bl.sdk.callback.ResetLockCallback;
 import com.ttlock.bl.sdk.callback.ResetPasscodeCallback;
-import com.ttlock.bl.sdk.callback.ScanKeypadCallback;
 import com.ttlock.bl.sdk.callback.ScanLockCallback;
 import com.ttlock.bl.sdk.callback.ScanWifiCallback;
 import com.ttlock.bl.sdk.callback.SetAutoLockingPeriodCallback;
+import com.ttlock.bl.sdk.callback.SetDoorSensorAlertTimeCallback;
 import com.ttlock.bl.sdk.callback.SetHotelCardSectorCallback;
 import com.ttlock.bl.sdk.callback.SetHotelDataCallback;
 import com.ttlock.bl.sdk.callback.SetLiftControlableFloorsCallback;
@@ -84,6 +84,7 @@ import com.ttlock.bl.sdk.callback.SetRemoteUnlockSwitchCallback;
 import com.ttlock.bl.sdk.constant.LogType;
 import com.ttlock.bl.sdk.constant.RecoveryData;
 import com.ttlock.bl.sdk.device.Remote;
+import com.ttlock.bl.sdk.device.WirelessDoorSensor;
 import com.ttlock.bl.sdk.device.WirelessKeypad;
 import com.ttlock.bl.sdk.entity.AccessoryInfo;
 import com.ttlock.bl.sdk.entity.AccessoryType;
@@ -115,6 +116,11 @@ import com.ttlock.bl.sdk.gateway.model.ConfigureGatewayInfo;
 import com.ttlock.bl.sdk.gateway.model.DeviceInfo;
 import com.ttlock.bl.sdk.gateway.model.GatewayError;
 import com.ttlock.bl.sdk.gateway.model.WiFi;
+import com.ttlock.bl.sdk.keypad.InitKeypadCallback;
+import com.ttlock.bl.sdk.keypad.ScanKeypadCallback;
+import com.ttlock.bl.sdk.keypad.WirelessKeypadClient;
+import com.ttlock.bl.sdk.keypad.model.InitKeypadResult;
+import com.ttlock.bl.sdk.keypad.model.KeypadError;
 import com.ttlock.bl.sdk.remote.api.RemoteClient;
 import com.ttlock.bl.sdk.remote.callback.InitRemoteCallback;
 import com.ttlock.bl.sdk.remote.callback.ScanRemoteCallback;
@@ -124,7 +130,14 @@ import com.ttlock.bl.sdk.util.DigitUtil;
 import com.ttlock.bl.sdk.util.FeatureValueUtil;
 import com.ttlock.bl.sdk.util.GsonUtil;
 import com.ttlock.bl.sdk.util.LogUtil;
+import com.ttlock.bl.sdk.wirelessdoorsensor.WirelessDoorSensorClient;
+import com.ttlock.bl.sdk.wirelessdoorsensor.callback.InitDoorSensorCallback;
+import com.ttlock.bl.sdk.wirelessdoorsensor.callback.ScanWirelessDoorSensorCallback;
+import com.ttlock.bl.sdk.wirelessdoorsensor.model.DoorSensorError;
+import com.ttlock.bl.sdk.wirelessdoorsensor.model.InitDoorSensorResult;
+import com.ttlock.ttlock_flutter.constant.CommandType;
 import com.ttlock.ttlock_flutter.constant.GatewayCommand;
+import com.ttlock.ttlock_flutter.constant.TTDoorSensorCommand;
 import com.ttlock.ttlock_flutter.constant.TTGatewayConnectStatus;
 import com.ttlock.ttlock_flutter.constant.TTKeyPadCommand;
 import com.ttlock.ttlock_flutter.constant.TTLockCommand;
@@ -181,8 +194,8 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   public static final int ResultStateProgress = 1;
   public static final int ResultStateFail = 2;
 
-  //todo:需要区分多类型
-  private boolean isGatewayCommand;
+  private int commandType;
+
   /**
    * lock is busy try
    */
@@ -230,10 +243,19 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       initSdk();
     }
     if (GatewayCommand.isGatewayCommand(call.method)) {//gateway
-      isGatewayCommand = true;
+      commandType = CommandType.GATEWAY;
       gatewayCommand(call);
+    } else if (TTRemoteCommand.isRemoteCommand(call.method)) {
+      commandType = CommandType.REMOTE_KEY;
+      remoteCommand(call);
+    } else if (TTKeyPadCommand.isKeypadCommand(call.method)) {
+      commandType = CommandType.KEY_PAD;
+      keypadCommand(call);
+    } else if (TTDoorSensorCommand.isDoorSensorCommand(call.method)) {
+      commandType = CommandType.DOOR_SENSOR;
+      doorSensorCommand(call);
     } else {//door lock
-      isGatewayCommand = false;
+      commandType = CommandType.DOOR_LOCK;
       doorLockCommand(call);
     }
   }
@@ -242,6 +264,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     TTLockClient.getDefault().prepareBTService(activity);
     GatewayClient.getDefault().prepareBTService(activity);
     RemoteClient.getDefault().prepareBTService(activity);
+    WirelessKeypadClient.getDefault().prepareBTService(activity);
     WirelessKeypadClient.getDefault().prepareBTService(activity);
   }
 
@@ -312,11 +335,109 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     }
   }
 
+  public void remoteCommand(MethodCall call) {
+    String command = call.method;
+    Map<String, Object> params = (Map<String, Object>) call.arguments;
+    switch (command) {
+      case TTRemoteCommand.COMMAND_START_SCAN_REMOTE:
+        startScanRemote();
+        break;
+      case TTRemoteCommand.COMMAND_STOP_SCAN_REMOTE:
+        stopScanRemote();
+        break;
+      case TTRemoteCommand.COMMAND_INIT_REMOTE:
+        initRemote(params);
+        break;
+    }
+  }
+
+  public void keypadCommand(MethodCall call) {
+    String command = call.method;
+    Map<String, Object> params = (Map<String, Object>)call.arguments;
+    switch (command) {
+      case TTKeyPadCommand.COMMAND_START_SCAN_KEY_PAD:
+        startScanKeyPad();
+        break;
+      case TTKeyPadCommand.COMMAND_STOP_SCAN_KEY_PAD:
+        stopScanKeyPad();
+        break;
+      case TTKeyPadCommand.COMMAND_INIT_KEY_PAD:
+        initKeyPad(params);
+        break;
+    }
+  }
+
+  public void doorSensorCommand(MethodCall call) {
+    String command = call.method;
+    Map<String, Object> params = (Map<String, Object>) call.arguments;
+    switch (command) {
+      case TTDoorSensorCommand.COMMAND_START_SCAN_DOOR_SENSOR:
+        startScanDoorSensor();
+        break;
+      case TTDoorSensorCommand.COMMAND_STOP_SCAN_DOOR_SENSOR:
+        stopScanDoorSensor();
+        break;
+      case TTDoorSensorCommand.COMMAND_INIT_DOOR_SENSOR:
+        initDoorSensor(params);
+        break;
+    }
+  }
+
   public void isSupportFeature(TtlockModel ttlockModel) {
     boolean isSupport = FeatureValueUtil.isSupportFeature(ttlockModel.lockData, TTLockFunction.flutter2Native(ttlockModel.supportFunction));
     ttlockModel.isSupport = isSupport;
     LogUtil.d(TTLockFunction.flutter2Native(ttlockModel.supportFunction) + ":" + isSupport);
     successCallbackCommand(TTLockCommand.COMMAND_SUPPORT_FEATURE, ttlockModel.toMap());
+  }
+
+  /**-------------------- door sensor -----------------------------**/
+  public void startScanDoorSensor() {
+    PermissionUtils.doWithScanPermission(activity, success -> {
+      if (success) {
+        WirelessDoorSensorClient.getDefault().startScan(new ScanWirelessDoorSensorCallback() {
+          @Override
+          public void onScan(WirelessDoorSensor wirelessDoorSensor) {
+            Map<String, Object> params = new HashMap<>();
+            params.put(TTParam.NAME, wirelessDoorSensor.getName());
+            params.put(TTParam.MAC, wirelessDoorSensor.getAddress());
+            params.put(TTParam.RSSI, wirelessDoorSensor.getRssi());
+            successCallbackCommand(TTDoorSensorCommand.COMMAND_INIT_DOOR_SENSOR, params);
+          }
+        });
+      } else {
+        LogUtil.d("no scan permission");
+      }
+    });
+  }
+
+  public void stopScanDoorSensor() {
+    WirelessDoorSensorClient.getDefault().stopScan();
+  }
+
+  public void initDoorSensor(Map<String, Object> params) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        BluetoothDevice device = BluetoothAdapter.getDefaultAdapter().getRemoteDevice((String) params.get(TTParam.MAC));
+        WirelessDoorSensor doorSensor = new WirelessDoorSensor(device);
+        WirelessDoorSensorClient.getDefault().initialize(doorSensor, (String) params.get(TTParam.LOCK_MAC), new InitDoorSensorCallback() {
+          @Override
+          public void onInitSuccess(InitDoorSensorResult initDoorSensorResult) {
+            params.put(TTParam.ELECTRIC_QUANTITY, initDoorSensorResult.getBatteryLevel());
+            params.put(TTParam.MODEL_NUM, initDoorSensorResult.getFirmwareInfo().getModelNum());
+            params.put(TTParam.FIRMWARE_REVISION, initDoorSensorResult.getFirmwareInfo().getFirmwareRevision());
+            params.put(TTParam.HARD_WARE_REVISION, initDoorSensorResult.getFirmwareInfo().getHardwareRevision());
+            successCallbackCommand(TTDoorSensorCommand.COMMAND_INIT_DOOR_SENSOR, params);
+          }
+
+          @Override
+          public void onFail(DoorSensorError doorSensorError) {
+            errorCallbackCommand(TTDoorSensorCommand.COMMAND_INIT_DOOR_SENSOR, doorSensorError);
+          }
+        });
+      } else {
+        callbackCommand(TTKeyPadCommand.COMMAND_INIT_KEY_PAD, ResultStateFail, params, LockError.LOCK_NO_PERMISSION.getIntErrorCode(), "no connect permission");
+      }
+    });
   }
 
   /**--------------------------- keypad -------------------------- **/
@@ -327,14 +448,14 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
           @Override
           public void onScanKeyboardSuccess(WirelessKeypad wirelessKeypad) {
             TTKeyPadScanModel ttKeyPadScanModel = new TTKeyPadScanModel();
-            ttKeyPadScanModel.keyPadMac = wirelessKeypad.getAddress();
-            ttKeyPadScanModel.keyPadName = wirelessKeypad.getName();
+            ttKeyPadScanModel.mac = wirelessKeypad.getAddress();
+            ttKeyPadScanModel.name = wirelessKeypad.getName();
             ttKeyPadScanModel.rssi = wirelessKeypad.getRssi();
             successCallbackCommand(TTKeyPadCommand.COMMAND_START_SCAN_KEY_PAD, ttKeyPadScanModel.toMap());
           }
 
           @Override
-          public void onFail(LockError lockError) {
+          public void onScanFailed(int errorcode) {
 
           }
         });
@@ -355,14 +476,15 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         WirelessKeypad keypad = new WirelessKeypad(device);
         WirelessKeypadClient.getDefault().initializeKeypad(keypad, (String) params.get(TTParam.LOCK_MAC), new InitKeypadCallback() {
           @Override
-          public void onInitKeypadSuccess(int specialValue) {
-            params.put(TTParam.SPECIAL_VALUE, specialValue);
+          public void onInitKeypadSuccess(InitKeypadResult initKeypadResult) {
+            params.put(TTParam.ELECTRIC_QUANTITY, initKeypadResult.getBatteryLevel());
+            params.put(TTParam.KEYPAD_FEATURE_VALUE, initKeypadResult.getFeatureValue());
             successCallbackCommand(TTKeyPadCommand.COMMAND_INIT_KEY_PAD, params);
           }
 
           @Override
-          public void onFail(LockError lockError) {
-            errorCallbackCommand(TTKeyPadCommand.COMMAND_INIT_KEY_PAD, lockError);
+          public void onFail(KeypadError keypadError) {
+            errorCallbackCommand(TTKeyPadCommand.COMMAND_INIT_KEY_PAD, keypadError);
           }
         });
       } else {
@@ -380,8 +502,8 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
           @Override
           public void onScanRemote(Remote remote) {
             TTRemoteScanModel ttRemoteScanModel = new TTRemoteScanModel();
-            ttRemoteScanModel.remoteMac = remote.getAddress();
-            ttRemoteScanModel.remoteName = remote.getName();
+            ttRemoteScanModel.mac = remote.getAddress();
+            ttRemoteScanModel.name = remote.getName();
             ttRemoteScanModel.rssi = remote.getRssi();
             successCallbackCommand(TTRemoteCommand.COMMAND_START_SCAN_REMOTE, ttRemoteScanModel.toMap());
           }
@@ -404,7 +526,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         RemoteClient.getDefault().initialize(remote, (String) params.get(TTParam.LOCK_DATA), new InitRemoteCallback() {
           @Override
           public void onInitSuccess(InitRemoteResult initRemoteResult) {
-            params.put(TTParam.BATTERY, initRemoteResult.getBatteryLevel());
+            params.put(TTParam.ELECTRIC_QUANTITY, initRemoteResult.getBatteryLevel());
             params.put(TTParam.MODEL_NUM, initRemoteResult.getSystemInfo().getModelNum());
             params.put(TTParam.FIRMWARE_REVISION, initRemoteResult.getSystemInfo().getFirmwareRevision());
             params.put(TTParam.HARD_WARE_REVISION, initRemoteResult.getSystemInfo().getHardwareRevision());
@@ -785,6 +907,27 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         break;
       case TTLockCommand.COMMAND_GET_LOCK_SOUND_WITH_SOUND_VOLUME:
         getLockSoundWithSoundVolume(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_SET_LOCK_DOOR_SENSORY_ALERT_TIME:
+        setDoorSensorAlertTime(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_ADD_LOCK_REMOTE_KEY:
+        addRemoteKey(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_DELETE_LOCK_REMOTE_KEY:
+        deleteRemoteKey(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_SET_LOCK_REMOTE_KEY_VALID_DATE:
+        modifyRemoteKey(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_GET_LOCK_REMOTE_ACCESSORY_ELECTRIC_QUANTITY:
+        getAccessoryElectricQuantity(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_ADD_LOCK_DOOR_SENSORY:
+        addDoorSensor(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_DELETE_LOCK_DOOR_SENSORY:
+        deleteDoorSensor(ttlockModel);
         break;
       default:
         apiFail(LockError.INVALID_COMMAND);
@@ -2328,6 +2471,66 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
+  public void addDoorSensor(final TtlockModel ttlockModel) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().addDoorSensor(ttlockModel.mac, ttlockModel.lockData, new AddDoorSensorCallback() {
+          @Override
+          public void onAddSuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void deleteDoorSensor(final TtlockModel ttlockModel) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().deleteDoorSensor(ttlockModel.lockData, new DeleteDoorSensorCallback() {
+          @Override
+          public void onDeleteSuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void setDoorSensorAlertTime(final TtlockModel ttlockModel) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().setDoorSensorAlertTime(ttlockModel.alertTime, ttlockModel.lockData, new SetDoorSensorAlertTimeCallback() {
+          @Override
+          public void onSetDoorSensorAlertTimeSuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
   public void addRemoteKey(final TtlockModel ttlockModel) {
     ValidityInfo validityInfo = new ValidityInfo();
     validityInfo.setStartDate(ttlockModel.startDate);
@@ -2342,7 +2545,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     }
     PermissionUtils.doWithConnectPermission(activity, success -> {
       if (success) {
-        TTLockClient.getDefault().addRemote(ttlockModel.remoteMac, validityInfo, ttlockModel.lockData, new AddRemoteCallback() {
+        TTLockClient.getDefault().addRemote(ttlockModel.mac, validityInfo, ttlockModel.lockData, new AddRemoteCallback() {
           @Override
           public void onAddSuccess() {
             apiSuccess(ttlockModel);
@@ -2373,7 +2576,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     }
     PermissionUtils.doWithConnectPermission(activity, success -> {
       if (success) {
-        TTLockClient.getDefault().modifyRemoteValidityPeriod(ttlockModel.remoteMac, validityInfo, ttlockModel.lockData, new ModifyRemoteValidityPeriodCallback() {
+        TTLockClient.getDefault().modifyRemoteValidityPeriod(ttlockModel.mac, validityInfo, ttlockModel.lockData, new ModifyRemoteValidityPeriodCallback() {
           @Override
           public void onModifySuccess() {
             apiSuccess(ttlockModel);
@@ -2393,7 +2596,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   public void deleteRemoteKey(final TtlockModel ttlockModel) {
     PermissionUtils.doWithConnectPermission(activity, success -> {
       if (success) {
-        TTLockClient.getDefault().deleteRemote(ttlockModel.remoteMac, ttlockModel.lockData, new DeleteRemoteCallback() {
+        TTLockClient.getDefault().deleteRemote(ttlockModel.mac, ttlockModel.lockData, new DeleteRemoteCallback() {
           @Override
           public void onDeleteSuccess() {
             apiSuccess(ttlockModel);
@@ -2432,8 +2635,21 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
   public void getAccessoryElectricQuantity(final TtlockModel ttlockModel) {
     AccessoryInfo accessoryInfo = new AccessoryInfo();
-    accessoryInfo.setAccessoryType(AccessoryType.getInstance(ttlockModel.type + 1));
-    accessoryInfo.setAccessoryMac(ttlockModel.deviceMac);
+//    TTRemoteAccessory { remoteKey, remoteKeypad, doorSensor }
+    AccessoryType accessoryType = null;
+    switch (ttlockModel.remoteAccessory) {
+      case 0://remoteKey
+        accessoryType = AccessoryType.REMOTE;
+        break;
+      case 1://remoteKeypad
+        accessoryType = AccessoryType.WIRELESS_KEYPAD;
+        break;
+      case 2://doorSensor
+        accessoryType = AccessoryType.DOOR_SENSOR;
+        break;
+    }
+    accessoryInfo.setAccessoryType(accessoryType);
+    accessoryInfo.setAccessoryMac(ttlockModel.mac);
     PermissionUtils.doWithConnectPermission(activity, success -> {
       if (success) {
         TTLockClient.getDefault().getAccessoryBatteryLevel(accessoryInfo, ttlockModel.lockData, new GetAccessoryBatteryLevelCallback() {
@@ -2497,14 +2713,26 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       case PERMISSIONS_REQUEST_CODE: {
         // If request is cancelled, the result arrays are empty.
         if (grantResults.length > 0) {
-          for (int i=0;i<permissions.length;i++) {
+          for (int i = 0; i < permissions.length; i++) {
             if (Manifest.permission.ACCESS_FINE_LOCATION.equals(permissions[i]) && grantResults[i] == PackageManager.PERMISSION_GRANTED) {
               // permission was granted, yay! Do the
               // contacts-related task you need to do.
-              if (isGatewayCommand) {
-                startScanGateway();
-              } else {
-                startScan();
+              switch (commandType) {
+                case CommandType.DOOR_LOCK:
+                  startScan();
+                  break;
+                case CommandType.DOOR_SENSOR:
+                  startScanDoorSensor();
+                  break;
+                case CommandType.GATEWAY:
+                  startScanGateway();
+                  break;
+                case CommandType.KEY_PAD:
+                  startScanKeyPad();
+                  break;
+                case CommandType.REMOTE_KEY:
+                  startScanRemote();
+                  break;
               }
             } else {
               // permission denied, boo! Disable the
@@ -2602,8 +2830,15 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void errorCallbackCommand(String command, RemoteError remoteError) {
-    //todo:做转换
-    callbackCommand(command, ResultStateFail, null, remoteError.ordinal(), remoteError.getDescription());
+    callbackCommand(command, ResultStateFail, null, remoteError.getErrorCode(), remoteError.getDescription());
+  }
+
+  public void errorCallbackCommand(String command, KeypadError keypadError) {
+    callbackCommand(command, ResultStateFail, null, keypadError.getErrorCode(), keypadError.getDescription());
+  }
+
+  public void errorCallbackCommand(String command, DoorSensorError doorSensorError) {
+    callbackCommand(command, ResultStateFail, null, doorSensorError.getErrorCode(), doorSensorError.getDescription());
   }
 
   public void errorCallbackCommand(String command, GatewayError gatewayError) {

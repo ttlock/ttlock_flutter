@@ -128,6 +128,10 @@ class TTLock {
   static const String COMMAND_GET_LOCK_REMOTE_ACCESSORY_ELECTRIC_QUANTITY =
       "lockGetRemoteAccessoryElectricQuantity";
 
+  static const String COMMAND_ADD_LOCK_DOOR_SENSORY =
+      "lockAddDoorSensor";
+  static const String COMMAND_DELETE_LOCK_DOOR_SENSORY =
+      "lockDeleteDoorSensor";
   static const String COMMAND_SET_LOCK_DOOR_SENSORY_ALERT_TIME =
       "lockSetDoorSensorAlertTime";
 
@@ -1059,6 +1063,21 @@ class TTLock {
     map[TTResponse.mac] = remoteAccessoryMac;
     map[TTResponse.lockData] = lockData;
     invoke(COMMAND_GET_LOCK_REMOTE_ACCESSORY_ELECTRIC_QUANTITY, map, callback,
+        fail: failedCallback);
+  }
+
+  static void addDoorSensor(String doorSensorMac, String lockData,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+    Map map = new Map();
+    map[TTResponse.mac] = doorSensorMac;
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_ADD_LOCK_DOOR_SENSORY, map, callback,
+        fail: failedCallback);
+  }
+
+  static void deleteDoorSensor(String lockData,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+    invoke(COMMAND_DELETE_LOCK_DOOR_SENSORY, lockData, callback,
         fail: failedCallback);
   }
 
