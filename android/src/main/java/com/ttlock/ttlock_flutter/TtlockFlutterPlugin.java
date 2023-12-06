@@ -267,7 +267,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     GatewayClient.getDefault().prepareBTService(activity);
     RemoteClient.getDefault().prepareBTService(activity);
     WirelessKeypadClient.getDefault().prepareBTService(activity);
-    WirelessKeypadClient.getDefault().prepareBTService(activity);
+    WirelessDoorSensorClient.getDefault().prepareBTService(activity);
   }
 
   public void doorLockCommand(MethodCall call) {
