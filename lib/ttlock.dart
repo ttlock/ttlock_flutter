@@ -125,6 +125,7 @@ class TTLock {
   static const String COMMAND_DELETE_LOCK_REMOTE_KEY = "lockDeleteRemoteKey";
   static const String COMMAND_SET_LOCK_REMOTE_KEY_VALID_DATE =
       "lockModifyRemoteKeyValidDate";
+  static const String COMMAND_CLEAR_REMOTE_KEY = "clearRemoteKey";
   static const String COMMAND_GET_LOCK_REMOTE_ACCESSORY_ELECTRIC_QUANTITY =
       "lockGetRemoteAccessoryElectricQuantity";
 
@@ -1034,6 +1035,11 @@ class TTLock {
     invoke(COMMAND_DELETE_LOCK_REMOTE_KEY, map, callback, fail: failedCallback);
   }
 
+  static void clearRemoteKey(String lockData,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+    invoke(COMMAND_CLEAR_REMOTE_KEY, lockData, callback, fail: failedCallback);
+  }
+
   static void setRemoteKeyValidDate(
       String remoteKeyMac,
       List<TTCycleModel>? cycleList,
@@ -1056,7 +1062,7 @@ class TTLock {
       TTRemoteAccessory remoteAccessory,
       String remoteAccessoryMac,
       String lockData,
-      TTSuccessCallback callback,
+      TTGetLockAccessoryElectricQuantity callback,
       TTFailedCallback failedCallback) {
     Map map = new Map();
     map[TTResponse.remoteAccessory] = remoteAccessory.index;

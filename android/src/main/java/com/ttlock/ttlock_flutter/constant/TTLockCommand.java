@@ -131,4 +131,6 @@ public class TTLockCommand {
     public static final String COMMAND_GET_LOCK_REMOTE_ACCESSORY_ELECTRIC_QUANTITY =
             "lockGetRemoteAccessoryElectricQuantity";
 
+    public static final String COMMAND_CLEAR_REMOTE_KEY = "clearRemoteKey";
+
 }

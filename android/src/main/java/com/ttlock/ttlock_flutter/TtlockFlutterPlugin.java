@@ -175,6 +175,8 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
+import com.ttlock.bl.sdk.entity.LockData;
+import com.ttlock.bl.sdk.api.EncryptionUtil;
 
 /** TtlockFlutterPlugin */
 public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware, EventChannel.StreamHandler {
@@ -930,6 +932,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         break;
       case TTLockCommand.COMMAND_DELETE_LOCK_DOOR_SENSORY:
         deleteDoorSensor(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_CLEAR_REMOTE_KEY:
+        clearRemote(ttlockModel);
         break;
       default:
         apiFail(LockError.INVALID_COMMAND);
@@ -2659,6 +2664,26 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
           public void onGetAccessoryBatteryLevelSuccess(AccessoryInfo accessoryInfo) {
             ttlockModel.accessoryBattery = accessoryInfo.getAccessoryBattery();
             ttlockModel.updateDate = accessoryInfo.getBatteryDate();
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void clearRemote(final TtlockModel ttlockModel) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().clearRemote(ttlockModel.lockData, new ClearRemoteCallback() {
+          @Override
+          public void onClearSuccess() {
             apiSuccess(ttlockModel);
           }
 
