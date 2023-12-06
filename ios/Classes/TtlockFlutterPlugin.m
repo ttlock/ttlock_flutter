@@ -905,7 +905,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
     
     
     
-    //门禁
+    //门磁
     else if ([command isEqualToString:command_door_sensor_start_scan]) {
         [TTDoorSensor startScanWithSuccess:^(TTDoorSensorScanModel * _Nonnull model) {
             NSMutableDictionary *dict = @{}.mutableCopy;
@@ -936,6 +936,23 @@ typedef NS_ENUM(NSInteger, ResultState) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
     }
+    
+    else if ([command isEqualToString:command_lock_add_door_sensor]) {
+        [TTLock addDoorSensorWithDoorSensorMac:lockModel.mac lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }
+    
+    else if ([command isEqualToString:command_lock_delete_door_sensor]) {
+        [TTLock clearDoorSensorWithLockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }
+
     
     
     

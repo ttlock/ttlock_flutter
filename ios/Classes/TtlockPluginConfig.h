@@ -129,11 +129,13 @@
 #define command_lock_delete_remote_key @"lockDeleteRemoteKey"
 
 
-#pragma mark - 门禁
+#pragma mark - 门磁
 #define command_door_sensor_start_scan @"doorSensorStartScan"
 #define command_door_sensor_stop_scan @"doorSensorStopScan"
 #define command_door_sensor_init @"doorSensorInit"
 #define command_lock_set_door_sensor_alert_time @"lockSetDoorSensorAlertTime"
+#define command_lock_add_door_sensor @"lockAddDoorSensor"
+#define command_lock_delete_door_sensor @"lockDeleteDoorSensor"
 
 
 #pragma mark - 无线键盘
