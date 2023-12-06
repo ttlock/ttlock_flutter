@@ -421,7 +421,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       if (success) {
         BluetoothDevice device = BluetoothAdapter.getDefaultAdapter().getRemoteDevice((String) params.get(TTParam.MAC));
         WirelessDoorSensor doorSensor = new WirelessDoorSensor(device);
-        WirelessDoorSensorClient.getDefault().initialize(doorSensor, (String) params.get(TTParam.LOCK_MAC), new InitDoorSensorCallback() {
+        String lockData = (String) params.get(TTParam.LOCK_DATA);
+        LockData lockParam = EncryptionUtil.parseLockData(lockData);
+        WirelessDoorSensorClient.getDefault().initialize(doorSensor, lockParam.getLockMac(), new InitDoorSensorCallback() {
           @Override
           public void onInitSuccess(InitDoorSensorResult initDoorSensorResult) {
             params.put(TTParam.ELECTRIC_QUANTITY, initDoorSensorResult.getBatteryLevel());
