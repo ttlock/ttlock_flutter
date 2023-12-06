@@ -421,9 +421,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       if (success) {
         BluetoothDevice device = BluetoothAdapter.getDefaultAdapter().getRemoteDevice((String) params.get(TTParam.MAC));
         WirelessDoorSensor doorSensor = new WirelessDoorSensor(device);
-        String lockData = (String) params.get(TTParam.LOCK_DATA);
-        LockData lockParam = EncryptionUtil.parseLockData(lockData);
-        WirelessDoorSensorClient.getDefault().initialize(doorSensor, lockParam.getLockMac(), new InitDoorSensorCallback() {
+        WirelessDoorSensorClient.getDefault().initialize(doorSensor, (String) params.get(TTParam.LOCK_DATA), new InitDoorSensorCallback() {
           @Override
           public void onInitSuccess(InitDoorSensorResult initDoorSensorResult) {
             params.put(TTParam.ELECTRIC_QUANTITY, initDoorSensorResult.getBatteryLevel());
@@ -2859,15 +2857,15 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void errorCallbackCommand(String command, RemoteError remoteError) {
-    callbackCommand(command, ResultStateFail, null, remoteError.getErrorCode(), remoteError.getDescription());
+    callbackCommand(command, ResultStateFail, null, 0, remoteError.getDescription());
   }
 
   public void errorCallbackCommand(String command, KeypadError keypadError) {
-    callbackCommand(command, ResultStateFail, null, keypadError.getErrorCode(), keypadError.getDescription());
+    callbackCommand(command, ResultStateFail, null, 0, keypadError.getDescription());
   }
 
   public void errorCallbackCommand(String command, DoorSensorError doorSensorError) {
-    callbackCommand(command, ResultStateFail, null, doorSensorError.getErrorCode(), doorSensorError.getDescription());
+    callbackCommand(command, ResultStateFail, null, 0, doorSensorError.getDescription());
   }
 
   public void errorCallbackCommand(String command, GatewayError gatewayError) {
