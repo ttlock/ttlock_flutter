@@ -5,7 +5,7 @@ class TTDoorSensor {
   static const String COMMAND_STOP_SCAN_DOOR_SENSOR = "doorSensorStopScan";
   static const String COMMAND_INIT_DOOR_SENSOR = "doorSensorInit";
 
-  static void startScan(TTRemoteAccessoryScanModel scanCallback) {
+  static void startScan(TTRemoteAccessoryScanCallback scanCallback) {
     TTLock.invoke(COMMAND_START_SCAN_DOOR_SENSOR, null, scanCallback);
   }
 

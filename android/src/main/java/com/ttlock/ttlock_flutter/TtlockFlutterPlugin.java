@@ -401,7 +401,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
             params.put(TTParam.NAME, wirelessDoorSensor.getName());
             params.put(TTParam.MAC, wirelessDoorSensor.getAddress());
             params.put(TTParam.RSSI, wirelessDoorSensor.getRssi());
-            successCallbackCommand(TTDoorSensorCommand.COMMAND_INIT_DOOR_SENSOR, params);
+            successCallbackCommand(TTDoorSensorCommand.COMMAND_START_SCAN_DOOR_SENSOR, params);
           }
         });
       } else {
@@ -474,7 +474,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       if (success) {
         BluetoothDevice device = BluetoothAdapter.getDefaultAdapter().getRemoteDevice((String) params.get(TTParam.MAC));
         WirelessKeypad keypad = new WirelessKeypad(device);
-        WirelessKeypadClient.getDefault().initializeKeypad(keypad, (String) params.get(TTParam.LOCK_MAC), new InitKeypadCallback() {
+        String lockData = (String) params.get(TTParam.LOCK_DATA);
+        LockData lockParam = EncryptionUtil.parseLockData(lockData);
+        WirelessKeypadClient.getDefault().initializeKeypad(keypad, lockParam.lockMac, new InitKeypadCallback() {
           @Override
           public void onInitKeypadSuccess(InitKeypadResult initKeypadResult) {
             params.put(TTParam.ELECTRIC_QUANTITY, initKeypadResult.getBatteryLevel());

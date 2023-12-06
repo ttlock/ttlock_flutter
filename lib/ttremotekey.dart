@@ -5,7 +5,7 @@ class TTRemoteKey {
   static const String COMMAND_STOP_SCAN_REMOTE_KEY = "stopScanRemoteKey";
   static const String COMMAND_INIT_REMOTE_KEY = "initRemoteKey";
 
-  static void startScan(TTRemoteAccessoryScanModel scanCallback) {
+  static void startScan(TTRemoteAccessoryScanCallback scanCallback) {
     TTLock.invoke(COMMAND_START_SCAN_REMOTE_KEY, null, scanCallback);
   }
 

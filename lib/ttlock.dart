@@ -1019,7 +1019,7 @@ class TTLock {
       TTFailedCallback failedCallback) {
     Map map = new Map();
     map[TTResponse.mac] = remoteKeyMac;
-    map[TTResponse.cycleJsonList] = cycleList;
+    map[TTResponse.cycleJsonList] = cycleList==null?null:convert.jsonEncode(cycleList);
     map[TTResponse.startDate] = startDate;
     map[TTResponse.endDate] = endDate;
     map[TTResponse.lockData] = lockData;
@@ -1044,7 +1044,7 @@ class TTLock {
       TTFailedCallback failedCallback) {
     Map map = new Map();
     map[TTResponse.mac] = remoteKeyMac;
-    map[TTResponse.cycleJsonList] = cycleList;
+    map[TTResponse.cycleJsonList] = cycleList==null?null:convert.jsonEncode(cycleList);
     map[TTResponse.startDate] = startDate;
     map[TTResponse.endDate] = endDate;
     map[TTResponse.lockData] = lockData;
