@@ -2037,7 +2037,7 @@ enum TTLockFuction {
   ble5G,
   nbAwake,
   recoverCyclePasscode,
-  wirelessKeyFob,
+  remoteKey,
   getAccessoryElectricQuantity,
   soundVolumeAndLanguageSetting,
   qrCode,
