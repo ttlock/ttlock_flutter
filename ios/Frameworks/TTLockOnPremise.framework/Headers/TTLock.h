@@ -1,5 +1,5 @@
 
-//  version:1.4.2
+//  version:1.4.8
 
 #import <Foundation/Foundation.h>
 #import <TTLockOnPremise/TTBlocks.h>
@@ -14,6 +14,7 @@
 #import <TTLockOnPremise/TTWirelessKeypadScanModel.h>
 #import <TTLockOnPremise/TTWirelessKeyFob.h>
 #import <TTLockOnPremise/TTWirelessKeyFobScanModel.h>
+#import <TTLockOnPremise/TTDoorSensor.h>
 
 @interface TTLock : NSObject
 /**
@@ -54,6 +55,12 @@
  Stop Bluetooth scanning
  */
 + (void)stopScan;
+
+/**
+ Cancel Operations
+ Cancel an active or pending connection to peripheral. Note that this is non-blocking, and any CBPeripheral commands that are still pending to peripheral may or may not complete.
+ */
++ (void)cancelOperationsWithLockMac:(NSString *)lockMac;
 
 #pragma mark - Lock basic operation
 /**
@@ -1092,6 +1099,19 @@ Config Ip
                       lockData:(NSString *)lockData
                        success:(TTSucceedBlock)success
                        failure:(TTFailedBlock)failure;
+
+/**
+ Get the lock log Parallel
+
+ @param lockData The lock data string used to operate lock
+ @param success A block invoked when the lock log is got
+ @param failure A block invoked when the operation fails
+ */
++ (void)getOperationLogParallelWithLockData:(NSString *)lockData
+                        success:(TTGetLockOperateRecordSucceedBlock)success
+                        failure:(TTFailedBlock)failure;
+
+
 
 #pragma mark - deprecated
 
