@@ -816,6 +816,11 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       }
 
       @Override
+      public void onGetDoorSensorStatusSuccess(int status) {
+
+      }
+
+      @Override
       public void onFail(LockError lockError) {
         apiFail(lockError);
       }
