@@ -2662,7 +2662,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         TTLockClient.getDefault().getAccessoryBatteryLevel(accessoryInfo, ttlockModel.lockData, new GetAccessoryBatteryLevelCallback() {
           @Override
           public void onGetAccessoryBatteryLevelSuccess(AccessoryInfo accessoryInfo) {
-            ttlockModel.accessoryBattery = accessoryInfo.getAccessoryBattery();
+            ttlockModel.electricQuantity = accessoryInfo.getAccessoryBattery();
             ttlockModel.updateDate = accessoryInfo.getBatteryDate();
             apiSuccess(ttlockModel);
           }
