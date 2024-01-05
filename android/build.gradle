@@ -22,7 +22,7 @@ rootProject.allprojects {
         google()
         jcenter()
         flatDir {
-            dirs 'libs'
+            dirs project(':ttlock_flutter').file('libs')
         }
     }
 }
