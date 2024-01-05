@@ -26,7 +26,7 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
     if (project.android.hasProperty("namespace")) {
-        namespace 'com.cr0manty.vpn_check'
+        namespace 'com.ttlock.ttlock_flutter_example'
     }
 
     compileSdkVersion 31

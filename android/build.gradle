@@ -31,7 +31,7 @@ apply plugin: 'com.android.library'
 
 android {
     if (project.android.hasProperty("namespace")) {
-        namespace 'com.cr0manty.vpn_check'
+        namespace 'com.ttlock.ttlock_flutter'
     }
 
     compileSdkVersion 31
