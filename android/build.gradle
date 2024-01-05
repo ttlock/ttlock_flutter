@@ -30,6 +30,10 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
+    if (project.android.hasProperty("namespace")) {
+        namespace 'com.cr0manty.vpn_check'
+    }
+
     compileSdkVersion 31
 
     defaultConfig {

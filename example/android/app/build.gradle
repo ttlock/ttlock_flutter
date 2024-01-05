@@ -25,6 +25,10 @@ apply plugin: 'com.android.application'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
+    if (project.android.hasProperty("namespace")) {
+        namespace 'com.cr0manty.vpn_check'
+    }
+
     compileSdkVersion 31
 
     lintOptions {
