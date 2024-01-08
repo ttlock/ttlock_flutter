@@ -67,6 +67,9 @@ enum Command {
   setHotelCardSector,
   setHotelData,
 
+  setLockDirectionLeft,
+  getLockDirection,
+
   getLockSystemInfo,
 
   setNBServerInfo,
@@ -126,6 +129,8 @@ class _LockPageState extends State<LockPage> {
     },
     {"Get Lock Audio Switch State": Command.getLockAudioSwitchState},
     {"Set Lock Audio Switch State": Command.setLockAudioSwitchState},
+    {"Get Lock Unlock Direction": Command.getLockDirection},
+    {"Set Lock Unlock Direction Left": Command.setLockDirectionLeft},
     {"Get Lock Sound Volume Type": Command.getLockSoundVolumeType},
     {"Set Lock Sound Volume Type": Command.setLockSoundVolumeType},
     {"Add Passage Mode": Command.addPassageMode},
@@ -467,6 +472,23 @@ class _LockPageState extends State<LockPage> {
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
+        break;
+
+      case Command.getLockDirection:
+        TTLock.getLockDirection(lockData, (direction) {
+          _showSuccessAndDismiss("direction: $direction");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+
+      case Command.setLockDirectionLeft:
+        TTLock.setLockDirection(TTLockDirection.left, lockData, () {
+          _showSuccessAndDismiss("Success");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+
         break;
 
       case Command.setLockSoundVolumeType:

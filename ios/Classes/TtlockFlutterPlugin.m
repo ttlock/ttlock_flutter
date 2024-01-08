@@ -352,6 +352,21 @@ typedef NS_ENUM(NSInteger, ResultState) {
         }];
 
         
+    }else if ([command isEqualToString:command_get_lock_direction]) {
+        [TTLock getUnlockDirectionWithLockData:lockModel.lockData success:^(TTUnlockDirection direction) {
+            TtlockModel *data = [TtlockModel new];
+            data.direction = @(direction - 1);
+            [weakSelf successCallbackCommand:command data:data];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }else if ([command isEqualToString:command_set_lock_direction]) {
+        TTUnlockDirection direction = lockModel.direction.intValue + 1;
+        [TTLock setUnlockDirection:direction lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
     }else if ([command isEqualToString:command_set_lock_config]) {
         BOOL switchOn = lockModel.isOn.intValue;
         TTLockConfigType lockConfigType = lockModel.lockConfig.intValue + 1;

@@ -75,6 +75,8 @@
 @property (nonatomic, strong) NSNumber * oneMeterRssi;
 @property (nonatomic, strong) NSNumber *timestamp;
 @property (nonatomic, strong) NSNumber *isOn;
+@property (nonatomic, strong) NSNumber *direction;
+
 
 
 

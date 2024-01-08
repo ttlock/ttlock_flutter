@@ -71,6 +71,9 @@
 #define command_get_lock_config @"getLockConfig"
 #define command_set_lock_config @"setLockConfig"
 
+#define command_get_lock_direction @"getLockDirection"
+#define command_set_lock_direction @"setLockDirection"
+
 #define command_get_all_passage_modes @"getAllPassageModes"
 #define command_add_passage_mode @"addPassageMode"
 #define command_clear_all_passage_modes @"clearAllPassageModes"
