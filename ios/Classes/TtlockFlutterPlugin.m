@@ -1185,7 +1185,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
         }
     }
  
-    return [dic copy];
+    return [dic mutableCopy];
 
 }
 
