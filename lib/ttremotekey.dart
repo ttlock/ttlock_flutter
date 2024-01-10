@@ -15,13 +15,13 @@ class TTRemoteKey {
 
   static void init(
     String mac,
-    String lockMac,
+    String lockData,
     TTGetLockSystemCallback callback,
     TTRemoteFailedCallback failedCallback,
   ) {
     Map map = Map();
     map[TTResponse.mac] = mac;
-    map[TTResponse.lockMac] = lockMac;
+    map[TTResponse.lockData] = lockData;
     TTLock.invoke(COMMAND_INIT_REMOTE_KEY, map, callback, fail: failedCallback);
   }
 }
