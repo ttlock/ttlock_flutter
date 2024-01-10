@@ -16,13 +16,13 @@ class TTRemoteKeypad {
 
   static void init(
     String mac,
-    String lockData,
+    String lockMac,
     TTRemoteKeypadInitSuccessCallback callback,
     TTRemoteFailedCallback failedCallback,
   ) {
     Map map = Map();
     map[TTResponse.mac] = mac;
-    map[TTResponse.lockData] = lockData;
+    map[TTResponse.lockMac] = lockMac;
     TTLock.invoke(COMMAND_INIT_REMOTE_KEYPAD, map, callback,
         fail: failedCallback);
   }

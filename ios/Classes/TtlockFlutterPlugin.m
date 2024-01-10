@@ -986,7 +986,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
         [TTWirelessKeypad stopScanKeypad];
     }
     else if ([command isEqualToString:command_remote_keypad_init]) {
-        [TTWirelessKeypad initializeKeypadWithKeypadMac:lockModel.mac lockMac:lockModel.lockData block:^(NSString *wirelessKeypadFeatureValue, TTKeypadStatus status, int electricQuantity) {
+        [TTWirelessKeypad initializeKeypadWithKeypadMac:lockModel.mac lockMac:lockModel.lockMac block:^(NSString *wirelessKeypadFeatureValue, TTKeypadStatus status, int electricQuantity) {
             if(status == TTKeypadSuccess){
                 NSMutableDictionary *dict = @{}.mutableCopy;
                 dict[@"electricQuantity"] = @(electricQuantity);
