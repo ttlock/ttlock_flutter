@@ -7,6 +7,10 @@ import android.bluetooth.BluetoothDevice;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
+
+import com.ttlock.bl.sdk.callback.GetUnlockDirectionCallback;
+import com.ttlock.bl.sdk.callback.SetUnlockDirectionCallback;
+import com.ttlock.bl.sdk.entity.UnlockDirection;
 import com.ttlock.ttlock_flutter.model.TTLockFunction;
 
 import android.src.main.java.com.ttlock.ttlock_flutter.model.SoundVolumeConverter;
@@ -611,6 +615,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         break;
       case TTLockCommand.COMMAND_GET_LOCK_FRETURE_VALUE:
         getFeatureValue(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_GET_LOCK_DIRECTION:
+        getUnlockDirection(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_SET_LOCK_DIRECTION:
+        setUnlockDirection(ttlockModel);
         break;
       case TTLockCommand.COMMAND_SET_ADMIN_ERASE_PASSCODE:
 
@@ -1801,6 +1811,50 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         apiFail(lockError);
       }
     });
+  }
+
+  public void setUnlockDirection(final TtlockModel ttlockModel) {
+//    PermissionUtils.doWithConnectPermission(activity, success -> {
+//      if (success) {
+//        enum TTLockDirection { left, right }
+        UnlockDirection unlockDirection = ttlockModel.direction == 1 ?  UnlockDirection.RIGHT : UnlockDirection.LEFT;
+        TTLockClient.getDefault().setUnlockDirection(unlockDirection, ttlockModel.lockData, new SetUnlockDirectionCallback() {
+          @Override
+          public void onSetUnlockDirectionSuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+//      } else {
+//        apiFail(LockError.LOCK_NO_PERMISSION);
+//      }
+//    });
+  }
+
+  public void getUnlockDirection(final TtlockModel ttlockModel) {
+//    PermissionUtils.doWithConnectPermission(activity, success -> {
+//      if (success) {
+        TTLockClient.getDefault().getUnlockDirection(ttlockModel.lockData, new GetUnlockDirectionCallback() {
+          @Override
+          public void onGetUnlockDirectionSuccess(UnlockDirection unlockDirection) {
+            //enum TTLockDirection { left, right }
+            ttlockModel.direction = unlockDirection == UnlockDirection.LEFT ? 0 : 1;
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+//      } else {
+//        apiFail(LockError.LOCK_NO_PERMISSION);
+//      }
+//    });
   }
 
   public void setAdminErasePasscode(final TtlockModel ttlockModel) {
