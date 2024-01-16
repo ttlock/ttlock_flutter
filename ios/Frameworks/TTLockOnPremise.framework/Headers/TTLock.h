@@ -1,5 +1,5 @@
 
-//  version:1.4.8
+//  version:1.5.2
 
 #import <Foundation/Foundation.h>
 #import <TTLockOnPremise/TTBlocks.h>
