@@ -2944,8 +2944,10 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       public void run() {
         HashMap<String, Object> resultMap = new HashMap<>();
         resultMap.put("command", command);
-        resultMap.put("errorMessage", errorMessage);
-        resultMap.put("errorCode", errorCode);
+        if (errorCode >= 0) {//真正有错误的时候才返回errorCode 跟 errorMessage
+          resultMap.put("errorMessage", errorMessage);
+          resultMap.put("errorCode", errorCode);
+        }
         resultMap.put("resultState", resultState);
         resultMap.put("data", data);
 
