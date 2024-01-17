@@ -1123,8 +1123,10 @@ typedef NS_ENUM(NSInteger, ResultState) {
     NSMutableDictionary *resultDict = @{}.mutableCopy;
     resultDict[@"command"] = command;
     resultDict[@"errorMessage"] = errorMessage;
-    resultDict[@"errorCode"] = errorCode;
     resultDict[@"resultState"] = @(resultState);
+    if(resultState != 0){
+        resultDict[@"errorCode"] = errorCode;
+    }
     if (data) {
         if ([data isKindOfClass:TtlockModel.class]) {
             resultDict[@"data"] = [((TtlockModel *)data) toDictionary];
