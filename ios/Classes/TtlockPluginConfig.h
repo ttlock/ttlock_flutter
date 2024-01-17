@@ -71,6 +71,9 @@
 #define command_get_lock_config @"getLockConfig"
 #define command_set_lock_config @"setLockConfig"
 
+#define command_get_lock_direction @"getLockDirection"
+#define command_set_lock_direction @"setLockDirection"
+
 #define command_get_all_passage_modes @"getAllPassageModes"
 #define command_add_passage_mode @"addPassageMode"
 #define command_clear_all_passage_modes @"clearAllPassageModes"
@@ -117,6 +120,31 @@
 #define command_set_door_sensor_switch @"setDoorSensorSwitch"
 #define command_get_door_sensor_switch @"getDoorSensorSwitch"
 #define command_get_door_sensor_state @"getDoorSensorState"
+
+
+#pragma mark - 无线钥匙
+#define command_remote_key_start_scan @"startScanRemoteKey"
+#define command_remote_key_stop_scan @"stopScanRemoteKey"
+#define command_remote_key_init @"initRemoteKey"
+#define command_lock_add_remote_key @"lockAddRemoteKey"
+#define command_lock_get_remote_accessory_electric_quantity @"lockGetRemoteAccessoryElectricQuantity"
+#define command_lock_modify_remote_key_valid_date @"lockModifyRemoteKeyValidDate"
+#define command_lock_delete_remote_key @"lockDeleteRemoteKey"
+
+
+#pragma mark - 门磁
+#define command_door_sensor_start_scan @"doorSensorStartScan"
+#define command_door_sensor_stop_scan @"doorSensorStopScan"
+#define command_door_sensor_init @"doorSensorInit"
+#define command_lock_set_door_sensor_alert_time @"lockSetDoorSensorAlertTime"
+#define command_lock_add_door_sensor @"lockAddDoorSensor"
+#define command_lock_delete_door_sensor @"lockDeleteDoorSensor"
+
+
+#pragma mark - 无线键盘
+#define command_remote_keypad_start_scan @"remoteKeypadStartScan"
+#define command_remote_keypad_stop_scan @"remoteKeypadStopScan"
+#define command_remote_keypad_init @"remoteKeypadInit"
 
 #pragma mark - 酒店锁
 #define command_set_hotel_card_sector @"setHotelCardSector"

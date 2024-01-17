@@ -20,6 +20,7 @@
 @property (nonatomic, strong) NSNumber *endDate;
 @property (nonatomic, strong) NSNumber * passcodeType;
 @property (nonatomic, strong) NSNumber * cycleType;
+@property (nonatomic, strong) NSNumber * remoteAccessory;
 
 // 0、null - 读取最近的操作记录,  1-读取锁内存中的全部操作记录
 @property (nonatomic, strong) NSNumber *logType;
@@ -63,12 +64,19 @@
 @property (nonatomic, strong) NSNumber * isInited;
 @property (nonatomic, strong) NSNumber * isAllowUnlock;
 @property (nonatomic, strong) NSString * lockVersion;
+@property (nonatomic, strong) NSNumber * updateDate;
+
+@property (nonatomic, strong) NSNumber * alertTime;
+
+
 // 0-锁住  1-解锁  2-未知 3-解锁（车位锁）
 @property (nonatomic, strong) NSNumber * lockSwitchState;
 @property (nonatomic, strong) NSNumber * rssi;
 @property (nonatomic, strong) NSNumber * oneMeterRssi;
 @property (nonatomic, strong) NSNumber *timestamp;
 @property (nonatomic, strong) NSNumber *isOn;
+@property (nonatomic, strong) NSNumber *direction;
+
 
 
 
