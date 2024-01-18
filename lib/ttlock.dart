@@ -136,6 +136,7 @@ class TTLock {
 
   static const String COMMAND_GET_LOCK_DIRECTION = "getLockDirection";
   static const String COMMAND_SET_LOCK_DIRECTION = "setLockDirection";
+  static const String COMMAND_RESET_LOCK_BY_CODE = "resetLockByCode";
 
   // static const String COMMAND_GET_PASSCODE_VERIFICATION_PARAMS = "getPasscodeVerificationParams";
 
@@ -748,6 +749,14 @@ class TTLock {
       TTGetLockDirectionCallback callback, TTFailedCallback failedCallback) {
     invoke(COMMAND_GET_LOCK_DIRECTION, lockData, callback,
         fail: failedCallback);
+  }
+
+  static void resetLockByCode(String lockMac, String resetCode,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.lockMac] = lockMac;
+    map[TTResponse.resetCode] = resetCode;
+    invoke(COMMAND_RESET_LOCK_BY_CODE, map, callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -1686,6 +1695,7 @@ class TTResponse {
   static const String updateDate = "updateDate";
   static const String alertTime = "alertTime";
   static const String wirelessKeypadFeatureValue = "wirelessKeypadFeatureValue";
+  static const String resetCode = "resetCode";
 }
 
 class TTLockScanModel {
