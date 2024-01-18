@@ -133,7 +133,7 @@ public enum TTLockFunction {
             case recoverCyclePasscode:
                 return FeatureValue.CYCLIC_PASSCODE_CAN_RECOVERY;
             case wirelessKeyFob:
-                return FeatureValue.WIRELESS_KEY_FOB;
+                return FeatureValue.REMOTE;
             case getAccessoryElectricQuantity:
                 return FeatureValue.ACCESSORY_BATTERY;
             case soundVolumeAndLanguageSetting:
