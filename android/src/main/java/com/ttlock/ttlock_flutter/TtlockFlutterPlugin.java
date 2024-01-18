@@ -63,6 +63,7 @@ import com.ttlock.bl.sdk.callback.ModifyRemoteValidityPeriodCallback;
 import com.ttlock.bl.sdk.callback.RecoverLockDataCallback;
 import com.ttlock.bl.sdk.callback.ReportLossCardCallback;
 import com.ttlock.bl.sdk.callback.ResetKeyCallback;
+import com.ttlock.bl.sdk.callback.ResetLockByCodeCallback;
 import com.ttlock.bl.sdk.callback.ResetLockCallback;
 import com.ttlock.bl.sdk.callback.ResetPasscodeCallback;
 import com.ttlock.bl.sdk.callback.ScanLockCallback;
@@ -945,6 +946,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         break;
       case TTLockCommand.COMMAND_SET_LOCK_DIRECTION:
         setUnlockDirection(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_RESET_LOCK_BY_CODE:
+        resetLockByCode(ttlockModel);
         break;
       default:
         apiFail(LockError.INVALID_COMMAND);
@@ -2579,6 +2583,26 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
           public void onGetUnlockDirectionSuccess(UnlockDirection unlockDirection) {
             //enum TTLockDirection { left, right }
             ttlockModel.direction = unlockDirection == UnlockDirection.LEFT ? 0 : 1;
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void resetLockByCode(final TtlockModel ttlockModel) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().resetLockByCode(ttlockModel.lockMac, ttlockModel.resetCode, new ResetLockByCodeCallback() {
+          @Override
+          public void onResetSuccess() {
             apiSuccess(ttlockModel);
           }
 
