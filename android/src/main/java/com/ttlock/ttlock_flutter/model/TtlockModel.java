@@ -144,6 +144,9 @@ public class TtlockModel {
 
     public int remoteAccessory;
 
+    public int direction;
+    public String resetCode;
+
     @Override
     public String toString() {
         return "TtlockModel{" +

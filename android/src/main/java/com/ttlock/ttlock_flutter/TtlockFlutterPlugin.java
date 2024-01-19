@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -51,6 +52,7 @@ import com.ttlock.bl.sdk.callback.GetNBAwakeTimesCallback;
 import com.ttlock.bl.sdk.callback.GetOperationLogCallback;
 import com.ttlock.bl.sdk.callback.GetPasscodeVerificationInfoCallback;
 import com.ttlock.bl.sdk.callback.GetRemoteUnlockStateCallback;
+import com.ttlock.bl.sdk.callback.GetUnlockDirectionCallback;
 import com.ttlock.bl.sdk.callback.GetWifiInfoCallback;
 import com.ttlock.bl.sdk.callback.InitLockCallback;
 import com.ttlock.bl.sdk.callback.ModifyAdminPasscodeCallback;
@@ -61,6 +63,7 @@ import com.ttlock.bl.sdk.callback.ModifyRemoteValidityPeriodCallback;
 import com.ttlock.bl.sdk.callback.RecoverLockDataCallback;
 import com.ttlock.bl.sdk.callback.ReportLossCardCallback;
 import com.ttlock.bl.sdk.callback.ResetKeyCallback;
+import com.ttlock.bl.sdk.callback.ResetLockByCodeCallback;
 import com.ttlock.bl.sdk.callback.ResetLockCallback;
 import com.ttlock.bl.sdk.callback.ResetPasscodeCallback;
 import com.ttlock.bl.sdk.callback.ScanLockCallback;
@@ -81,6 +84,7 @@ import com.ttlock.bl.sdk.callback.SetPassageModeCallback;
 import com.ttlock.bl.sdk.callback.SetPowerSaverControlableLockCallback;
 import com.ttlock.bl.sdk.callback.SetPowerSaverWorkModeCallback;
 import com.ttlock.bl.sdk.callback.SetRemoteUnlockSwitchCallback;
+import com.ttlock.bl.sdk.callback.SetUnlockDirectionCallback;
 import com.ttlock.bl.sdk.constant.LogType;
 import com.ttlock.bl.sdk.constant.RecoveryData;
 import com.ttlock.bl.sdk.device.Remote;
@@ -104,6 +108,7 @@ import com.ttlock.bl.sdk.entity.RecoveryDataType;
 import com.ttlock.bl.sdk.entity.SoundVolume;
 import com.ttlock.bl.sdk.entity.TTLiftWorkMode;
 import com.ttlock.bl.sdk.entity.TTLockConfigType;
+import com.ttlock.bl.sdk.entity.UnlockDirection;
 import com.ttlock.bl.sdk.entity.ValidityInfo;
 import com.ttlock.bl.sdk.entity.WifiLockInfo;
 import com.ttlock.bl.sdk.gateway.api.GatewayClient;
@@ -476,9 +481,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       if (success) {
         BluetoothDevice device = BluetoothAdapter.getDefaultAdapter().getRemoteDevice((String) params.get(TTParam.MAC));
         WirelessKeypad keypad = new WirelessKeypad(device);
-        String lockData = (String) params.get(TTParam.LOCK_DATA);
-        LockData lockParam = EncryptionUtil.parseLockData(lockData);
-        WirelessKeypadClient.getDefault().initializeKeypad(keypad, lockParam.lockMac, new InitKeypadCallback() {
+        String lockMac = (String) params.get(TTParam.LOCK_MAC);
+//        LockData lockParam = EncryptionUtil.parseLockData(lockData);
+        WirelessKeypadClient.getDefault().initializeKeypad(keypad, lockMac, new InitKeypadCallback() {
           @Override
           public void onInitKeypadSuccess(InitKeypadResult initKeypadResult) {
             params.put(TTParam.ELECTRIC_QUANTITY, initKeypadResult.getBatteryLevel());
@@ -935,6 +940,15 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         break;
       case TTLockCommand.COMMAND_CLEAR_REMOTE_KEY:
         clearRemote(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_GET_LOCK_DIRECTION:
+        getUnlockDirection(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_SET_LOCK_DIRECTION:
+        setUnlockDirection(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_RESET_LOCK_BY_CODE:
+        resetLockByCode(ttlockModel);
         break;
       default:
         apiFail(LockError.INVALID_COMMAND);
@@ -2538,6 +2552,71 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
+  public void setUnlockDirection(final TtlockModel ttlockModel) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+//        enum TTLockDirection { left, right }
+        UnlockDirection unlockDirection = ttlockModel.direction == 1 ?  UnlockDirection.RIGHT : UnlockDirection.LEFT;
+        Log.e("tag", "unlockDirection:" + unlockDirection);
+        TTLockClient.getDefault().setUnlockDirection(unlockDirection, ttlockModel.lockData, new SetUnlockDirectionCallback() {
+          @Override
+          public void onSetUnlockDirectionSuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void getUnlockDirection(final TtlockModel ttlockModel) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().getUnlockDirection(ttlockModel.lockData, new GetUnlockDirectionCallback() {
+          @Override
+          public void onGetUnlockDirectionSuccess(UnlockDirection unlockDirection) {
+            //enum TTLockDirection { left, right }
+            ttlockModel.direction = unlockDirection == UnlockDirection.LEFT ? 0 : 1;
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void resetLockByCode(final TtlockModel ttlockModel) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().resetLockByCode(ttlockModel.lockMac, ttlockModel.resetCode, new ResetLockByCodeCallback() {
+          @Override
+          public void onResetSuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
   public void addRemoteKey(final TtlockModel ttlockModel) {
     ValidityInfo validityInfo = new ValidityInfo();
     validityInfo.setStartDate(ttlockModel.startDate);
@@ -2889,8 +2968,10 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       public void run() {
         HashMap<String, Object> resultMap = new HashMap<>();
         resultMap.put("command", command);
-        resultMap.put("errorMessage", errorMessage);
-        resultMap.put("errorCode", errorCode);
+        if (errorCode >= 0) {//真正有错误的时候才返回errorCode 跟 errorMessage
+          resultMap.put("errorMessage", errorMessage);
+          resultMap.put("errorCode", errorCode);
+        }
         resultMap.put("resultState", resultState);
         resultMap.put("data", data);
 

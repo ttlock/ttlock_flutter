@@ -26,6 +26,7 @@
 
 #define command_init_lock @"initLock"
 #define command_reset_lock @"resetLock"
+#define command_reset_lock_by_code @"resetLockByCode"
 
 #define command_control_lock @"controlLock"
 #define command_reset_ekey @"resetEkey"
@@ -70,6 +71,9 @@
 
 #define command_get_lock_config @"getLockConfig"
 #define command_set_lock_config @"setLockConfig"
+
+#define command_get_lock_direction @"getLockDirection"
+#define command_set_lock_direction @"setLockDirection"
 
 #define command_get_all_passage_modes @"getAllPassageModes"
 #define command_add_passage_mode @"addPassageMode"

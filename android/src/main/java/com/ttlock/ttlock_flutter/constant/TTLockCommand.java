@@ -133,4 +133,9 @@ public class TTLockCommand {
 
     public static final String COMMAND_CLEAR_REMOTE_KEY = "clearRemoteKey";
 
+    public static final String COMMAND_GET_LOCK_DIRECTION = "getLockDirection";
+    public static final String COMMAND_SET_LOCK_DIRECTION = "setLockDirection";
+
+    public static final String COMMAND_RESET_LOCK_BY_CODE = "resetLockByCode";
+
 }

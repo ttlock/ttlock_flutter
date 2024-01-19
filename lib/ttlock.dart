@@ -129,12 +129,14 @@ class TTLock {
   static const String COMMAND_GET_LOCK_REMOTE_ACCESSORY_ELECTRIC_QUANTITY =
       "lockGetRemoteAccessoryElectricQuantity";
 
-  static const String COMMAND_ADD_LOCK_DOOR_SENSORY =
-      "lockAddDoorSensor";
-  static const String COMMAND_DELETE_LOCK_DOOR_SENSORY =
-      "lockDeleteDoorSensor";
+  static const String COMMAND_ADD_LOCK_DOOR_SENSORY = "lockAddDoorSensor";
+  static const String COMMAND_DELETE_LOCK_DOOR_SENSORY = "lockDeleteDoorSensor";
   static const String COMMAND_SET_LOCK_DOOR_SENSORY_ALERT_TIME =
       "lockSetDoorSensorAlertTime";
+
+  static const String COMMAND_GET_LOCK_DIRECTION = "getLockDirection";
+  static const String COMMAND_SET_LOCK_DIRECTION = "setLockDirection";
+  static const String COMMAND_RESET_LOCK_BY_CODE = "resetLockByCode";
 
   // static const String COMMAND_GET_PASSCODE_VERIFICATION_PARAMS = "getPasscodeVerificationParams";
 
@@ -735,6 +737,28 @@ class TTLock {
     invoke(COMMAND_SET_LOCK_CONFIG, map, callback, fail: failedCallback);
   }
 
+  static void setLockDirection(TTLockDirection direction, String lockData,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.lockData] = lockData;
+    map[TTResponse.direction] = direction.index;
+    invoke(COMMAND_SET_LOCK_DIRECTION, map, callback, fail: failedCallback);
+  }
+
+  static void getLockDirection(String lockData,
+      TTGetLockDirectionCallback callback, TTFailedCallback failedCallback) {
+    invoke(COMMAND_GET_LOCK_DIRECTION, lockData, callback,
+        fail: failedCallback);
+  }
+
+  static void resetLockByCode(String lockMac, String resetCode,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.lockMac] = lockMac;
+    map[TTResponse.resetCode] = resetCode;
+    invoke(COMMAND_RESET_LOCK_BY_CODE, map, callback, fail: failedCallback);
+  }
+
 // ignore: slash_for_doc_comments
 /**
  * Config the lock passage mode. If config succeed,the lock will always be unlocked
@@ -1020,7 +1044,8 @@ class TTLock {
       TTFailedCallback failedCallback) {
     Map map = new Map();
     map[TTResponse.mac] = remoteKeyMac;
-    map[TTResponse.cycleJsonList] = cycleList==null?null:convert.jsonEncode(cycleList);
+    map[TTResponse.cycleJsonList] =
+        cycleList == null ? null : convert.jsonEncode(cycleList);
     map[TTResponse.startDate] = startDate;
     map[TTResponse.endDate] = endDate;
     map[TTResponse.lockData] = lockData;
@@ -1035,8 +1060,8 @@ class TTLock {
     invoke(COMMAND_DELETE_LOCK_REMOTE_KEY, map, callback, fail: failedCallback);
   }
 
-  static void clearRemoteKey(String lockData,
-      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+  static void clearRemoteKey(String lockData, TTSuccessCallback callback,
+      TTFailedCallback failedCallback) {
     invoke(COMMAND_CLEAR_REMOTE_KEY, lockData, callback, fail: failedCallback);
   }
 
@@ -1050,7 +1075,8 @@ class TTLock {
       TTFailedCallback failedCallback) {
     Map map = new Map();
     map[TTResponse.mac] = remoteKeyMac;
-    map[TTResponse.cycleJsonList] = cycleList==null?null:convert.jsonEncode(cycleList);
+    map[TTResponse.cycleJsonList] =
+        cycleList == null ? null : convert.jsonEncode(cycleList);
     map[TTResponse.startDate] = startDate;
     map[TTResponse.endDate] = endDate;
     map[TTResponse.lockData] = lockData;
@@ -1077,12 +1103,11 @@ class TTLock {
     Map map = new Map();
     map[TTResponse.mac] = doorSensorMac;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_ADD_LOCK_DOOR_SENSORY, map, callback,
-        fail: failedCallback);
+    invoke(COMMAND_ADD_LOCK_DOOR_SENSORY, map, callback, fail: failedCallback);
   }
 
-  static void deleteDoorSensor(String lockData,
-      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+  static void deleteDoorSensor(String lockData, TTSuccessCallback callback,
+      TTFailedCallback failedCallback) {
     invoke(COMMAND_DELETE_LOCK_DOOR_SENSORY, lockData, callback,
         fail: failedCallback);
   }
@@ -1255,7 +1280,11 @@ class TTLock {
         TTGetSwitchStateCallback switchStateCallback = callBack;
         switchStateCallback(data[TTResponse.isOn]);
         break;
-
+      case COMMAND_GET_LOCK_DIRECTION:
+        TTGetLockDirectionCallback lockDirectionCallback = callBack;
+        int direction = data[TTResponse.direction];
+        lockDirectionCallback(TTLockDirection.values[direction]);
+        break;
       case COMMAND_GET_LOCK_SYSTEM_INFO:
       case TTRemoteKey.COMMAND_INIT_REMOTE_KEY:
       case TTDoorSensor.COMMAND_INIT_DOOR_SENSOR:
@@ -1620,6 +1649,8 @@ class TTResponse {
   static const String weekly = "weekly";
   static const String monthly = "monthly";
 
+  static const String direction = "direction";
+
   static const String isSupport = "isSupport";
   static const String supportFunction = "supportFunction";
 
@@ -1664,6 +1695,7 @@ class TTResponse {
   static const String updateDate = "updateDate";
   static const String alertTime = "alertTime";
   static const String wirelessKeypadFeatureValue = "wirelessKeypadFeatureValue";
+  static const String resetCode = "resetCode";
 }
 
 class TTLockScanModel {
@@ -1780,6 +1812,8 @@ enum TTLockConfig {
   wifiLockPowerSavingMode
 }
 
+enum TTLockDirection { left, right }
+
 enum TTSoundVolumeType {
   firstLevel,
   secondLevel,
@@ -1876,6 +1910,7 @@ typedef TTAddFingerprintCallback = void Function(String fingerprintNumber);
 typedef TTGetAllFingerprintsCallback = void Function(List fingerprintList);
 typedef TTGetSwitchStateCallback = void Function(bool isOn);
 typedef TTGetLockStatusCallback = void Function(TTLockSwitchState state);
+typedef TTGetLockDirectionCallback = void Function(TTLockDirection direction);
 
 typedef TTGatewayFailedCallback = void Function(
     TTGatewayError errorCode, String errorMsg);
@@ -2050,5 +2085,18 @@ enum TTLockFuction {
   cpuCard,
   wifiLock,
   wifiLockStaticIP,
-  passcodeKeyNumber
+  passcodeKeyNumber,
+
+  meariCamera,
+  standAloneActivation,
+  doubleAuth,
+  authorizedUnlock,
+  gatewayAuthorizedUnlock,
+  noEkeyUnlock,
+  xiongMaiCamera,
+  zhiAnPhotoFace,
+  palmVein,
+  wifiArea,
+  xiaoCaoCamera,
+  resetLockByCode
 }
