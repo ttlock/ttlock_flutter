@@ -26,6 +26,7 @@
 
 #define command_init_lock @"initLock"
 #define command_reset_lock @"resetLock"
+#define command_reset_lock_by_code @"resetLockByCode"
 
 #define command_control_lock @"controlLock"
 #define command_reset_ekey @"resetEkey"

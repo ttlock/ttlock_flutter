@@ -2085,5 +2085,18 @@ enum TTLockFuction {
   cpuCard,
   wifiLock,
   wifiLockStaticIP,
-  passcodeKeyNumber
+  passcodeKeyNumber,
+
+  meariCamera,
+  standAloneActivation,
+  doubleAuth,
+  authorizedUnlock,
+  gatewayAuthorizedUnlock,
+  noEkeyUnlock,
+  xiongMaiCamera,
+  zhiAnPhotoFace,
+  palmVein,
+  wifiArea,
+  xiaoCaoCamera,
+  resetLockByCode
 }
