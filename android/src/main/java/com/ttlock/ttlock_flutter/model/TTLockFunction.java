@@ -187,8 +187,8 @@ public enum TTLockFunction {
                 return FeatureValue.ZHI_AN_FACE_DELIVERY;
             case palmVein:
                 return FeatureValue.PALM_VEIN;
-            case resetLockByCode:
-                return FeatureValue.RESET_LOCK_BY_CODE;
+//            case resetLockByCode:
+//                return FeatureValue.RESET_LOCK_BY_CODE;
             default:
                 return -1;
         }
