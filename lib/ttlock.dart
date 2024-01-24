@@ -2048,8 +2048,8 @@ enum TTLockFuction {
   unlockSwicth,
   audioSwitch,
   nbIoT, //15
-  //17
-  getAdminPasscode,
+
+  getAdminPasscode, //17
   hotelCard,
   noClock,
   noBroadcastInNormal,
