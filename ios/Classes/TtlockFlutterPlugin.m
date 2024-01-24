@@ -1303,6 +1303,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
                           @(TTErrorInvalidClientPara),
                           @(TTErrorLockIsLocked),
                           @(TTErrorRecordNotExist),
+                          @(TTErrorFail),
                           @(TTErrorBluetoothPoweredOff),
                           @(TTErrorConnectionTimeout),
                           @(TTErrorDisconnection),
