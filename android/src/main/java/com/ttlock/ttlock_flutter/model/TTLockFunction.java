@@ -59,7 +59,20 @@ public enum TTLockFunction {
     cpuCard,
     wifiLock,
     wifiLockStaticIP,
-    passcodeKeyNumber;
+    passcodeKeyNumber,
+
+    meariCamera,
+    standAloneActivation,
+    doubleAuth,
+    authorizedUnlock,
+    gatewayAuthorizedUnlock,
+    noEkeyUnlock,
+    xiongMaiCamera,
+    zhiAnPhotoFace,
+    palmVein,
+    wifiArea,
+    xiaoCaoCamera,
+    resetLockByCode;
 
     public static int flutter2Native(int index) {
         TTLockFunction ttLockFunction = null;
@@ -160,6 +173,22 @@ public enum TTLockFunction {
                 return FeatureValue.WIFI_LOCK_SUPPORT_STATIC_IP;
             case passcodeKeyNumber:
                 return FeatureValue.INCOMPLETE_PASSCODE;
+            case doubleAuth:
+                return FeatureValue.SUPPORT_DOUBLE_CHECK;
+            case authorizedUnlock:
+                return FeatureValue.APP_AUTH_UNLOCK;
+            case gatewayAuthorizedUnlock:
+                return FeatureValue.GATEWAY_AUTH_UNLOCK;
+            case noEkeyUnlock:
+                return FeatureValue.DO_NOT_SUPPORT_APP_AND_GATEWAY_UNLOCK;
+            case xiongMaiCamera:
+                return FeatureValue.SUPPORT_XM;
+            case zhiAnPhotoFace:
+                return FeatureValue.ZHI_AN_FACE_DELIVERY;
+            case palmVein:
+                return FeatureValue.PALM_VEIN;
+            case resetLockByCode:
+                return FeatureValue.RESET_LOCK_BY_CODE;
             default:
                 return -1;
         }
