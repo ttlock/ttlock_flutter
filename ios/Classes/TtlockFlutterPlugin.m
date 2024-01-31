@@ -291,12 +291,13 @@ typedef NS_ENUM(NSInteger, ResultState) {
         }];
         
     }else if ([command isEqualToString:command_get_lock_version]) {
-        NSString *lockMac = (NSString *)arguments;
-        [TTLock getLockVersionWithLockMac:lockMac success:^(NSDictionary *lockVersion) {
-            [weakSelf successCallbackCommand:command data:lockVersion];
-        } failure:^(TTError errorCode, NSString *errorMsg) {
-            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
-        }];
+        [TTLock getLockVersionWithLockMac:lockModel.lockMac success:^(NSDictionary *lockVersion) {
+                   TtlockModel *data = [TtlockModel new];
+                   data.lockVersion = lockVersion ? [weakSelf dictionaryToJson:lockVersion] : @"";
+                   [weakSelf successCallbackCommand:command data:data];
+               } failure:^(TTError errorCode, NSString *errorMsg) {
+                   [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+               }];
     }else if ([command isEqualToString:command_get_lock_switch_state]) {
         [TTLock getLockSwitchStateWithLockData:lockModel.lockData success:^(TTLockSwitchState lockSwitchState, TTDoorSensorState doorSensorState) {
             TtlockModel *data = [TtlockModel new];
@@ -759,20 +760,6 @@ typedef NS_ENUM(NSInteger, ResultState) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
     }
-    
-    else if ([command isEqualToString:command_get_lock_version]) {
-        [TTLock getLockVersionWithLockMac:lockModel.lockMac success:^(NSDictionary *lockVersion) {
-            NSError *parseError;
-            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:lockVersion options:NSJSONWritingPrettyPrinted error:&parseError];
-            NSString * str = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-            
-            TtlockModel *data = [TtlockModel new];
-            data.lockVersion = str;
-            [weakSelf successCallbackCommand:command data:data];
-        } failure:^(TTError errorCode, NSString *errorMsg) {
-            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
-        }];
-    }
     else if ([command isEqualToString:command_scan_wifi]) {
         [TTLock scanWifiWithLockData:lockModel.lockData success:^(BOOL isFinished, NSArray *wifiArr) {
             NSMutableDictionary *dict = @{}.mutableCopy;
@@ -1164,6 +1151,15 @@ typedef NS_ENUM(NSInteger, ResultState) {
     return [NSJSONSerialization JSONObjectWithData:jsonData
                                                                options:NSJSONReadingMutableContainers
                                                                  error:nil];
+}
+
+//字典转json格式字符串：
+- (NSString*)dictionaryToJson:(NSDictionary *)dic
+{
+    NSError *parseError = nil;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dic options:NSJSONWritingPrettyPrinted error:&parseError];
+    
+    return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 }
 
 
