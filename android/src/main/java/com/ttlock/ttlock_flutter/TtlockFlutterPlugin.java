@@ -1006,6 +1006,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
             data.isAllowUnlock = extendedBluetoothDevice.isTouch();
             data.lockVersion = extendedBluetoothDevice.getLockVersionJson();
             data.rssi = extendedBluetoothDevice.getRssi();
+            data.timestamp = extendedBluetoothDevice.getDate();
             successCallbackCommand(TTLockCommand.COMMAND_START_SCAN_LOCK, data.toMap());
 //              data.lockSwitchState = @(scanModel.lockSwitchState);
 //              data.oneMeterRssi = @(scanModel.oneMeterRSSI);
