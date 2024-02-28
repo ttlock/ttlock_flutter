@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <application
-        android:name="io.flutter.app.FlutterApplication"
+        android:name="${applicationName}"
         android:label="ttlock_flutter_example"
         tools:replace="android:label"
         android:icon="@mipmap/ic_launcher">
