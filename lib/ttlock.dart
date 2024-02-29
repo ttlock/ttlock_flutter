@@ -138,6 +138,8 @@ class TTLock {
   static const String COMMAND_SET_LOCK_DIRECTION = "setLockDirection";
   static const String COMMAND_RESET_LOCK_BY_CODE = "resetLockByCode";
 
+  static const String COMMAND_VERIFY_LOCK = "verifyLock";
+
   // static const String COMMAND_GET_PASSCODE_VERIFICATION_PARAMS = "getPasscodeVerificationParams";
 
   static List _commandQueue = [];
@@ -1125,6 +1127,11 @@ class TTLock {
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     invoke(COMMAND_SET_LOCK_ENTER_UPGRADE_MODE, lockData, callback,
         fail: failedCallback);
+  }
+
+  static void verfyLock(String lockData, TTSuccessCallback callback,
+      TTFailedCallback failedCallback) {
+    invoke(COMMAND_VERIFY_LOCK, lockData, callback, fail: failedCallback);
   }
 
   static bool isListenEvent = false;

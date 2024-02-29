@@ -83,6 +83,8 @@
 
 #define command_set_lock_enter_upgrade_mode @"setLockEnterUpgradeMode"
 
+#define command_verify_lock @"verifyLock"
+
 #pragma mark - 网关指令
 #define command_start_scan_gateway @"startScanGateway"
 #define command_stop_scan_gateway @"stopScanGateway"
