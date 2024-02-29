@@ -1129,7 +1129,7 @@ class TTLock {
         fail: failedCallback);
   }
 
-  static void verfyLock(String lockData, TTSuccessCallback callback,
+  static void verifyLock(String lockData, TTSuccessCallback callback,
       TTFailedCallback failedCallback) {
     invoke(COMMAND_VERIFY_LOCK, lockData, callback, fail: failedCallback);
   }
