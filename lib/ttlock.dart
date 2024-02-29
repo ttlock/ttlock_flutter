@@ -1131,7 +1131,9 @@ class TTLock {
 
   static void verifyLock(String lockMac, TTSuccessCallback callback,
       TTFailedCallback failedCallback) {
-    invoke(COMMAND_VERIFY_LOCK, lockMac, callback, fail: failedCallback);
+    Map map = new Map();
+    map[TTResponse.lockMac] = lockMac;
+    invoke(COMMAND_VERIFY_LOCK, map, callback, fail: failedCallback);
   }
 
   static bool isListenEvent = false;
