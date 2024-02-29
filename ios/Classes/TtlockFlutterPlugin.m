@@ -857,7 +857,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
     }else if ([command isEqualToString:command_verify_lock]) {
-        [TTLock verifyLockWithLockMac:lockModel.lockData success:^{
+        [TTLock verifyLockWithLockMac:lockModel.mac success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];

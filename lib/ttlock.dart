@@ -1129,9 +1129,9 @@ class TTLock {
         fail: failedCallback);
   }
 
-  static void verifyLock(String lockData, TTSuccessCallback callback,
+  static void verifyLock(String lockMac, TTSuccessCallback callback,
       TTFailedCallback failedCallback) {
-    invoke(COMMAND_VERIFY_LOCK, lockData, callback, fail: failedCallback);
+    invoke(COMMAND_VERIFY_LOCK, lockMac, callback, fail: failedCallback);
   }
 
   static bool isListenEvent = false;
