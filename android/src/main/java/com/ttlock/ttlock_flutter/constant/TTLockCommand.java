@@ -138,4 +138,6 @@ public class TTLockCommand {
 
     public static final String COMMAND_RESET_LOCK_BY_CODE = "resetLockByCode";
 
+    public static final String COMMAND_VERIFY_LOCK = "verifyLock";
+
 }

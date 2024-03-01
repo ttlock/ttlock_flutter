@@ -85,6 +85,7 @@ import com.ttlock.bl.sdk.callback.SetPowerSaverControlableLockCallback;
 import com.ttlock.bl.sdk.callback.SetPowerSaverWorkModeCallback;
 import com.ttlock.bl.sdk.callback.SetRemoteUnlockSwitchCallback;
 import com.ttlock.bl.sdk.callback.SetUnlockDirectionCallback;
+import com.ttlock.bl.sdk.callback.VerifyLockCallback;
 import com.ttlock.bl.sdk.constant.LogType;
 import com.ttlock.bl.sdk.constant.RecoveryData;
 import com.ttlock.bl.sdk.device.Remote;
@@ -950,6 +951,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       case TTLockCommand.COMMAND_RESET_LOCK_BY_CODE:
         resetLockByCode(ttlockModel);
         break;
+      case TTLockCommand.COMMAND_VERIFY_LOCK:
+        verifyLock(ttlockModel);
+        break;
       default:
         apiFail(LockError.INVALID_COMMAND);
         LogUtil.d("unknown command:" + command);
@@ -957,7 +961,25 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     }
   }
 
+  public void verifyLock(final TtlockModel ttlockModel) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().verifyLock(ttlockModel.lockMac, new VerifyLockCallback() {
+          @Override
+          public void onVerifySuccess() {
+            apiSuccess(ttlockModel);
+          }
 
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
 
   private void commandTimeOutCheck() {
     commandTimeOutCheck(COMMAND_TIME_OUT);
