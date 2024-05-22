@@ -82,7 +82,12 @@ enum Command {
   configWifi,
   configServer,
   getWifiInfo,
-  configIp
+  configIp,
+
+  addFace,
+  addFaceData,
+  modifyFace,
+  clearFace
 }
 
 class _LockPageState extends State<LockPage> {
@@ -155,7 +160,11 @@ class _LockPageState extends State<LockPage> {
     {"Wifi lock config wifi": Command.configWifi},
     {"Wifi lock config server": Command.configServer},
     {"Wifi lock get wifi info": Command.getWifiInfo},
-    {"Wifi lock config ip": Command.configIp}
+    {"Wifi lock config ip": Command.configIp},
+
+    {"Add face": Command.addFace},
+    {"Modify face": Command.modifyFace},
+    {"Clear Face": Command.clearFace}
   ];
 
   String note =
@@ -165,6 +174,7 @@ class _LockPageState extends State<LockPage> {
   String lockMac = '';
   String? addCardNumber;
   String? addFingerprintNumber;
+  String? addFaceNumber;
   BuildContext? _context;
 
   _LockPageState(String lockData, String lockMac) {
@@ -713,6 +723,40 @@ class _LockPageState extends State<LockPage> {
 
         TTLock.configIp(paramMap, lockData, () {
           _showSuccessAndDismiss("config ip success");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+
+      case Command.addFace:
+        TTLock.addFace(null, startDate, endDate, lockData,
+            (state, faceErrorCode) {
+          _showSuccessAndDismiss(
+              "add face progress state :" + state.toString());
+        }, (faceNumber) {
+          addFaceNumber = faceNumber;
+          _showSuccessAndDismiss("add face success :" + faceNumber);
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+
+      case Command.modifyFace:
+        if (addFaceNumber == null) {
+          _showErrorAndDismiss(TTLockError.fail, 'please add face first');
+          return;
+        }
+        TTLock.modifyFace(null, startDate, endDate, addFaceNumber!, lockData,
+            () {
+          _showSuccessAndDismiss("modify face success");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+
+      case Command.clearFace:
+        TTLock.clearFace(lockData, () {
+          _showSuccessAndDismiss("clear face success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });

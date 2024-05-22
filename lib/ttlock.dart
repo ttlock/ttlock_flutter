@@ -140,6 +140,11 @@ class TTLock {
 
   static const String COMMAND_VERIFY_LOCK = "verifyLock";
 
+  static const String COMMAND_ADD_FACE = "faceAdd";
+  static const String COMMAND_ADD_FACE_DATA = "faceDataAdd";
+  static const String COMMAND_MODIFY_FACE = "faceModify";
+  static const String COMMAND_CLEAR_FACE = "faceClear";
+
   // static const String COMMAND_GET_PASSCODE_VERIFICATION_PARAMS = "getPasscodeVerificationParams";
 
   static List _commandQueue = [];
@@ -1136,6 +1141,70 @@ class TTLock {
     invoke(COMMAND_VERIFY_LOCK, map, callback, fail: failedCallback);
   }
 
+  static void addFace(
+      List<TTCycleModel>? cycleList,
+      int startDate,
+      int endDate,
+      String lockData,
+      TTAddFaceProgressCallback progressCallback,
+      TTAddFaceSuccessCallback callback,
+      TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.startDate] = startDate;
+    map[TTResponse.endDate] = endDate;
+    map[TTResponse.lockData] = lockData;
+    if (cycleList != null && cycleList.length > 0) {
+      map[TTResponse.cycleJsonList] = convert.jsonEncode(cycleList);
+    }
+    invoke(COMMAND_ADD_FACE, map, callback,
+        progress: progressCallback, fail: failedCallback);
+  }
+
+  static void addFaceData(
+      List<TTCycleModel>? cycleList,
+      int startDate,
+      int endDate,
+      String faceFeatureData,
+      String lockData,
+      TTAddFaceSuccessCallback callback,
+      TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.startDate] = startDate;
+    map[TTResponse.endDate] = endDate;
+    map[TTResponse.lockData] = lockData;
+    map[TTResponse.faceFeatureData] = faceFeatureData;
+    if (cycleList != null && cycleList.length > 0) {
+      map[TTResponse.cycleJsonList] = convert.jsonEncode(cycleList);
+    }
+    invoke(COMMAND_ADD_FACE_DATA, map, callback, fail: failedCallback);
+  }
+
+  static void modifyFace(
+      List<TTCycleModel>? cycleList,
+      int startDate,
+      int endDate,
+      String faceNumber,
+      String lockData,
+      TTSuccessCallback callback,
+      TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.startDate] = startDate;
+    map[TTResponse.endDate] = endDate;
+    map[TTResponse.lockData] = lockData;
+    map[TTResponse.faceNumber] = faceNumber;
+    if (cycleList != null && cycleList.length > 0) {
+      map[TTResponse.cycleJsonList] = convert.jsonEncode(cycleList);
+    }
+    invoke(COMMAND_MODIFY_FACE, map, callback, fail: failedCallback);
+  }
+
+  static void clearFace(String lockData, TTSuccessCallback callback,
+      TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_CLEAR_FACE, map, callback, fail: failedCallback);
+  }
+
   static bool isListenEvent = false;
   static var scanCommandList = [
     COMMAND_START_SCAN_LOCK,
@@ -1518,6 +1587,11 @@ class TTLock {
         progressCallback(
             data[TTResponse.currentCount], data[TTResponse.totalCount]);
         break;
+      case COMMAND_ADD_FACE:
+        TTAddFaceProgressCallback progressCallback = callBack;
+        progressCallback(
+            data[TTResponse.state], data[TTResponse.errorCode]);
+        break;
       default:
     }
   }
@@ -1650,6 +1724,8 @@ class TTResponse {
   static const String records = "records";
   static const String maxTime = "maxTime";
   static const String cycleJsonList = "cycleJsonList";
+  static const String faceFeatureData = "faceFeatureData";
+  static const String faceNumber = "faceNumber";
 
   static const String minTime = "minTime";
   static const String currentTime = "currentTime";
@@ -1960,6 +2036,11 @@ typedef TTGetLockAccessoryElectricQuantity = void Function(
 typedef TTRemoteKeypadInitSuccessCallback = void Function(
     int electricQuantity, String wirelessKeypadFeatureValue);
 
+typedef TTAddFaceProgressCallback = void Function(
+    TTFaceState state, TTFaceErrorCode faceErrorCode);
+
+typedef TTAddFaceSuccessCallback = void Function(String faceNumber);
+
 class TTRemoteAccessoryScanModel {
   String name = '';
   String mac = '';
@@ -2108,4 +2189,29 @@ enum TTLockFuction {
   wifiArea,
   xiaoCaoCamera,
   resetLockByCode
+}
+
+enum TTFaceState { success, canStartAdd, error }
+
+enum TTFaceErrorCode {
+  noFaceDetected,
+  tooCloseToTheTop,
+  tooCloseToTheBottom,
+  tooCloseToTheLeft,
+  tooCloseToTheRight,
+  tooFarAway,
+  tooClose,
+  eyebrowsCovered,
+  eyesCovered,
+  faceCovered,
+  faceDirection,
+  eyeOpeningDetected,
+  eyesClosedStatus,
+  failedToDetectEye,
+  needTurnHeadToLeft,
+  needTurnHeadToRight,
+  needRaiseHead,
+  needLowerHead,
+  needTiltHeadToLeft,
+  needTiltHeadToRight,
 }

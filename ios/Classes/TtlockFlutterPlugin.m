@@ -864,9 +864,53 @@ typedef NS_ENUM(NSInteger, ResultState) {
         }];
     }
     
+#pragma mark - 人脸识别
+    else if ([command isEqualToString:command_face_add]) {
+        NSArray *cycleConfigArray = (NSArray *)[self dictFromJsonStr:lockModel.cycleJsonList];
+        [TTLock addFaceWithCyclicConfig:cycleConfigArray startDate:lockModel.startDate.longLongValue endDate:lockModel.endDate.longLongValue lockData:lockModel.lockData progress:^(TTAddFaceState state, TTFaceErrorCode faceErrorCode) {
+            NSDictionary *progressDict  = @{@"state": @(state), @"errorCode": @(faceErrorCode)};
+            [weakSelf progressCallbackCommand:command data:progressDict];
+            
+        } success:^(NSString *faceNumber) {
+            NSDictionary *dict  = @{@"faceNumber": faceNumber};
+            [weakSelf successCallbackCommand:command data:dict];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }
+    
+    else if ([command isEqualToString:command_face_data_add]) {
+        NSArray *cycleConfigArray = (NSArray *)[self dictFromJsonStr:lockModel.cycleJsonList];
+        [TTLock addFaceFeatureData:lockModel.faceFeatureData cyclicConfig:cycleConfigArray startDate:lockModel.startDate.longLongValue endDate:lockModel.endDate.longLongValue lockData:lockModel.lockData success:^(NSString *faceNumber) {
+            NSDictionary *dict  = @{@"faceNumber": faceNumber};
+            [weakSelf successCallbackCommand:command data:dict];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }
+    
+    else if ([command isEqualToString:command_face_modify]) {
+        NSArray *cycleConfigArray = (NSArray *)[self dictFromJsonStr:lockModel.cycleJsonList];
+        [TTLock modifyFaceValidityWithCyclicConfig:cycleConfigArray faceNumber:lockModel.faceNumber startDate:lockModel.startDate.longLongValue endDate:lockModel.endDate.longLongValue lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }
+    
+    else if ([command isEqualToString:command_face_clear]) {
+        
+        [TTLock clearFaceWithLockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }
     
     
-    //无线钥匙
+    
+    
+#pragma mark - 无线钥匙
     else if ([command isEqualToString:command_remote_key_start_scan]) {
         [TTWirelessKeyFob startScanWithBlock:^(TTWirelessKeyFobScanModel *model) {
             NSMutableDictionary *dict = @{}.mutableCopy;

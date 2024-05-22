@@ -153,7 +153,11 @@
 #define command_set_hotel_card_sector @"setHotelCardSector"
 #define command_set_hotel_info @"setHotelInfo"
 
-
+#pragma mark - 人脸识别
+#define command_face_add @"faceAdd"
+#define command_face_data_add @"faceDataAdd"
+#define command_face_modify @"faceModify"
+#define command_face_clear @"faceClear"
 
 #define command_get_all_valid_passcode @"getAllValidPasscode"
 #define command_get_all_valid_fingerprint @"getAllValidFingerprint"

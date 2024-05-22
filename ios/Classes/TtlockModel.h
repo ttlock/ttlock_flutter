@@ -126,6 +126,11 @@
 
 @property (nonatomic, strong) NSNumber *soundVolumeType;
 
+@property (nonatomic, strong) NSString *faceNumber;
+
+@property (nonatomic, strong) NSString *faceFeatureData;
+
+
 + (TtlockModel *)modelWithDict:(NSDictionary *)dict;
 - (NSDictionary *)toDictionary;
 @end
