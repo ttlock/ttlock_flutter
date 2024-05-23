@@ -128,6 +128,8 @@
 
 @property (nonatomic, strong) NSString *faceNumber;
 
+@property (nonatomic, strong) NSNumber *errorCode;
+
 @property (nonatomic, strong) NSString *faceFeatureData;
 
 

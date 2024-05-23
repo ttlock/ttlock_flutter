@@ -1561,6 +1561,11 @@ class TTLock {
         remoteKeypadInitSuccessCallback(data[TTResponse.electricQuantity],
             data[TTResponse.wirelessKeypadFeatureValue]);
         break;
+      case COMMAND_ADD_FACE:
+        TTAddFaceSuccessCallback addFaceSuccessCallback =
+            callBack;
+        addFaceSuccessCallback(data[TTResponse.faceNumber]);
+        break;
       default:
         TTSuccessCallback successCallback = callBack;
         successCallback();
@@ -1589,8 +1594,8 @@ class TTLock {
         break;
       case COMMAND_ADD_FACE:
         TTAddFaceProgressCallback progressCallback = callBack;
-        progressCallback(
-            data[TTResponse.state], data[TTResponse.errorCode]);
+        progressCallback(TTFaceState.values[data[TTResponse.state]],
+            TTFaceErrorCode.values[data[TTResponse.errorCode]]);
         break;
       default:
     }
@@ -2194,6 +2199,7 @@ enum TTLockFuction {
 enum TTFaceState { success, canStartAdd, error }
 
 enum TTFaceErrorCode {
+  normal,
   noFaceDetected,
   tooCloseToTheTop,
   tooCloseToTheBottom,

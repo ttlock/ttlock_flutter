@@ -868,8 +868,10 @@ typedef NS_ENUM(NSInteger, ResultState) {
     else if ([command isEqualToString:command_face_add]) {
         NSArray *cycleConfigArray = (NSArray *)[self dictFromJsonStr:lockModel.cycleJsonList];
         [TTLock addFaceWithCyclicConfig:cycleConfigArray startDate:lockModel.startDate.longLongValue endDate:lockModel.endDate.longLongValue lockData:lockModel.lockData progress:^(TTAddFaceState state, TTFaceErrorCode faceErrorCode) {
-            NSDictionary *progressDict  = @{@"state": @(state), @"errorCode": @(faceErrorCode)};
-            [weakSelf progressCallbackCommand:command data:progressDict];
+            TtlockModel *model = [TtlockModel new];
+            model.state = @(state - 1);
+            model.errorCode = @(faceErrorCode);
+            [weakSelf progressCallbackCommand:command data:model];
             
         } success:^(NSString *faceNumber) {
             NSDictionary *dict  = @{@"faceNumber": faceNumber};
