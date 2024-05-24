@@ -230,6 +230,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
   private boolean sdkIsInit;
 
+  /**
+   * 添加人脸状态
+   */
+  private static final int STATUS_FACE_ENTER_ADD_MODE = 1;
+  private static final int STATUS_FACE_ERROR = 2;
+
   private Runnable commandTimeOutRunable = new Runnable() {
     @Override
     public void run() {
@@ -967,6 +973,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         break;
       case TTLockCommand.COMMAND_MODIFY_FACE:
         modifyFace(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_DELETE_FACE:
+        deleteFace(ttlockModel);
         break;
       case TTLockCommand.COMMAND_CLEAR_FACE:
         clearFace(ttlockModel);
@@ -2837,12 +2846,16 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         TTLockClient.getDefault().addFace(ttlockModel.lockData, validityInfo, new AddFaceCallback() {
           @Override
           public void onEnterAddMode() {
-
+            ttlockModel.state = STATUS_FACE_ENTER_ADD_MODE;
+            progressCallbackCommand(commandQue.peek(), ttlockModel.toMap());
           }
 
           @Override
           public void onCollectionStatus(FaceCollectionStatus faceCollectionStatus) {
-
+            ttlockModel.state = STATUS_FACE_ERROR;
+            Map<String, Object> hashMap = ttlockModel.toMap();
+            hashMap.put("errorCode", faceCollectionStatus.getValue());
+            progressCallbackCommand(commandQue.peek(), hashMap);
           }
 
           @Override
@@ -2880,12 +2893,16 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
           TTLockClient.getDefault().addFaceFeatureData(ttlockModel.lockData, ttlockModel.faceFeatureData, validityInfo, new AddFaceCallback() {
             @Override
             public void onEnterAddMode() {
-
+              ttlockModel.state = STATUS_FACE_ENTER_ADD_MODE;
+              progressCallbackCommand(commandQue.peek(), ttlockModel.toMap());
             }
 
             @Override
             public void onCollectionStatus(FaceCollectionStatus faceCollectionStatus) {
-
+              ttlockModel.state = STATUS_FACE_ERROR;
+              Map<String, Object> hashMap = ttlockModel.toMap();
+              hashMap.put("errorCode", faceCollectionStatus.getValue());
+              progressCallbackCommand(commandQue.peek(), hashMap);
             }
 
             @Override
