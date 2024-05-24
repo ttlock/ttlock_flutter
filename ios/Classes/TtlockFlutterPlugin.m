@@ -900,6 +900,15 @@ typedef NS_ENUM(NSInteger, ResultState) {
         }];
     }
     
+    else if ([command isEqualToString:command_face_delete]) {
+        NSArray *cycleConfigArray = (NSArray *)[self dictFromJsonStr:lockModel.cycleJsonList];
+        [TTLock deleteFaceNumber:lockModel.faceNumber lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
+        }];
+    }
+    
     else if ([command isEqualToString:command_face_clear]) {
         
         [TTLock clearFaceWithLockData:lockModel.lockData success:^{
