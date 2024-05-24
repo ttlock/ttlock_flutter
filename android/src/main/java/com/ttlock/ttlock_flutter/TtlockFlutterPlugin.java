@@ -233,8 +233,8 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   /**
    * 添加人脸状态
    */
-  private static final int STATUS_FACE_ENTER_ADD_MODE = 1;
-  private static final int STATUS_FACE_ERROR = 2;
+  private static final int STATUS_FACE_ENTER_ADD_MODE = 0;
+  private static final int STATUS_FACE_ERROR = 1;
 
   private Runnable commandTimeOutRunable = new Runnable() {
     @Override
