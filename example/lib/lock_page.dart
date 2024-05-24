@@ -87,6 +87,7 @@ enum Command {
   addFace,
   addFaceData,
   modifyFace,
+  deleteFace,
   clearFace
 }
 
@@ -164,6 +165,7 @@ class _LockPageState extends State<LockPage> {
 
     {"Add face": Command.addFace},
     {"Modify face": Command.modifyFace},
+    {"Delete Face": Command.deleteFace},
     {"Clear Face": Command.clearFace}
   ];
 
@@ -753,7 +755,18 @@ class _LockPageState extends State<LockPage> {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
         break;
-
+      case Command.deleteFace:
+        if (addFaceNumber == null) {
+          _showErrorAndDismiss(TTLockError.fail, 'please add face first');
+          return;
+        }
+        TTLock.deleteFace(addFaceNumber!, lockData, () {
+          addFaceNumber = null;
+          _showSuccessAndDismiss("delete face success");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
       case Command.clearFace:
         TTLock.clearFace(lockData, () {
           _showSuccessAndDismiss("clear face success");

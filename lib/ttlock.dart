@@ -143,6 +143,7 @@ class TTLock {
   static const String COMMAND_ADD_FACE = "faceAdd";
   static const String COMMAND_ADD_FACE_DATA = "faceDataAdd";
   static const String COMMAND_MODIFY_FACE = "faceModify";
+  static const String COMMAND_DELETE_FACE = "faceDelete";
   static const String COMMAND_CLEAR_FACE = "faceClear";
 
   // static const String COMMAND_GET_PASSCODE_VERIFICATION_PARAMS = "getPasscodeVerificationParams";
@@ -1205,6 +1206,14 @@ class TTLock {
     invoke(COMMAND_CLEAR_FACE, map, callback, fail: failedCallback);
   }
 
+  static void deleteFace(String faceNumber, String lockData,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.lockData] = lockData;
+    map[TTResponse.faceNumber] = faceNumber;
+    invoke(COMMAND_DELETE_FACE, map, callback, fail: failedCallback);
+  }
+
   static bool isListenEvent = false;
   static var scanCommandList = [
     COMMAND_START_SCAN_LOCK,
@@ -1562,8 +1571,7 @@ class TTLock {
             data[TTResponse.wirelessKeypadFeatureValue]);
         break;
       case COMMAND_ADD_FACE:
-        TTAddFaceSuccessCallback addFaceSuccessCallback =
-            callBack;
+        TTAddFaceSuccessCallback addFaceSuccessCallback = callBack;
         addFaceSuccessCallback(data[TTResponse.faceNumber]);
         break;
       default:
