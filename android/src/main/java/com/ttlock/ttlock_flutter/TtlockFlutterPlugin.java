@@ -19,11 +19,13 @@ import com.ttlock.bl.sdk.api.ExtendedBluetoothDevice;
 import com.ttlock.bl.sdk.api.TTLockClient;
 import com.ttlock.bl.sdk.callback.ActivateLiftFloorsCallback;
 import com.ttlock.bl.sdk.callback.AddDoorSensorCallback;
+import com.ttlock.bl.sdk.callback.AddFaceCallback;
 import com.ttlock.bl.sdk.callback.AddFingerprintCallback;
 import com.ttlock.bl.sdk.callback.AddICCardCallback;
 import com.ttlock.bl.sdk.callback.AddRemoteCallback;
 import com.ttlock.bl.sdk.callback.ClearAllFingerprintCallback;
 import com.ttlock.bl.sdk.callback.ClearAllICCardCallback;
+import com.ttlock.bl.sdk.callback.ClearFaceCallback;
 import com.ttlock.bl.sdk.callback.ClearPassageModeCallback;
 import com.ttlock.bl.sdk.callback.ClearRemoteCallback;
 import com.ttlock.bl.sdk.callback.ConfigServerCallback;
@@ -31,6 +33,7 @@ import com.ttlock.bl.sdk.callback.ConfigWifiCallback;
 import com.ttlock.bl.sdk.callback.ControlLockCallback;
 import com.ttlock.bl.sdk.callback.CreateCustomPasscodeCallback;
 import com.ttlock.bl.sdk.callback.DeleteDoorSensorCallback;
+import com.ttlock.bl.sdk.callback.DeleteFaceCallback;
 import com.ttlock.bl.sdk.callback.DeleteFingerprintCallback;
 import com.ttlock.bl.sdk.callback.DeletePasscodeCallback;
 import com.ttlock.bl.sdk.callback.DeleteRemoteCallback;
@@ -56,6 +59,7 @@ import com.ttlock.bl.sdk.callback.GetUnlockDirectionCallback;
 import com.ttlock.bl.sdk.callback.GetWifiInfoCallback;
 import com.ttlock.bl.sdk.callback.InitLockCallback;
 import com.ttlock.bl.sdk.callback.ModifyAdminPasscodeCallback;
+import com.ttlock.bl.sdk.callback.ModifyFacePeriodCallback;
 import com.ttlock.bl.sdk.callback.ModifyFingerprintPeriodCallback;
 import com.ttlock.bl.sdk.callback.ModifyICCardPeriodCallback;
 import com.ttlock.bl.sdk.callback.ModifyPasscodeCallback;
@@ -96,6 +100,7 @@ import com.ttlock.bl.sdk.entity.AccessoryType;
 import com.ttlock.bl.sdk.entity.ActivateLiftFloorsResult;
 import com.ttlock.bl.sdk.entity.ControlLockResult;
 import com.ttlock.bl.sdk.entity.CyclicConfig;
+import com.ttlock.bl.sdk.entity.FaceCollectionStatus;
 import com.ttlock.bl.sdk.entity.HotelData;
 import com.ttlock.bl.sdk.entity.IpSetting;
 import com.ttlock.bl.sdk.entity.LockError;
@@ -953,6 +958,18 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         break;
       case TTLockCommand.COMMAND_VERIFY_LOCK:
         verifyLock(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_ADD_FACE:
+        addFace(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_ADD_FACE_DATA:
+        addFaceData(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_MODIFY_FACE:
+        modifyFace(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_CLEAR_FACE:
+        clearFace(ttlockModel);
         break;
       default:
         apiFail(LockError.INVALID_COMMAND);
@@ -2802,7 +2819,163 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
   //---------------remote------------------------------
 
+  public void addFace(final TtlockModel ttlockModel) {
+    ValidityInfo validityInfo = new ValidityInfo();
+    validityInfo.setStartDate(ttlockModel.startDate);
+    validityInfo.setEndDate(ttlockModel.endDate);
 
+    if (TextUtils.isEmpty(ttlockModel.cycleJsonList)) {
+      validityInfo.setModeType(ValidityInfo.TIMED);
+    } else {
+      validityInfo.setModeType(ValidityInfo.CYCLIC);
+      validityInfo.setCyclicConfigs(GsonUtil.toObject(ttlockModel.cycleJsonList, new TypeToken<List<CyclicConfig>>() {
+      }));
+      ttlockModel.cycleJsonList = null;//clear data
+    }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().addFace(ttlockModel.lockData, validityInfo, new AddFaceCallback() {
+          @Override
+          public void onEnterAddMode() {
+
+          }
+
+          @Override
+          public void onCollectionStatus(FaceCollectionStatus faceCollectionStatus) {
+
+          }
+
+          @Override
+          public void onAddFinished(long faceNumber) {
+            ttlockModel.faceNumber = String.valueOf(faceNumber);
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void addFaceData(final TtlockModel ttlockModel) {
+    ValidityInfo validityInfo = new ValidityInfo();
+    validityInfo.setStartDate(ttlockModel.startDate);
+    validityInfo.setEndDate(ttlockModel.endDate);
+
+    if (TextUtils.isEmpty(ttlockModel.cycleJsonList)) {
+      validityInfo.setModeType(ValidityInfo.TIMED);
+    } else {
+      validityInfo.setModeType(ValidityInfo.CYCLIC);
+      validityInfo.setCyclicConfigs(GsonUtil.toObject(ttlockModel.cycleJsonList, new TypeToken<List<CyclicConfig>>() {
+      }));
+      ttlockModel.cycleJsonList = null;//clear data
+    }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+          TTLockClient.getDefault().addFaceFeatureData(ttlockModel.lockData, ttlockModel.faceFeatureData, validityInfo, new AddFaceCallback() {
+            @Override
+            public void onEnterAddMode() {
+
+            }
+
+            @Override
+            public void onCollectionStatus(FaceCollectionStatus faceCollectionStatus) {
+
+            }
+
+            @Override
+            public void onAddFinished(long faceNumber) {
+              ttlockModel.faceNumber = String.valueOf(faceNumber);
+              apiSuccess(ttlockModel);
+            }
+
+            @Override
+            public void onFail(LockError lockError) {
+              apiFail(lockError);
+            }
+          });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void modifyFace(final TtlockModel ttlockModel) {
+    ValidityInfo validityInfo = new ValidityInfo();
+    validityInfo.setStartDate(ttlockModel.startDate);
+    validityInfo.setEndDate(ttlockModel.endDate);
+
+    if (TextUtils.isEmpty(ttlockModel.cycleJsonList)) {
+      validityInfo.setModeType(ValidityInfo.TIMED);
+    } else {
+      validityInfo.setModeType(ValidityInfo.CYCLIC);
+      validityInfo.setCyclicConfigs(GsonUtil.toObject(ttlockModel.cycleJsonList, new TypeToken<List<CyclicConfig>>() {
+      }));
+      ttlockModel.cycleJsonList = null;//clear data
+    }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().modifyFaceValidityPeriod(ttlockModel.lockData, Long.valueOf(ttlockModel.faceNumber), validityInfo, new ModifyFacePeriodCallback() {
+          @Override
+          public void onModifySuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void deleteFace(final TtlockModel ttlockModel) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().deleteFace(ttlockModel.lockData, Long.valueOf(ttlockModel.faceNumber), new DeleteFaceCallback() {
+          @Override
+          public void onDeleteSuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void clearFace(final TtlockModel ttlockModel) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().clearFace(ttlockModel.lockData, new ClearFaceCallback() {
+          @Override
+          public void onClearSuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
 
   public void setAdminErasePasscode(final TtlockModel ttlockModel) {
 

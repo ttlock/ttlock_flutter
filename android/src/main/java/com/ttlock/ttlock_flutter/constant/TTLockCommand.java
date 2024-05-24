@@ -140,4 +140,9 @@ public class TTLockCommand {
 
     public static final String COMMAND_VERIFY_LOCK = "verifyLock";
 
+    public static final String COMMAND_ADD_FACE = "faceAdd";
+    public static final String COMMAND_ADD_FACE_DATA = "faceDataAdd";
+    public static final String COMMAND_MODIFY_FACE = "faceModify";
+    public static final String COMMAND_CLEAR_FACE = "faceClear";
+
 }
