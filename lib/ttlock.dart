@@ -2204,7 +2204,7 @@ enum TTLockFuction {
   resetLockByCode
 }
 
-enum TTFaceState { success, canStartAdd, error }
+enum TTFaceState { canStartAdd, error }
 
 enum TTFaceErrorCode {
   normal,
