@@ -25,6 +25,10 @@ apply plugin: 'com.android.application'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
+    if (project.android.hasProperty("namespace")) {
+        namespace 'com.ttlock.ttlock_flutter_example'
+    }
+
     compileSdkVersion 31
 
     lintOptions {
@@ -53,11 +57,6 @@ android {
             shrinkResources false
             minifyEnabled false
         }
-    }
-}
-repositories {
-    flatDir {
-        dirs 'libs', '..\\..\\..\\android\\libs'
     }
 }
 
