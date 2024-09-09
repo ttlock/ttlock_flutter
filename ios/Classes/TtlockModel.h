@@ -21,6 +21,7 @@
 @property (nonatomic, strong) NSNumber * passcodeType;
 @property (nonatomic, strong) NSNumber * cycleType;
 @property (nonatomic, strong) NSNumber * remoteAccessory;
+@property (nonatomic, strong) NSString * resetCode;
 
 // 0、null - 读取最近的操作记录,  1-读取锁内存中的全部操作记录
 @property (nonatomic, strong) NSNumber *logType;
@@ -124,6 +125,13 @@
 @property (nonatomic, strong) NSString *cardListString;
 
 @property (nonatomic, strong) NSNumber *soundVolumeType;
+
+@property (nonatomic, strong) NSString *faceNumber;
+
+@property (nonatomic, strong) NSNumber *errorCode;
+
+@property (nonatomic, strong) NSString *faceFeatureData;
+
 
 + (TtlockModel *)modelWithDict:(NSDictionary *)dict;
 - (NSDictionary *)toDictionary;

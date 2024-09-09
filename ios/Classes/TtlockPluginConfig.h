@@ -26,6 +26,7 @@
 
 #define command_init_lock @"initLock"
 #define command_reset_lock @"resetLock"
+#define command_reset_lock_by_code @"resetLockByCode"
 
 #define command_control_lock @"controlLock"
 #define command_reset_ekey @"resetEkey"
@@ -81,6 +82,8 @@
 #define command_function_support @"functionSupport"
 
 #define command_set_lock_enter_upgrade_mode @"setLockEnterUpgradeMode"
+
+#define command_verify_lock @"verifyLock"
 
 #pragma mark - 网关指令
 #define command_start_scan_gateway @"startScanGateway"
@@ -150,7 +153,12 @@
 #define command_set_hotel_card_sector @"setHotelCardSector"
 #define command_set_hotel_info @"setHotelInfo"
 
-
+#pragma mark - 人脸识别
+#define command_face_add @"faceAdd"
+#define command_face_data_add @"faceDataAdd"
+#define command_face_modify @"faceModify"
+#define command_face_delete @"faceDelete"
+#define command_face_clear @"faceClear"
 
 #define command_get_all_valid_passcode @"getAllValidPasscode"
 #define command_get_all_valid_fingerprint @"getAllValidFingerprint"

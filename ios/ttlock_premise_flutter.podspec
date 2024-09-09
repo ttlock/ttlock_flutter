@@ -17,7 +17,8 @@ A new flutter plugin project.
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
   s.platform = :ios, '9.0'
-  s.vendored_frameworks = "Frameworks/**/*.framework"
+  # s.vendored_frameworks = "Frameworks/**/*.framework"
+  s.dependency 'TTLockOnPremise', '2.1.2'
   s.static_framework = true
   s.public_header_files = 'Classes/**/*.h'
 

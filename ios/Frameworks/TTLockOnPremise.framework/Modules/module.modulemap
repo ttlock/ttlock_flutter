@@ -1,6 +1,0 @@
-framework module TTLockOnPremise {
-  umbrella header "TTLock.h"
-
-  export *
-  module * { export * }
-}
