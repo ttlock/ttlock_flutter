@@ -1864,6 +1864,8 @@ class TTLockSystemModel {
   String? nbCardNumber;
   String? nbRssi;
 
+  String? lockData;
+
   // ignore: non_constant_identifier_names
   TTLockSystemModel(Map map) {
     this.modelNum = map["modelNum"];
@@ -1875,6 +1877,8 @@ class TTLockSystemModel {
     this.nbNodeId = map["nbNodeId"];
     this.nbCardNumber = map["nbCardNumber"];
     this.nbRssi = map["nbRssi"];
+
+    this.lockData = map["lockData"];
   }
 }
 
