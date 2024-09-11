@@ -138,4 +138,14 @@ public class TTLockCommand {
     public static final String COMMAND_GET_LOCK_DIRECTION = "getLockDirection";
     public static final String COMMAND_SET_LOCK_DIRECTION = "setLockDirection";
 
+    public static final String COMMAND_RESET_LOCK_BY_CODE = "resetLockByCode";
+
+    public static final String COMMAND_VERIFY_LOCK = "verifyLock";
+
+    public static final String COMMAND_ADD_FACE = "faceAdd";
+    public static final String COMMAND_ADD_FACE_DATA = "faceDataAdd";
+    public static final String COMMAND_DELETE_FACE = "faceDelete";
+    public static final String COMMAND_MODIFY_FACE = "faceModify";
+    public static final String COMMAND_CLEAR_FACE = "faceClear";
+
 }

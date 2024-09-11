@@ -143,6 +143,12 @@ public class TtlockModel {
 
     public int direction;
 
+    public String resetCode;
+
+    public String faceFeatureData;
+
+    public String faceNumber;
+
     @Override
     public String toString() {
         return "TtlockModel{" +

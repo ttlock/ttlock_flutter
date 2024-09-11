@@ -164,7 +164,8 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   public static final int ResultStateProgress = 1;
   public static final int ResultStateFail = 2;
 
-  private boolean isGatewayCommand;
+  private int commandType;
+
   /**
    * lock is busy try
    */
@@ -174,6 +175,22 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
    * time out: 30s
    */
   private static final long COMMAND_TIME_OUT = 30 * 1000;
+
+  /**
+   * 2000.2.1 00:00:00
+   */
+  public static final long INVALID_START_DATE = 949334400000L;
+  /**
+   * 2000.2.1 01:00:00
+   */
+  public static final long INVALID_END_DATE = 949338000000L;
+
+  /**
+   * 添加人脸状态
+   */
+  private static final int STATUS_FACE_ENTER_ADD_MODE = 0;
+  private static final int STATUS_FACE_ERROR = 1;
+
   private Runnable commandTimeOutRunable = new Runnable() {
     @Override
     public void run() {
@@ -197,10 +214,19 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
     if (GatewayCommand.isGatewayCommand(call.method)) {//gateway
-      isGatewayCommand = true;
+      commandType = CommandType.GATEWAY;
       gatewayCommand(call);
+    } else if (TTRemoteCommand.isRemoteCommand(call.method)) {
+      commandType = CommandType.REMOTE_KEY;
+      remoteCommand(call);
+    } else if (TTKeyPadCommand.isKeypadCommand(call.method)) {
+      commandType = CommandType.KEY_PAD;
+      keypadCommand(call);
+    } else if (TTDoorSensorCommand.isDoorSensorCommand(call.method)) {
+      commandType = CommandType.DOOR_SENSOR;
+      doorSensorCommand(call);
     } else {//door lock
-      isGatewayCommand = false;
+      commandType = CommandType.DOOR_LOCK;
       doorLockCommand(call);
     }
   }
@@ -269,8 +295,53 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       case GatewayCommand.COMMAND_CONFIG_IP:
         gatewayConfigIp(gatewayModel);
         break;
-      case GatewayCommand.COMMAND_UPGRADE_GATEWAY:
+    }
+  }
 
+  public void remoteCommand(MethodCall call) {
+    String command = call.method;
+    Map<String, Object> params = (Map<String, Object>) call.arguments;
+    switch (command) {
+      case TTRemoteCommand.COMMAND_START_SCAN_REMOTE:
+        startScanRemote();
+        break;
+      case TTRemoteCommand.COMMAND_STOP_SCAN_REMOTE:
+        stopScanRemote();
+        break;
+      case TTRemoteCommand.COMMAND_INIT_REMOTE:
+        initRemote(params);
+        break;
+    }
+  }
+
+  public void keypadCommand(MethodCall call) {
+    String command = call.method;
+    Map<String, Object> params = (Map<String, Object>)call.arguments;
+    switch (command) {
+      case TTKeyPadCommand.COMMAND_START_SCAN_KEY_PAD:
+        startScanKeyPad();
+        break;
+      case TTKeyPadCommand.COMMAND_STOP_SCAN_KEY_PAD:
+        stopScanKeyPad();
+        break;
+      case TTKeyPadCommand.COMMAND_INIT_KEY_PAD:
+        initKeyPad(params);
+        break;
+    }
+  }
+
+  public void doorSensorCommand(MethodCall call) {
+    String command = call.method;
+    Map<String, Object> params = (Map<String, Object>) call.arguments;
+    switch (command) {
+      case TTDoorSensorCommand.COMMAND_START_SCAN_DOOR_SENSOR:
+        startScanDoorSensor();
+        break;
+      case TTDoorSensorCommand.COMMAND_STOP_SCAN_DOOR_SENSOR:
+        stopScanDoorSensor();
+        break;
+      case TTDoorSensorCommand.COMMAND_INIT_DOOR_SENSOR:
+        initDoorSensor(params);
         break;
     }
   }
@@ -280,6 +351,162 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     ttlockModel.isSupport = isSupport;
     LogUtil.d(TTLockFunction.flutter2Native(ttlockModel.supportFunction) + ":" + isSupport);
     successCallbackCommand(TTLockCommand.COMMAND_SUPPORT_FEATURE, ttlockModel.toMap());
+  }
+
+  /**-------------------- door sensor -----------------------------**/
+  public void startScanDoorSensor() {
+    PermissionUtils.doWithScanPermission(activity, success -> {
+      if (success) {
+        WirelessDoorSensorClient.getDefault().startScan(new ScanWirelessDoorSensorCallback() {
+          @Override
+          public void onScan(WirelessDoorSensor wirelessDoorSensor) {
+            Map<String, Object> params = new HashMap<>();
+            params.put(TTParam.NAME, wirelessDoorSensor.getName());
+            params.put(TTParam.MAC, wirelessDoorSensor.getAddress());
+            params.put(TTParam.RSSI, wirelessDoorSensor.getRssi());
+            successCallbackCommand(TTDoorSensorCommand.COMMAND_START_SCAN_DOOR_SENSOR, params);
+          }
+        });
+      } else {
+        LogUtil.d("no scan permission");
+      }
+    });
+  }
+
+  public void stopScanDoorSensor() {
+    WirelessDoorSensorClient.getDefault().stopScan();
+  }
+
+  public void initDoorSensor(Map<String, Object> params) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        BluetoothDevice device = BluetoothAdapter.getDefaultAdapter().getRemoteDevice((String) params.get(TTParam.MAC));
+        WirelessDoorSensor doorSensor = new WirelessDoorSensor(device);
+        WirelessDoorSensorClient.getDefault().initialize(doorSensor, (String) params.get(TTParam.LOCK_DATA), new InitDoorSensorCallback() {
+          @Override
+          public void onInitSuccess(InitDoorSensorResult initDoorSensorResult) {
+            params.put(TTParam.ELECTRIC_QUANTITY, initDoorSensorResult.getBatteryLevel());
+            params.put(TTParam.MODEL_NUM, initDoorSensorResult.getFirmwareInfo().getModelNum());
+            params.put(TTParam.FIRMWARE_REVISION, initDoorSensorResult.getFirmwareInfo().getFirmwareRevision());
+            params.put(TTParam.HARD_WARE_REVISION, initDoorSensorResult.getFirmwareInfo().getHardwareRevision());
+            successCallbackCommand(TTDoorSensorCommand.COMMAND_INIT_DOOR_SENSOR, params);
+          }
+
+          @Override
+          public void onFail(DoorSensorError doorSensorError) {
+            errorCallbackCommand(TTDoorSensorCommand.COMMAND_INIT_DOOR_SENSOR, doorSensorError);
+          }
+        });
+      } else {
+        callbackCommand(TTKeyPadCommand.COMMAND_INIT_KEY_PAD, ResultStateFail, params, LockError.LOCK_NO_PERMISSION.getIntErrorCode(), "no connect permission");
+      }
+    });
+  }
+
+  /**--------------------------- keypad -------------------------- **/
+  public void startScanKeyPad() {
+    PermissionUtils.doWithScanPermission(activity, success -> {
+      if (success) {
+        WirelessKeypadClient.getDefault().startScanKeyboard(new ScanKeypadCallback() {
+          @Override
+          public void onScanKeyboardSuccess(WirelessKeypad wirelessKeypad) {
+            TTKeyPadScanModel ttKeyPadScanModel = new TTKeyPadScanModel();
+            ttKeyPadScanModel.mac = wirelessKeypad.getAddress();
+            ttKeyPadScanModel.name = wirelessKeypad.getName();
+            ttKeyPadScanModel.rssi = wirelessKeypad.getRssi();
+            successCallbackCommand(TTKeyPadCommand.COMMAND_START_SCAN_KEY_PAD, ttKeyPadScanModel.toMap());
+          }
+
+          @Override
+          public void onScanFailed(int errorcode) {
+
+          }
+        });
+      } else {
+        LogUtil.d("no scan permission");
+      }
+    });
+  }
+
+  public void stopScanKeyPad() {
+    WirelessKeypadClient.getDefault().stopScanKeyboard();
+  }
+
+  public void initKeyPad(Map<String, Object> params) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        BluetoothDevice device = BluetoothAdapter.getDefaultAdapter().getRemoteDevice((String) params.get(TTParam.MAC));
+        WirelessKeypad keypad = new WirelessKeypad(device);
+        String lockMac = (String) params.get(TTParam.LOCK_MAC);
+//        LockData lockParam = EncryptionUtil.parseLockData(lockData);
+        WirelessKeypadClient.getDefault().initializeKeypad(keypad, lockMac, new InitKeypadCallback() {
+          @Override
+          public void onInitKeypadSuccess(InitKeypadResult initKeypadResult) {
+            params.put(TTParam.ELECTRIC_QUANTITY, initKeypadResult.getBatteryLevel());
+            params.put(TTParam.KEYPAD_FEATURE_VALUE, initKeypadResult.getFeatureValue());
+            successCallbackCommand(TTKeyPadCommand.COMMAND_INIT_KEY_PAD, params);
+          }
+
+          @Override
+          public void onFail(KeypadError keypadError) {
+            errorCallbackCommand(TTKeyPadCommand.COMMAND_INIT_KEY_PAD, keypadError);
+          }
+        });
+      } else {
+        callbackCommand(TTKeyPadCommand.COMMAND_INIT_KEY_PAD, ResultStateFail, params, LockError.LOCK_NO_PERMISSION.getIntErrorCode(), "no connect permission");
+      }
+    });
+  }
+
+  /** ---------------------- remote ------------------------- **/
+
+  public void startScanRemote() {
+    PermissionUtils.doWithScanPermission(activity, success -> {
+      if (success) {
+        RemoteClient.getDefault().startScan(new ScanRemoteCallback() {
+          @Override
+          public void onScanRemote(Remote remote) {
+            TTRemoteScanModel ttRemoteScanModel = new TTRemoteScanModel();
+            ttRemoteScanModel.mac = remote.getAddress();
+            ttRemoteScanModel.name = remote.getName();
+            ttRemoteScanModel.rssi = remote.getRssi();
+            successCallbackCommand(TTRemoteCommand.COMMAND_START_SCAN_REMOTE, ttRemoteScanModel.toMap());
+          }
+        });
+      } else {
+        LogUtil.d("no scan permission");
+      }
+    });
+  }
+
+  public void stopScanRemote() {
+    RemoteClient.getDefault().stopScan();
+  }
+
+  public void initRemote(Map<String, Object> params) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        BluetoothDevice device = BluetoothAdapter.getDefaultAdapter().getRemoteDevice((String) params.get(TTParam.MAC));
+        Remote remote = new Remote(device);
+        RemoteClient.getDefault().initialize(remote, (String) params.get(TTParam.LOCK_DATA), new InitRemoteCallback() {
+          @Override
+          public void onInitSuccess(InitRemoteResult initRemoteResult) {
+            params.put(TTParam.ELECTRIC_QUANTITY, initRemoteResult.getBatteryLevel());
+            params.put(TTParam.MODEL_NUM, initRemoteResult.getSystemInfo().getModelNum());
+            params.put(TTParam.FIRMWARE_REVISION, initRemoteResult.getSystemInfo().getFirmwareRevision());
+            params.put(TTParam.HARD_WARE_REVISION, initRemoteResult.getSystemInfo().getHardwareRevision());
+            successCallbackCommand(TTRemoteCommand.COMMAND_INIT_REMOTE, params);
+          }
+
+          @Override
+          public void onFail(RemoteError remoteError) {
+            errorCallbackCommand(TTRemoteCommand.COMMAND_INIT_REMOTE, remoteError);
+          }
+        });
+      } else {
+        callbackCommand(TTRemoteCommand.COMMAND_INIT_REMOTE, ResultStateFail, params, RemoteError.FAILED.getErrorCode(), "no connect permission");
+      }
+    });
   }
 
   public void startScanGateway() {
@@ -622,8 +849,26 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       case TTLockCommand.COMMAND_SET_LOCK_DIRECTION:
         setUnlockDirection(ttlockModel);
         break;
-      case TTLockCommand.COMMAND_SET_ADMIN_ERASE_PASSCODE:
-
+      case TTLockCommand.COMMAND_RESET_LOCK_BY_CODE:
+        resetLockByCode(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_VERIFY_LOCK:
+        verifyLock(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_ADD_FACE:
+        addFace(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_ADD_FACE_DATA:
+        addFaceData(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_MODIFY_FACE:
+        modifyFace(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_DELETE_FACE:
+        deleteFace(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_CLEAR_FACE:
+        clearFace(ttlockModel);
         break;
       default:
         apiFail(LockError.INVALID_COMMAND);
@@ -632,7 +877,25 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     }
   }
 
+  public void verifyLock(final TtlockModel ttlockModel) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().verifyLock(ttlockModel.lockMac, new VerifyLockCallback() {
+          @Override
+          public void onVerifySuccess() {
+            apiSuccess(ttlockModel);
+          }
 
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
 
   private void commandTimeOutCheck() {
     commandTimeOutCheck(COMMAND_TIME_OUT);
@@ -1858,6 +2121,354 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 //    });
   }
 
+  public void resetLockByCode(final TtlockModel ttlockModel) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().resetLockByCode(ttlockModel.lockMac, ttlockModel.resetCode, new ResetLockByCodeCallback() {
+          @Override
+          public void onResetSuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void addRemoteKey(final TtlockModel ttlockModel) {
+    ValidityInfo validityInfo = new ValidityInfo();
+    validityInfo.setStartDate(ttlockModel.startDate);
+    validityInfo.setEndDate(ttlockModel.endDate);
+
+    if (TextUtils.isEmpty(ttlockModel.cycleJsonList)) {
+      validityInfo.setModeType(ValidityInfo.TIMED);
+    } else {
+      validityInfo.setModeType(ValidityInfo.CYCLIC);
+      validityInfo.setCyclicConfigs(GsonUtil.toObject(ttlockModel.cycleJsonList, new TypeToken<List<CyclicConfig>>(){}));
+      ttlockModel.cycleJsonList = null;//clear data
+    }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().addRemote(ttlockModel.mac, validityInfo, ttlockModel.lockData, new AddRemoteCallback() {
+          @Override
+          public void onAddSuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void modifyRemoteKey(final TtlockModel ttlockModel) {
+    ValidityInfo validityInfo = new ValidityInfo();
+    validityInfo.setStartDate(ttlockModel.startDate);
+    validityInfo.setEndDate(ttlockModel.endDate);
+
+    if (TextUtils.isEmpty(ttlockModel.cycleJsonList)) {
+      validityInfo.setModeType(ValidityInfo.TIMED);
+    } else {
+      validityInfo.setModeType(ValidityInfo.CYCLIC);
+      validityInfo.setCyclicConfigs(GsonUtil.toObject(ttlockModel.cycleJsonList, new TypeToken<List<CyclicConfig>>(){}));
+      ttlockModel.cycleJsonList = null;//clear data
+    }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().modifyRemoteValidityPeriod(ttlockModel.mac, validityInfo, ttlockModel.lockData, new ModifyRemoteValidityPeriodCallback() {
+          @Override
+          public void onModifySuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void deleteRemoteKey(final TtlockModel ttlockModel) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().deleteRemote(ttlockModel.mac, ttlockModel.lockData, new DeleteRemoteCallback() {
+          @Override
+          public void onDeleteSuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void clearAllRemoteKey(final TtlockModel ttlockModel) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().clearRemote(ttlockModel.lockData, new ClearRemoteCallback() {
+          @Override
+          public void onClearSuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void getAccessoryElectricQuantity(final TtlockModel ttlockModel) {
+    AccessoryInfo accessoryInfo = new AccessoryInfo();
+//    TTRemoteAccessory { remoteKey, remoteKeypad, doorSensor }
+    AccessoryType accessoryType = null;
+    switch (ttlockModel.remoteAccessory) {
+      case 0://remoteKey
+        accessoryType = AccessoryType.REMOTE;
+        break;
+      case 1://remoteKeypad
+        accessoryType = AccessoryType.WIRELESS_KEYPAD;
+        break;
+      case 2://doorSensor
+        accessoryType = AccessoryType.DOOR_SENSOR;
+        break;
+    }
+    accessoryInfo.setAccessoryType(accessoryType);
+    accessoryInfo.setAccessoryMac(ttlockModel.mac);
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().getAccessoryBatteryLevel(accessoryInfo, ttlockModel.lockData, new GetAccessoryBatteryLevelCallback() {
+          @Override
+          public void onGetAccessoryBatteryLevelSuccess(AccessoryInfo accessoryInfo) {
+            ttlockModel.electricQuantity = accessoryInfo.getAccessoryBattery();
+            ttlockModel.updateDate = accessoryInfo.getBatteryDate();
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void clearRemote(final TtlockModel ttlockModel) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().clearRemote(ttlockModel.lockData, new ClearRemoteCallback() {
+          @Override
+          public void onClearSuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  //---------------remote------------------------------
+
+  public void addFace(final TtlockModel ttlockModel) {
+    ValidityInfo validityInfo = new ValidityInfo();
+    validityInfo.setStartDate(ttlockModel.startDate);
+    validityInfo.setEndDate(ttlockModel.endDate);
+
+    if (TextUtils.isEmpty(ttlockModel.cycleJsonList)) {
+      validityInfo.setModeType(ValidityInfo.TIMED);
+    } else {
+      validityInfo.setModeType(ValidityInfo.CYCLIC);
+      validityInfo.setCyclicConfigs(GsonUtil.toObject(ttlockModel.cycleJsonList, new TypeToken<List<CyclicConfig>>() {
+      }));
+      ttlockModel.cycleJsonList = null;//clear data
+    }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().addFace(ttlockModel.lockData, validityInfo, new AddFaceCallback() {
+          @Override
+          public void onEnterAddMode() {
+            ttlockModel.state = STATUS_FACE_ENTER_ADD_MODE;
+            progressCallbackCommand(commandQue.peek(), ttlockModel.toMap());
+          }
+
+          @Override
+          public void onCollectionStatus(FaceCollectionStatus faceCollectionStatus) {
+            ttlockModel.state = STATUS_FACE_ERROR;
+            Map<String, Object> hashMap = ttlockModel.toMap();
+            hashMap.put("errorCode", faceCollectionStatus.getValue());
+            progressCallbackCommand(commandQue.peek(), hashMap);
+          }
+
+          @Override
+          public void onAddFinished(long faceNumber) {
+            ttlockModel.faceNumber = String.valueOf(faceNumber);
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void addFaceData(final TtlockModel ttlockModel) {
+    ValidityInfo validityInfo = new ValidityInfo();
+    validityInfo.setStartDate(ttlockModel.startDate);
+    validityInfo.setEndDate(ttlockModel.endDate);
+
+    if (TextUtils.isEmpty(ttlockModel.cycleJsonList)) {
+      validityInfo.setModeType(ValidityInfo.TIMED);
+    } else {
+      validityInfo.setModeType(ValidityInfo.CYCLIC);
+      validityInfo.setCyclicConfigs(GsonUtil.toObject(ttlockModel.cycleJsonList, new TypeToken<List<CyclicConfig>>() {
+      }));
+      ttlockModel.cycleJsonList = null;//clear data
+    }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().addFaceFeatureData(ttlockModel.lockData, ttlockModel.faceFeatureData, validityInfo, new AddFaceCallback() {
+          @Override
+          public void onEnterAddMode() {
+            ttlockModel.state = STATUS_FACE_ENTER_ADD_MODE;
+            progressCallbackCommand(commandQue.peek(), ttlockModel.toMap());
+          }
+
+          @Override
+          public void onCollectionStatus(FaceCollectionStatus faceCollectionStatus) {
+            ttlockModel.state = STATUS_FACE_ERROR;
+            Map<String, Object> hashMap = ttlockModel.toMap();
+            hashMap.put("errorCode", faceCollectionStatus.getValue());
+            progressCallbackCommand(commandQue.peek(), hashMap);
+          }
+
+          @Override
+          public void onAddFinished(long faceNumber) {
+            ttlockModel.faceNumber = String.valueOf(faceNumber);
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void modifyFace(final TtlockModel ttlockModel) {
+    ValidityInfo validityInfo = new ValidityInfo();
+    validityInfo.setStartDate(ttlockModel.startDate);
+    validityInfo.setEndDate(ttlockModel.endDate);
+
+    if (TextUtils.isEmpty(ttlockModel.cycleJsonList)) {
+      validityInfo.setModeType(ValidityInfo.TIMED);
+    } else {
+      validityInfo.setModeType(ValidityInfo.CYCLIC);
+      validityInfo.setCyclicConfigs(GsonUtil.toObject(ttlockModel.cycleJsonList, new TypeToken<List<CyclicConfig>>() {
+      }));
+      ttlockModel.cycleJsonList = null;//clear data
+    }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().modifyFaceValidityPeriod(ttlockModel.lockData, Long.valueOf(ttlockModel.faceNumber), validityInfo, new ModifyFacePeriodCallback() {
+          @Override
+          public void onModifySuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void deleteFace(final TtlockModel ttlockModel) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().deleteFace(ttlockModel.lockData, Long.valueOf(ttlockModel.faceNumber), new DeleteFaceCallback() {
+          @Override
+          public void onDeleteSuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void clearFace(final TtlockModel ttlockModel) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().clearFace(ttlockModel.lockData, new ClearFaceCallback() {
+          @Override
+          public void onClearSuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
   public void setAdminErasePasscode(final TtlockModel ttlockModel) {
 
   }
@@ -1896,14 +2507,26 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       case PERMISSIONS_REQUEST_CODE: {
         // If request is cancelled, the result arrays are empty.
         if (grantResults.length > 0) {
-          for (int i=0;i<permissions.length;i++) {
+          for (int i = 0; i < permissions.length; i++) {
             if (Manifest.permission.ACCESS_FINE_LOCATION.equals(permissions[i]) && grantResults[i] == PackageManager.PERMISSION_GRANTED) {
               // permission was granted, yay! Do the
               // contacts-related task you need to do.
-              if (isGatewayCommand) {
-                startScanGateway();
-              } else {
-                startScan();
+              switch (commandType) {
+                case CommandType.DOOR_LOCK:
+                  startScan();
+                  break;
+                case CommandType.DOOR_SENSOR:
+                  startScanDoorSensor();
+                  break;
+                case CommandType.GATEWAY:
+                  startScanGateway();
+                  break;
+                case CommandType.KEY_PAD:
+                  startScanKeyPad();
+                  break;
+                case CommandType.REMOTE_KEY:
+                  startScanRemote();
+                  break;
               }
             } else {
               // permission denied, boo! Disable the
