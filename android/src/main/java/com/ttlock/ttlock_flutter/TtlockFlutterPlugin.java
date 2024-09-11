@@ -187,7 +187,6 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import com.ttlock.bl.sdk.entity.LockData;
-import com.ttlock.bl.sdk.api.EncryptionUtil;
 
 /** TtlockFlutterPlugin */
 public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware, EventChannel.StreamHandler {
