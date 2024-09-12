@@ -505,14 +505,19 @@ typedef NS_ENUM(NSInteger, ResultState) {
              }
         }];
     }else if ([command isEqualToString:command_upgrade_gateway]) {
-        [TTGateway upgradeGatewayWithGatewayMac:lockModel.mac block:^(TTGatewayStatus status) {
-            if (status == TTGatewaySuccess) {
-                [weakSelf successCallbackCommand:command data:nil];
-            }else{
-
-               [weakSelf errorCallbackCommand:command code:status details:nil];
+        [TTGateway connectGatewayWithGatewayMac:lockModel.mac block:^(TTGatewayConnectStatus connectStatus) {
+            if(connectStatus == TTGatewayConnectSuccess){
+                [TTGateway upgradeGatewayWithGatewayMac:lockModel.mac block:^(TTGatewayStatus status) {
+                    if (status == TTGatewaySuccess) {
+                        [weakSelf successCallbackCommand:command data:nil];
+                    }else{
+                            [weakSelf errorCallbackCommand:command code:status details:nil];
+                    }
+                }];
+            } else {
+                [weakSelf errorCallbackCommand:command code:connectStatus == TTGatewayConnectTimeout ? TTGatewayTimeout :TTGatewayFail details:nil];
             }
-        }];
+       }];
     }else if ([command isEqualToString:command_function_support]) {
         NSInteger index = lockModel.supportFunction.integerValue;
                 NSArray *functionArray = @[
