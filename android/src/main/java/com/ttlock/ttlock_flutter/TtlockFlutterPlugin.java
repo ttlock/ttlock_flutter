@@ -7,12 +7,6 @@ import android.bluetooth.BluetoothDevice;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
-
-import com.ttlock.bl.sdk.callback.GetUnlockDirectionCallback;
-import com.ttlock.bl.sdk.callback.SetUnlockDirectionCallback;
-import com.ttlock.bl.sdk.entity.UnlockDirection;
-import com.ttlock.ttlock_flutter.model.TTLockFunction;
-
 import android.src.main.java.com.ttlock.ttlock_flutter.model.SoundVolumeConverter;
 import android.text.TextUtils;
 
@@ -24,18 +18,25 @@ import com.google.gson.reflect.TypeToken;
 import com.ttlock.bl.sdk.api.ExtendedBluetoothDevice;
 import com.ttlock.bl.sdk.api.TTLockClient;
 import com.ttlock.bl.sdk.callback.ActivateLiftFloorsCallback;
+import com.ttlock.bl.sdk.callback.AddFaceCallback;
 import com.ttlock.bl.sdk.callback.AddFingerprintCallback;
 import com.ttlock.bl.sdk.callback.AddICCardCallback;
+import com.ttlock.bl.sdk.callback.AddRemoteCallback;
 import com.ttlock.bl.sdk.callback.ClearAllFingerprintCallback;
 import com.ttlock.bl.sdk.callback.ClearAllICCardCallback;
+import com.ttlock.bl.sdk.callback.ClearFaceCallback;
 import com.ttlock.bl.sdk.callback.ClearPassageModeCallback;
+import com.ttlock.bl.sdk.callback.ClearRemoteCallback;
 import com.ttlock.bl.sdk.callback.ConfigServerCallback;
 import com.ttlock.bl.sdk.callback.ConfigWifiCallback;
 import com.ttlock.bl.sdk.callback.ControlLockCallback;
 import com.ttlock.bl.sdk.callback.CreateCustomPasscodeCallback;
+import com.ttlock.bl.sdk.callback.DeleteFaceCallback;
 import com.ttlock.bl.sdk.callback.DeleteFingerprintCallback;
 import com.ttlock.bl.sdk.callback.DeleteICCardCallback;
 import com.ttlock.bl.sdk.callback.DeletePasscodeCallback;
+import com.ttlock.bl.sdk.callback.DeleteRemoteCallback;
+import com.ttlock.bl.sdk.callback.GetAccessoryBatteryLevelCallback;
 import com.ttlock.bl.sdk.callback.GetAdminPasscodeCallback;
 import com.ttlock.bl.sdk.callback.GetAllValidFingerprintCallback;
 import com.ttlock.bl.sdk.callback.GetAllValidICCardCallback;
@@ -51,17 +52,20 @@ import com.ttlock.bl.sdk.callback.GetLockVersionCallback;
 import com.ttlock.bl.sdk.callback.GetNBAwakeModesCallback;
 import com.ttlock.bl.sdk.callback.GetNBAwakeTimesCallback;
 import com.ttlock.bl.sdk.callback.GetOperationLogCallback;
-import com.ttlock.bl.sdk.callback.GetPasscodeVerificationInfoCallback;
 import com.ttlock.bl.sdk.callback.GetRemoteUnlockStateCallback;
+import com.ttlock.bl.sdk.callback.GetUnlockDirectionCallback;
 import com.ttlock.bl.sdk.callback.GetWifiInfoCallback;
 import com.ttlock.bl.sdk.callback.InitLockCallback;
 import com.ttlock.bl.sdk.callback.ModifyAdminPasscodeCallback;
+import com.ttlock.bl.sdk.callback.ModifyFacePeriodCallback;
 import com.ttlock.bl.sdk.callback.ModifyFingerprintPeriodCallback;
 import com.ttlock.bl.sdk.callback.ModifyICCardPeriodCallback;
 import com.ttlock.bl.sdk.callback.ModifyPasscodeCallback;
+import com.ttlock.bl.sdk.callback.ModifyRemoteValidityPeriodCallback;
 import com.ttlock.bl.sdk.callback.RecoverLockDataCallback;
 import com.ttlock.bl.sdk.callback.ReportLossCardCallback;
 import com.ttlock.bl.sdk.callback.ResetKeyCallback;
+import com.ttlock.bl.sdk.callback.ResetLockByCodeCallback;
 import com.ttlock.bl.sdk.callback.ResetLockCallback;
 import com.ttlock.bl.sdk.callback.ResetPasscodeCallback;
 import com.ttlock.bl.sdk.callback.ScanLockCallback;
@@ -76,15 +80,22 @@ import com.ttlock.bl.sdk.callback.SetLockSoundWithSoundVolumeCallback;
 import com.ttlock.bl.sdk.callback.SetLockTimeCallback;
 import com.ttlock.bl.sdk.callback.SetNBAwakeModesCallback;
 import com.ttlock.bl.sdk.callback.SetNBAwakeTimesCallback;
-import com.ttlock.bl.sdk.callback.SetNBServerCallback;
 import com.ttlock.bl.sdk.callback.SetPassageModeCallback;
 import com.ttlock.bl.sdk.callback.SetPowerSaverControlableLockCallback;
 import com.ttlock.bl.sdk.callback.SetPowerSaverWorkModeCallback;
 import com.ttlock.bl.sdk.callback.SetRemoteUnlockSwitchCallback;
+import com.ttlock.bl.sdk.callback.SetUnlockDirectionCallback;
+import com.ttlock.bl.sdk.callback.VerifyLockCallback;
 import com.ttlock.bl.sdk.constant.RecoveryData;
+import com.ttlock.bl.sdk.device.Remote;
+import com.ttlock.bl.sdk.device.WirelessDoorSensor;
+import com.ttlock.bl.sdk.device.WirelessKeypad;
+import com.ttlock.bl.sdk.entity.AccessoryInfo;
+import com.ttlock.bl.sdk.entity.AccessoryType;
 import com.ttlock.bl.sdk.entity.ActivateLiftFloorsResult;
 import com.ttlock.bl.sdk.entity.ControlLockResult;
 import com.ttlock.bl.sdk.entity.CyclicConfig;
+import com.ttlock.bl.sdk.entity.FaceCollectionStatus;
 import com.ttlock.bl.sdk.entity.HotelData;
 import com.ttlock.bl.sdk.entity.IpSetting;
 import com.ttlock.bl.sdk.entity.LockError;
@@ -98,6 +109,7 @@ import com.ttlock.bl.sdk.entity.RecoveryDataType;
 import com.ttlock.bl.sdk.entity.SoundVolume;
 import com.ttlock.bl.sdk.entity.TTLiftWorkMode;
 import com.ttlock.bl.sdk.entity.TTLockConfigType;
+import com.ttlock.bl.sdk.entity.UnlockDirection;
 import com.ttlock.bl.sdk.entity.ValidityInfo;
 import com.ttlock.bl.sdk.entity.WifiLockInfo;
 import com.ttlock.bl.sdk.gateway.api.GatewayClient;
@@ -110,13 +122,33 @@ import com.ttlock.bl.sdk.gateway.model.ConfigureGatewayInfo;
 import com.ttlock.bl.sdk.gateway.model.DeviceInfo;
 import com.ttlock.bl.sdk.gateway.model.GatewayError;
 import com.ttlock.bl.sdk.gateway.model.WiFi;
+import com.ttlock.bl.sdk.keypad.InitKeypadCallback;
+import com.ttlock.bl.sdk.keypad.ScanKeypadCallback;
+import com.ttlock.bl.sdk.keypad.WirelessKeypadClient;
+import com.ttlock.bl.sdk.keypad.model.InitKeypadResult;
+import com.ttlock.bl.sdk.keypad.model.KeypadError;
+import com.ttlock.bl.sdk.remote.api.RemoteClient;
+import com.ttlock.bl.sdk.remote.callback.InitRemoteCallback;
+import com.ttlock.bl.sdk.remote.callback.ScanRemoteCallback;
+import com.ttlock.bl.sdk.remote.model.InitRemoteResult;
+import com.ttlock.bl.sdk.remote.model.RemoteError;
 import com.ttlock.bl.sdk.util.DigitUtil;
 import com.ttlock.bl.sdk.util.FeatureValueUtil;
 import com.ttlock.bl.sdk.util.GsonUtil;
 import com.ttlock.bl.sdk.util.LogUtil;
+import com.ttlock.bl.sdk.wirelessdoorsensor.WirelessDoorSensorClient;
+import com.ttlock.bl.sdk.wirelessdoorsensor.callback.InitDoorSensorCallback;
+import com.ttlock.bl.sdk.wirelessdoorsensor.callback.ScanWirelessDoorSensorCallback;
+import com.ttlock.bl.sdk.wirelessdoorsensor.model.DoorSensorError;
+import com.ttlock.bl.sdk.wirelessdoorsensor.model.InitDoorSensorResult;
+import com.ttlock.ttlock_flutter.constant.CommandType;
 import com.ttlock.ttlock_flutter.constant.GatewayCommand;
+import com.ttlock.ttlock_flutter.constant.TTDoorSensorCommand;
 import com.ttlock.ttlock_flutter.constant.TTGatewayConnectStatus;
+import com.ttlock.ttlock_flutter.constant.TTKeyPadCommand;
 import com.ttlock.ttlock_flutter.constant.TTLockCommand;
+import com.ttlock.ttlock_flutter.constant.TTParam;
+import com.ttlock.ttlock_flutter.constant.TTRemoteCommand;
 import com.ttlock.ttlock_flutter.model.CommandObj;
 import com.ttlock.ttlock_flutter.model.GatewayErrorConverter;
 import com.ttlock.ttlock_flutter.model.GatewayModel;
@@ -124,9 +156,13 @@ import com.ttlock.ttlock_flutter.model.LiftWorkModeConverter;
 import com.ttlock.ttlock_flutter.model.PowerSaverWorkModeConverter;
 import com.ttlock.ttlock_flutter.model.TTBluetoothState;
 import com.ttlock.ttlock_flutter.model.TTGatewayScanModel;
+import com.ttlock.ttlock_flutter.model.TTKeyPadScanModel;
 import com.ttlock.ttlock_flutter.model.TTLockConfigConverter;
 import com.ttlock.ttlock_flutter.model.TTLockErrorConverter;
+import com.ttlock.ttlock_flutter.model.TTLockFunction;
+import com.ttlock.ttlock_flutter.model.TTRemoteScanModel;
 import com.ttlock.ttlock_flutter.model.TtlockModel;
+import com.ttlock.ttlock_flutter.util.PermissionUtils;
 import com.ttlock.ttlock_flutter.util.Utils;
 
 import java.util.ArrayDeque;
@@ -2617,6 +2653,18 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     if (commandObj != null) {
       callbackCommand(commandObj.getCommand(), ResultStateProgress, data, -1, "");
     }
+  }
+
+  public void errorCallbackCommand(String command, RemoteError remoteError) {
+    callbackCommand(command, ResultStateFail, null, 0, remoteError.getDescription());
+  }
+
+  public void errorCallbackCommand(String command, KeypadError keypadError) {
+    callbackCommand(command, ResultStateFail, null, 0, keypadError.getDescription());
+  }
+
+  public void errorCallbackCommand(String command, DoorSensorError doorSensorError) {
+    callbackCommand(command, ResultStateFail, null, 0, doorSensorError.getDescription());
   }
 
   public void errorCallbackCommand(String command, GatewayError gatewayError) {
