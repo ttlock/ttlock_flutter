@@ -331,6 +331,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       case GatewayCommand.COMMAND_CONFIG_IP:
         gatewayConfigIp(gatewayModel);
         break;
+      case GatewayCommand.COMMAND_UPGRADE_GATEWAY:
+        enterGatewayDfuMode();
+        break;
     }
   }
 
@@ -611,8 +614,8 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
-  public void gatewayUpgrade() {
-
+  public void enterGatewayDfuMode() {
+    successCallbackCommand(GatewayCommand.COMMAND_UPGRADE_GATEWAY, null);
   }
 
   public void getSurroundWifi(final GatewayModel gatewayModel) {
