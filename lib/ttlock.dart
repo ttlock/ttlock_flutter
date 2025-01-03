@@ -1912,7 +1912,10 @@ enum TTLockConfig {
   resetButton,
   privacyLock,
   passageModeAutoUnlock,
-  wifiLockPowerSavingMode
+  wifiLockPowerSavingMode,
+  doubleAuth,
+  publicMode,
+  lowBatteryAutoUnlock
 }
 
 enum TTLockDirection { left, right }
