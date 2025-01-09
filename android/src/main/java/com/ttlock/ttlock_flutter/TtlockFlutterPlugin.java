@@ -18,6 +18,7 @@ import com.google.gson.reflect.TypeToken;
 import com.ttlock.bl.sdk.api.ExtendedBluetoothDevice;
 import com.ttlock.bl.sdk.api.TTLockClient;
 import com.ttlock.bl.sdk.callback.ActivateLiftFloorsCallback;
+import com.ttlock.bl.sdk.callback.AddDoorSensorCallback;
 import com.ttlock.bl.sdk.callback.AddFaceCallback;
 import com.ttlock.bl.sdk.callback.AddFingerprintCallback;
 import com.ttlock.bl.sdk.callback.AddICCardCallback;
@@ -31,6 +32,7 @@ import com.ttlock.bl.sdk.callback.ConfigServerCallback;
 import com.ttlock.bl.sdk.callback.ConfigWifiCallback;
 import com.ttlock.bl.sdk.callback.ControlLockCallback;
 import com.ttlock.bl.sdk.callback.CreateCustomPasscodeCallback;
+import com.ttlock.bl.sdk.callback.DeleteDoorSensorCallback;
 import com.ttlock.bl.sdk.callback.DeleteFaceCallback;
 import com.ttlock.bl.sdk.callback.DeleteFingerprintCallback;
 import com.ttlock.bl.sdk.callback.DeleteICCardCallback;
@@ -71,6 +73,7 @@ import com.ttlock.bl.sdk.callback.ResetPasscodeCallback;
 import com.ttlock.bl.sdk.callback.ScanLockCallback;
 import com.ttlock.bl.sdk.callback.ScanWifiCallback;
 import com.ttlock.bl.sdk.callback.SetAutoLockingPeriodCallback;
+import com.ttlock.bl.sdk.callback.SetDoorSensorAlertTimeCallback;
 import com.ttlock.bl.sdk.callback.SetHotelCardSectorCallback;
 import com.ttlock.bl.sdk.callback.SetHotelDataCallback;
 import com.ttlock.bl.sdk.callback.SetLiftControlableFloorsCallback;
@@ -878,6 +881,30 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         break;
       case TTLockCommand.COMMAND_GET_LOCK_SOUND_WITH_SOUND_VOLUME:
         getLockSoundWithSoundVolume(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_SET_LOCK_DOOR_SENSORY_ALERT_TIME:
+        setDoorSensorAlertTime(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_ADD_LOCK_REMOTE_KEY:
+        addRemoteKey(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_DELETE_LOCK_REMOTE_KEY:
+        deleteRemoteKey(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_SET_LOCK_REMOTE_KEY_VALID_DATE:
+        modifyRemoteKey(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_GET_LOCK_REMOTE_ACCESSORY_ELECTRIC_QUANTITY:
+        getAccessoryElectricQuantity(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_ADD_LOCK_DOOR_SENSORY:
+        addDoorSensor(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_DELETE_LOCK_DOOR_SENSORY:
+        deleteDoorSensor(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_CLEAR_REMOTE_KEY:
+        clearRemote(ttlockModel);
         break;
       case TTLockCommand.COMMAND_GET_LOCK_FRETURE_VALUE:
         getFeatureValue(ttlockModel);
@@ -2112,6 +2139,66 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       @Override
       public void onFail(LockError lockError) {
         apiFail(lockError);
+      }
+    });
+  }
+
+  public void addDoorSensor(final TtlockModel ttlockModel) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().addDoorSensor(ttlockModel.mac, ttlockModel.lockData, new AddDoorSensorCallback() {
+          @Override
+          public void onAddSuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void deleteDoorSensor(final TtlockModel ttlockModel) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().deleteDoorSensor(ttlockModel.lockData, new DeleteDoorSensorCallback() {
+          @Override
+          public void onDeleteSuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void setDoorSensorAlertTime(final TtlockModel ttlockModel) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().setDoorSensorAlertTime(ttlockModel.alertTime, ttlockModel.lockData, new SetDoorSensorAlertTimeCallback() {
+          @Override
+          public void onSetDoorSensorAlertTimeSuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
       }
     });
   }

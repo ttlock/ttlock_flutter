@@ -14,7 +14,10 @@ public enum  TTLockConfigConverter {
     resetButton,
     privacyLock,
     passageModeAutoUnlock,
-    wifiLockPowerSavingMode;
+    wifiLockPowerSavingMode,
+    doubleAuth,
+    publicMode,
+    lowBatteryAutoUnlock;
 
     public static TTLockConfigType flutter2Native(int index) {
         if (index < TTLockConfigConverter.class.getEnumConstants().length) {
@@ -41,6 +44,8 @@ public enum  TTLockConfigConverter {
                 return TTLockConfigType.PASSAGE_MODE_AUTO_UNLOCK_SETTING;
             case wifiLockPowerSavingMode:
                 return TTLockConfigType.WIFI_LOCK_POWER_SAVING_MODE;
+            case doubleAuth:
+                return TTLockConfigType.DOUBLE_CHECK;
         }
         return null;
     }
