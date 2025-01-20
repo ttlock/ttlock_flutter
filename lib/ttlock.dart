@@ -1571,6 +1571,7 @@ class TTLock {
             data[TTResponse.wirelessKeypadFeatureValue]);
         break;
       case COMMAND_ADD_FACE:
+      case COMMAND_ADD_FACE_DATA:
         TTAddFaceSuccessCallback addFaceSuccessCallback = callBack;
         addFaceSuccessCallback(data[TTResponse.faceNumber]);
         break;
