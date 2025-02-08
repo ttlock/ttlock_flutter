@@ -3,129 +3,153 @@
   "packages": [
     {
       "name": "async",
-      "rootUri": "file:///usr/local/Caskroom/flutter/2.0.5/flutter/.pub-cache/hosted/pub.dartlang.org/async-2.6.1",
+      "rootUri": "file:///C:/Users/xutc/AppData/Local/Pub/Cache/hosted/pub.dev/async-2.11.0",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "2.18"
     },
     {
       "name": "boolean_selector",
-      "rootUri": "file:///usr/local/Caskroom/flutter/2.0.5/flutter/.pub-cache/hosted/pub.dartlang.org/boolean_selector-2.1.0",
+      "rootUri": "file:///C:/Users/xutc/AppData/Local/Pub/Cache/hosted/pub.dev/boolean_selector-2.1.1",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "2.17"
     },
     {
       "name": "characters",
-      "rootUri": "file:///usr/local/Caskroom/flutter/2.0.5/flutter/.pub-cache/hosted/pub.dartlang.org/characters-1.1.0",
-      "packageUri": "lib/",
-      "languageVersion": "2.12"
-    },
-    {
-      "name": "charcode",
-      "rootUri": "file:///usr/local/Caskroom/flutter/2.0.5/flutter/.pub-cache/hosted/pub.dartlang.org/charcode-1.2.0",
+      "rootUri": "file:///C:/Users/xutc/AppData/Local/Pub/Cache/hosted/pub.dev/characters-1.3.0",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
     {
       "name": "clock",
-      "rootUri": "file:///usr/local/Caskroom/flutter/2.0.5/flutter/.pub-cache/hosted/pub.dartlang.org/clock-1.1.0",
+      "rootUri": "file:///C:/Users/xutc/AppData/Local/Pub/Cache/hosted/pub.dev/clock-1.1.1",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
     {
       "name": "collection",
-      "rootUri": "file:///usr/local/Caskroom/flutter/2.0.5/flutter/.pub-cache/hosted/pub.dartlang.org/collection-1.15.0",
+      "rootUri": "file:///C:/Users/xutc/AppData/Local/Pub/Cache/hosted/pub.dev/collection-1.19.0",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "cupertino_icons",
+      "rootUri": "file:///C:/Users/xutc/AppData/Local/Pub/Cache/hosted/pub.dev/cupertino_icons-1.0.8",
+      "packageUri": "lib/",
+      "languageVersion": "3.1"
     },
     {
       "name": "fake_async",
-      "rootUri": "file:///usr/local/Caskroom/flutter/2.0.5/flutter/.pub-cache/hosted/pub.dartlang.org/fake_async-1.2.0",
+      "rootUri": "file:///C:/Users/xutc/AppData/Local/Pub/Cache/hosted/pub.dev/fake_async-1.3.1",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
     {
       "name": "flutter",
-      "rootUri": "file:///usr/local/Caskroom/flutter/2.0.5/flutter/packages/flutter",
+      "rootUri": "file:///E:/Users/xutc/dev/flutter/packages/flutter",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "3.3"
     },
     {
       "name": "flutter_test",
-      "rootUri": "file:///usr/local/Caskroom/flutter/2.0.5/flutter/packages/flutter_test",
+      "rootUri": "file:///E:/Users/xutc/dev/flutter/packages/flutter_test",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "leak_tracker",
+      "rootUri": "file:///C:/Users/xutc/AppData/Local/Pub/Cache/hosted/pub.dev/leak_tracker-10.0.7",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "leak_tracker_flutter_testing",
+      "rootUri": "file:///C:/Users/xutc/AppData/Local/Pub/Cache/hosted/pub.dev/leak_tracker_flutter_testing-3.0.8",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "leak_tracker_testing",
+      "rootUri": "file:///C:/Users/xutc/AppData/Local/Pub/Cache/hosted/pub.dev/leak_tracker_testing-3.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
     },
     {
       "name": "matcher",
-      "rootUri": "file:///usr/local/Caskroom/flutter/2.0.5/flutter/.pub-cache/hosted/pub.dartlang.org/matcher-0.12.10",
+      "rootUri": "file:///C:/Users/xutc/AppData/Local/Pub/Cache/hosted/pub.dev/matcher-0.12.16+1",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "material_color_utilities",
+      "rootUri": "file:///C:/Users/xutc/AppData/Local/Pub/Cache/hosted/pub.dev/material_color_utilities-0.11.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
     },
     {
       "name": "meta",
-      "rootUri": "file:///usr/local/Caskroom/flutter/2.0.5/flutter/.pub-cache/hosted/pub.dartlang.org/meta-1.3.0",
+      "rootUri": "file:///C:/Users/xutc/AppData/Local/Pub/Cache/hosted/pub.dev/meta-1.15.0",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
     {
       "name": "path",
-      "rootUri": "file:///usr/local/Caskroom/flutter/2.0.5/flutter/.pub-cache/hosted/pub.dartlang.org/path-1.8.0",
+      "rootUri": "file:///C:/Users/xutc/AppData/Local/Pub/Cache/hosted/pub.dev/path-1.9.0",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "3.0"
     },
     {
       "name": "sky_engine",
-      "rootUri": "file:///usr/local/Caskroom/flutter/2.0.5/flutter/bin/cache/pkg/sky_engine",
+      "rootUri": "file:///E:/Users/xutc/dev/flutter/bin/cache/pkg/sky_engine",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "3.2"
     },
     {
       "name": "source_span",
-      "rootUri": "file:///usr/local/Caskroom/flutter/2.0.5/flutter/.pub-cache/hosted/pub.dartlang.org/source_span-1.8.1",
+      "rootUri": "file:///C:/Users/xutc/AppData/Local/Pub/Cache/hosted/pub.dev/source_span-1.10.0",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "2.18"
     },
     {
       "name": "stack_trace",
-      "rootUri": "file:///usr/local/Caskroom/flutter/2.0.5/flutter/.pub-cache/hosted/pub.dartlang.org/stack_trace-1.10.0",
+      "rootUri": "file:///C:/Users/xutc/AppData/Local/Pub/Cache/hosted/pub.dev/stack_trace-1.12.0",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "3.4"
     },
     {
       "name": "stream_channel",
-      "rootUri": "file:///usr/local/Caskroom/flutter/2.0.5/flutter/.pub-cache/hosted/pub.dartlang.org/stream_channel-2.1.0",
+      "rootUri": "file:///C:/Users/xutc/AppData/Local/Pub/Cache/hosted/pub.dev/stream_channel-2.1.2",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "2.19"
     },
     {
       "name": "string_scanner",
-      "rootUri": "file:///usr/local/Caskroom/flutter/2.0.5/flutter/.pub-cache/hosted/pub.dartlang.org/string_scanner-1.1.0",
+      "rootUri": "file:///C:/Users/xutc/AppData/Local/Pub/Cache/hosted/pub.dev/string_scanner-1.3.0",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "3.1"
     },
     {
       "name": "term_glyph",
-      "rootUri": "file:///usr/local/Caskroom/flutter/2.0.5/flutter/.pub-cache/hosted/pub.dartlang.org/term_glyph-1.2.0",
+      "rootUri": "file:///C:/Users/xutc/AppData/Local/Pub/Cache/hosted/pub.dev/term_glyph-1.2.1",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
     {
       "name": "test_api",
-      "rootUri": "file:///usr/local/Caskroom/flutter/2.0.5/flutter/.pub-cache/hosted/pub.dartlang.org/test_api-0.3.0",
+      "rootUri": "file:///C:/Users/xutc/AppData/Local/Pub/Cache/hosted/pub.dev/test_api-0.7.3",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
-    },
-    {
-      "name": "typed_data",
-      "rootUri": "file:///usr/local/Caskroom/flutter/2.0.5/flutter/.pub-cache/hosted/pub.dartlang.org/typed_data-1.3.0",
-      "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "3.4"
     },
     {
       "name": "vector_math",
-      "rootUri": "file:///usr/local/Caskroom/flutter/2.0.5/flutter/.pub-cache/hosted/pub.dartlang.org/vector_math-2.1.0",
+      "rootUri": "file:///C:/Users/xutc/AppData/Local/Pub/Cache/hosted/pub.dev/vector_math-2.1.4",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "2.14"
+    },
+    {
+      "name": "vm_service",
+      "rootUri": "file:///C:/Users/xutc/AppData/Local/Pub/Cache/hosted/pub.dev/vm_service-14.3.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
     },
     {
       "name": "ttlock_premise_flutter",
@@ -134,7 +158,10 @@
       "languageVersion": "2.12"
     }
   ],
-  "generated": "2024-09-09T01:17:52.646564Z",
+  "generated": "2025-02-08T07:03:10.583461Z",
   "generator": "pub",
-  "generatorVersion": "2.13.4"
+  "generatorVersion": "3.6.2",
+  "flutterRoot": "file:///E:/Users/xutc/dev/flutter",
+  "flutterVersion": "3.27.4",
+  "pubCache": "file:///C:/Users/xutc/AppData/Local/Pub/Cache"
 }

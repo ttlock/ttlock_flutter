@@ -55,6 +55,7 @@ android {
             dirs 'libs', '..\\..\\..\\android\\libs'
         }
     }
+    namespace 'com.ttlock.ttlock_flutter_example'
 
 }
 
