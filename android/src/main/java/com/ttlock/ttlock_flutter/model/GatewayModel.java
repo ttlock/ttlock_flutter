@@ -19,7 +19,7 @@ public class GatewayModel {
     public int type;
     public int companyId;
     public int branchId;
-
+    public String apn;
     public String ipSettingJsonStr;
 
     public GatewayModel toObject(Map<String, Object> params) {

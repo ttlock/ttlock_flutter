@@ -116,6 +116,7 @@ import com.ttlock.bl.sdk.entity.UnlockDirection;
 import com.ttlock.bl.sdk.entity.ValidityInfo;
 import com.ttlock.bl.sdk.entity.WifiLockInfo;
 import com.ttlock.bl.sdk.gateway.api.GatewayClient;
+import com.ttlock.bl.sdk.gateway.callback.ConfigApnCallback;
 import com.ttlock.bl.sdk.gateway.callback.ConfigIpCallback;
 import com.ttlock.bl.sdk.gateway.callback.ConnectCallback;
 import com.ttlock.bl.sdk.gateway.callback.InitGatewayCallback;
@@ -336,6 +337,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         break;
       case GatewayCommand.COMMAND_UPGRADE_GATEWAY:
         enterGatewayDfuMode();
+        break;
+      case GatewayCommand.COMMAND_CONFIG_APN:
+          gatewayConfigApn(gatewayModel);
         break;
     }
   }
@@ -619,6 +623,20 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
   public void enterGatewayDfuMode() {
     successCallbackCommand(GatewayCommand.COMMAND_UPGRADE_GATEWAY, null);
+  }
+
+  public void gatewayConfigApn(final GatewayModel gatewayModel) {
+    GatewayClient.getDefault().configApn(gatewayModel.mac, gatewayModel.apn, new ConfigApnCallback() {
+      @Override
+      public void onConfigSuccess() {
+        successCallbackCommand(GatewayCommand.COMMAND_CONFIG_APN, null);
+      }
+
+      @Override
+      public void onFail(GatewayError gatewayError) {
+        errorCallbackCommand(GatewayCommand.COMMAND_CONFIG_APN, gatewayError);
+      }
+    });
   }
 
   public void getSurroundWifi(final GatewayModel gatewayModel) {
