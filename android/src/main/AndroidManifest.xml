@@ -1,6 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-  package="com.ttlock.ttlock_flutter">
+    xmlns:tools="http://schemas.android.com/tools">
     <!--
  Needed only if your app looks for Bluetooth devices.
          You must add an attribute to this permission, or declare the
