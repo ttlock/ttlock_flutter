@@ -22,15 +22,14 @@ class _GatewayPageState extends State<GatewayPage> {
     super.initState();
     _wifi = wifi;
     _type = type;
-
   }
 
   void _showLoading() {
-    ProgressHud.of(_context!).showLoading();
+    ProgressHud.of(_context!)!.showLoading();
   }
 
   void _showAndDismiss(ProgressHudType type, String text) {
-    ProgressHud.of(_context!).showAndDismiss(type, text);
+    ProgressHud.of(_context!)!.showAndDismiss(type, text);
   }
 
   void _initGateway_2(String? wifi, String? wifiPassword) {

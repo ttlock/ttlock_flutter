@@ -46,11 +46,11 @@ class _ScanPageState extends State<ScanPage> {
   }
 
   void _showLoading() {
-    ProgressHud.of(_context!).showLoading(text: '');
+    ProgressHud.of(_context!)!.showLoading(text: '');
   }
 
   void _dismissLoading() {
-    ProgressHud.of(_context!).dismiss();
+    ProgressHud.of(_context!)!.dismiss();
   }
 
   void _initLock(TTLockScanModel scanModel) async {

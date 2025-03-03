@@ -15,7 +15,8 @@ class _HomePageState extends State<HomePage> {
   void _startScanGateway() {
     if (Config.uid == 0 || Config.ttlockLoginPassword.length == 0) {
       String text = 'Please config the ttlockUid and the ttlockLoginPassword';
-      ProgressHud.of(_context!).showAndDismiss(ProgressHudType.error, text);
+      ProgressHud.of(_context!)!.showAndDismiss(ProgressHudType.error, text);
+
       return;
     }
     _startScan(ScanType.gateway);

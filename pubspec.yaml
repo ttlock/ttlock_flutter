@@ -1,6 +1,6 @@
 name: ttlock_flutter
 description: The ttLock flutter plugin that used to controle smart lock and gateway.
-version: 0.3.6
+version: 0.3.7
 homepage: https://github.com/ttlock/ttlock_flutter.git
 
 environment:
