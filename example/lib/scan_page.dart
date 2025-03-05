@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:ttlock_flutter/ttelectricMeter.dart';
 import 'package:ttlock_flutter/ttgateway.dart';
 import 'package:ttlock_flutter/ttlock.dart';
 import 'package:ttlock_flutter_example/gateway_page.dart';
 import 'wifi_page.dart';
 import 'package:bmprogresshud/progresshud.dart';
 import 'lock_page.dart';
+import 'electric_meter_page.dart';
 
-enum ScanType { lock, gateway }
+enum ScanType { lock, gateway, electricMeter }
 
 class ScanPage extends StatefulWidget {
   ScanPage({required this.scanType}) : super();
@@ -28,13 +30,16 @@ class _ScanPageState extends State<ScanPage> {
 
     if (scanType == ScanType.lock) {
       _startScanLock();
-    } else {
+    } else if (scanType == ScanType.gateway) {
       _startScanGateway();
+    } else if (scanType == ScanType.electricMeter) {
+      _startScanElectricMeter();
     }
   }
 
   List<TTLockScanModel> _lockList = [];
   List<TTGatewayScanModel> _gatewayList = [];
+  List<TTElectricMeterScanModel> _electricMeterList = [];
 
   void dispose() {
     if (scanType == ScanType.lock) {
@@ -68,6 +73,28 @@ class _ScanPageState extends State<ScanPage> {
           title: scanModel.lockName,
           lockData: lockData,
           lockMac: scanModel.lockMac,
+        );
+      }));
+    }, (errorCode, errorMsg) {
+      _dismissLoading();
+    });
+  }
+
+  void _initEelectricMeter(TTElectricMeterScanModel scanModel) async {
+    _showLoading();
+
+    ElectricMeterInitParamModel initParamModel = ElectricMeterInitParamModel();
+    initParamModel.mac = scanModel.mac;
+    initParamModel.name = scanModel.name;
+    initParamModel.payMode = TTElectricMeterPayMode.postpaid;
+    initParamModel.price = '1';
+    TTElectricmeter.init(initParamModel, () {
+      _dismissLoading();
+      Navigator.push(context,
+          new MaterialPageRoute(builder: (BuildContext context) {
+        return ElectricMeterPage(
+          name: scanModel.name,
+          mac: scanModel.mac,
         );
       }));
     }, (errorCode, errorMsg) {
@@ -161,9 +188,27 @@ class _ScanPageState extends State<ScanPage> {
     });
   }
 
+  void _startScanElectricMeter() {
+    _gatewayList = [];
+    TTElectricmeter.startScan((scanModel) {
+      bool contain = false;
+      for (TTElectricMeterScanModel model in _electricMeterList) {
+        if (scanModel.mac == model.mac) {
+          contain = true;
+          break;
+        }
+      }
+      if (!contain) {
+        setState(() {
+          _electricMeterList.add(scanModel);
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    String title = scanType == ScanType.lock ? 'Lock' : 'Gateway';
+    String title = ['Lock', 'Gateway', 'Electric Meter'][scanType!.index];
     return Scaffold(
         appBar: AppBar(
           title: Text(title),
@@ -181,7 +226,8 @@ class _ScanPageState extends State<ScanPage> {
   Widget getListView() {
     String gatewayNote = 'please repower the gateway';
     String lockNote = 'please touch the keyboard of lock';
-    String note = scanType == ScanType.lock ? lockNote : gatewayNote;
+    String electricMeterNote = 'please touch the keyboard of electric meter';
+    String note = [lockNote, gatewayNote, electricMeterNote][scanType!.index];
     return Column(
       children: <Widget>[
         Text(note),
@@ -206,10 +252,15 @@ class _ScanPageState extends State<ScanPage> {
                     if (scanModel.isInited) {
                       textColor = Colors.grey;
                     }
-                  } else {
+                  } else if (scanType == ScanType.gateway) {
                     TTGatewayScanModel scanModel = _gatewayList[index];
                     title = 'Gateway：${scanModel.gatewayName}';
                     subtitle = 'click to connect the gateway';
+                  } else {
+                    TTElectricMeterScanModel scanModel =
+                        _electricMeterList[index];
+                    title = 'Electric meter：${scanModel.name}';
+                    subtitle = 'click to init the electric meter';
                   }
 
                   TextStyle textStyle = new TextStyle(color: textColor);
@@ -224,10 +275,15 @@ class _ScanPageState extends State<ScanPage> {
                           TTLock.stopScanLock();
                           _initLock(scanModel);
                         }
-                      } else {
+                      } else if (scanType == ScanType.gateway) {
                         TTGatewayScanModel scanModel = _gatewayList[index];
                         TTGateway.stopScan();
                         _connectGateway(scanModel.gatewayMac, scanModel.type!);
+                      } else if (scanType == ScanType.electricMeter) {
+                        TTElectricMeterScanModel scanModel =
+                            _electricMeterList[index];
+                        TTElectricmeter.stopScan();
+                        _initEelectricMeter(scanModel);
                       }
                     },
                   );

@@ -48,7 +48,7 @@
 
 //电表
 @property (nonatomic, strong) NSString *name;
-@property (nonatomic, strong) NSNumber *mode;
+@property (nonatomic, strong) NSNumber *payMode;
 @property (nonatomic, strong) NSString *price;
 @property (nonatomic, strong) NSString *url;
 @property (nonatomic, strong) NSString *clientId;

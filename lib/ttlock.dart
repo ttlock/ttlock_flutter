@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:ttlock_flutter/ttdoorSensor.dart';
+import 'package:ttlock_flutter/ttelectricMeter.dart';
 import 'package:ttlock_flutter/ttremoteKey.dart';
 import 'package:ttlock_flutter/ttremoteKeypad.dart';
 import 'dart:convert' as convert;
@@ -1215,19 +1216,6 @@ class TTLock {
   }
 
   static bool isListenEvent = false;
-  static var scanCommandList = [
-    COMMAND_START_SCAN_LOCK,
-    COMMAND_STOP_SCAN_LOCK,
-    TTGateway.COMMAND_START_SCAN_GATEWAY,
-    TTGateway.COMMAND_STOP_SCAN_GATEWAY,
-    TTDoorSensor.COMMAND_START_SCAN_DOOR_SENSOR,
-    TTDoorSensor.COMMAND_STOP_SCAN_DOOR_SENSOR,
-    TTRemoteKey.COMMAND_START_SCAN_REMOTE_KEY,
-    TTRemoteKey.COMMAND_STOP_SCAN_REMOTE_KEY,
-    TTRemoteKeypad.COMMAND_START_SCAN_REMOTE_KEYPAD,
-    TTRemoteKeypad.COMMAND_STOP_SCAN_REMOTE_KEYPAD
-  ];
-
   static void invoke(String command, Object? parameter, Object? success,
       {Object? progress, Object? fail}) {
     if (!isListenEvent) {
@@ -1238,6 +1226,20 @@ class TTLock {
     }
 
     //开始、停止扫描的时候  清空之前所有的扫描回调
+    const scanCommandList = [
+      COMMAND_START_SCAN_LOCK,
+      COMMAND_STOP_SCAN_LOCK,
+      TTGateway.COMMAND_START_SCAN_GATEWAY,
+      TTGateway.COMMAND_STOP_SCAN_GATEWAY,
+      TTDoorSensor.COMMAND_START_SCAN_DOOR_SENSOR,
+      TTDoorSensor.COMMAND_STOP_SCAN_DOOR_SENSOR,
+      TTRemoteKey.COMMAND_START_SCAN_REMOTE_KEY,
+      TTRemoteKey.COMMAND_STOP_SCAN_REMOTE_KEY,
+      TTRemoteKeypad.COMMAND_START_SCAN_REMOTE_KEYPAD,
+      TTRemoteKeypad.COMMAND_STOP_SCAN_REMOTE_KEYPAD,
+      TTElectricmeter.COMMAND_START_SCAN_ELECTRIC_METER,
+      TTElectricmeter.COMMAND_STOP_SCAN_ELECTRIC_METER
+    ];
     scanCommandList.forEach((scanCommand) {
       if (command.compareTo(scanCommand) == 0) {
         List removeMapList = [];
@@ -1247,6 +1249,9 @@ class TTLock {
               key.compareTo(TTGateway.COMMAND_START_SCAN_GATEWAY) == 0 ||
               key.compareTo(TTRemoteKey.COMMAND_START_SCAN_REMOTE_KEY) == 0 ||
               key.compareTo(TTRemoteKeypad.COMMAND_START_SCAN_REMOTE_KEYPAD) ==
+                  0 ||
+              key.compareTo(
+                      TTElectricmeter.COMMAND_START_SCAN_ELECTRIC_METER) ==
                   0 ||
               key.compareTo(TTDoorSensor.COMMAND_START_SCAN_DOOR_SENSOR) == 0) {
             removeMapList.add(map);
@@ -1262,7 +1267,8 @@ class TTLock {
         command == TTGateway.COMMAND_STOP_SCAN_GATEWAY ||
         command == TTRemoteKey.COMMAND_STOP_SCAN_REMOTE_KEY ||
         command == TTRemoteKeypad.COMMAND_STOP_SCAN_REMOTE_KEYPAD ||
-        command == TTDoorSensor.COMMAND_STOP_SCAN_DOOR_SENSOR) {
+        command == TTDoorSensor.COMMAND_STOP_SCAN_DOOR_SENSOR ||
+        command == TTElectricmeter.COMMAND_STOP_SCAN_ELECTRIC_METER) {
     } else {
       Map commandMap = new Map();
       Map callbackMap = new Map();
@@ -1306,7 +1312,8 @@ class TTLock {
           command == TTGateway.COMMAND_START_SCAN_GATEWAY ||
           command == TTRemoteKey.COMMAND_START_SCAN_REMOTE_KEY ||
           command == TTRemoteKeypad.COMMAND_START_SCAN_REMOTE_KEYPAD ||
-          command == TTDoorSensor.COMMAND_START_SCAN_DOOR_SENSOR) {
+          command == TTDoorSensor.COMMAND_START_SCAN_DOOR_SENSOR ||
+          command == TTElectricmeter.COMMAND_START_SCAN_ELECTRIC_METER) {
         reomveCommand = false;
       }
       if (command == COMMAND_SCAN_WIFI && data[TTResponse.finished] == false) {
@@ -1351,6 +1358,10 @@ class TTLock {
       case TTDoorSensor.COMMAND_START_SCAN_DOOR_SENSOR:
         TTRemoteAccessoryScanCallback scanCallback = callBack;
         scanCallback(TTRemoteAccessoryScanModel(data));
+        break;
+      case TTElectricmeter.COMMAND_START_SCAN_ELECTRIC_METER:
+        TTElectricMeterScanCallback scanCallback = callBack;
+        scanCallback(TTElectricMeterScanModel(data));
         break;
 
       case COMMAND_GET_AUTOMATIC_LOCK_PERIODIC_TIME:
@@ -1787,6 +1798,7 @@ class TTResponse {
   static const String wifiPassword = "wifiPassword";
 
   static const String mac = "mac";
+  static const String name = "name";
 
   static const String remoteAccessory = "remoteAccessory";
 
@@ -1796,6 +1808,16 @@ class TTResponse {
   static const String alertTime = "alertTime";
   static const String wirelessKeypadFeatureValue = "wirelessKeypadFeatureValue";
   static const String resetCode = "resetCode";
+
+  static const String totalKwh = "totalKwh";
+  static const String remainderKwh = "remainderKwh";
+  static const String voltage = "voltage";
+  static const String electricCurrent = "electricCurrent";
+
+  static const String onOff = "onOff";
+  static const String payMode = "payMode";
+  static const String scanTime = "scanTime";
+  // static const String onOff = "onOff";
 }
 
 class TTLockScanModel {

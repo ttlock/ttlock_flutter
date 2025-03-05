@@ -1073,6 +1073,9 @@ typedef NS_ENUM(NSInteger, ResultState) {
     }
     
 #pragma mark - 电表
+    else if ([command isEqualToString:command_electric_meter_config_server]) {
+//        [TTElectricMeter configServer];
+    }
     else if ([command isEqualToString:command_electric_meter_start_scan]) {
         [TTElectricMeter startScanWithSuccess:^(TTElectricMeterModel * _Nonnull model) {
             NSMutableDictionary *dict = @{}.mutableCopy;
@@ -1111,78 +1114,86 @@ typedef NS_ENUM(NSInteger, ResultState) {
     }
     
     else if ([command isEqualToString:command_electric_meter_init]) {
-        [TTElectricMeter addWithMac:lockModel.mac name:lockModel.name mode:lockModel.mode.intValue price:lockModel.price url:lockModel.url clientId:lockModel.clientId accessToken:lockModel.accessToken success:^{
+        NSDictionary *dict = @{
+            @"name": lockModel.name,
+            @"mac": lockModel.mac,
+            @"price": lockModel.price,
+            @"payMode": lockModel.payMode,
+        };
+        
+        [TTElectricMeter addWithInfo:dict success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTElectricMeterError error) {
             [weakSelf errorCallbackCommand:command code:error details:nil];
         }];
     }
     else if ([command isEqualToString:command_electric_meter_delete]) {
-        [TTElectricMeter deleteWithMac:lockModel.mac url:lockModel.url clientId:lockModel.clientId accessToken:lockModel.accessToken success:^{
+        [TTElectricMeter deleteWithMac:lockModel.mac success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTElectricMeterError error) {
             [weakSelf errorCallbackCommand:command code:error details:nil];
         }];
     }
     else if ([command isEqualToString:command_electric_meter_set_power_on_off]) {
-        [TTElectricMeter setPowerOnOffWithMac:lockModel.mac powerOn:lockModel.isOn url:lockModel.url clientId:lockModel.clientId accessToken:lockModel.accessToken success:^{
+        [TTElectricMeter setPowerOnOffWithMac:lockModel.mac powerOn:lockModel.isOn success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTElectricMeterError error) {
             [weakSelf errorCallbackCommand:command code:error details:nil];
         }];
     }
     else if ([command isEqualToString:command_electric_meter_set_remaining_electricity]) {
-        [TTElectricMeter setRemainingElectricityWithMac:lockModel.mac remainderKwh:lockModel.remainderKwh.intValue url:lockModel.url clientId:lockModel.clientId accessToken:lockModel.accessToken success:^{
+        [TTElectricMeter setRemainingElectricityWithMac:lockModel.mac remainderKwh:lockModel.remainderKwh.intValue success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTElectricMeterError error) {
             [weakSelf errorCallbackCommand:command code:error details:nil];
         }];
     }
     else if ([command isEqualToString:command_electric_meter_clear_remaining_electricity]) {
-        [TTElectricMeter clearRemainingElectricityWithMac:lockModel.mac url:lockModel.url clientId:lockModel.clientId accessToken:lockModel.accessToken success:^{
+        [TTElectricMeter clearRemainingElectricityWithMac:lockModel.mac success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTElectricMeterError error) {
             [weakSelf errorCallbackCommand:command code:error details:nil];
         }];
     }
     else if ([command isEqualToString:command_electric_meter_read_data]) {
-        [TTElectricMeter readDataWithMac:lockModel.mac url:lockModel.url clientId:lockModel.clientId accessToken:lockModel.accessToken success:^{
+        [TTElectricMeter readDataWithMac:lockModel.mac success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTElectricMeterError error) {
             [weakSelf errorCallbackCommand:command code:error details:nil];
         }];
     }
-    else if ([command isEqualToString:command_electric_meter_set_work_mode]) {
-        [TTElectricMeter setWorkModeWithMac:lockModel.mac mode:lockModel.mode.intValue price:lockModel.price url:lockModel.url clientId:lockModel.clientId accessToken:lockModel.accessToken success:^{
+    else if ([command isEqualToString:command_electric_meter_set_pay_mode]) {
+        [TTElectricMeter setPayModeWithMac:lockModel.mac payMode:lockModel.payMode.intValue price:lockModel.price success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTElectricMeterError error) {
             [weakSelf errorCallbackCommand:command code:error details:nil];
         }];
+       
     }
     
     else if ([command isEqualToString:command_electric_meter_charg]) {
-        [TTElectricMeter chargeWithMac:lockModel.mac chargeAmount:lockModel.chargeAmount chargeKwh:lockModel.chargeKwh url:lockModel.url clientId:lockModel.clientId accessToken:lockModel.accessToken success:^{
+        [TTElectricMeter rechargeWithMac:lockModel.mac rechargeAmount:lockModel.chargeAmount rechargeKwh:lockModel.chargeKwh  success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTElectricMeterError error) {
             [weakSelf errorCallbackCommand:command code:error details:nil];
         }];
     }
     else if ([command isEqualToString:command_electric_meter_set_max_power]) {
-        [TTElectricMeter setMaxPowerWithMac:lockModel.mac maxPower:lockModel.maxPower.intValue url:lockModel.url clientId:lockModel.clientId accessToken:lockModel.accessToken success:^{
+        [TTElectricMeter setMaxPowerWithMac:lockModel.mac maxPower:lockModel.maxPower.intValue success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTElectricMeterError error) {
             [weakSelf errorCallbackCommand:command code:error details:nil];
         }];
     }
     else if ([command isEqualToString:command_electric_meter_get_feature_value]) {
-        [TTElectricMeter getFeatureValueWithMac:lockModel.mac url:lockModel.url clientId:lockModel.clientId accessToken:lockModel.accessToken success:^{
+        [TTElectricMeter getFeatureValueWithMac:lockModel.mac success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTElectricMeterError error) {
             [weakSelf errorCallbackCommand:command code:error details:nil];
         }];
     }
     else if ([command isEqualToString:command_electric_meter_enter_upgrade_mode]) {
-        [TTElectricMeter enterUpgradeModeWithMac:lockModel.mac url:lockModel.url clientId:lockModel.clientId accessToken:lockModel.accessToken success:^{
+        [TTElectricMeter enterUpgradeModeWithMac:lockModel.mac success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTElectricMeterError error) {
             [weakSelf errorCallbackCommand:command code:error details:nil];
@@ -1314,7 +1325,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
     }else if([self isDoorSensorCommand:command]){
         errorCode = @([self getTTDoorSensoryErrorCode:[code intValue]]);
     }else if([self isElectricMeterCommand:command]){
-        errorCode = @([self getTTDoorSensoryErrorCode:[code intValue]]);
+        errorCode = @([self getTTElectricErrorCode:[code intValue]]);
     }else{
         errorCode = [self getTTLockErrorCode:code];
     }
@@ -1469,6 +1480,22 @@ typedef NS_ENUM(NSInteger, ResultState) {
     
     ];
     NSInteger errorCode = TTDoorSensorErrorFail;
+    for (int i = 0; i < codeArray.count; i++) {
+        if([codeArray[i] intValue] == status){
+            errorCode = i;
+        }
+    }
+    return errorCode;
+}
+
+- (NSInteger)getTTElectricErrorCode:(TTElectricMeterError) status{
+    NSArray *codeArray =@[@(TTElectricMeterBluetoothPowerOff),
+                          @(TTElectricMeterConnectTimeout),
+                          @(TTElectricMeterDisconnect),
+                          @(TTElectricMeterNetError)
+    
+    ];
+    NSInteger errorCode = TTElectricMeterConnectTimeout;
     for (int i = 0; i < codeArray.count; i++) {
         if([codeArray[i] intValue] == status){
             errorCode = i;
