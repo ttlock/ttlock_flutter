@@ -11,6 +11,7 @@ class TTGateway {
   static const String COMMAND_UPGRADE_GATEWAY = "upgradeGateway";
 
   static const String COMMAND_CONFIG_IP = "gatewayConfigIp";
+  static const String COMMAND_CONFIG_APN = "gatewayConfigApn";
 
   static void startScan(TTGatewayScanCallback scanCallback) {
     TTLock.invoke(COMMAND_START_SCAN_GATEWAY, null, scanCallback);
@@ -75,5 +76,13 @@ class TTGateway {
     Map map = Map();
     map["mac"] = mac;
     TTLock.invoke(COMMAND_DISCONNECT_GATEWAY, map, callback);
+  }
+
+  static void configApn(String mac, String apn, TTSuccessCallback callback,
+      TTGatewayFailedCallback failedCallback) {
+    Map map = Map();
+    map["mac"] = mac;
+    map["apn"] = apn;
+    TTLock.invoke(COMMAND_CONFIG_APN, map, callback, fail: failedCallback);
   }
 }

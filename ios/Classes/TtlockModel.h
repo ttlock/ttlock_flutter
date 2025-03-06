@@ -144,6 +144,8 @@
 
 @property (nonatomic, strong) NSString *faceFeatureData;
 
+@property (nonatomic, strong) NSString * apn;
+
 
 + (TtlockModel *)modelWithDict:(NSDictionary *)dict;
 - (NSDictionary *)toDictionary;

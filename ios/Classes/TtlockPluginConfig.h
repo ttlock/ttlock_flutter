@@ -94,6 +94,7 @@
 #define command_init_gateway @"initGateway"
 #define command_config_gateway_ip @"gatewayConfigIp"
 #define command_upgrade_gateway @"upgradeGateway"
+#define command_gateway_config_apn @"gatewayConfigApn"
 
 
 #pragma mark - 梯控

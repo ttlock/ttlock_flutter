@@ -421,7 +421,9 @@ typedef NS_ENUM(NSInteger, ResultState) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
         
-    }else if ([command isEqualToString:command_start_scan_gateway]) {
+    }
+#pragma 网关
+    else if ([command isEqualToString:command_start_scan_gateway]) {
         [TTGateway startScanGatewayWithBlock:^(TTGatewayScanModel *model) {
             NSMutableDictionary *dict = @{}.mutableCopy;
             dict[@"gatewayMac"] = model.gatewayMac;
@@ -518,6 +520,14 @@ typedef NS_ENUM(NSInteger, ResultState) {
                 [weakSelf errorCallbackCommand:command code:connectStatus == TTGatewayConnectTimeout ? TTGatewayTimeout :TTGatewayFail details:nil];
             }
        }];
+    }else if ([command isEqualToString:command_gateway_config_apn]) {
+        [TTGateway configApn:lockModel.apn block:^(TTGatewayStatus status) {
+            if (status == TTGatewaySuccess) {
+                [weakSelf successCallbackCommand:command data:nil];
+            }else{
+                [weakSelf errorCallbackCommand:command code:status details:nil];
+            }
+        }];
     }else if ([command isEqualToString:command_function_support]) {
         NSInteger index = lockModel.supportFunction.integerValue;
                 NSArray *functionArray = @[
