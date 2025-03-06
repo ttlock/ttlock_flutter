@@ -121,11 +121,11 @@ typedef NS_ENUM(NSInteger, ResultState) {
             data.lockTime = @(lockTime);
             data.electricQuantity = @(electricQuantity);
             data.uniqueId = @(uniqueId);
+            data.lockData = lockModel.lockData;
             [weakSelf successCallbackCommand:command data:data];
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
-        
     }else if ([command isEqualToString:command_reset_ekey]){
         [TTLock resetEkeyWithLockData:lockModel.lockData success:^(NSString *lockData) {
             TtlockModel *data = [TtlockModel new];

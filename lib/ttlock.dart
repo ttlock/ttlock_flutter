@@ -1396,7 +1396,7 @@ class TTLock {
       case COMMAND_CONTROL_LOCK:
         TTControlLockCallback controlLockCallback = callBack;
         controlLockCallback(data[TTResponse.lockTime],
-            data[TTResponse.electricQuantity], data[TTResponse.uniqueId]);
+            data[TTResponse.electricQuantity], data[TTResponse.uniqueId], data[TTResponse.lockData]);
         break;
 
       case COMMAND_ACTIVE_LIFT_FLOORS:
@@ -2001,7 +2001,7 @@ typedef TTBluetoothStateCallback = void Function(TTBluetoothState state);
 typedef TTBluetoothScanStateCallback = void Function(bool isScanning);
 typedef TTLockDataCallback = void Function(String lockData);
 typedef TTControlLockCallback = void Function(
-    int lockTime, int electricQuantity, int uniqueId);
+    int lockTime, int electricQuantity, int uniqueId, String lockData);
 typedef TTGetAdminPasscodeCallback = void Function(String adminPasscode);
 typedef TTGetLockElectricQuantityCallback = void Function(int electricQuantity);
 typedef TTGetLockOperateRecordCallback = void Function(String records);
