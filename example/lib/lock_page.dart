@@ -186,16 +186,19 @@ class _LockPageState extends State<LockPage> {
   }
 
   void _showLoading(String text) {
-    ProgressHud.of(_context!)!.showLoading(text: text);
+    // ProgressHud.of(_context!)!.showLoading(text: text);
+    print(text);
   }
 
   void _showSuccessAndDismiss(String text) {
-    ProgressHud.of(_context!)!.showSuccessAndDismiss(text: text);
+    // ProgressHud.of(_context!)!.showSuccessAndDismiss(text: text);
+    print(text);
   }
 
   void _showErrorAndDismiss(TTLockError errorCode, String errorMsg) {
-    ProgressHud.of(_context!)!.showErrorAndDismiss(
-        text: 'errorCode:$errorCode errorMessage:$errorMsg');
+    // ProgressHud.of(_context!)!.showErrorAndDismiss(
+    //     text: 'errorCode:$errorCode errorMessage:$errorMsg');
+    print("失败：" + errorMsg);
   }
 
   @override

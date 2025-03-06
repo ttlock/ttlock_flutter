@@ -422,7 +422,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
         }];
         
     }
-#pragma 网关
+#pragma -- 网关
     else if ([command isEqualToString:command_start_scan_gateway]) {
         [TTGateway startScanGatewayWithBlock:^(TTGatewayScanModel *model) {
             NSMutableDictionary *dict = @{}.mutableCopy;

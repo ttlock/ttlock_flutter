@@ -75,7 +75,7 @@ class TTElectricmeter {
     map["payMode"] = paramMode.payMode.index;
     map["name"] = paramMode.name;
     TTLock.invoke(COMMAND_ELECTRIC_METER_INIT, map, successCallback,
-        fail: failedCallback);
+        fail_callback: failedCallback);
   }
 
   static void delete(
@@ -86,7 +86,7 @@ class TTElectricmeter {
     Map map = Map();
     map["mac"] = mac;
     TTLock.invoke(COMMAND_ELECTRIC_METER_DELETE, map, successCallback,
-        fail: failedCallback);
+        fail_callback: failedCallback);
   }
 
   static void setPowerOnOff(
@@ -99,7 +99,7 @@ class TTElectricmeter {
     map["mac"] = mac;
     map["isOn"] = isOn;
     TTLock.invoke(COMMAND_ELECTRIC_METER_SET_POWER_ON_OFF, map, successCallback,
-        fail: failedCallback);
+        fail_callback: failedCallback);
   }
 
   static void setRemainderKwh(
@@ -113,7 +113,7 @@ class TTElectricmeter {
     map["remainderKwh"] = remainderKwh;
     TTLock.invoke(
         COMMAND_ELECTRIC_METER_SET_REMAINING_ELECTRICITY, map, successCallback,
-        fail: failedCallback);
+        fail_callback: failedCallback);
   }
 
   static void clearRemainderKwh(
@@ -126,7 +126,7 @@ class TTElectricmeter {
 
     TTLock.invoke(COMMAND_ELECTRIC_METER_CLEAR_REMAINING_ELECTRICITY, map,
         successCallback,
-        fail: failedCallback);
+        fail_callback: failedCallback);
   }
 
   static void readData(
@@ -137,7 +137,7 @@ class TTElectricmeter {
     Map map = Map();
     map["mac"] = mac;
     TTLock.invoke(COMMAND_ELECTRIC_METER_READ_DATA, map, successCallback,
-        fail: failedCallback);
+        fail_callback: failedCallback);
   }
 
   static void setPayMode(
@@ -150,7 +150,7 @@ class TTElectricmeter {
     map["mac"] = mac;
     map["payMode"] = payMode.index;
     TTLock.invoke(COMMAND_ELECTRIC_METER_SET_PAY_MODE, map, successCallback,
-        fail: failedCallback);
+        fail_callback: failedCallback);
   }
 
   static void recharg(
@@ -165,7 +165,7 @@ class TTElectricmeter {
     map["chargeKwh"] = kwh;
     map["chargeAmount"] = amount;
     TTLock.invoke(COMMAND_ELECTRIC_METER_CHARG, map, successCallback,
-        fail: failedCallback);
+        fail_callback: failedCallback);
   }
 
   static void setMaxPower(
@@ -178,7 +178,7 @@ class TTElectricmeter {
     map["mac"] = mac;
     map["maxPower"] = maxPower;
     TTLock.invoke(COMMAND_ELECTRIC_METER_SET_MAX_POWER, map, successCallback,
-        fail: failedCallback);
+        fail_callback: failedCallback);
   }
 
   static void readFeatureValue(
@@ -190,7 +190,7 @@ class TTElectricmeter {
     map["mac"] = mac;
     TTLock.invoke(
         COMMAND_ELECTRIC_METER_GET_FEATURE_VALUE, map, successCallback,
-        fail: failedCallback);
+        fail_callback: failedCallback);
   }
 
   // static void enterUpgradeMode(

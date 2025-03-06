@@ -22,6 +22,6 @@ class TTRemoteKey {
     Map map = Map();
     map[TTResponse.mac] = mac;
     map[TTResponse.lockData] = lockData;
-    TTLock.invoke(COMMAND_INIT_REMOTE_KEY, map, callback, fail: failedCallback);
+    TTLock.invoke(COMMAND_INIT_REMOTE_KEY, map, callback, fail_callback: failedCallback);
   }
 }

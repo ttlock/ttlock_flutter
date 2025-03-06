@@ -23,6 +23,6 @@ class TTDoorSensor {
     map[TTResponse.mac] = mac;
     map[TTResponse.lockData] = lockData;
     TTLock.invoke(COMMAND_INIT_DOOR_SENSOR, map, callback,
-        fail: failedCallback);
+        fail_callback: failedCallback);
   }
 }

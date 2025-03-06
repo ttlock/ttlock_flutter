@@ -24,6 +24,6 @@ class TTRemoteKeypad {
     map[TTResponse.mac] = mac;
     map[TTResponse.lockMac] = lockMac;
     TTLock.invoke(COMMAND_INIT_REMOTE_KEYPAD, map, callback,
-        fail: failedCallback);
+        fail_callback: failedCallback);
   }
 }
