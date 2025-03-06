@@ -1,4 +1,5 @@
 import 'package:ttlock_flutter/ttlock.dart';
+import 'dart:convert' as convert;
 
 typedef TTElectricMeterScanCallback = void Function(
     TTElectricMeterScanModel scanModel);
@@ -64,17 +65,22 @@ class TTElectricmeter {
     TTLock.invoke(COMMAND_ELECTRIC_METER_DISCONNECT, map, null);
   }
 
+  /**
+   * 
+   *  Map paramMap = Map();
+      paramMap["mac"] = sacnModel.mac;
+      paramMap["price"] = sacnModel.price;
+      paramMap["payMode"] = TTElectricMeterPayMode.postpaid.index;
+      paramMap["name"] = sacnModel.name;
+   */
   static void init(
-    ElectricMeterInitParamModel paramMode,
+    Map paramMap,
     TTSuccessCallback successCallback,
     TTElectricMeterFailedCallback failedCallback,
   ) {
     Map map = Map();
-    map["mac"] = paramMode.mac;
-    map["price"] = paramMode.price;
-    map["payMode"] = paramMode.payMode.index;
-    map["name"] = paramMode.name;
-    TTLock.invoke(COMMAND_ELECTRIC_METER_INIT, map, successCallback,
+    map["addMeterJsonStr"] = convert.jsonEncode(paramMap);
+    TTLock.invoke(COMMAND_ELECTRIC_METER_INIT, paramMap, successCallback,
         fail_callback: failedCallback);
   }
 

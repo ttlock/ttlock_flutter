@@ -1124,13 +1124,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
     }
     
     else if ([command isEqualToString:command_electric_meter_init]) {
-        NSDictionary *dict = @{
-            @"name": lockModel.name,
-            @"mac": lockModel.mac,
-            @"price": lockModel.price,
-            @"payMode": lockModel.payMode,
-        };
-        
+        NSDictionary *dict = [self dictFromJsonStr:lockModel.addMeterJsonStr];
         [TTElectricMeter addWithInfo:dict success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTElectricMeterError error) {

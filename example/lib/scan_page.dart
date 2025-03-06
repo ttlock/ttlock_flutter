@@ -96,13 +96,13 @@ class _ScanPageState extends State<ScanPage> {
       }));
     } else {
       _showLoading();
-      ElectricMeterInitParamModel initParamModel =
-          ElectricMeterInitParamModel();
-      initParamModel.mac = scanModel.mac;
-      initParamModel.name = scanModel.name;
-      initParamModel.payMode = TTElectricMeterPayMode.postpaid;
-      initParamModel.price = '1';
-      TTElectricmeter.init(initParamModel, () {
+
+      Map initParamMap = Map();
+      initParamMap["mac"] = scanModel.mac;
+      initParamMap["name"] = scanModel.name;
+      initParamMap["payMode"] = TTElectricMeterPayMode.postpaid.index;
+      initParamMap["price"] = '1';
+      TTElectricmeter.init(initParamMap, () {
         _dismissLoading();
         Navigator.push(context,
             new MaterialPageRoute(builder: (BuildContext context) {
