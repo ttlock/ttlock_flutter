@@ -1265,6 +1265,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
                                     command_config_gateway_ip,
                                     command_disconnect_gateway,
                                     command_init_gateway,
+                                     command_gateway_config_apn,
                                     command_upgrade_gateway
     ];
     
