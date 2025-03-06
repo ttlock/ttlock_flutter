@@ -193,17 +193,17 @@ class TTElectricmeter {
         fail: failedCallback);
   }
 
-  static void enterUpgradeMode(
-    String mac,
-    TTSuccessCallback successCallback,
-    TTElectricMeterFailedCallback failedCallback,
-  ) {
-    Map map = Map();
-    map["mac"] = mac;
-    TTLock.invoke(
-        COMMAND_ELECTRIC_METER_ENTER_UPGRADE_MODE, map, successCallback,
-        fail: failedCallback);
-  }
+  // static void enterUpgradeMode(
+  //   String mac,
+  //   TTSuccessCallback successCallback,
+  //   TTElectricMeterFailedCallback failedCallback,
+  // ) {
+  //   Map map = Map();
+  //   map["mac"] = mac;
+  //   TTLock.invoke(
+  //       COMMAND_ELECTRIC_METER_ENTER_UPGRADE_MODE, map, successCallback,
+  //       fail: failedCallback);
+  // }
 }
 
 class ElectricMeterServerParamMode {

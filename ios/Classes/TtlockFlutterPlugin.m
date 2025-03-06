@@ -1192,13 +1192,13 @@ typedef NS_ENUM(NSInteger, ResultState) {
             [weakSelf errorCallbackCommand:command code:error details:nil];
         }];
     }
-    else if ([command isEqualToString:command_electric_meter_enter_upgrade_mode]) {
-        [TTElectricMeter enterUpgradeModeWithMac:lockModel.mac success:^{
-            [weakSelf successCallbackCommand:command data:nil];
-        } failure:^(TTElectricMeterError error) {
-            [weakSelf errorCallbackCommand:command code:error details:nil];
-        }];
-    }
+//    else if ([command isEqualToString:command_electric_meter_enter_upgrade_mode]) {
+//        [TTElectricMeter enterUpgradeModeWithMac:lockModel.mac success:^{
+//            [weakSelf successCallbackCommand:command data:nil];
+//        } failure:^(TTElectricMeterError error) {
+//            [weakSelf errorCallbackCommand:command code:error details:nil];
+//        }];
+//    }
     
     
     
