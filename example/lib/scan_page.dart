@@ -44,8 +44,10 @@ class _ScanPageState extends State<ScanPage> {
   void dispose() {
     if (scanType == ScanType.lock) {
       TTLock.stopScanLock();
-    } else {
+    } else if (scanType == ScanType.gateway) {
       TTGateway.stopScan();
+    } else if (scanType == ScanType.electricMeter) {
+      TTElectricmeter.stopScan();
     }
     super.dispose();
   }
@@ -81,15 +83,8 @@ class _ScanPageState extends State<ScanPage> {
   }
 
   void _initEelectricMeter(TTElectricMeterScanModel scanModel) async {
-    _showLoading();
-
-    ElectricMeterInitParamModel initParamModel = ElectricMeterInitParamModel();
-    initParamModel.mac = scanModel.mac;
-    initParamModel.name = scanModel.name;
-    initParamModel.payMode = TTElectricMeterPayMode.postpaid;
-    initParamModel.price = '1';
-    TTElectricmeter.init(initParamModel, () {
-      _dismissLoading();
+    print("init electric meter：" + scanModel.isInited.toString());
+    if (scanModel.isInited) {
       Navigator.push(context,
           new MaterialPageRoute(builder: (BuildContext context) {
         return ElectricMeterPage(
@@ -97,9 +92,27 @@ class _ScanPageState extends State<ScanPage> {
           mac: scanModel.mac,
         );
       }));
-    }, (errorCode, errorMsg) {
-      _dismissLoading();
-    });
+    } else {
+      _showLoading();
+      ElectricMeterInitParamModel initParamModel =
+          ElectricMeterInitParamModel();
+      initParamModel.mac = scanModel.mac;
+      initParamModel.name = scanModel.name;
+      initParamModel.payMode = TTElectricMeterPayMode.postpaid;
+      initParamModel.price = '1';
+      TTElectricmeter.init(initParamModel, () {
+        _dismissLoading();
+        Navigator.push(context,
+            new MaterialPageRoute(builder: (BuildContext context) {
+          return ElectricMeterPage(
+            name: scanModel.name,
+            mac: scanModel.mac,
+          );
+        }));
+      }, (errorCode, errorMsg) {
+        _dismissLoading();
+      });
+    }
   }
 
   void _connectGateway(String mac, TTGatewayType type) async {
@@ -263,7 +276,12 @@ class _ScanPageState extends State<ScanPage> {
                     TTElectricMeterScanModel scanModel =
                         _electricMeterList[index];
                     title = 'Meter：${scanModel.name}';
-                    subtitle = 'click to init the electric meter';
+                    subtitle = scanModel.isInited
+                        ? 'meter has been inited'
+                        : 'click to init the meter';
+                    if (scanModel.isInited) {
+                      textColor = Colors.grey;
+                    }
                   }
 
                   TextStyle textStyle = new TextStyle(color: textColor);

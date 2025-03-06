@@ -25,11 +25,18 @@ enum Command {
 class _ElectricMeterState extends State<ElectricMeterPage> {
   List<Map<String, Command>> _commandList = [
     {"Reset": Command.reset},
-    {"Read data": Command.readData}
+    {"Read data": Command.readData},
+    {"Set on off": Command.setOnOff},
+    {"Set remainder kwh": Command.setRemainderKwh},
+    {"Cleaer remainder kwh": Command.cleaerRemainderKwh},
+    {"Set max power": Command.setMaxPower},
+    {"Set pay mode": Command.setPayMode},
+    {"Recharg": Command.recharg},
+    {"Read feature value": Command.readFeatureValue}
   ];
 
   String note =
-      'Note: You need to reset the lock befor pop current page,otherwise the lock will can\'t be initialized again';
+      'Note: You need to reset the electric meter befor pop current page,otherwise the electric meter will can\'t be initialized again';
 
   String mac = '';
   String name = '';
@@ -60,7 +67,7 @@ class _ElectricMeterState extends State<ElectricMeterPage> {
     switch (command) {
       case Command.reset:
         TTElectricmeter.delete(mac, () {
-          print("Reset success");
+          _showSuccessAndDismiss("Reset success");
           Navigator.popAndPushNamed(context, '/');
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
@@ -69,7 +76,7 @@ class _ElectricMeterState extends State<ElectricMeterPage> {
 
       case Command.setOnOff:
         TTElectricmeter.setPowerOnOff(mac, false, () {
-          print("Read data success");
+          _showSuccessAndDismiss("Read data success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
@@ -77,7 +84,7 @@ class _ElectricMeterState extends State<ElectricMeterPage> {
 
       case Command.readData:
         TTElectricmeter.readData(mac, () {
-          print("Read data success");
+          _showSuccessAndDismiss("Read data success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
@@ -85,7 +92,7 @@ class _ElectricMeterState extends State<ElectricMeterPage> {
 
       case Command.setRemainderKwh:
         TTElectricmeter.setRemainderKwh(mac, 100, () {
-          print("Set remiander kwh success");
+          _showSuccessAndDismiss("Set remiander kwh success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
@@ -93,7 +100,7 @@ class _ElectricMeterState extends State<ElectricMeterPage> {
 
       case Command.cleaerRemainderKwh:
         TTElectricmeter.clearRemainderKwh(mac, () {
-          print("Clear remainder kwh success");
+          _showSuccessAndDismiss("Clear remainder kwh success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
@@ -101,7 +108,14 @@ class _ElectricMeterState extends State<ElectricMeterPage> {
 
       case Command.setPayMode:
         TTElectricmeter.setPayMode(mac, TTElectricMeterPayMode.prepaid, () {
-          print("Set pay mode success");
+          _showSuccessAndDismiss("Set pay mode success");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+      case Command.setMaxPower:
+        TTElectricmeter.setMaxPower(mac, 280, () {
+          _showSuccessAndDismiss("Set max power success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
@@ -109,7 +123,7 @@ class _ElectricMeterState extends State<ElectricMeterPage> {
 
       case Command.recharg:
         TTElectricmeter.recharg(mac, '1', '2', () {
-          print("Recharg success");
+          _showSuccessAndDismiss("Recharg success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
@@ -117,7 +131,7 @@ class _ElectricMeterState extends State<ElectricMeterPage> {
 
       case Command.readFeatureValue:
         TTElectricmeter.readFeatureValue(mac, () {
-          print("Read feature value success");
+          _showSuccessAndDismiss("Read feature value success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
@@ -136,10 +150,10 @@ class _ElectricMeterState extends State<ElectricMeterPage> {
         itemBuilder: (context, index) {
           Map<String, Command> map = _commandList[index];
           String title = '${map.keys.first}';
-          String subtitle = index == 0 ? note : '';
+
           return ListTile(
             title: Text(title),
-            subtitle: Text(subtitle),
+            subtitle: Text(index == 0 ? note : ''),
             onTap: () {
               _click(map.values.first, context);
             },

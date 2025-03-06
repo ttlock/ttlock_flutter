@@ -91,13 +91,13 @@ class TTElectricmeter {
 
   static void setPowerOnOff(
     String mac,
-    bool onOff,
+    bool isOn,
     TTSuccessCallback successCallback,
     TTElectricMeterFailedCallback failedCallback,
   ) {
     Map map = Map();
     map["mac"] = mac;
-    map["onOff"] = onOff;
+    map["isOn"] = isOn;
     TTLock.invoke(COMMAND_ELECTRIC_METER_SET_POWER_ON_OFF, map, successCallback,
         fail: failedCallback);
   }
@@ -110,7 +110,7 @@ class TTElectricmeter {
   ) {
     Map map = Map();
     map["mac"] = mac;
-    map["setRemainderKwh"] = setRemainderKwh;
+    map["remainderKwh"] = remainderKwh;
     TTLock.invoke(
         COMMAND_ELECTRIC_METER_SET_REMAINING_ELECTRICITY, map, successCallback,
         fail: failedCallback);
