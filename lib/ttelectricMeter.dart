@@ -36,14 +36,12 @@ class TTElectricmeter {
   static const String COMMAND_ELECTRIC_METER_ENTER_UPGRADE_MODE =
       "electricMeterEnterUpgradeMode";
 
-  static void configServer(
-    ElectricMeterServerParamMode paramMode,
-    TTSuccessCallback successCallback,
-    TTRemoteFailedCallback failedCallback,
-  ) {
-    TTLock.invoke(
-        COMMAND_CONFIG_SERVER_ELECTRIC_METER, paramMode, successCallback,
-        fail: failedCallback);
+  static void configServer(ElectricMeterServerParamMode paramMode) {
+    Map map = Map();
+    map["url"] = paramMode.url;
+    map["clientId"] = paramMode.clientId;
+    map["accessToken"] = paramMode.accessToken;
+    TTLock.invoke(COMMAND_CONFIG_SERVER_ELECTRIC_METER, map, null);
   }
 
   static void startScan(TTElectricMeterScanCallback scanCallback) {

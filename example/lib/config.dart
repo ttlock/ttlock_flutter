@@ -1,4 +1,4 @@
-class Config {
+class GatewayConfig {
   //test account ttlock uid,  https://api.ttlock.com/v3/user/getUid
   static int uid = 17498;
   //test account ttlock login password
@@ -6,3 +6,4 @@ class Config {
   // custom gateway name
   static String gatewayName = 'My gateway 1';
 }
+

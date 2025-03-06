@@ -151,7 +151,7 @@ class TTLock {
 
   static List _commandQueue = [];
 
-  static bool printLog = true;
+  static bool printLog = false;
 
   // ignore: slash_for_doc_comments
 /**
@@ -1645,7 +1645,7 @@ class TTLock {
     if (index > -1) {
       _commandQueue.removeAt(index);
     }
-
+    //错误码转枚举
     if (command == TTGateway.COMMAND_GET_SURROUND_WIFI ||
         command == TTGateway.COMMAND_INIT_GATEWAY ||
         command == TTGateway.COMMAND_CONFIG_IP ||
@@ -1660,6 +1660,12 @@ class TTLock {
         command == TTRemoteKeypad.COMMAND_INIT_REMOTE_KEYPAD) {
       TTRemoteFailedCallback? failedCallback = callBack;
       TTRemoteAccessoryError error = TTRemoteAccessoryError.values[errorCode];
+      if (failedCallback != null) {
+        failedCallback(error, errorMessage);
+      }
+    } else if (command.contains('electricMeter')) {
+      TTElectricMeterFailedCallback? failedCallback = callBack;
+      TTElectricMeterErrorCode error = TTElectricMeterErrorCode.values[errorCode];
       if (failedCallback != null) {
         failedCallback(error, errorMessage);
       }

@@ -189,7 +189,7 @@ class _ScanPageState extends State<ScanPage> {
   }
 
   void _startScanElectricMeter() {
-    _gatewayList = [];
+    _electricMeterList = [];
     TTElectricmeter.startScan((scanModel) {
       bool contain = false;
       for (TTElectricMeterScanModel model in _electricMeterList) {
@@ -226,7 +226,7 @@ class _ScanPageState extends State<ScanPage> {
   Widget getListView() {
     String gatewayNote = 'please repower the gateway';
     String lockNote = 'please touch the keyboard of lock';
-    String electricMeterNote = 'please touch the keyboard of electric meter';
+    String electricMeterNote = '';
     String note = [lockNote, gatewayNote, electricMeterNote][scanType!.index];
     return Column(
       children: <Widget>[
@@ -236,9 +236,12 @@ class _ScanPageState extends State<ScanPage> {
                 separatorBuilder: (BuildContext context, int index) {
                   return Divider(height: 2, color: Colors.green);
                 },
-                itemCount: (scanType == ScanType.lock
-                    ? _lockList.length
-                    : _gatewayList.length),
+                itemCount: [
+                  _lockList,
+                  _gatewayList,
+                  _electricMeterList
+                ][scanType!.index]
+                    .length,
                 itemBuilder: (context, index) {
                   String title;
                   String subtitle;
@@ -259,7 +262,7 @@ class _ScanPageState extends State<ScanPage> {
                   } else {
                     TTElectricMeterScanModel scanModel =
                         _electricMeterList[index];
-                    title = 'Electric meter：${scanModel.name}';
+                    title = 'Meter：${scanModel.name}';
                     subtitle = 'click to init the electric meter';
                   }
 

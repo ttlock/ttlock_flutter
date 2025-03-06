@@ -1074,7 +1074,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
     
 #pragma mark - 电表
     else if ([command isEqualToString:command_electric_meter_config_server]) {
-//        [TTElectricMeter configServer];
+        [TTElectricMeter setClientParamWithUrl:lockModel.url clientId:lockModel.clientId accessToken:lockModel.accessToken];
     }
     else if ([command isEqualToString:command_electric_meter_start_scan]) {
         [TTElectricMeter startScanWithSuccess:^(TTElectricMeterModel * _Nonnull model) {
