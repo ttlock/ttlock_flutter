@@ -80,7 +80,7 @@ class TTElectricmeter {
   ) {
     Map map = Map();
     map["addMeterJsonStr"] = convert.jsonEncode(paramMap);
-    TTLock.invoke(COMMAND_ELECTRIC_METER_INIT, paramMap, successCallback,
+    TTLock.invoke(COMMAND_ELECTRIC_METER_INIT, map, successCallback,
         fail_callback: failedCallback);
   }
 
