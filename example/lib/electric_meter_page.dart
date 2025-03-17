@@ -91,7 +91,7 @@ class _ElectricMeterState extends State<ElectricMeterPage> {
         break;
 
       case Command.setRemainderKwh:
-        TTElectricmeter.setRemainderKwh(mac, 100, () {
+        TTElectricmeter.setRemainderKwh(mac, '100.1', () {
           _showSuccessAndDismiss("Set remiander kwh success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);

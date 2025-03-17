@@ -1146,7 +1146,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
         }];
     }
     else if ([command isEqualToString:command_electric_meter_set_remaining_electricity]) {
-        [TTElectricMeter setRemainingElectricityWithMac:lockModel.mac remainderKwh:lockModel.remainderKwh.intValue success:^{
+        [TTElectricMeter setRemainingElectricityWithMac:lockModel.mac remainderKwh:lockModel.remainderKwh success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
             [weakSelf errorCallbackCommand:command code:error details:errorMsg];

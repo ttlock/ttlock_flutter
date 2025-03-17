@@ -53,7 +53,7 @@
 @property (nonatomic, strong) NSString *url;
 @property (nonatomic, strong) NSString *clientId;
 @property (nonatomic, strong) NSString *accessToken;
-@property (nonatomic, strong) NSNumber *remainderKwh;
+@property (nonatomic, strong) NSString *remainderKwh;
 @property (nonatomic, strong) NSString *chargeAmount;
 @property (nonatomic, strong) NSString *chargeKwh;
 @property (nonatomic, strong) NSNumber *maxPower;

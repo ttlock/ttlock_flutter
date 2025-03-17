@@ -110,7 +110,7 @@ class TTElectricmeter {
 
   static void setRemainderKwh(
     String mac,
-    int remainderKwh,
+    String remainderKwh,
     TTSuccessCallback successCallback,
     TTElectricMeterFailedCallback failedCallback,
   ) {
