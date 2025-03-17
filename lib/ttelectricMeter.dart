@@ -261,5 +261,7 @@ enum TTElectricMeterErrorCode {
   bluetoothPowerOff,
   connectTimeout,
   disconnect,
-  netError
+  netError,
+  serverError,
+  meterExistedInServer
 }

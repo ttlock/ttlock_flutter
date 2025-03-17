@@ -1102,8 +1102,8 @@ typedef NS_ENUM(NSInteger, ResultState) {
             dict[@"voltage"] = model.voltage;
             dict[@"electricCurrent"] = model.electricCurrent;
             [weakSelf successCallbackCommand:command data:dict];
-        } failure:^(TTElectricMeterError error) {
-            [weakSelf errorCallbackCommand:command code:error details:nil];
+        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error details:errorMsg];
         }];
     }
     
@@ -1114,8 +1114,8 @@ typedef NS_ENUM(NSInteger, ResultState) {
     else if ([command isEqualToString:command_electric_meter_connect]) {
         [TTElectricMeter connectWithMac:lockModel.mac success:^{
             [weakSelf successCallbackCommand:command data:nil];
-        } failure:^(TTElectricMeterError error) {
-            [weakSelf errorCallbackCommand:command code:error details:nil];
+        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error details:errorMsg];
         }];
     }
     
@@ -1127,79 +1127,77 @@ typedef NS_ENUM(NSInteger, ResultState) {
         NSDictionary *dict = [self dictFromJsonStr:lockModel.addMeterJsonStr];
         [TTElectricMeter addWithInfo:dict success:^{
             [weakSelf successCallbackCommand:command data:nil];
-        } failure:^(TTElectricMeterError error) {
-            [weakSelf errorCallbackCommand:command code:error details:nil];
+        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error details:errorMsg];
         }];
     }
     else if ([command isEqualToString:command_electric_meter_delete]) {
         [TTElectricMeter deleteWithMac:lockModel.mac success:^{
             [weakSelf successCallbackCommand:command data:nil];
-        } failure:^(TTElectricMeterError error) {
-            [weakSelf errorCallbackCommand:command code:error details:nil];
+        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error details:errorMsg];
         }];
     }
     else if ([command isEqualToString:command_electric_meter_set_power_on_off]) {
         [TTElectricMeter setPowerOnOffWithMac:lockModel.mac powerOn:lockModel.isOn success:^{
             [weakSelf successCallbackCommand:command data:nil];
-        } failure:^(TTElectricMeterError error) {
-            [weakSelf errorCallbackCommand:command code:error details:nil];
+        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error details:errorMsg];
         }];
     }
     else if ([command isEqualToString:command_electric_meter_set_remaining_electricity]) {
         [TTElectricMeter setRemainingElectricityWithMac:lockModel.mac remainderKwh:lockModel.remainderKwh.intValue success:^{
             [weakSelf successCallbackCommand:command data:nil];
-        } failure:^(TTElectricMeterError error) {
-            [weakSelf errorCallbackCommand:command code:error details:nil];
+        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error details:errorMsg];
         }];
     }
     else if ([command isEqualToString:command_electric_meter_clear_remaining_electricity]) {
         [TTElectricMeter clearRemainingElectricityWithMac:lockModel.mac success:^{
             [weakSelf successCallbackCommand:command data:nil];
-        } failure:^(TTElectricMeterError error) {
-            [weakSelf errorCallbackCommand:command code:error details:nil];
+        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error details:errorMsg];
         }];
     }
     else if ([command isEqualToString:command_electric_meter_read_data]) {
         [TTElectricMeter readDataWithMac:lockModel.mac success:^{
             [weakSelf successCallbackCommand:command data:nil];
-        } failure:^(TTElectricMeterError error) {
-            [weakSelf errorCallbackCommand:command code:error details:nil];
+        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error details:errorMsg];
         }];
     }
     else if ([command isEqualToString:command_electric_meter_set_pay_mode]) {
         [TTElectricMeter setPayModeWithMac:lockModel.mac payMode:lockModel.payMode.intValue price:lockModel.price success:^{
             [weakSelf successCallbackCommand:command data:nil];
-        } failure:^(TTElectricMeterError error) {
-            [weakSelf errorCallbackCommand:command code:error details:nil];
+        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error details:errorMsg];
         }];
-       
     }
-    
     else if ([command isEqualToString:command_electric_meter_charg]) {
         [TTElectricMeter rechargeWithMac:lockModel.mac rechargeAmount:lockModel.chargeAmount rechargeKwh:lockModel.chargeKwh  success:^{
             [weakSelf successCallbackCommand:command data:nil];
-        } failure:^(TTElectricMeterError error) {
-            [weakSelf errorCallbackCommand:command code:error details:nil];
+        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error details:errorMsg];
         }];
     }
     else if ([command isEqualToString:command_electric_meter_set_max_power]) {
         [TTElectricMeter setMaxPowerWithMac:lockModel.mac maxPower:lockModel.maxPower.intValue success:^{
             [weakSelf successCallbackCommand:command data:nil];
-        } failure:^(TTElectricMeterError error) {
-            [weakSelf errorCallbackCommand:command code:error details:nil];
+        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error details:errorMsg];
         }];
     }
     else if ([command isEqualToString:command_electric_meter_get_feature_value]) {
         [TTElectricMeter getFeatureValueWithMac:lockModel.mac success:^{
             [weakSelf successCallbackCommand:command data:nil];
-        } failure:^(TTElectricMeterError error) {
-            [weakSelf errorCallbackCommand:command code:error details:nil];
+        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error details:errorMsg];
         }];
     }
 //    else if ([command isEqualToString:command_electric_meter_enter_upgrade_mode]) {
 //        [TTElectricMeter enterUpgradeModeWithMac:lockModel.mac success:^{
 //            [weakSelf successCallbackCommand:command data:nil];
-//        } failure:^(TTElectricMeterError error) {
+//        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
 //            [weakSelf errorCallbackCommand:command code:error details:nil];
 //        }];
 //    }
@@ -1497,8 +1495,9 @@ typedef NS_ENUM(NSInteger, ResultState) {
     NSArray *codeArray =@[@(TTElectricMeterBluetoothPowerOff),
                           @(TTElectricMeterConnectTimeout),
                           @(TTElectricMeterDisconnect),
-                          @(TTElectricMeterNetError)
-    
+                          @(TTElectricMeterNetError),
+                          @(TTElectricMeterRequestServerError),
+                          @(TTElectricMeterExistedInServer)
     ];
     NSInteger errorCode = TTElectricMeterConnectTimeout;
     for (int i = 0; i < codeArray.count; i++) {
