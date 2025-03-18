@@ -76,7 +76,7 @@ class _ElectricMeterState extends State<ElectricMeterPage> {
 
       case Command.setOnOff:
         TTElectricmeter.setPowerOnOff(mac, false, () {
-          _showSuccessAndDismiss("Read data success");
+          _showSuccessAndDismiss("Set Power success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
@@ -107,7 +107,7 @@ class _ElectricMeterState extends State<ElectricMeterPage> {
         break;
 
       case Command.setPayMode:
-        TTElectricmeter.setPayMode(mac, TTElectricMeterPayMode.prepaid, () {
+        TTElectricmeter.setPayMode(mac, "1.0", TTElectricMeterPayMode.prepaid, () {
           _showSuccessAndDismiss("Set pay mode success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);

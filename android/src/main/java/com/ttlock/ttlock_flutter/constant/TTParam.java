@@ -18,4 +18,23 @@ public class TTParam {
     public static final String HARD_WARE_REVISION = "hardwareRevision";
     public static final String FIRMWARE_REVISION = "firmwareRevision";
 
+    public static final String isInited = "isInited";
+    public static final String totalKwh = "totalKwh";
+    public static final String remainderKwh = "remainderKwh";
+    public static final String voltage = "voltage";
+    public static final String electricCurrent = "electricCurrent";
+    public static final String onOff = "onOff";
+    public static final String payMode = "payMode";
+    public static final String scanTime = "scanTime";
+    public static final String price = "price";
+
+    public static final String maxPower = "maxPower";
+
+
+    public static final String chargeKwh = "chargeKwh";
+    public static final String chargeAmount = "chargeAmount";
+
+    public static final String url = "url";
+    public static final String clientId = "clientId";
+    public static final String accessToken = "accessToken";
 }
