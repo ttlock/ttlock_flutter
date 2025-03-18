@@ -1138,7 +1138,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
         }];
     }
     else if ([command isEqualToString:command_electric_meter_set_power_on_off]) {
-        [TTElectricMeter setPowerOnOffWithMac:lockModel.mac powerOn:lockModel.isOn ? 1 : 0 success:^{
+        [TTElectricMeter setPowerOnOffWithMac:lockModel.mac powerOn:lockModel.isOn.boolValue success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
             [weakSelf errorCallbackCommand:command code:error details:errorMsg];
