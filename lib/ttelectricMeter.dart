@@ -78,9 +78,7 @@ class TTElectricmeter {
     TTSuccessCallback successCallback,
     TTElectricMeterFailedCallback failedCallback,
   ) {
-    Map map = Map();
-    map["addMeterJsonStr"] = convert.jsonEncode(paramMap);
-    TTLock.invoke(COMMAND_ELECTRIC_METER_INIT, map, successCallback,
+    TTLock.invoke(COMMAND_ELECTRIC_METER_INIT, paramMap, successCallback,
         fail_callback: failedCallback);
   }
 
@@ -148,12 +146,14 @@ class TTElectricmeter {
 
   static void setPayMode(
     String mac,
+    String price,
     TTElectricMeterPayMode payMode,
     TTSuccessCallback successCallback,
     TTElectricMeterFailedCallback failedCallback,
   ) {
     Map map = Map();
     map["mac"] = mac;
+    map["price"] = price;
     map["payMode"] = payMode.index;
     TTLock.invoke(COMMAND_ELECTRIC_METER_SET_PAY_MODE, map, successCallback,
         fail_callback: failedCallback);

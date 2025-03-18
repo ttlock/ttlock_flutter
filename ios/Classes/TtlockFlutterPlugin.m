@@ -93,7 +93,6 @@ typedef NS_ENUM(NSInteger, ResultState) {
         [self successCallbackCommand:command data:data];
     }else if ([command isEqualToString:command_init_lock]) {
         NSDictionary *dict = (NSDictionary *)arguments;
-     
         [TTLock initLockWithDict:dict success:^(NSString *lockData) {
             TtlockModel *data = [TtlockModel new];
             data.lockData = lockData;
@@ -1124,7 +1123,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
     }
     
     else if ([command isEqualToString:command_electric_meter_init]) {
-        NSDictionary *dict = [self dictFromJsonStr:lockModel.addMeterJsonStr];
+        NSDictionary *dict = (NSDictionary *)arguments;
         [TTElectricMeter addWithInfo:dict success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
@@ -1139,7 +1138,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
         }];
     }
     else if ([command isEqualToString:command_electric_meter_set_power_on_off]) {
-        [TTElectricMeter setPowerOnOffWithMac:lockModel.mac powerOn:lockModel.isOn success:^{
+        [TTElectricMeter setPowerOnOffWithMac:lockModel.mac powerOn:lockModel.isOn ? 1 : 0 success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
             [weakSelf errorCallbackCommand:command code:error details:errorMsg];

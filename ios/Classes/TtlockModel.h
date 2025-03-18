@@ -57,7 +57,6 @@
 @property (nonatomic, strong) NSString *chargeAmount;
 @property (nonatomic, strong) NSString *chargeKwh;
 @property (nonatomic, strong) NSNumber *maxPower;
-@property (nonatomic, strong) NSString *addMeterJsonStr;
 
 
 
