@@ -105,6 +105,7 @@ import com.ttlock.bl.sdk.electricmeter.callback.ReadDataCallback;
 import com.ttlock.bl.sdk.electricmeter.callback.ScanElectricMeterCallback;
 import com.ttlock.bl.sdk.electricmeter.callback.SetMaxPowerCallback;
 import com.ttlock.bl.sdk.electricmeter.callback.SetPowerOnOffCallback;
+import com.ttlock.bl.sdk.electricmeter.callback.SetRemainingElectricityCallback;
 import com.ttlock.bl.sdk.electricmeter.callback.SetWorkModeCallback;
 import com.ttlock.bl.sdk.electricmeter.model.ElectricMeter;
 import com.ttlock.bl.sdk.electricmeter.model.ElectricMeterError;
@@ -441,6 +442,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         electricMeterConnect(params);
         break;
       case TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_DISCONNECT:
+        electricMeterDisConnect();
         break;
       case TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_INIT:
         electricMeterInit(params);
@@ -548,6 +550,20 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
+  public void electricMeterDisConnect()
+  {
+    PermissionUtils.doWithConnectPermission(activity, (success) -> {
+      if(success)
+      {
+        ElectricMeterClient.getDefault().disconnect();
+        successCallbackCommand(TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_DISCONNECT, new HashMap<>());
+
+      }else {
+        callbackCommand(TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_DISCONNECT, ResultStateFail, null, ElectricityMeterErrorConvert.bluetoothPowerOff,"no connect permission" );
+      }
+    });
+  }
+
   public void electricMeterInit(Map<String, Object> params)
   {
     PermissionUtils.doWithConnectPermission(activity, (success) -> {
@@ -630,11 +646,23 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
   public void electricMeterSetRemainderKwh(Map<String, Object> params)
   {
-    //TODO
     PermissionUtils.doWithConnectPermission(activity, (success) -> {
       if(success)
       {
 
+        ElectricMeterClient.getDefault()
+                .setRemainingElectricity(params.get(TTParam.MAC).toString(),
+                        params.get(TTParam.remainderKwh).toString(), new SetRemainingElectricityCallback() {
+                          @Override
+                          public void onSetSuccess() {
+                            successCallbackCommand(TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_SET_REMAINING_ELECTRICITY, new HashMap<>());
+                          }
+
+                          @Override
+                          public void onFail(ElectricMeterError electricMeterError) {
+                            errorCallbackCommand(TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_SET_REMAINING_ELECTRICITY, electricMeterError);
+                          }
+                        });
       }else
       {
         callbackCommand(TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_DELETE, ResultStateFail, null, ElectricityMeterErrorConvert.bluetoothPowerOff,"no connect permission" );
