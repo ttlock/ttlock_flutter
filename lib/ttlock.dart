@@ -149,7 +149,7 @@ class TTLock {
 
   // static const String COMMAND_GET_PASSCODE_VERIFICATION_PARAMS = "getPasscodeVerificationParams";
 
-  static Map<String, Map> _commandMap = Map();
+  static Map<String, List<Map>> _commandMap = Map();
 
   static bool printLog = false;
 
@@ -1279,7 +1279,9 @@ class TTLock {
       callbackMap[CALLBACK_PROGRESS] = progress_callback;
       callbackMap[CALLBACK_FAIL] = fail_callback;
 
-      _commandMap[command] = callbackMap;
+      List<Map> commandList = _commandMap[command] ?? [];
+      commandList.add(callbackMap);
+      _commandMap[command] = commandList;
     }
 
     _commandChannel.invokeMethod(command, parameter);
@@ -1295,7 +1297,8 @@ class TTLock {
 
   static void _successCallback(String command, Map data) {
     //获取队列里面能匹配到最前一个回调指令
-    dynamic callBack = _commandMap[command]?[CALLBACK_SUCCESS];
+    List<Map> commandList = _commandMap[command] ?? [];
+    dynamic callBack = commandList.length > 0 ? commandList.first[CALLBACK_SUCCESS] : null;
     //如果是 网关扫描、锁扫描、网关获取附近wifi 需要特殊处理
     bool reomveCommand = true;
     if (callBack == null) {
@@ -1317,9 +1320,9 @@ class TTLock {
         reomveCommand = false;
       }
     }
-    if (reomveCommand) {
+    if (reomveCommand && commandList.length > 0) {
       // print("成功后删除指令：" + command);
-      _commandMap.remove(command);
+      commandList.removeAt(0);
     }
 
     if (callBack == null) {
@@ -1587,7 +1590,8 @@ class TTLock {
   }
 
   static void _progressCallback(String command, Map data) {
-    dynamic callBack = _commandMap[command]?[CALLBACK_PROGRESS];
+    List<Map> commandList = _commandMap[command] ?? [];
+    dynamic callBack = commandList.length > 0 ? commandList.first[CALLBACK_PROGRESS] : null;
     switch (command) {
       case COMMAND_ADD_CARD:
         TTAddCardProgressCallback progressCallback = callBack;
@@ -1617,10 +1621,11 @@ class TTLock {
       errorCode = TTLockError.fail.index;
     }
 
-    dynamic callBack = _commandMap[command]?[CALLBACK_FAIL];
+    List<Map> commandList = _commandMap[command] ?? [];
+    dynamic callBack = commandList.length > 0 ? commandList.first[CALLBACK_FAIL] : null;
     if (callBack != null) {
       // print("失败删除指令：" + command);
-      _commandMap.remove(command);
+      commandList.removeAt(0);
     }
     //错误码转枚举
     if (command == TTGateway.COMMAND_GET_SURROUND_WIFI ||
