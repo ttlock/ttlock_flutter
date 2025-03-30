@@ -1,5 +1,4 @@
 import 'package:ttlock_flutter/ttlock.dart';
-import 'dart:convert' as convert;
 
 typedef TTElectricMeterScanCallback = void Function(
     TTElectricMeterScanModel scanModel);
@@ -53,10 +52,12 @@ class TTElectricmeter {
     TTLock.invoke(COMMAND_STOP_SCAN_ELECTRIC_METER, null, null);
   }
 
-  static void connect(String mac, TTSuccessCallback callback,TTElectricMeterFailedCallback failedCallback) {
+  static void connect(String mac, TTSuccessCallback callback,
+      TTElectricMeterFailedCallback failedCallback) {
     Map map = Map();
     map["mac"] = mac;
-    TTLock.invoke(COMMAND_ELECTRIC_METER_CONNECT, map, callback, fail_callback: failedCallback);
+    TTLock.invoke(COMMAND_ELECTRIC_METER_CONNECT, map, callback,
+        fail_callback: failedCallback);
   }
 
   static void disconnect(String mac) {
