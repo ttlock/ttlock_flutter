@@ -1,8 +1,8 @@
 import 'package:flutter/services.dart';
 import 'package:ttlock_flutter/ttdoorSensor.dart';
 import 'package:ttlock_flutter/ttelectricMeter.dart';
-import 'package:ttlock_flutter/ttremoteKey.dart';
 import 'package:ttlock_flutter/ttremoteKeypad.dart';
+import 'package:ttlock_flutter/ttremotekey.dart';
 import 'dart:convert' as convert;
 import 'ttgateway.dart';
 
@@ -1298,7 +1298,8 @@ class TTLock {
   static void _successCallback(String command, Map data) {
     //获取队列里面能匹配到最前一个回调指令
     List<Map> commandList = _commandMap[command] ?? [];
-    dynamic callBack = commandList.length > 0 ? commandList.first[CALLBACK_SUCCESS] : null;
+    dynamic callBack =
+        commandList.length > 0 ? commandList.first[CALLBACK_SUCCESS] : null;
     //如果是 网关扫描、锁扫描、网关获取附近wifi 需要特殊处理
     bool reomveCommand = true;
     if (callBack == null) {
@@ -1398,8 +1399,11 @@ class TTLock {
 
       case COMMAND_CONTROL_LOCK:
         TTControlLockCallback controlLockCallback = callBack;
-        controlLockCallback(data[TTResponse.lockTime],
-            data[TTResponse.electricQuantity], data[TTResponse.uniqueId], data[TTResponse.lockData]);
+        controlLockCallback(
+            data[TTResponse.lockTime],
+            data[TTResponse.electricQuantity],
+            data[TTResponse.uniqueId],
+            data[TTResponse.lockData]);
         break;
 
       case COMMAND_ACTIVE_LIFT_FLOORS:
@@ -1591,7 +1595,8 @@ class TTLock {
 
   static void _progressCallback(String command, Map data) {
     List<Map> commandList = _commandMap[command] ?? [];
-    dynamic callBack = commandList.length > 0 ? commandList.first[CALLBACK_PROGRESS] : null;
+    dynamic callBack =
+        commandList.length > 0 ? commandList.first[CALLBACK_PROGRESS] : null;
     switch (command) {
       case COMMAND_ADD_CARD:
         TTAddCardProgressCallback progressCallback = callBack;
@@ -1622,7 +1627,8 @@ class TTLock {
     }
 
     List<Map> commandList = _commandMap[command] ?? [];
-    dynamic callBack = commandList.length > 0 ? commandList.first[CALLBACK_FAIL] : null;
+    dynamic callBack =
+        commandList.length > 0 ? commandList.first[CALLBACK_FAIL] : null;
     if (callBack != null) {
       // print("失败删除指令：" + command);
       commandList.removeAt(0);
