@@ -482,13 +482,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
   public void electricMeterConfigServer(Map<String, Object> params)
   {
-
-    Log.d("设置config url", params.get(TTParam.url).toString());
-    Log.d("设置config clientId", params.get(TTParam.clientId).toString());
-    Log.d("设置config accessToken", params.get(TTParam.accessToken).toString());
     ElectricMeterClient.getDefault().setClientParam(params.get(TTParam.url).toString(),
             params.get(TTParam.clientId).toString(), params.get(TTParam.accessToken).toString());
-
+    successCallbackCommand(TTElectricityMeterCommand.COMMAND_CONFIG_SERVER_ELECTRIC_METER, new HashMap<>());
   }
 
   public  void electricMeterStartScan()
@@ -665,7 +661,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
                         });
       }else
       {
-        callbackCommand(TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_DELETE, ResultStateFail, null, ElectricityMeterErrorConvert.bluetoothPowerOff,"no connect permission" );
+        callbackCommand(TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_SET_REMAINING_ELECTRICITY, ResultStateFail, null, ElectricityMeterErrorConvert.bluetoothPowerOff,"no connect permission" );
       }
     });
   }
