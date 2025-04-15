@@ -1408,7 +1408,6 @@ class TTLock {
             data[TTResponse.electricQuantity], data[TTResponse.uniqueId]);
         break;
 
-      case COMMAND_RESET_PASSCODE:
       case COMMAND_MODIFY_ADMIN_PASSCODE:
         if (isOnPremise) {
           TTLockDataCallback lockDataCallback = callBack;
