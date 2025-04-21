@@ -1551,7 +1551,7 @@ class TTLock {
       //   TTGetLockSystemInfoCallback getLockSystemInfoCallback = callBack;
       //   getLockSystemInfoCallback(TTLockSystemInfoModel(data));
       //   break;
-//
+
       // case COMMAND_GET_PASSCODE_VERIFICATION_PARAMS:
       //   TTGetPasscodeVerificationParamsCallback getPasscodeVerificationParamsCallback = callBack;
       //   getPasscodeVerificationParamsCallback(data[TTResponse.lockData]);
