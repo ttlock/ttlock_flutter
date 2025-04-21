@@ -148,6 +148,8 @@
 @property (nonatomic, strong) NSString * apn;
 
 
+@property (nonatomic, strong) NSNumber *slotNumber;
+
 + (TtlockModel *)modelWithDict:(NSDictionary *)dict;
 - (NSDictionary *)toDictionary;
 @end
