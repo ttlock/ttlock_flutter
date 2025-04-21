@@ -18,7 +18,6 @@ class TTLock {
   static const String CALLBACK_PROGRESS = "callback_progress";
   static const String CALLBACK_FAIL = "callback_fail";
   static const String CALLBACK_OTHER_FAIL = "callback_other_fail";
-  
 
   static const String COMMAND_START_SCAN_LOCK = "startScanLock";
   static const String COMMAND_STOP_SCAN_LOCK = "stopScanLock";
@@ -64,14 +63,19 @@ class TTLock {
   static const String COMMAND_GET_LOCK_OPERATE_RECORD = "getLockOperateRecord";
   static const String COMMAND_GET_LOCK_POWER = "getLockPower";
   static const String COMMAND_GET_LOCK_SWITCH_STATE = "getLockSwitchState";
-  static const String COMMAND_GET_LOCK_SYSTEM_INFO = "getLockSystemInfoWithLockData";
+  static const String COMMAND_GET_LOCK_SYSTEM_INFO =
+      "getLockSystemInfoWithLockData";
   static const String COMMAND_GET_LOCK_FRETURE_VALUE = "getLockFreatureValue";
 
-  static const String COMMAND_GET_AUTOMATIC_LOCK_PERIODIC_TIME = "getLockAutomaticLockingPeriodicTime";
-  static const String COMMAND_SET_AUTOMATIC_LOCK_PERIODIC_TIME = "setLockAutomaticLockingPeriodicTime";
+  static const String COMMAND_GET_AUTOMATIC_LOCK_PERIODIC_TIME =
+      "getLockAutomaticLockingPeriodicTime";
+  static const String COMMAND_SET_AUTOMATIC_LOCK_PERIODIC_TIME =
+      "setLockAutomaticLockingPeriodicTime";
 
-  static const String COMMAND_GET_LOCK_REMOTE_UNLOCK_SWITCH_STATE = "getLockRemoteUnlockSwitchState";
-  static const String COMMAND_SET_LOCK_REMOTE_UNLOCK_SWITCH_STATE = "setLockRemoteUnlockSwitchState";
+  static const String COMMAND_GET_LOCK_REMOTE_UNLOCK_SWITCH_STATE =
+      "getLockRemoteUnlockSwitchState";
+  static const String COMMAND_SET_LOCK_REMOTE_UNLOCK_SWITCH_STATE =
+      "setLockRemoteUnlockSwitchState";
 
   static const String COMMAND_GET_LOCK_CONFIG = "getLockConfig";
   static const String COMMAND_SET_LOCK_CONFIG = "setLockConfig";
@@ -144,10 +148,6 @@ class TTLock {
   static const String COMMAND_MODIFY_FACE = "faceModify";
   static const String COMMAND_DELETE_FACE = "faceDelete";
   static const String COMMAND_CLEAR_FACE = "faceClear";
-
-
-
-
 
   // static const String COMMAND_GET_PASSCODE_VERIFICATION_PARAMS = "getPasscodeVerificationParams";
 
@@ -1253,7 +1253,9 @@ class TTLock {
   static bool isListenEvent = false;
   static void invoke(
       String command, Object? parameter, Object? success_callback,
-      {Object? progress_callback, Object? fail_callback, Object? other_fail_callback}) {
+      {Object? progress_callback,
+      Object? fail_callback,
+      Object? other_fail_callback}) {
     if (!isListenEvent) {
       isListenEvent = true;
       _listenChannel
@@ -1301,7 +1303,8 @@ class TTLock {
   static void _successCallback(String command, Map data) {
     //获取队列里面能匹配到最前一个回调指令
     List<Map> commandList = _commandMap[command] ?? [];
-    dynamic callBack = commandList.length > 0 ? commandList.first[CALLBACK_SUCCESS] : null;
+    dynamic callBack =
+        commandList.length > 0 ? commandList.first[CALLBACK_SUCCESS] : null;
     //如果是 网关扫描、锁扫描、网关获取附近wifi 需要特殊处理
     bool reomveCommand = true;
     if (callBack == null) {
@@ -1400,8 +1403,11 @@ class TTLock {
 
       case COMMAND_CONTROL_LOCK:
         TTControlLockCallback controlLockCallback = callBack;
-        controlLockCallback(data[TTResponse.lockTime],
-            data[TTResponse.electricQuantity], data[TTResponse.uniqueId], data[TTResponse.lockData]);
+        controlLockCallback(
+            data[TTResponse.lockTime],
+            data[TTResponse.electricQuantity],
+            data[TTResponse.uniqueId],
+            data[TTResponse.lockData]);
         break;
 
       case COMMAND_ACTIVE_LIFT_FLOORS:
@@ -1586,8 +1592,14 @@ class TTLock {
         getStoredLocks(data["lockMacs"]);
         break;
       case TTRemoteKeypad.COMMAND_INIT_MUTIFUCTIONAL_REMOTE_KEYPAD:
-        TTMutifunctionalRemoteKeypadInitSuccessCallback initSuccessCallback = callBack;
-        initSuccessCallback(data["electricQuantity"],data["wirelessKeypadFeatureValue"],data["slotNumber"],data["slotLimit"],TTLockSystemModel(data["systemInfoModel"]));
+        TTMutifunctionalRemoteKeypadInitSuccessCallback initSuccessCallback =
+            callBack;
+        initSuccessCallback(
+            data["electricQuantity"],
+            data["wirelessKeypadFeatureValue"],
+            data["slotNumber"],
+            data["slotLimit"],
+            TTLockSystemModel(data["systemInfoModel"]));
         break;
       case COMMAND_ADD_FACE:
       case COMMAND_ADD_FACE_DATA:
@@ -1603,7 +1615,8 @@ class TTLock {
 
   static void _progressCallback(String command, Map data) {
     List<Map> commandList = _commandMap[command] ?? [];
-    dynamic callBack = commandList.length > 0 ? commandList.first[CALLBACK_PROGRESS] : null;
+    dynamic callBack =
+        commandList.length > 0 ? commandList.first[CALLBACK_PROGRESS] : null;
     switch (command) {
       case COMMAND_ADD_CARD:
       case TTRemoteKeypad.COMMAND_MUTIFUCTIONAL_REMOTE_KEYPAD_ADD_CARD:
@@ -1636,8 +1649,10 @@ class TTLock {
     }
 
     List<Map> commandList = _commandMap[command] ?? [];
-    dynamic callBack = commandList.length > 0 ? commandList.first[CALLBACK_FAIL] : null;
-    dynamic otherCallBack = commandList.length > 0 ? commandList.first[CALLBACK_OTHER_FAIL] : null;
+    dynamic callBack =
+        commandList.length > 0 ? commandList.first[CALLBACK_FAIL] : null;
+    dynamic otherCallBack =
+        commandList.length > 0 ? commandList.first[CALLBACK_OTHER_FAIL] : null;
     if (commandList.length > 0) {
       commandList.removeAt(0);
     }
@@ -1651,47 +1666,52 @@ class TTLock {
       if (failedCallback != null) {
         failedCallback(error, errorMessage);
       }
-    } 
+    }
     //普通键盘和遥控钥匙失败处理
     else if (command == TTRemoteKey.COMMAND_INIT_REMOTE_KEY ||
         command == TTDoorSensor.COMMAND_INIT_DOOR_SENSOR ||
         command == TTRemoteKeypad.COMMAND_INIT_REMOTE_KEYPAD) {
       TTRemoteKeypadFailedCallback? failedCallback = callBack;
-      TTRemoteKeyPadAccessoryError error = TTRemoteKeyPadAccessoryError.values[errorCode];
+      TTRemoteKeyPadAccessoryError error =
+          TTRemoteKeyPadAccessoryError.values[errorCode];
       if (failedCallback != null) {
         failedCallback(error, errorMessage);
       }
-
     }
     // 多功能键盘失败处理
-     else if (
-     ( command == TTRemoteKeypad.COMMAND_INIT_MUTIFUCTIONAL_REMOTE_KEYPAD && data["errorDevice"] == TTErrorDevice.keyPad.index)
-    || command == TTRemoteKeypad.COMMAND_MUTIFUCTIONAL_REMOTE_KEYPAD_DELETE_STORED_LOCK 
-    || command == TTRemoteKeypad.COMMAND_MUTIFUCTIONAL_REMOTE_KEYPAD_GET_STORED_LOCK
-    || command == TTRemoteKeypad.COMMAND_MUTIFUCTIONAL_REMOTE_KEYPAD_ADD_CARD) {
-      TTRemoteKeypadFailedCallback? failedCallback = callBack;
-      TTRemoteKeyPadAccessoryError error = TTRemoteKeyPadAccessoryError.values[errorCode];
+    else if ((command ==
+            TTRemoteKeypad.COMMAND_INIT_MUTIFUCTIONAL_REMOTE_KEYPAD) ||
+        command ==
+            TTRemoteKeypad
+                .COMMAND_MUTIFUCTIONAL_REMOTE_KEYPAD_DELETE_STORED_LOCK ||
+        command ==
+            TTRemoteKeypad
+                .COMMAND_MUTIFUCTIONAL_REMOTE_KEYPAD_GET_STORED_LOCK ||
+        command ==
+            TTRemoteKeypad
+                .COMMAND_MUTIFUCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT ||
+        command ==
+            TTRemoteKeypad.COMMAND_MUTIFUCTIONAL_REMOTE_KEYPAD_ADD_CARD) {
+      TTRemoteKeypadFailedCallback? failedCallback =
+          data["errorDevice"] == TTErrorDevice.keyPad.index
+              ? otherCallBack
+              : callBack;
+      TTRemoteKeyPadAccessoryError error =
+          TTRemoteKeyPadAccessoryError.values[errorCode];
       if (failedCallback != null) {
         failedCallback(error, errorMessage);
       }
     }
-    else if ( command == TTRemoteKeypad.COMMAND_MUTIFUCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT && data["errorDevice"] == TTErrorDevice.keyPad.index) {
-      TTRemoteKeypadFailedCallback? failedCallback = otherCallBack;
-      TTRemoteKeyPadAccessoryError error = TTRemoteKeyPadAccessoryError.values[errorCode];
-      if (failedCallback != null) {
-        failedCallback(error, errorMessage);
-      }
-    }
-    
+
     //蓝牙电表失败处理
-     else if (command.contains('electricMeter')) {
+    else if (command.contains('electricMeter')) {
       TTElectricMeterFailedCallback? failedCallback = callBack;
       TTElectricMeterErrorCode error =
           TTElectricMeterErrorCode.values[errorCode];
       if (failedCallback != null) {
         failedCallback(error, errorMessage);
       }
-    } 
+    }
     //锁失败处理
     else {
       TTFailedCallback? failedCallback = callBack;
@@ -2113,7 +2133,6 @@ typedef TTRemoteAccessoryScanCallback = void Function(
 
 typedef TTGetLockAccessoryElectricQuantity = void Function(
     int electricQuantity, int updateDate);
-  
 
 typedef TTRemoteKeypadSuccessCallback = void Function();
 
@@ -2121,11 +2140,14 @@ typedef TTRemoteKeypadInitSuccessCallback = void Function(
     int electricQuantity, String wirelessKeypadFeatureValue);
 
 typedef TTMutifunctionalRemoteKeypadInitSuccessCallback = void Function(
-    int electricQuantity, String wirelessKeypadFeatureValue, int slotNumber, int slotLimit, TTLockSystemModel systemInfoModel);
+    int electricQuantity,
+    String wirelessKeypadFeatureValue,
+    int slotNumber,
+    int slotLimit,
+    TTLockSystemModel systemInfoModel);
 
 typedef TTRemoteKeypadGetStoredLockSuccessCallback = void Function(
     List lockMacs);
-
 
 typedef TTRemoteKeypadFailedCallback = void Function(
     TTRemoteKeyPadAccessoryError errorCode, String errorMsg);
@@ -2215,7 +2237,14 @@ enum TTGatewayConnectStatus { timeout, success, faile }
 
 enum TTRemoteAccessoryError { fail, wrongCrc, connectTimeout }
 
-enum TTRemoteKeyPadAccessoryError { fail, wrongCrc, connectTimeout, factoryDate, duplicateFingerprint, lackOfStorageSpace }
+enum TTRemoteKeyPadAccessoryError {
+  fail,
+  wrongCrc,
+  connectTimeout,
+  factoryDate,
+  duplicateFingerprint,
+  lackOfStorageSpace
+}
 
 enum TTLockFuction {
   passcode,
