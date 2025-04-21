@@ -64,19 +64,14 @@ class TTLock {
   static const String COMMAND_GET_LOCK_OPERATE_RECORD = "getLockOperateRecord";
   static const String COMMAND_GET_LOCK_POWER = "getLockPower";
   static const String COMMAND_GET_LOCK_SWITCH_STATE = "getLockSwitchState";
-  static const String COMMAND_GET_LOCK_SYSTEM_INFO =
-      "getLockSystemInfoWithLockData";
+  static const String COMMAND_GET_LOCK_SYSTEM_INFO = "getLockSystemInfoWithLockData";
   static const String COMMAND_GET_LOCK_FRETURE_VALUE = "getLockFreatureValue";
 
-  static const String COMMAND_GET_AUTOMATIC_LOCK_PERIODIC_TIME =
-      "getLockAutomaticLockingPeriodicTime";
-  static const String COMMAND_SET_AUTOMATIC_LOCK_PERIODIC_TIME =
-      "setLockAutomaticLockingPeriodicTime";
+  static const String COMMAND_GET_AUTOMATIC_LOCK_PERIODIC_TIME = "getLockAutomaticLockingPeriodicTime";
+  static const String COMMAND_SET_AUTOMATIC_LOCK_PERIODIC_TIME = "setLockAutomaticLockingPeriodicTime";
 
-  static const String COMMAND_GET_LOCK_REMOTE_UNLOCK_SWITCH_STATE =
-      "getLockRemoteUnlockSwitchState";
-  static const String COMMAND_SET_LOCK_REMOTE_UNLOCK_SWITCH_STATE =
-      "setLockRemoteUnlockSwitchState";
+  static const String COMMAND_GET_LOCK_REMOTE_UNLOCK_SWITCH_STATE = "getLockRemoteUnlockSwitchState";
+  static const String COMMAND_SET_LOCK_REMOTE_UNLOCK_SWITCH_STATE = "setLockRemoteUnlockSwitchState";
 
   static const String COMMAND_GET_LOCK_CONFIG = "getLockConfig";
   static const String COMMAND_SET_LOCK_CONFIG = "setLockConfig";
