@@ -2161,11 +2161,15 @@ class TTRemoteAccessoryScanModel {
   String name = '';
   String mac = '';
   int rssi = -1;
+  bool isMultifunctionalKeypad = false;
+  Map advertisementData = {};
 
   TTRemoteAccessoryScanModel(Map map) {
     this.name = map["name"];
     this.mac = map["mac"];
     this.rssi = map["rssi"];
+    this.isMultifunctionalKeypad = map["isMultifunctionalKeypad"];
+    this.advertisementData = map["advertisementData"];
   }
 }
 
