@@ -85,6 +85,10 @@
 
 #define command_verify_lock @"verifyLock"
 
+#define command_clear_remote_key @"clearRemoteKey"
+
+
+
 #pragma mark - 网关指令
 #define command_start_scan_gateway @"startScanGateway"
 #define command_stop_scan_gateway @"stopScanGateway"

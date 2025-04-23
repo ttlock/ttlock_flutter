@@ -886,7 +886,14 @@ typedef NS_ENUM(NSInteger, ErrorDevice) {
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];
         }];
+    }else if ([command isEqualToString:command_clear_remote_key]) {
+        [TTLock clearWirelessKeyFobsWithLockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];
+        }];
     }
+    
     
 #pragma mark - 人脸识别
     else if ([command isEqualToString:command_face_add]) {
