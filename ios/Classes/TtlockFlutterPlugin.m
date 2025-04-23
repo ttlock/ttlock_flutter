@@ -871,6 +871,12 @@ else if ([command isEqualToString:command_recover_card]) {
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
+    }else if ([command isEqualToString:command_clear_remote_key]) {
+        [TTLock clearWirelessKeyFobsWithLockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];
+        }];
     }
     
 #pragma mark - 人脸识别
