@@ -2,10 +2,16 @@ PODS:
   - Flutter (1.0.0)
   - ttlock_premise_flutter (0.0.1):
     - Flutter
+    - TTLockOnPremise (= 2.1.2)
+  - TTLockOnPremise (2.1.2)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - ttlock_premise_flutter (from `.symlinks/plugins/ttlock_premise_flutter/ios`)
+
+SPEC REPOS:
+  trunk:
+    - TTLockOnPremise
 
 EXTERNAL SOURCES:
   Flutter:
@@ -14,9 +20,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/ttlock_premise_flutter/ios"
 
 SPEC CHECKSUMS:
-  Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
-  ttlock_premise_flutter: 12b51c706305ed2ed3da48a1c5ebd95ebf4ebbea
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  ttlock_premise_flutter: a765309efdd4f18d96eb36681855cc04cb0b372d
+  TTLockOnPremise: 57a4865ebdad82427ca1439239fa243f960c494e
 
 PODFILE CHECKSUM: b1f7a399522c118a74b177b13c01eca692aa7e6d
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.16.2

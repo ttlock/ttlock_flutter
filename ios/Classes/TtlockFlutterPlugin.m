@@ -875,7 +875,7 @@ else if ([command isEqualToString:command_recover_card]) {
         [TTLock clearWirelessKeyFobsWithLockData:lockModel.lockData success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTError errorCode, NSString *errorMsg) {
-            [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];
+            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
         }];
     }
     
