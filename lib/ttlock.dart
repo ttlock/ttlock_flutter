@@ -1880,7 +1880,7 @@ class TTLockScanModel {
   // bool isDfuMode;
   int electricQuantity = -1;
   String lockVersion = '';
-  TTLockSwitchState lockSwitchState = TTLockSwitchState.unknow;
+  TTLockSwitchState lockSwitchState = TTLockSwitchState.unknown;
   int rssi = -1;
   int oneMeterRssi = -1;
   int timestamp = 0;
@@ -1978,7 +1978,7 @@ enum TTOperateRecordType { latest, total }
 
 enum TTControlAction { unlock, lock }
 
-enum TTLockSwitchState { lock, unlock, unknow }
+enum TTLockSwitchState { lock, unlock, unknown }
 
 enum TTPassageModeType { weekly, monthly }
 
@@ -2264,7 +2264,7 @@ enum TTLockFunction {
   gatewayUnlock,
   lockFreeze,
   cyclePassword,
-  unlockSwicth,
+  unlockSwitch,
   audioSwitch,
   nbIoT, //15
 

@@ -30,7 +30,7 @@ class _KeyPadState extends State<KeyPadPage> {
   ];
 
   String note =
-      'Note: You need to reset the electric meter befor pop current page,otherwise the electric meter will can\'t be initialized again';
+      'Note: You need to reset the electric meter before pop current page,otherwise the electric meter will can\'t be initialized again';
 
   String mac = '';
   String name = '';

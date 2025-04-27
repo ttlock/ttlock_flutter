@@ -54,11 +54,11 @@ enum Command {
   clearAllPassageModes,
 
   activateLiftFloors,
-  setLiftControlableFloors,
+  setLiftControlAbleFloors,
   setLiftWorkMode,
 
   setPowerSaverWorkMode,
-  setPowerSaverControlableLock,
+  setPowerSaverControlAbleLock,
 
   // setDoorSensorSwitch,
   // getDoorSensorSwitch,
@@ -142,10 +142,10 @@ class _LockPageState extends State<LockPage> {
     {"Add Passage Mode": Command.addPassageMode},
     {"Clear All Passage Mode": Command.clearAllPassageModes},
     {"Activate Lift Floors": Command.activateLiftFloors},
-    {"Set Lift Controlable Floors": Command.setLiftControlableFloors},
+    {"Set Lift Control Able Floors": Command.setLiftControlAbleFloors},
     {"Set Lift Work Mode": Command.setLiftWorkMode},
     {"Set Power Saver Work Mode": Command.setPowerSaverWorkMode},
-    {"Set Power Saver Controlable": Command.setPowerSaverControlableLock},
+    {"Set Power Saver Control Able": Command.setPowerSaverControlAbleLock},
     // {"Set Door Sensor Switch": Command.setDoorSensorSwitch},
     // {"Get Door Sensor Switch": Command.getDoorSensorSwitch},
     // {"Get Door Sensor State": Command.getDoorSensorState},
@@ -170,7 +170,7 @@ class _LockPageState extends State<LockPage> {
   ];
 
   String note =
-      'Note: You need to reset the lock befor pop current page,otherwise the lock will can\'t be initialized again';
+      'Note: You need to reset the lock before pop current page,otherwise the lock will can\'t be initialized again';
 
   String lockData = '';
   String lockMac = '';
@@ -513,8 +513,8 @@ class _LockPageState extends State<LockPage> {
         break;
 
       case Command.getLockSoundVolumeType:
-        TTLock.getLockSoundWithSoundVolume(lockData, (ttLocksoundVolumeType) {
-          _showSuccessAndDismiss("sound volume type: $ttLocksoundVolumeType");
+        TTLock.getLockSoundWithSoundVolume(lockData, (ttLockSoundVolumeType) {
+          _showSuccessAndDismiss("sound volume type: $ttLockSoundVolumeType");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
@@ -543,12 +543,12 @@ class _LockPageState extends State<LockPage> {
         TTLock.activateLift("1,2,3", lockData,
             (lockTime, electricQuantity, uniqueId) {
           _showSuccessAndDismiss(
-              "Active lift florrs success lockTime:$lockTime electricQuantity:$electricQuantity uniqueId:$uniqueId");
+              "Active lift floors success lockTime:$lockTime electricQuantity:$electricQuantity uniqueId:$uniqueId");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
         break;
-      case Command.setLiftControlableFloors:
+      case Command.setLiftControlAbleFloors:
         TTLock.setLiftControlAble("3", lockData, () {
           _showSuccessAndDismiss("Success");
         }, (errorCode, errorMsg) {
@@ -570,7 +570,7 @@ class _LockPageState extends State<LockPage> {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
         break;
-      case Command.setPowerSaverControlableLock:
+      case Command.setPowerSaverControlAbleLock:
         TTLock.setPowerSaverControlAbleLock(this.lockMac, lockData, () {
           _showSuccessAndDismiss("Success");
         }, (errorCode, errorMsg) {
