@@ -286,7 +286,7 @@ class _LockPageState extends State<LockPage> {
         });
         break;
       case Command.customPasscode:
-        TTLock.supportFunction(TTLockFuction.managePasscode, lockData,
+        TTLock.supportFunction(TTLockFunction.managePasscode, lockData,
             (isSupport) {
           // not support
           if (!isSupport) {
@@ -305,7 +305,7 @@ class _LockPageState extends State<LockPage> {
         break;
 
       case Command.modifyPasscode:
-        TTLock.supportFunction(TTLockFuction.managePasscode, lockData,
+        TTLock.supportFunction(TTLockFunction.managePasscode, lockData,
             (isSupport) {
           // not support
           if (!isSupport) {
@@ -323,7 +323,7 @@ class _LockPageState extends State<LockPage> {
 
         break;
       case Command.deletePasscode:
-        TTLock.supportFunction(TTLockFuction.managePasscode, lockData,
+        TTLock.supportFunction(TTLockFunction.managePasscode, lockData,
             (isSupport) {
           if (isSupport) {
             TTLock.deletePasscode("7777", lockData, () {
@@ -505,7 +505,7 @@ class _LockPageState extends State<LockPage> {
 
       case Command.setLockSoundVolumeType:
         TTLock.setLockSoundWithSoundVolume(
-            TTSoundVolumeType.fouthLevel, lockData, () {
+            TTSoundVolumeType.fourthLevel, lockData, () {
           _showSuccessAndDismiss("Success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
@@ -549,7 +549,7 @@ class _LockPageState extends State<LockPage> {
         });
         break;
       case Command.setLiftControlableFloors:
-        TTLock.setLiftControlable("3", lockData, () {
+        TTLock.setLiftControlAble("3", lockData, () {
           _showSuccessAndDismiss("Success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
@@ -571,7 +571,7 @@ class _LockPageState extends State<LockPage> {
         });
         break;
       case Command.setPowerSaverControlableLock:
-        TTLock.setPowerSaverControlableLock(this.lockMac, lockData, () {
+        TTLock.setPowerSaverControlAbleLock(this.lockMac, lockData, () {
           _showSuccessAndDismiss("Success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);

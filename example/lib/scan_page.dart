@@ -47,7 +47,7 @@ class _ScanPageState extends State<ScanPage> {
     } else if (scanType == ScanType.gateway) {
       TTGateway.stopScan();
     } else if (scanType == ScanType.electricMeter) {
-      TTElectricmeter.stopScan();
+      TTElectricMeter.stopScan();
     }
     super.dispose();
   }
@@ -82,7 +82,7 @@ class _ScanPageState extends State<ScanPage> {
     });
   }
 
-  void _initEelectricMeter(TTElectricMeterScanModel scanModel) async {
+  void _initElectricMeter(TTElectricMeterScanModel scanModel) async {
     print("init electric meter：" + scanModel.isInited.toString());
     if (scanModel.isInited) {
       Navigator.push(context,
@@ -100,7 +100,7 @@ class _ScanPageState extends State<ScanPage> {
       initParamMap["name"] = scanModel.name;
       initParamMap["payMode"] = TTElectricMeterPayMode.postpaid.index;
       initParamMap["price"] = '1';
-      TTElectricmeter.init(initParamMap, () {
+      TTElectricMeter.init(initParamMap, () {
         _dismissLoading();
         Navigator.push(context,
             new MaterialPageRoute(builder: (BuildContext context) {
@@ -203,7 +203,7 @@ class _ScanPageState extends State<ScanPage> {
 
   void _startScanElectricMeter() {
     _electricMeterList = [];
-    TTElectricmeter.startScan((scanModel) {
+    TTElectricMeter.startScan((scanModel) {
       bool contain = false;
       for (TTElectricMeterScanModel model in _electricMeterList) {
         if (scanModel.mac == model.mac) {
@@ -237,7 +237,7 @@ class _ScanPageState extends State<ScanPage> {
   }
 
   Widget getListView() {
-    String gatewayNote = 'please repower the gateway';
+    String gatewayNote = 'please power on again the gateway';
     String lockNote = 'please touch the keyboard of lock';
     String electricMeterNote = '';
     String note = [lockNote, gatewayNote, electricMeterNote][scanType!.index];
@@ -303,8 +303,8 @@ class _ScanPageState extends State<ScanPage> {
                       } else if (scanType == ScanType.electricMeter) {
                         TTElectricMeterScanModel scanModel =
                             _electricMeterList[index];
-                        TTElectricmeter.stopScan();
-                        _initEelectricMeter(scanModel);
+                        TTElectricMeter.stopScan();
+                        _initElectricMeter(scanModel);
                       }
                     },
                   );

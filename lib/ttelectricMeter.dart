@@ -7,7 +7,7 @@ typedef TTElectricMeterScanCallback = void Function(
 typedef TTElectricMeterFailedCallback = void Function(
     TTElectricMeterErrorCode errorCode, String message);
 
-class TTElectricmeter {
+class TTElectricMeter {
   static const String COMMAND_CONFIG_SERVER_ELECTRIC_METER =
       "electricMeterConfigServer";
   static const String COMMAND_START_SCAN_ELECTRIC_METER =
@@ -29,7 +29,7 @@ class TTElectricmeter {
       "electricMeterReadData";
   static const String COMMAND_ELECTRIC_METER_SET_PAY_MODE =
       "electricMeterSetPayMode";
-  static const String COMMAND_ELECTRIC_METER_CHARG = "electricMeterCharg";
+  static const String COMMAND_ELECTRIC_METER_CHARGE = "electricMeterCharg";
   static const String COMMAND_ELECTRIC_METER_SET_MAX_POWER =
       "electricMeterSetMaxPower";
   static const String COMMAND_ELECTRIC_METER_GET_FEATURE_VALUE =
@@ -53,10 +53,12 @@ class TTElectricmeter {
     TTLock.invoke(COMMAND_STOP_SCAN_ELECTRIC_METER, null, null);
   }
 
-  static void connect(String mac, TTSuccessCallback callback,TTElectricMeterFailedCallback failedCallback) {
+  static void connect(String mac, TTSuccessCallback callback,
+      TTElectricMeterFailedCallback failedCallback) {
     Map map = Map();
     map["mac"] = mac;
-    TTLock.invoke(COMMAND_ELECTRIC_METER_CONNECT, map, callback, fail_callback: failedCallback);
+    TTLock.invoke(COMMAND_ELECTRIC_METER_CONNECT, map, callback,
+        fail_callback: failedCallback);
   }
 
   static void disconnect(String mac) {
@@ -68,10 +70,10 @@ class TTElectricmeter {
   /**
    * 
    *  Map paramMap = Map();
-      paramMap["mac"] = sacnModel.mac;
-      paramMap["price"] = sacnModel.price;
+      paramMap["mac"] = scanModel.mac;
+      paramMap["price"] = scanModel.price;
       paramMap["payMode"] = TTElectricMeterPayMode.postpaid.index;
-      paramMap["name"] = sacnModel.name;
+      paramMap["name"] = scanModel.name;
    */
   static void init(
     Map paramMap,
@@ -159,7 +161,7 @@ class TTElectricmeter {
         fail_callback: failedCallback);
   }
 
-  static void recharg(
+  static void recharge(
     String mac,
     String amount,
     String kwh,
@@ -170,7 +172,7 @@ class TTElectricmeter {
     map["mac"] = mac;
     map["chargeKwh"] = kwh;
     map["chargeAmount"] = amount;
-    TTLock.invoke(COMMAND_ELECTRIC_METER_CHARG, map, successCallback,
+    TTLock.invoke(COMMAND_ELECTRIC_METER_CHARGE, map, successCallback,
         fail_callback: failedCallback);
   }
 

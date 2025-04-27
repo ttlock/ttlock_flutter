@@ -8,16 +8,16 @@ class TTRemoteKeypad {
   static const String COMMAND_STOP_SCAN_REMOTE_KEYPAD = "remoteKeypadStopScan";
   static const String COMMAND_INIT_REMOTE_KEYPAD = "remoteKeypadInit";
 
-  static const String COMMAND_INIT_MUTIFUCTIONAL_REMOTE_KEYPAD =
-      "multifuctionalRemoteKeypadInit";
-  static const String COMMAND_MUTIFUCTIONAL_REMOTE_KEYPAD_DELETE_STORED_LOCK =
-      "multifuctionalRemoteKeypadDeleteLock";
-  static const String COMMAND_MUTIFUCTIONAL_REMOTE_KEYPAD_GET_STORED_LOCK =
-      "multifuctionalRemoteKeypadGetLocks";
-  static const String COMMAND_MUTIFUCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT =
-      "multifuctionalRemoteKeypadAddFingerprint";
-  static const String COMMAND_MUTIFUCTIONAL_REMOTE_KEYPAD_ADD_CARD =
-      "multifuctionalRemoteKeypadAddCard";
+  static const String COMMAND_INIT_MULTIFUNCTIONAL_REMOTE_KEYPAD =
+      "multifunctionalRemoteKeypadInit";
+  static const String COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_DELETE_STORED_LOCK =
+      "multifunctionalRemoteKeypadDeleteLock";
+  static const String COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_GET_STORED_LOCK =
+      "multifunctionalRemoteKeypadGetLocks";
+  static const String COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT =
+      "multifunctionalRemoteKeypadAddFingerprint";
+  static const String COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD =
+      "multifunctionalRemoteKeypadAddCard";
 
   static void startScan(TTRemoteAccessoryScanCallback scanCallback) {
     TTLock.invoke(COMMAND_START_SCAN_REMOTE_KEYPAD, null, scanCallback);
@@ -40,17 +40,17 @@ class TTRemoteKeypad {
         fail_callback: failedCallback);
   }
 
-  static void multifuctionalInit(
+  static void multifunctionalInit(
       String mac,
       String lockMac,
-      TTMutifunctionalRemoteKeypadInitSuccessCallback callback,
-      TTFailedCallback lockfailedCallback,
+      TTMultifunctionalRemoteKeypadInitSuccessCallback callback,
+      TTFailedCallback lockFailedCallback,
       TTRemoteKeypadFailedCallback keyPadFailedCallback) {
     Map map = Map();
     map[TTResponse.mac] = mac;
     map[TTResponse.lockMac] = lockMac;
-    TTLock.invoke(COMMAND_INIT_MUTIFUCTIONAL_REMOTE_KEYPAD, map, callback,
-        fail_callback: lockfailedCallback,
+    TTLock.invoke(COMMAND_INIT_MULTIFUNCTIONAL_REMOTE_KEYPAD, map, callback,
+        fail_callback: lockFailedCallback,
         other_fail_callback: keyPadFailedCallback);
   }
 
@@ -62,7 +62,7 @@ class TTRemoteKeypad {
     Map map = Map();
     map[TTResponse.mac] = mac;
     TTLock.invoke(
-        COMMAND_MUTIFUCTIONAL_REMOTE_KEYPAD_GET_STORED_LOCK, map, callback,
+        COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_GET_STORED_LOCK, map, callback,
         fail_callback: failedCallback);
   }
 
@@ -76,7 +76,7 @@ class TTRemoteKeypad {
     map[TTResponse.mac] = mac;
     map[TTResponse.slotNumber] = slotNumber;
     TTLock.invoke(
-        COMMAND_MUTIFUCTIONAL_REMOTE_KEYPAD_DELETE_STORED_LOCK, map, callback,
+        COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_DELETE_STORED_LOCK, map, callback,
         fail_callback: failedCallback);
   }
 
@@ -88,7 +88,7 @@ class TTRemoteKeypad {
       String lockData,
       TTAddFingerprintProgressCallback progressCallback,
       TTAddFingerprintCallback callback,
-      TTFailedCallback lockfailedCallback,
+      TTFailedCallback lockFailedCallback,
       TTRemoteKeypadFailedCallback keyPadFailedCallback) {
     Map map = Map();
     map[TTResponse.mac] = mac;
@@ -99,9 +99,9 @@ class TTRemoteKeypad {
       map[TTResponse.cycleJsonList] = convert.jsonEncode(cycleList);
     }
     TTLock.invoke(
-        COMMAND_MUTIFUCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT, map, callback,
+        COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT, map, callback,
         progress_callback: progressCallback,
-        fail_callback: lockfailedCallback,
+        fail_callback: lockFailedCallback,
         other_fail_callback: keyPadFailedCallback);
   }
 
@@ -120,7 +120,7 @@ class TTRemoteKeypad {
     if (cycleList != null && cycleList.length > 0) {
       map[TTResponse.cycleJsonList] = convert.jsonEncode(cycleList);
     }
-    TTLock.invoke(COMMAND_MUTIFUCTIONAL_REMOTE_KEYPAD_ADD_CARD, map, callback,
+    TTLock.invoke(COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD, map, callback,
         progress_callback: progressCallback, fail_callback: failedCallback);
   }
 }
