@@ -2168,8 +2168,8 @@ class TTRemoteAccessoryScanModel {
     this.name = map["name"];
     this.mac = map["mac"];
     this.rssi = map["rssi"];
-    this.isMultifunctionalKeypad = map["isMultifunctionalKeypad"];
-    this.advertisementData = map["advertisementData"];
+    this.isMultifunctionalKeypad = map["isMultifunctionalKeypad"]??false;
+    this.advertisementData = map["advertisementData"]??{};
   }
 }
 

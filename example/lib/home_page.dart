@@ -43,6 +43,11 @@ class _HomePageState extends State<HomePage> {
     _startScan(ScanType.electricMeter);
   }
 
+
+  void _startKeyPadPage() {
+    _startScan(ScanType.keyPad);
+  }
+
   void _startScan(ScanType scanType) {
     Navigator.push(context,
         new MaterialPageRoute(builder: (BuildContext context) {
@@ -66,7 +71,12 @@ class _HomePageState extends State<HomePage> {
         child: Text('Electric Meter',
             style: TextStyle(fontWeight: FontWeight.w600)),
         onPressed: _startScanElectricMeter,
-      )
+      ),
+      ElevatedButton(
+        child: Text('Key Pad',
+            style: TextStyle(fontWeight: FontWeight.w600)),
+        onPressed: _startKeyPadPage,
+      ),
     ]);
   }
 

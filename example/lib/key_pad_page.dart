@@ -78,7 +78,10 @@ class _KeyPadState extends State<KeyPadPage> {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
         break;
-
+      case Command.addFingerprint:
+        break;
+      case Command.addCard:
+        break;
       default:
     }
   }
