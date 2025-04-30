@@ -1592,14 +1592,14 @@ class TTLock {
         getStoredLocks(data["lockMacs"]);
         break;
       case TTRemoteKeypad.COMMAND_INIT_MULTIFUNCTIONAL_REMOTE_KEYPAD:
+        print(data["systemInfoModel"]);
         TTMultifunctionalRemoteKeypadInitSuccessCallback initSuccessCallback =
             callBack;
         initSuccessCallback(
             data["electricQuantity"],
             data["wirelessKeypadFeatureValue"],
             data["slotNumber"],
-            data["slotLimit"],
-            TTLockSystemModel(data["systemInfoModel"]));
+            data["slotLimit"]);
         break;
       case COMMAND_ADD_FACE:
       case COMMAND_ADD_FACE_DATA:
@@ -2143,8 +2143,7 @@ typedef TTMultifunctionalRemoteKeypadInitSuccessCallback = void Function(
     int electricQuantity,
     String wirelessKeypadFeatureValue,
     int slotNumber,
-    int slotLimit,
-    TTLockSystemModel systemInfoModel);
+    int slotLimit);
 
 typedef TTRemoteKeypadGetStoredLockSuccessCallback = void Function(
     List lockMacs);
@@ -2168,8 +2167,8 @@ class TTRemoteAccessoryScanModel {
     this.name = map["name"];
     this.mac = map["mac"];
     this.rssi = map["rssi"];
-    this.isMultifunctionalKeypad = map["isMultifunctionalKeypad"]??false;
-    this.advertisementData = map["advertisementData"]??{};
+    this.isMultifunctionalKeypad = map["isMultifunctionalKeypad"] ?? false;
+    this.advertisementData = map["advertisementData"] ?? {};
   }
 }
 

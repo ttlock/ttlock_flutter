@@ -1078,7 +1078,6 @@ typedef NS_ENUM(NSInteger, ErrorDevice) {
             dict[@"rssi"] = @(model.RSSI);
             dict[@"mac"] = model.keypadMac;
             dict[@"isMultifunctionalKeypad"] = @(model.isMultifunctionalKeypad);
-            dict[@"advertisementData"] = model.advertisementData;
             [weakSelf successCallbackCommand:command data:dict];
         }];
     }
