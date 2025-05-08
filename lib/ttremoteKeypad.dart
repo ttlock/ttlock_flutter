@@ -42,13 +42,13 @@ class TTRemoteKeypad {
 
   static void multifunctionalInit(
       String mac,
-      String lockMac,
+      String lockData,
       TTMultifunctionalRemoteKeypadInitSuccessCallback callback,
       TTFailedCallback lockFailedCallback,
       TTRemoteKeypadFailedCallback keyPadFailedCallback) {
     Map map = Map();
     map[TTResponse.mac] = mac;
-    map[TTResponse.lockMac] = lockMac;
+    map[TTResponse.lockData] = lockData;
     TTLock.invoke(COMMAND_INIT_MULTIFUNCTIONAL_REMOTE_KEYPAD, map, callback,
         fail_callback: lockFailedCallback,
         other_fail_callback: keyPadFailedCallback);
