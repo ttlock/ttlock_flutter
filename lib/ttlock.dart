@@ -4,6 +4,7 @@ import 'package:ttlock_flutter/ttdoorSensor.dart';
 import 'package:ttlock_flutter/ttelectricMeter.dart';
 import 'package:ttlock_flutter/ttremoteKey.dart';
 import 'package:ttlock_flutter/ttremoteKeypad.dart';
+import 'package:ttlock_flutter/ttwaterMeter.dart';
 import 'dart:convert' as convert;
 import 'ttgateway.dart';
 
@@ -1315,6 +1316,7 @@ class TTLock {
           command == TTRemoteKey.COMMAND_START_SCAN_REMOTE_KEY ||
           command == TTRemoteKeypad.COMMAND_START_SCAN_REMOTE_KEYPAD ||
           command == TTDoorSensor.COMMAND_START_SCAN_DOOR_SENSOR ||
+          command == TTWaterMeter.COMMAND_START_SCAN_WATER_METER ||
           command == TTElectricMeter.COMMAND_START_SCAN_ELECTRIC_METER) {
         removeCommand = false;
       }
@@ -1365,7 +1367,10 @@ class TTLock {
         TTElectricMeterScanCallback scanCallback = callBack;
         scanCallback(TTElectricMeterScanModel(data));
         break;
-
+      case TTWaterMeter.COMMAND_START_SCAN_WATER_METER:
+        TTWaterMeterScanCallback scanCallback = callBack;
+        scanCallback(TTWaterMeterScanModel(data));
+        break;
       case COMMAND_GET_AUTOMATIC_LOCK_PERIODIC_TIME:
         TTGetLockAutomaticLockingPeriodicTimeCallback
             getLockAutomaticLockingPeriodicTimeCallback = callBack;
@@ -1703,15 +1708,16 @@ class TTLock {
       }
     }
 
-    //蓝牙电表失败处理
-    else if (command.contains('electricMeter')) {
-      TTElectricMeterFailedCallback? failedCallback = callBack;
-      TTElectricMeterErrorCode error =
-          TTElectricMeterErrorCode.values[errorCode];
+    //蓝牙水电表失败处理
+    else if (command.contains('electricMeter') ||
+        command.contains('waterMeter')) {
+      TTMeterFailedCallback? failedCallback = callBack;
+      TTMeterErrorCode error = TTMeterErrorCode.values[errorCode];
       if (failedCallback != null) {
         failedCallback(error, errorMessage);
       }
     }
+
     //锁失败处理
     else {
       TTFailedCallback? failedCallback = callBack;
@@ -1870,6 +1876,11 @@ class TTResponse {
   static const String payMode = "payMode";
   static const String scanTime = "scanTime";
   static const String slotNumber = "slotNumber";
+
+  static const String totalM3 = "totalM3";
+  static const String remainderM3 = "remainderM3";
+  static const String magneticInterference = "magneticInterference";
+  static const String waterValveFailure = "waterValveFailure";
 }
 
 class TTLockScanModel {
@@ -2156,6 +2167,15 @@ typedef TTAddFaceProgressCallback = void Function(
 
 typedef TTAddFaceSuccessCallback = void Function(String faceNumber);
 
+typedef TTElectricMeterScanCallback = void Function(
+    TTElectricMeterScanModel scanModel);
+
+typedef TTMeterFailedCallback = void Function(
+    TTMeterErrorCode errorCode, String message);
+
+typedef TTWaterMeterScanCallback = void Function(
+    TTWaterMeterScanModel scanModel);
+
 class TTRemoteAccessoryScanModel {
   String name = '';
   String mac = '';
@@ -2345,4 +2365,15 @@ enum TTFaceErrorCode {
   needLowerHead,
   needTiltHeadToLeft,
   needTiltHeadToRight,
+}
+
+enum TTMeterPayMode { postpaid, prepaid }
+
+enum TTMeterErrorCode {
+  bluetoothPowerOff,
+  connectTimeout,
+  disconnect,
+  netError,
+  serverError,
+  meterExistedInServer
 }

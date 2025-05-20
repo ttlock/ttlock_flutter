@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ttlock_flutter/TTElectricMeter.dart';
 import 'package:bmprogresshud/progresshud.dart';
+import 'package:ttlock_flutter/ttlock.dart';
 
 class ElectricMeterPage extends StatefulWidget {
   ElectricMeterPage({Key? key, required this.name, required this.mac})
@@ -56,8 +57,7 @@ class _ElectricMeterState extends State<ElectricMeterPage> {
     ProgressHud.of(_context!)!.showSuccessAndDismiss(text: text);
   }
 
-  void _showErrorAndDismiss(
-      TTElectricMeterErrorCode errorCode, String errorMsg) {
+  void _showErrorAndDismiss(TTMeterErrorCode errorCode, String errorMsg) {
     ProgressHud.of(_context!)!.showErrorAndDismiss(
         text: 'errorCode:$errorCode errorMessage:$errorMsg');
   }
@@ -107,8 +107,7 @@ class _ElectricMeterState extends State<ElectricMeterPage> {
         break;
 
       case Command.setPayMode:
-        TTElectricMeter.setPayMode(mac, "1.0", TTElectricMeterPayMode.prepaid,
-            () {
+        TTElectricMeter.setPayMode(mac, "1.0", TTMeterPayMode.prepaid, () {
           _showSuccessAndDismiss("Set pay mode success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);

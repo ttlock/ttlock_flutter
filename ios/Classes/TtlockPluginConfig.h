@@ -196,8 +196,23 @@
 
 
 
-
-
+#pragma mark - 水表
+#define command_water_meter_config_server @"waterMeterConfigServer"
+#define command_water_meter_start_scan @"waterMeterStartScan"
+#define command_water_meter_stop_scan @"waterMeterStopScan"
+#define command_water_meter_connect @"waterMeterConnect"
+#define command_water_meter_disconnect @"waterMeterDisconnect"
+#define command_water_meter_init @"waterMeterInit"
+#define command_water_meter_delete @"waterMeterDelete"
+#define command_water_meter_set_power_on_off @"waterMeterSetPowerOnOff"
+#define command_water_meter_set_remaining_m3 @"waterMeterSetRemainingM3"
+#define command_water_meter_clear_remaining_m3 @"waterMeterClearRemainingM3"
+#define command_water_meter_read_data @"waterMeterReadData"
+#define command_water_meter_set_pay_mode @"waterMeterSetPayMode"
+#define command_water_meter_charge @"waterMeterCharge"
+#define command_water_meter_set_total_usage @"waterMeterSetTotalUsage"
+#define command_water_meter_get_feature_value @"waterMeterGetFeatureValue"
+#define command_water_meter_enter_upgrade_mode @"waterMeterEnterUpgradeMode"
 
 
 

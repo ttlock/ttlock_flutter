@@ -1,66 +1,59 @@
-// import 'package:ttlock_flutter/ttlock.dart';
+import 'package:ttlock_flutter/ttlock.dart';
 import 'dart:convert' as convert;
 
-import 'package:ttlock_flutter/ttlock.dart';
+class TTWaterMeter {
+  static const String COMMAND_CONFIG_SERVER_WATER_METER =
+      "waterMeterConfigServer";
+  static const String COMMAND_START_SCAN_WATER_METER = "waterMeterStartScan";
+  static const String COMMAND_STOP_SCAN_WATER_METER = "waterMeterStopScan";
+  static const String COMMAND_WATER_METER_CONNECT = "waterMeterConnect";
+  static const String COMMAND_WATER_METER_DISCONNECT = "waterMeterDisconnect";
+  static const String COMMAND_WATER_METER_INIT = "waterMeterInit";
+  static const String COMMAND_WATER_METER_DELETE = "waterMeterDelete";
+  static const String COMMAND_WATER_METER_SET_POWER_ON_OFF =
+      "waterMeterSetPowerOnOff";
+  static const String COMMAND_WATER_METER_SET_REMAINING_M3 =
+      "waterMeterSetRemainingM3";
+  static const String COMMAND_WATER_METER_CLEAR_REMAINING_M3 =
+      "waterMeterClearRemainingM3";
+  static const String COMMAND_WATER_METER_READ_DATA = "waterMeterReadData";
+  static const String COMMAND_WATER_METER_SET_PAY_MODE = "waterMeterSetPayMode";
+  static const String COMMAND_WATER_METER_CHARGE = "waterMeterCharge";
+  static const String COMMAND_WATER_METER_SET_TOTAL_USAGE =
+      "waterMeterSetTotalUsage";
+  static const String COMMAND_WATER_METER_GET_FEATURE_VALUE =
+      "waterMeterGetFeatureValue";
+  static const String COMMAND_WATER_METER_ENTER_UPGRADE_MODE =
+      "waterMeterEnterUpgradeMode";
 
-class TTElectricMeter {
-  static const String COMMAND_CONFIG_SERVER_ELECTRIC_METER =
-      "electricMeterConfigServer";
-  static const String COMMAND_START_SCAN_ELECTRIC_METER =
-      "electricMeterStartScan";
-  static const String COMMAND_STOP_SCAN_ELECTRIC_METER =
-      "electricMeterStopScan";
-  static const String COMMAND_ELECTRIC_METER_CONNECT = "electricMeterConnect";
-  static const String COMMAND_ELECTRIC_METER_DISCONNECT =
-      "electricMeterDisconnect";
-  static const String COMMAND_ELECTRIC_METER_INIT = "electricMeterInit";
-  static const String COMMAND_ELECTRIC_METER_DELETE = "electricMeterDelete";
-  static const String COMMAND_ELECTRIC_METER_SET_POWER_ON_OFF =
-      "electricMeterSetPowerOnOff";
-  static const String COMMAND_ELECTRIC_METER_SET_REMAINING_ELECTRICITY =
-      "electricMeterSetRemainingElectricity";
-  static const String COMMAND_ELECTRIC_METER_CLEAR_REMAINING_ELECTRICITY =
-      "electricMeterClearRemainingElectricity";
-  static const String COMMAND_ELECTRIC_METER_READ_DATA =
-      "electricMeterReadData";
-  static const String COMMAND_ELECTRIC_METER_SET_PAY_MODE =
-      "electricMeterSetPayMode";
-  static const String COMMAND_ELECTRIC_METER_CHARGE = "electricMeterCharg";
-  static const String COMMAND_ELECTRIC_METER_SET_MAX_POWER =
-      "electricMeterSetMaxPower";
-  static const String COMMAND_ELECTRIC_METER_GET_FEATURE_VALUE =
-      "electricMeterGetFeatureValue";
-  static const String COMMAND_ELECTRIC_METER_ENTER_UPGRADE_MODE =
-      "electricMeterEnterUpgradeMode";
-
-  static void configServer(ElectricMeterServerParamMode paramMode) {
+  static void configServer(WaterMeterServerParamMode paramMode) {
     Map map = Map();
     map["url"] = paramMode.url;
     map["clientId"] = paramMode.clientId;
     map["accessToken"] = paramMode.accessToken;
-    TTLock.invoke(COMMAND_CONFIG_SERVER_ELECTRIC_METER, map, null);
+    TTLock.invoke(COMMAND_CONFIG_SERVER_WATER_METER, map, null);
   }
 
-  static void startScan(TTElectricMeterScanCallback scanCallback) {
-    TTLock.invoke(COMMAND_START_SCAN_ELECTRIC_METER, null, scanCallback);
+  static void startScan(TTWaterMeterScanCallback scanCallback) {
+    TTLock.invoke(COMMAND_START_SCAN_WATER_METER, null, scanCallback);
   }
 
   static void stopScan() {
-    TTLock.invoke(COMMAND_STOP_SCAN_ELECTRIC_METER, null, null);
+    TTLock.invoke(COMMAND_STOP_SCAN_WATER_METER, null, null);
   }
 
   static void connect(String mac, TTSuccessCallback callback,
       TTMeterFailedCallback failedCallback) {
     Map map = Map();
     map["mac"] = mac;
-    TTLock.invoke(COMMAND_ELECTRIC_METER_CONNECT, map, callback,
+    TTLock.invoke(COMMAND_WATER_METER_CONNECT, map, callback,
         fail_callback: failedCallback);
   }
 
   static void disconnect(String mac) {
     Map map = Map();
     map["mac"] = mac;
-    TTLock.invoke(COMMAND_ELECTRIC_METER_DISCONNECT, map, null);
+    TTLock.invoke(COMMAND_WATER_METER_DISCONNECT, map, null);
   }
 
   /**
@@ -68,7 +61,7 @@ class TTElectricMeter {
    *  Map paramMap = Map();
       paramMap["mac"] = scanModel.mac;
       paramMap["price"] = scanModel.price;
-      paramMap["payMode"] = TTElectricMeterPayMode.postpaid.index;
+      paramMap["payMode"] = TTWaterMeterPayMode.postpaid.index;
       paramMap["name"] = scanModel.name;
    */
   static void init(
@@ -76,7 +69,7 @@ class TTElectricMeter {
     TTSuccessCallback successCallback,
     TTMeterFailedCallback failedCallback,
   ) {
-    TTLock.invoke(COMMAND_ELECTRIC_METER_INIT, paramMap, successCallback,
+    TTLock.invoke(COMMAND_WATER_METER_INIT, paramMap, successCallback,
         fail_callback: failedCallback);
   }
 
@@ -87,7 +80,7 @@ class TTElectricMeter {
   ) {
     Map map = Map();
     map["mac"] = mac;
-    TTLock.invoke(COMMAND_ELECTRIC_METER_DELETE, map, successCallback,
+    TTLock.invoke(COMMAND_WATER_METER_DELETE, map, successCallback,
         fail_callback: failedCallback);
   }
 
@@ -100,21 +93,20 @@ class TTElectricMeter {
     Map map = Map();
     map["mac"] = mac;
     map["isOn"] = isOn;
-    TTLock.invoke(COMMAND_ELECTRIC_METER_SET_POWER_ON_OFF, map, successCallback,
+    TTLock.invoke(COMMAND_WATER_METER_SET_POWER_ON_OFF, map, successCallback,
         fail_callback: failedCallback);
   }
 
   static void setRemainderKwh(
     String mac,
-    String remainderKwh,
+    String remainderM3,
     TTSuccessCallback successCallback,
     TTMeterFailedCallback failedCallback,
   ) {
     Map map = Map();
     map["mac"] = mac;
-    map["remainderKwh"] = remainderKwh;
-    TTLock.invoke(
-        COMMAND_ELECTRIC_METER_SET_REMAINING_ELECTRICITY, map, successCallback,
+    map["remainderM3"] = remainderM3;
+    TTLock.invoke(COMMAND_WATER_METER_SET_REMAINING_M3, map, successCallback,
         fail_callback: failedCallback);
   }
 
@@ -126,8 +118,7 @@ class TTElectricMeter {
     Map map = Map();
     map["mac"] = mac;
 
-    TTLock.invoke(COMMAND_ELECTRIC_METER_CLEAR_REMAINING_ELECTRICITY, map,
-        successCallback,
+    TTLock.invoke(COMMAND_WATER_METER_CLEAR_REMAINING_M3, map, successCallback,
         fail_callback: failedCallback);
   }
 
@@ -138,7 +129,7 @@ class TTElectricMeter {
   ) {
     Map map = Map();
     map["mac"] = mac;
-    TTLock.invoke(COMMAND_ELECTRIC_METER_READ_DATA, map, successCallback,
+    TTLock.invoke(COMMAND_WATER_METER_READ_DATA, map, successCallback,
         fail_callback: failedCallback);
   }
 
@@ -153,35 +144,35 @@ class TTElectricMeter {
     map["mac"] = mac;
     map["price"] = price;
     map["payMode"] = payMode.index;
-    TTLock.invoke(COMMAND_ELECTRIC_METER_SET_PAY_MODE, map, successCallback,
+    TTLock.invoke(COMMAND_WATER_METER_SET_PAY_MODE, map, successCallback,
         fail_callback: failedCallback);
   }
 
   static void recharge(
     String mac,
     String amount,
-    String kwh,
+    String m3,
     TTSuccessCallback successCallback,
     TTMeterFailedCallback failedCallback,
   ) {
     Map map = Map();
     map["mac"] = mac;
-    map["chargeKwh"] = kwh;
+    map["m3"] = m3;
     map["chargeAmount"] = amount;
-    TTLock.invoke(COMMAND_ELECTRIC_METER_CHARGE, map, successCallback,
+    TTLock.invoke(COMMAND_WATER_METER_CHARGE, map, successCallback,
         fail_callback: failedCallback);
   }
 
-  static void setMaxPower(
+  static void setTotalUsage(
     String mac,
-    int maxPower,
+    int totalM3,
     TTSuccessCallback successCallback,
     TTMeterFailedCallback failedCallback,
   ) {
     Map map = Map();
     map["mac"] = mac;
-    map["maxPower"] = maxPower;
-    TTLock.invoke(COMMAND_ELECTRIC_METER_SET_MAX_POWER, map, successCallback,
+    map["totalM3"] = totalM3;
+    TTLock.invoke(COMMAND_WATER_METER_SET_TOTAL_USAGE, map, successCallback,
         fail_callback: failedCallback);
   }
 
@@ -192,58 +183,58 @@ class TTElectricMeter {
   ) {
     Map map = Map();
     map["mac"] = mac;
-    TTLock.invoke(
-        COMMAND_ELECTRIC_METER_GET_FEATURE_VALUE, map, successCallback,
+    TTLock.invoke(COMMAND_WATER_METER_GET_FEATURE_VALUE, map, successCallback,
         fail_callback: failedCallback);
   }
 
   // static void enterUpgradeMode(
   //   String mac,
   //   TTSuccessCallback successCallback,
-  //   TTElectricMeterFailedCallback failedCallback,
+  //   TTMeterFailedCallback failedCallback,
   // ) {
   //   Map map = Map();
   //   map["mac"] = mac;
   //   TTLock.invoke(
-  //       COMMAND_ELECTRIC_METER_ENTER_UPGRADE_MODE, map, successCallback,
+  //       COMMAND_WATER_METER_ENTER_UPGRADE_MODE, map, successCallback,
   //       fail: failedCallback);
   // }
 }
 
-class ElectricMeterServerParamMode {
+class WaterMeterServerParamMode {
   late String url;
   late String clientId;
   late String accessToken;
 }
 
-class ElectricMeterInitParamModel {
+class WaterMeterInitParamModel {
   late String mac;
   late String name;
   late String price;
   late TTMeterPayMode payMode;
 }
 
-class TTElectricMeterScanModel {
+class TTWaterMeterScanModel {
   String name = '';
   String mac = '';
   bool isInited = true;
-  String totalKwh = '';
-  String remainderKwh = '';
-  String voltage = '';
-  String electricCurrent = '';
+  String totalM3 = '';
+  String remainderM3 = '';
   bool onOff = true;
   int rssi = -1;
+  int magneticInterference = 0;
+  int electricQuantity = -1;
+  int waterValveFailure = 0;
   TTMeterPayMode payMode = TTMeterPayMode.postpaid;
   int scanTime = 0;
 
-  TTElectricMeterScanModel(Map map) {
+  TTWaterMeterScanModel(Map map) {
     this.name = map[TTResponse.name];
     this.mac = map[TTResponse.mac];
     this.isInited = map[TTResponse.isInited];
-    this.totalKwh = map[TTResponse.totalKwh];
-    this.remainderKwh = map[TTResponse.remainderKwh];
-    this.voltage = map[TTResponse.voltage];
-    this.electricCurrent = map[TTResponse.electricCurrent];
+    this.totalM3 = map[TTResponse.totalKwh];
+    this.remainderM3 = map[TTResponse.remainderM3];
+    this.electricQuantity = map[TTResponse.electricQuantity];
+    this.waterValveFailure = map[TTResponse.waterValveFailure];
     this.rssi = map[TTResponse.rssi];
     this.onOff = map[TTResponse.onOff];
     this.payMode = map[TTResponse.payMode] == 0

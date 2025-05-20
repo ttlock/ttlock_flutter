@@ -105,7 +105,7 @@ class _ScanPageState extends State<ScanPage> {
       Map initParamMap = Map();
       initParamMap["mac"] = scanModel.mac;
       initParamMap["name"] = scanModel.name;
-      initParamMap["payMode"] = TTElectricMeterPayMode.postpaid.index;
+      initParamMap["payMode"] = TTMeterPayMode.postpaid.index;
       initParamMap["price"] = '1';
       TTElectricMeter.init(initParamMap, () {
         _dismissLoading();

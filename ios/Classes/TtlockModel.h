@@ -58,6 +58,13 @@
 @property (nonatomic, strong) NSString *chargeKwh;
 @property (nonatomic, strong) NSNumber *maxPower;
 
+@property (nonatomic, strong) NSString *remainderM3;
+@property (nonatomic, strong) NSString *m3;
+@property (nonatomic, strong) NSString *totalM3;
+
+
+
+
 
 
 
