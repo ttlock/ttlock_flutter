@@ -231,7 +231,7 @@ class TTWaterMeterScanModel {
     this.name = map[TTResponse.name];
     this.mac = map[TTResponse.mac];
     this.isInited = map[TTResponse.isInited];
-    this.totalM3 = map[TTResponse.totalKwh];
+    this.totalM3 = map[TTResponse.totalM3];
     this.remainderM3 = map[TTResponse.remainderM3];
     this.electricQuantity = map[TTResponse.electricQuantity];
     this.waterValveFailure = map[TTResponse.waterValveFailure];
