@@ -97,7 +97,7 @@ class TTWaterMeter {
         fail_callback: failedCallback);
   }
 
-  static void setRemainderKwh(
+  static void setRemainderM3(
     String mac,
     String remainderM3,
     TTSuccessCallback successCallback,
@@ -110,7 +110,7 @@ class TTWaterMeter {
         fail_callback: failedCallback);
   }
 
-  static void clearRemainderKwh(
+  static void clearRemainderM3(
     String mac,
     TTSuccessCallback successCallback,
     TTMeterFailedCallback failedCallback,
