@@ -61,7 +61,7 @@ class TTWaterMeter {
    *  Map paramMap = Map();
       paramMap["mac"] = scanModel.mac;
       paramMap["price"] = scanModel.price;
-      paramMap["payMode"] = TTWaterMeterPayMode.postpaid.index;
+      paramMap["payMode"] = TTMeterPayMode.postpaid.index;
       paramMap["name"] = scanModel.name;
    */
   static void init(

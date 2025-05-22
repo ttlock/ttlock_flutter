@@ -1285,7 +1285,9 @@ typedef NS_ENUM(NSInteger, ErrorDevice) {
     }
     
 #pragma mark - 水表
-    
+    else if ([command isEqualToString:command_water_meter_config_server]) {
+            [TTWaterMeter setClientParamWithUrl:lockModel.url clientId:lockModel.clientId accessToken:lockModel.accessToken];
+        }
     else if ([command isEqualToString:command_water_meter_start_scan]) {
         [TTWaterMeter startScanWithSuccess:^(TTWaterMeterModel * _Nonnull model) {
             NSMutableDictionary *dict = @{}.mutableCopy;
