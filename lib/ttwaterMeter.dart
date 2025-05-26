@@ -165,13 +165,13 @@ class TTWaterMeter {
 
   static void setTotalUsage(
     String mac,
-    int totalM3,
+    double totalM3,
     TTSuccessCallback successCallback,
     TTMeterFailedCallback failedCallback,
   ) {
     Map map = Map();
     map["mac"] = mac;
-    map["totalM3"] = totalM3;
+    map["totalM3"] = totalM3.toString();
     TTLock.invoke(COMMAND_WATER_METER_SET_TOTAL_USAGE, map, successCallback,
         fail_callback: failedCallback);
   }
