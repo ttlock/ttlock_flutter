@@ -1660,7 +1660,7 @@ typedef NS_ENUM(NSInteger, ErrorDevice) {
     
     ];
     
-    NSInteger errorCode = TTGatewayFail;
+    NSInteger errorCode = [codeArray indexOfObject:@(TTGatewayFail)];
     for (int i = 0; i < codeArray.count; i++) {
         if([codeArray[i] intValue] == status){
             errorCode = i;
@@ -1678,7 +1678,7 @@ typedef NS_ENUM(NSInteger, ErrorDevice) {
                           @(TTKeyFobConnectTimeout)
     
     ];
-    NSInteger errorCode = TTKeyFobFail;
+    NSInteger errorCode = [codeArray indexOfObject:@(TTKeyFobFail)];
     for (int i = 0; i < codeArray.count; i++) {
         if([codeArray[i] intValue] == status){
             errorCode = i;
@@ -1696,7 +1696,7 @@ typedef NS_ENUM(NSInteger, ErrorDevice) {
                           @(TTKeypadDuplicateFingerprint),
                           @(TTKeypadLackOfStorageSpace),
     ];
-    NSInteger errorCode = TTKeypadFail;
+    NSInteger errorCode = [codeArray indexOfObject:@(TTKeypadFail)];
     for (int i = 0; i < codeArray.count; i++) {
         if([codeArray[i] intValue] == status){
             errorCode = i;
@@ -1712,7 +1712,7 @@ typedef NS_ENUM(NSInteger, ErrorDevice) {
                           @(TTDoorSensorErrorConnectTimeout)
     
     ];
-    NSInteger errorCode = TTDoorSensorErrorFail;
+    NSInteger errorCode = [codeArray indexOfObject:@(TTDoorSensorErrorFail)];
     for (int i = 0; i < codeArray.count; i++) {
         if([codeArray[i] intValue] == status){
             errorCode = i;
@@ -1729,7 +1729,7 @@ typedef NS_ENUM(NSInteger, ErrorDevice) {
                           @(TTElectricMeterRequestServerError),
                           @(TTElectricMeterExistedInServer)
     ];
-    NSInteger errorCode = TTElectricMeterConnectTimeout;
+    NSInteger errorCode = [codeArray indexOfObject:@(TTElectricMeterConnectTimeout)];
     for (int i = 0; i < codeArray.count; i++) {
         if([codeArray[i] intValue] == status){
             errorCode = i;
@@ -1746,7 +1746,7 @@ typedef NS_ENUM(NSInteger, ErrorDevice) {
                           @(TTWaterMeterRequestServerError),
                           @(TTWaterMeterExistedInServer)
     ];
-    NSInteger errorCode = TTWaterMeterConnectTimeout;
+    NSInteger errorCode = [codeArray indexOfObject:@(TTWaterMeterConnectTimeout)];
     for (int i = 0; i < codeArray.count; i++) {
         if([codeArray[i] intValue] == status){
             errorCode = i;
@@ -1757,7 +1757,7 @@ typedef NS_ENUM(NSInteger, ErrorDevice) {
 
 
 - (NSNumber *)getTTLockErrorCode:(NSNumber *) code{
-    NSInteger errorCode = TTErrorFail;
+   
     NSArray *codeArray =@[@(TTErrorHadReseted),
                           @(TTErrorCRCError),
                           @(TTErrorNoPermisstion),
@@ -1798,7 +1798,7 @@ typedef NS_ENUM(NSInteger, ErrorDevice) {
                           @(TTErrorInvalidParameter),
                           @(TTErrorWrongSSID),
                           @(TTErrorWrongWifiPassword)];
-    
+    NSInteger errorCode = [codeArray indexOfObject:@(TTErrorFail)];
     for (int i = 0; i < codeArray.count; i++) {
         if([codeArray[i] intValue] == code.intValue){
             errorCode = i;
