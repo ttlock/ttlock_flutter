@@ -37,4 +37,10 @@ public class TTParam {
     public static final String url = "url";
     public static final String clientId = "clientId";
     public static final String accessToken = "accessToken";
+
+    public static final String slotNumber = "slotNumber";
+    public static final String startDate = "startDate";
+    public static final String endDate = "endDate";
+    public static final String cycleJsonList = "cycleJsonList";
+    public static final String fingerprintNumber = "fingerprintNumber";
 }

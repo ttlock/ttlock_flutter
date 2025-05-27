@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ttlock_flutter/ttdoorSensor.dart';
 import 'package:ttlock_flutter/ttelectricMeter.dart';
@@ -1697,15 +1696,23 @@ class TTLock {
                 .COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT ||
         command ==
             TTRemoteKeypad.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD) {
-      TTRemoteKeypadFailedCallback? failedCallback =
-          data["errorDevice"] == TTErrorDevice.keyPad.index
-              ? otherCallBack
-              : callBack;
-      TTRemoteKeyPadAccessoryError error =
+
+      if(data["errorDevice"] == TTErrorDevice.keyPad.index)
+        {
+          TTRemoteKeypadFailedCallback? failedCallback = otherCallBack;
+          TTRemoteKeyPadAccessoryError error =
           TTRemoteKeyPadAccessoryError.values[errorCode];
-      if (failedCallback != null) {
-        failedCallback(error, errorMessage);
-      }
+          if (failedCallback != null) {
+            failedCallback(error, errorMessage);
+          }
+        }else
+          {
+            if(errorCode<0)
+            {
+              errorCode = 0;
+            }
+            callBack?.call(TTLockError.values[errorCode], errorMessage);
+          }
     }
 
     //蓝牙水电表失败处理
