@@ -1058,6 +1058,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         {
           List<CyclicConfig> cycleList = new Gson().fromJson(cycleJsonList, new TypeToken<List<CyclicConfig>>(){}.getType());
           info.setCyclicConfigs(cycleList);
+          info.setModeType(ValidityInfo.CYCLIC);
         }
         MultifunctionalKeypadClient.getDefault().addFingerprint(keyPadMac,
                 lockData, info, new com.ttlock.bl.sdk.mulfunkeypad.callback.AddFingerprintCallback() {
@@ -1123,6 +1124,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         {
           List<CyclicConfig> cycleList = new Gson().fromJson(cycleJsonList, new TypeToken<List<CyclicConfig>>(){}.getType());
           info.setCyclicConfigs(cycleList);
+          info.setModeType(ValidityInfo.CYCLIC);
         }
         MultifunctionalKeypadClient.getDefault().addCard(lockData,
                 info, new AddCardCallback() {
