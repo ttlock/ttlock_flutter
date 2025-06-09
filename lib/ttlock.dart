@@ -1975,7 +1975,7 @@ class TTLockSystemModel {
     this.nbCardNumber = map["nbCardNumber"];
     this.nbRssi = map["nbRssi"];
 
-    this.passcodeKeyNumber = map["passcodeKeyNumber"];
+    this.passcodeKeyNumber = map["passcodeKeyNumber"]?.toString();
 
     this.lockData = map["lockData"];
   }
