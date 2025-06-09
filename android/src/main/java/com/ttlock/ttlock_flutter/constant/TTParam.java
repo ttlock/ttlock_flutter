@@ -38,6 +38,15 @@ public class TTParam {
     public static final String clientId = "clientId";
     public static final String accessToken = "accessToken";
 
+    //水表
+    public static final String totalM3 = "totalM3";
+    public static final String remainderM3 = "remainderM3";
+    public static final String magneticInterference = "magneticInterference";
+    public static final String electricQuantity = "electricQuantity";
+    public static final String waterValveFailure = "waterValveFailure";
+
+
+
     public static final String slotNumber = "slotNumber";
     public static final String startDate = "startDate";
     public static final String endDate = "endDate";
