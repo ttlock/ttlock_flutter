@@ -539,8 +539,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
             params.put(TTParam.onOff, waterMeter.getOnOff() == 1);
             params.put(TTParam.RSSI, waterMeter.getRssi());
             params.put(TTParam.magneticInterference, String.valueOf(waterMeter.getMagneticInterference()));
-            //TODO
-            params.put(TTParam.electricQuantity, 0);
+            params.put(TTParam.electricQuantity, waterMeter.getBatteryCapacity());
             params.put(TTParam.waterValveFailure, waterMeter.getWaterValveMalfunction());
             params.put(TTParam.payMode, waterMeter.getPayMode());
             params.put(TTParam.scanTime, System.currentTimeMillis());
@@ -4219,11 +4218,11 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void errorCallbackCommand(String command, WaterMeterError waterMeterError) {
-    callbackCommand(command, ResultStateFail, null, WaterMeterErrorConvert.convert(waterMeterError), waterMeterError.getDescription());
+    callbackCommand(command, ResultStateFail, null, WaterMeterErrorConvert.convert(waterMeterError), waterMeterError.getErrorMsg());
   }
 
   public void errorCallbackCommand(String command, ElectricMeterError electricMeterError) {
-    callbackCommand(command, ResultStateFail, null, ElectricityMeterErrorConvert.convert(electricMeterError), electricMeterError.getDescription());
+    callbackCommand(command, ResultStateFail, null, ElectricityMeterErrorConvert.convert(electricMeterError), electricMeterError.getErrorMsg());
   }
 
   public void errorCallbackCommand(String command, RemoteError remoteError) {
