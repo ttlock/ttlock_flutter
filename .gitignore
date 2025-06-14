@@ -3,5 +3,6 @@ build
 
 .DS_Store
 .packages
+**/.cxx
 .dart_tool
 

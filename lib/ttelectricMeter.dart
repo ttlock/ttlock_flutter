@@ -1,4 +1,4 @@
-// import 'package:ttlock_flutter/ttlock.dart';
+import 'package:ttlock_flutter/ttlock.dart';
 import 'dart:convert' as convert;
 
 import 'package:ttlock_flutter/ttlock.dart';
@@ -50,7 +50,7 @@ class TTElectricMeter {
   }
 
   static void connect(String mac, TTSuccessCallback callback,
-      TTMeterFailedCallback failedCallback) {
+      TTElectricMeterFailedCallback failedCallback) {
     Map map = Map();
     map["mac"] = mac;
     TTLock.invoke(COMMAND_ELECTRIC_METER_CONNECT, map, callback,

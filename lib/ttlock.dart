@@ -1,8 +1,8 @@
 import 'package:flutter/services.dart';
 import 'package:ttlock_flutter/ttdoorSensor.dart';
 import 'package:ttlock_flutter/ttelectricMeter.dart';
-import 'package:ttlock_flutter/ttremoteKey.dart';
 import 'package:ttlock_flutter/ttremoteKeypad.dart';
+import 'package:ttlock_flutter/ttremotekey.dart';
 import 'package:ttlock_flutter/ttwaterMeter.dart';
 import 'dart:convert' as convert;
 import 'ttgateway.dart';
@@ -1655,6 +1655,8 @@ class TTLock {
     List<Map> commandList = _commandMap[command] ?? [];
     dynamic callBack =
         commandList.length > 0 ? commandList.first[CALLBACK_FAIL] : null;
+    if (callBack != null) {
+      // print("失败删除指令：" + command);
     dynamic otherCallBack =
         commandList.length > 0 ? commandList.first[CALLBACK_OTHER_FAIL] : null;
     if (commandList.length > 0) {
