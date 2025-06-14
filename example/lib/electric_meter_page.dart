@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ttlock_flutter/ttelectricMeter.dart';
+import 'package:ttlock_flutter/TTElectricMeter.dart';
 import 'package:bmprogresshud/progresshud.dart';
+import 'package:ttlock_flutter/ttlock.dart';
 
 class ElectricMeterPage extends StatefulWidget {
   ElectricMeterPage({Key? key, required this.name, required this.mac})
@@ -15,10 +16,10 @@ enum Command {
   readData,
   setOnOff,
   setRemainderKwh,
-  cleaerRemainderKwh,
+  clearRemainderKwh,
   setMaxPower,
   setPayMode,
-  recharg,
+  recharge,
   readFeatureValue
 }
 
@@ -28,15 +29,15 @@ class _ElectricMeterState extends State<ElectricMeterPage> {
     {"Read data": Command.readData},
     {"Set on off": Command.setOnOff},
     {"Set remainder kwh": Command.setRemainderKwh},
-    {"Cleaer remainder kwh": Command.cleaerRemainderKwh},
+    {"Clear remainder kwh": Command.clearRemainderKwh},
     {"Set max power": Command.setMaxPower},
     {"Set pay mode": Command.setPayMode},
-    {"Recharg": Command.recharg},
+    {"Recharge": Command.recharge},
     {"Read feature value": Command.readFeatureValue}
   ];
 
   String note =
-      'Note: You need to reset the electric meter befor pop current page,otherwise the electric meter will can\'t be initialized again';
+      'Note: You need to reset the electric meter before pop current page,otherwise the electric meter will can\'t be initialized again';
 
   String mac = '';
   String name = '';
@@ -56,8 +57,7 @@ class _ElectricMeterState extends State<ElectricMeterPage> {
     ProgressHud.of(_context!)!.showSuccessAndDismiss(text: text);
   }
 
-  void _showErrorAndDismiss(
-      TTElectricMeterErrorCode errorCode, String errorMsg) {
+  void _showErrorAndDismiss(TTMeterErrorCode errorCode, String errorMsg) {
     ProgressHud.of(_context!)!.showErrorAndDismiss(
         text: 'errorCode:$errorCode errorMessage:$errorMsg');
   }
@@ -66,7 +66,7 @@ class _ElectricMeterState extends State<ElectricMeterPage> {
     _showLoading('');
     switch (command) {
       case Command.reset:
-        TTElectricmeter.delete(mac, () {
+        TTElectricMeter.delete(mac, () {
           _showSuccessAndDismiss("Reset success");
           Navigator.popAndPushNamed(context, '/');
         }, (errorCode, errorMsg) {
@@ -75,7 +75,7 @@ class _ElectricMeterState extends State<ElectricMeterPage> {
         break;
 
       case Command.setOnOff:
-        TTElectricmeter.setPowerOnOff(mac, false, () {
+        TTElectricMeter.setPowerOnOff(mac, false, () {
           _showSuccessAndDismiss("Set Power success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
@@ -83,7 +83,7 @@ class _ElectricMeterState extends State<ElectricMeterPage> {
         break;
 
       case Command.readData:
-        TTElectricmeter.readData(mac, () {
+        TTElectricMeter.readData(mac, () {
           _showSuccessAndDismiss("Read data success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
@@ -91,15 +91,15 @@ class _ElectricMeterState extends State<ElectricMeterPage> {
         break;
 
       case Command.setRemainderKwh:
-        TTElectricmeter.setRemainderKwh(mac, '100.1', () {
-          _showSuccessAndDismiss("Set remiander kwh success");
+        TTElectricMeter.setRemainderKwh(mac, '100.1', () {
+          _showSuccessAndDismiss("Set remainder kwh success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
         break;
 
-      case Command.cleaerRemainderKwh:
-        TTElectricmeter.clearRemainderKwh(mac, () {
+      case Command.clearRemainderKwh:
+        TTElectricMeter.clearRemainderKwh(mac, () {
           _showSuccessAndDismiss("Clear remainder kwh success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
@@ -107,30 +107,30 @@ class _ElectricMeterState extends State<ElectricMeterPage> {
         break;
 
       case Command.setPayMode:
-        TTElectricmeter.setPayMode(mac, "1.0", TTElectricMeterPayMode.prepaid, () {
+        TTElectricMeter.setPayMode(mac, "1.0", TTMeterPayMode.prepaid, () {
           _showSuccessAndDismiss("Set pay mode success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
         break;
       case Command.setMaxPower:
-        TTElectricmeter.setMaxPower(mac, 280, () {
+        TTElectricMeter.setMaxPower(mac, 280, () {
           _showSuccessAndDismiss("Set max power success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
         break;
 
-      case Command.recharg:
-        TTElectricmeter.recharg(mac, '1', '2', () {
-          _showSuccessAndDismiss("Recharg success");
+      case Command.recharge:
+        TTElectricMeter.recharge(mac, '1', '2', () {
+          _showSuccessAndDismiss("Recharge success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
         break;
 
       case Command.readFeatureValue:
-        TTElectricmeter.readFeatureValue(mac, () {
+        TTElectricMeter.readFeatureValue(mac, () {
           _showSuccessAndDismiss("Read feature value success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);

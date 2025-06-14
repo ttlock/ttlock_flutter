@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.ttlock.bl.sdk.api.ExtendedBluetoothDevice;
 import com.ttlock.bl.sdk.api.TTLockClient;
@@ -147,6 +148,11 @@ import com.ttlock.bl.sdk.keypad.ScanKeypadCallback;
 import com.ttlock.bl.sdk.keypad.WirelessKeypadClient;
 import com.ttlock.bl.sdk.keypad.model.InitKeypadResult;
 import com.ttlock.bl.sdk.keypad.model.KeypadError;
+import com.ttlock.bl.sdk.mulfunkeypad.api.MultifunctionalKeypadClient;
+import com.ttlock.bl.sdk.mulfunkeypad.callback.AddCardCallback;
+import com.ttlock.bl.sdk.mulfunkeypad.callback.DeleteLockCallback;
+import com.ttlock.bl.sdk.mulfunkeypad.model.InitMultifunctionalKeypadResult;
+import com.ttlock.bl.sdk.mulfunkeypad.model.MultifunctionalKeypadError;
 import com.ttlock.bl.sdk.remote.api.RemoteClient;
 import com.ttlock.bl.sdk.remote.callback.InitRemoteCallback;
 import com.ttlock.bl.sdk.remote.callback.ScanRemoteCallback;
@@ -156,6 +162,14 @@ import com.ttlock.bl.sdk.util.DigitUtil;
 import com.ttlock.bl.sdk.util.FeatureValueUtil;
 import com.ttlock.bl.sdk.util.GsonUtil;
 import com.ttlock.bl.sdk.util.LogUtil;
+import com.ttlock.bl.sdk.watermeter.api.WaterMeterClient;
+import com.ttlock.bl.sdk.watermeter.callback.ClearRemainingWaterCallback;
+import com.ttlock.bl.sdk.watermeter.callback.RechargeCallback;
+import com.ttlock.bl.sdk.watermeter.callback.SetRemainingWaterCallback;
+import com.ttlock.bl.sdk.watermeter.callback.SetTotalUsageCallback;
+import com.ttlock.bl.sdk.watermeter.callback.SetWaterOnOffCallback;
+import com.ttlock.bl.sdk.watermeter.model.WaterMeter;
+import com.ttlock.bl.sdk.watermeter.model.WaterMeterError;
 import com.ttlock.bl.sdk.wirelessdoorsensor.WirelessDoorSensorClient;
 import com.ttlock.bl.sdk.wirelessdoorsensor.callback.InitDoorSensorCallback;
 import com.ttlock.bl.sdk.wirelessdoorsensor.callback.ScanWirelessDoorSensorCallback;
@@ -170,6 +184,7 @@ import com.ttlock.ttlock_flutter.constant.TTKeyPadCommand;
 import com.ttlock.ttlock_flutter.constant.TTLockCommand;
 import com.ttlock.ttlock_flutter.constant.TTParam;
 import com.ttlock.ttlock_flutter.constant.TTRemoteCommand;
+import com.ttlock.ttlock_flutter.constant.TTWaterMeterCommand;
 import com.ttlock.ttlock_flutter.model.CommandObj;
 import com.ttlock.ttlock_flutter.model.ElectricityMeterErrorConvert;
 import com.ttlock.ttlock_flutter.model.GatewayErrorConverter;
@@ -185,6 +200,7 @@ import com.ttlock.ttlock_flutter.model.TTLockErrorConverter;
 import com.ttlock.ttlock_flutter.model.TTLockFunction;
 import com.ttlock.ttlock_flutter.model.TTRemoteScanModel;
 import com.ttlock.ttlock_flutter.model.TtlockModel;
+import com.ttlock.ttlock_flutter.model.WaterMeterErrorConvert;
 import com.ttlock.ttlock_flutter.util.PermissionUtils;
 import com.ttlock.ttlock_flutter.util.Utils;
 
@@ -293,6 +309,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     } else if (TTElectricityMeterCommand.isElectricityMeterCommand(call.method)) {
       commandType = CommandType.ELECTRICITY_METER;
       electricityCommand(call);
+    } else if (TTWaterMeterCommand.isWaterMeterCommand(call.method)) {
+      commandType = CommandType.WATER_METER;
+      waterMeterCommand(call);
     }
     else {//door lock
       commandType = CommandType.DOOR_LOCK;
@@ -305,8 +324,10 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     GatewayClient.getDefault().prepareBTService(activity);
     RemoteClient.getDefault().prepareBTService(activity);
     WirelessKeypadClient.getDefault().prepareBTService(activity);
+    MultifunctionalKeypadClient.getDefault().prepareBTService(activity);
     WirelessDoorSensorClient.getDefault().prepareBTService(activity);
     ElectricMeterClient.getDefault().prepareBTService(activity);
+    WaterMeterClient.getDefault().prepareBTService(activity);
   }
 
   public void doorLockCommand(MethodCall call) {
@@ -405,6 +426,21 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       case TTKeyPadCommand.COMMAND_INIT_KEY_PAD:
         initKeyPad(params);
         break;
+      case TTKeyPadCommand.COMMAND_INIT_MULTIFUNCTIONAL_REMOTE_KEYPAD:
+        initMultifunctionalKeyPad(params);
+        break;
+      case TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_DELETE_STORED_LOCK:
+        deleteLockAtSpecifiedSlot(params);
+        break;
+      case TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_GET_STORED_LOCK:
+
+        break;
+      case TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT:
+        multifunctionalKeyPadAddFinger(params);
+        break;
+      case TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD:
+        multifunctionalKeyPadAddCard(params);
+        break;
     }
   }
 
@@ -424,6 +460,408 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     }
   }
 
+  public void waterMeterCommand(MethodCall call) {
+    String command = call.method;
+    Map<String, Object> params = (Map<String, Object>) call.arguments;
+    switch (command) {
+      case TTWaterMeterCommand.COMMAND_CONFIG_SERVER_WATER_METER:
+        waterMeterConfigServer(params);
+        break;
+      case TTWaterMeterCommand.COMMAND_START_SCAN_WATER_METER:
+        waterMeterStartScan();
+        break;
+      case TTWaterMeterCommand.COMMAND_STOP_SCAN_WATER_METER:
+        waterMeterStopScan();
+        break;
+      case TTWaterMeterCommand.COMMAND_WATER_METER_CONNECT:
+        waterMeterConnect(params);
+        break;
+      case TTWaterMeterCommand.COMMAND_WATER_METER_DISCONNECT:
+        waterMeterDisconnect();
+        break;
+      case TTWaterMeterCommand.COMMAND_WATER_METER_INIT:
+        waterMeterInit(params);
+        break;
+      case TTWaterMeterCommand.COMMAND_WATER_METER_DELETE:
+        waterMeterDelete(params);
+        break;
+      case TTWaterMeterCommand.COMMAND_WATER_METER_SET_POWER_ON_OFF:
+        waterMeterSetPowerOnOff(params);
+        break;
+      case TTWaterMeterCommand.COMMAND_WATER_METER_SET_REMAINING_M3:
+        waterMeterSetRemainingM3(params);
+        break;
+      case TTWaterMeterCommand.COMMAND_WATER_METER_CLEAR_REMAINING_M3:
+        waterMeterClearRemainingM3(params);
+        break;
+      case TTWaterMeterCommand.COMMAND_WATER_METER_READ_DATA:
+        waterMeterReadData(params);
+        break;
+      case TTWaterMeterCommand.COMMAND_WATER_METER_SET_PAY_MODE:
+        waterMeterSetPayMode(params);
+        break;
+      case TTWaterMeterCommand.COMMAND_WATER_METER_CHARGE:
+        waterMeterCharge(params);
+        break;
+      case TTWaterMeterCommand.COMMAND_WATER_METER_SET_TOTAL_USAGE:
+        waterMeterSetTotalUsage(params);
+        break;
+      case TTWaterMeterCommand.COMMAND_WATER_METER_GET_FEATURE_VALUE:
+        waterMeterGetFeatureValue(params);
+        break;
+      case TTWaterMeterCommand.COMMAND_WATER_METER_ENTER_UPGRADE_MODE:
+        waterMeterEnterUpgradeMode(params);
+        break;
+    }
+  }
+
+  public void waterMeterConfigServer(Map<String, Object> params)
+  {
+    WaterMeterClient.getDefault().setClientParam(params.get(TTParam.url).toString(),
+            params.get(TTParam.clientId).toString(), params.get(TTParam.accessToken).toString());
+    successCallbackCommand(TTWaterMeterCommand.COMMAND_CONFIG_SERVER_WATER_METER, new HashMap<>());
+  }
+
+  public void waterMeterStartScan()
+  {
+    PermissionUtils.doWithScanPermission(activity, (success) -> {
+      if(success)
+      {
+        WaterMeterClient.getDefault().startScan(waterMeter -> {
+          if(waterMeter != null)
+          {
+            Map<String, Object> params = new HashMap<>();
+            params.put(TTParam.NAME, waterMeter.getName());
+            params.put(TTParam.MAC, waterMeter.getAddress());
+            params.put(TTParam.isInited, !waterMeter.isSettingMode());
+            params.put(TTParam.totalM3, String.valueOf(waterMeter.getTotalM3()));
+            params.put(TTParam.remainderM3, String.valueOf(waterMeter.getRemainderM3()));
+            params.put(TTParam.onOff, waterMeter.getOnOff() == 1);
+            params.put(TTParam.RSSI, waterMeter.getRssi());
+            params.put(TTParam.magneticInterference, String.valueOf(waterMeter.getMagneticInterference()));
+            params.put(TTParam.electricQuantity, waterMeter.getBatteryCapacity());
+            params.put(TTParam.waterValveFailure, waterMeter.getWaterValveMalfunction());
+            params.put(TTParam.payMode, waterMeter.getPayMode());
+            params.put(TTParam.scanTime, System.currentTimeMillis());
+            successCallbackCommand(TTWaterMeterCommand.COMMAND_START_SCAN_WATER_METER, params);
+          }
+        });
+      }else
+      {
+        LogUtil.d("no scan permission");
+      }
+    });
+  }
+
+  public void waterMeterStopScan()
+  {
+    WaterMeterClient.getDefault().stopScan();
+  }
+
+  public void waterMeterConnect(Map<String, Object> params)
+  {
+    PermissionUtils.doWithConnectPermission(activity, (success) -> {
+      if(success)
+      {
+        WaterMeterClient.getDefault().
+                connect(params.get(TTParam.MAC).toString(), new com.ttlock.bl.sdk.watermeter.callback.ConnectCallback() {
+                  @Override
+                  public void onConnectSuccess(WaterMeter waterMeter) {
+                    Map<String, Object> map = new HashMap<>();
+                    successCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_CONNECT, map);
+                  }
+
+                  @Override
+                  public void onFail(WaterMeterError waterMeterError) {
+                    errorCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_CONNECT, waterMeterError);
+
+                  }
+                });
+      }else {
+        callbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_CONNECT, ResultStateFail, null, WaterMeterErrorConvert.bluetoothPowerOff,"no connect permission" );
+      }
+    });
+  }
+
+  public void waterMeterDisconnect()
+  {
+    WaterMeterClient.getDefault().disconnect();
+    //flutter  层没有回调
+  //  successCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_DISCONNECT, new HashMap<>());
+  }
+
+  public void waterMeterInit(Map<String, Object> params)
+  {
+    PermissionUtils.doWithConnectPermission(activity, (success) -> {
+      if(success)
+      {
+        HashMap<String, String> map = new HashMap<>();
+        for (Map.Entry<String, Object> entry : params.entrySet()) {
+          map.put(entry.getKey(), entry.getValue().toString());
+        }
+//    String name = params.get(TTParam.NAME).toString();
+//    String mac = params.get(TTParam.MAC).toString();
+//    int model = (int)params.get("payMode");
+//    double price = (double)params.get("price");
+//    Log.d("打印价格", String.valueOf(price));
+        WaterMeterClient.getDefault().add(map, new com.ttlock.bl.sdk.watermeter.callback.AddCallback() {
+          @Override
+          public void onAddSuccess(FirmwareInfo firmwareInfo) {
+            successCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_INIT, new HashMap<>());
+
+          }
+
+          @Override
+          public void onFail(WaterMeterError waterMeterError) {
+            errorCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_INIT, waterMeterError);
+
+          }
+        });
+
+      }else
+      {
+        callbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_INIT, ResultStateFail, null, WaterMeterErrorConvert.bluetoothPowerOff,"no connect permission" );
+      }
+    });
+  }
+
+  public void waterMeterDelete(Map<String, Object> params)
+  {
+    PermissionUtils.doWithConnectPermission(activity, (success) -> {
+      if(success)
+      {
+        WaterMeterClient.getDefault().delete(params.get(TTParam.MAC).toString(), new com.ttlock.bl.sdk.watermeter.callback.DeleteCallback() {
+          @Override
+          public void onDeleteSuccess() {
+            successCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_DELETE, new HashMap<>());
+          }
+
+          @Override
+          public void onFail(WaterMeterError waterMeterError) {
+            errorCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_DELETE, waterMeterError);
+          }
+        });
+
+      }else
+      {
+        callbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_DELETE, ResultStateFail, null, WaterMeterErrorConvert.bluetoothPowerOff,"no connect permission" );
+      }
+    });
+  }
+
+  public void waterMeterSetPowerOnOff(Map<String, Object> params)
+  {
+    PermissionUtils.doWithConnectPermission(activity, (success) -> {
+      if(success)
+      {
+        WaterMeterClient.getDefault().setWaterOnOff(params.get(TTParam.MAC).toString(),
+                (boolean) params.get("isOn"), new SetWaterOnOffCallback() {
+                  @Override
+                  public void onSetSuccess() {
+                    successCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_SET_POWER_ON_OFF, new HashMap<>());
+
+                  }
+
+                  @Override
+                  public void onFail(WaterMeterError waterMeterError) {
+                    errorCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_SET_POWER_ON_OFF, waterMeterError);
+
+                  }
+                });
+      }else
+      {
+        callbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_SET_POWER_ON_OFF, ResultStateFail, null, WaterMeterErrorConvert.bluetoothPowerOff,"no connect permission" );
+      }
+    });
+  }
+
+  public void waterMeterSetRemainingM3(Map<String, Object> params)
+  {
+    PermissionUtils.doWithConnectPermission(activity, (success) -> {
+      if(success)
+      {
+        WaterMeterClient.getDefault()
+                .setRemainingWater(params.get(TTParam.MAC).toString(),
+                        params.get(TTParam.remainderM3).toString(), new SetRemainingWaterCallback() {
+                          @Override
+                          public void onSetSuccess() {
+                            successCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_SET_REMAINING_M3, new HashMap<>());
+
+                          }
+
+                          @Override
+                          public void onFail(WaterMeterError waterMeterError) {
+                            errorCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_SET_REMAINING_M3, waterMeterError);
+                          }
+                        });
+      }else
+      {
+        callbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_SET_REMAINING_M3, ResultStateFail, null, WaterMeterErrorConvert.bluetoothPowerOff,"no connect permission" );
+      }
+    });
+  }
+
+  public void waterMeterClearRemainingM3(Map<String, Object> params)
+  {
+    PermissionUtils.doWithConnectPermission(activity, (success) -> {
+      if(success)
+      {
+        WaterMeterClient.getDefault()
+                .clearRemainingWater(params.get(TTParam.MAC).toString(), new ClearRemainingWaterCallback() {
+                  @Override
+                  public void onClearSuccess() {
+                    successCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_CLEAR_REMAINING_M3, new HashMap<>());
+                  }
+
+                  @Override
+                  public void onFail(WaterMeterError waterMeterError) {
+                    errorCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_CLEAR_REMAINING_M3, waterMeterError);
+                  }
+                });
+      }else
+      {
+        callbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_CLEAR_REMAINING_M3, ResultStateFail, null, WaterMeterErrorConvert.bluetoothPowerOff,"no connect permission" );
+      }
+    });
+  }
+
+  public void waterMeterReadData(Map<String, Object> params)
+  {
+    PermissionUtils.doWithConnectPermission(activity, (success) -> {
+      if(success)
+      {
+        WaterMeterClient.getDefault()
+                .readData(params.get(TTParam.MAC).toString(), new com.ttlock.bl.sdk.watermeter.callback.ReadDataCallback() {
+                  @Override
+                  public void onReadSuccess() {
+                    successCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_READ_DATA, new HashMap<>());
+                  }
+
+                  @Override
+                  public void onFail(WaterMeterError waterMeterError) {
+                    errorCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_READ_DATA, waterMeterError);
+                  }
+                });
+      }else
+      {
+        callbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_READ_DATA, ResultStateFail, null, WaterMeterErrorConvert.bluetoothPowerOff,"no connect permission" );
+      }
+    });
+  }
+
+  public void waterMeterSetPayMode(Map<String, Object> params)
+  {
+    PermissionUtils.doWithConnectPermission(activity, (success) -> {
+      if(success)
+      {
+        WaterMeterClient.getDefault().setWorkMode(params.get(TTParam.MAC).toString(),
+                (int) params.get(TTParam.payMode), Double.parseDouble(params.get(TTParam.price).toString()), new com.ttlock.bl.sdk.watermeter.callback.SetWorkModeCallback() {
+                  @Override
+                  public void onSetWorkModeSuccess() {
+                    successCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_SET_PAY_MODE, new HashMap<>());
+
+                  }
+
+                  @Override
+                  public void onFail(WaterMeterError waterMeterError) {
+                    errorCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_SET_PAY_MODE, waterMeterError);
+                  }
+                });
+      }else
+      {
+        callbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_SET_PAY_MODE, ResultStateFail, null, WaterMeterErrorConvert.bluetoothPowerOff,"no connect permission" );
+      }
+    });
+
+  }
+
+  //TODO m3  和 chargeAmount顺序
+  public void waterMeterCharge(Map<String, Object> params)
+  {
+    PermissionUtils.doWithConnectPermission(activity, (success) -> {
+      if(success)
+      {
+        WaterMeterClient.getDefault().recharge(params.get(TTParam.MAC).toString(),
+                Double.parseDouble(params.get("m3").toString()),
+                Double.parseDouble(params.get("chargeAmount").toString()), new RechargeCallback() {
+                  @Override
+                  public void onRechargeSuccess() {
+                    successCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_CHARGE, new HashMap<>());
+
+                  }
+
+                  @Override
+                  public void onFail(WaterMeterError waterMeterError) {
+                    errorCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_CHARGE, waterMeterError);
+
+                  }
+                }
+        );
+
+      }else
+      {
+        callbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_CHARGE, ResultStateFail, null, WaterMeterErrorConvert.bluetoothPowerOff,"no connect permission" );
+      }
+    });
+  }
+
+  public void waterMeterSetTotalUsage(Map<String, Object> params)
+  {
+    PermissionUtils.doWithConnectPermission(activity, (success) -> {
+      if(success)
+      {
+        WaterMeterClient.getDefault().setTotalUsage(params.get(TTParam.MAC).toString(),
+                (int) params.get(TTParam.totalM3), new SetTotalUsageCallback() {
+                  @Override
+                  public void onSetSuccess() {
+                    successCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_SET_TOTAL_USAGE, new HashMap<>());
+
+                  }
+
+                  @Override
+                  public void onFail(WaterMeterError waterMeterError) {
+                    errorCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_SET_TOTAL_USAGE, waterMeterError);
+
+                  }
+                });
+
+      }else
+      {
+        callbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_SET_TOTAL_USAGE, ResultStateFail, null, WaterMeterErrorConvert.bluetoothPowerOff,"no connect permission" );
+      }
+    });
+  }
+
+  public void waterMeterGetFeatureValue(Map<String, Object> params)
+  {
+    PermissionUtils.doWithConnectPermission(activity, (success) -> {
+      if(success)
+      {
+        WaterMeterClient.getDefault().getFeatureValue(params.get(TTParam.MAC).toString(), new com.ttlock.bl.sdk.watermeter.callback.GetFeatureValueCallback() {
+          @Override
+          public void onGetFeatureValueSuccess() {
+            successCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_GET_FEATURE_VALUE, new HashMap<>());
+
+          }
+
+          @Override
+          public void onFail(WaterMeterError waterMeterError) {
+            errorCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_GET_FEATURE_VALUE, waterMeterError);
+
+          }
+        });
+
+      }else
+      {
+        callbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_GET_FEATURE_VALUE, ResultStateFail, null, WaterMeterErrorConvert.bluetoothPowerOff,"no connect permission" );
+      }
+    });
+  }
+
+  public void waterMeterEnterUpgradeMode(Map<String, Object> params)
+  {
+
+  }
 
   public void electricityCommand(MethodCall call) {
     String command = call.method;
@@ -482,13 +920,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
   public void electricMeterConfigServer(Map<String, Object> params)
   {
-
-    Log.d("设置config url", params.get(TTParam.url).toString());
-    Log.d("设置config clientId", params.get(TTParam.clientId).toString());
-    Log.d("设置config accessToken", params.get(TTParam.accessToken).toString());
     ElectricMeterClient.getDefault().setClientParam(params.get(TTParam.url).toString(),
             params.get(TTParam.clientId).toString(), params.get(TTParam.accessToken).toString());
-
+    successCallbackCommand(TTElectricityMeterCommand.COMMAND_CONFIG_SERVER_ELECTRIC_METER, new HashMap<>());
   }
 
   public  void electricMeterStartScan()
@@ -665,7 +1099,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
                         });
       }else
       {
-        callbackCommand(TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_DELETE, ResultStateFail, null, ElectricityMeterErrorConvert.bluetoothPowerOff,"no connect permission" );
+        callbackCommand(TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_SET_REMAINING_ELECTRICITY, ResultStateFail, null, ElectricityMeterErrorConvert.bluetoothPowerOff,"no connect permission" );
       }
     });
   }
@@ -904,14 +1338,36 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
           }
         });
+        Log.d("扫描到多功能键盘", "开始扫描");
+        MultifunctionalKeypadClient.getDefault().startScanKeypad(new ScanKeypadCallback() {
+          @Override
+          public void onScanKeyboardSuccess(WirelessKeypad wirelessKeypad) {
+            HashMap<String, Object> params = new HashMap<>();
+            params.put("mac", wirelessKeypad.getAddress());
+            params.put("name", wirelessKeypad.getName());
+            params.put("rssi", wirelessKeypad.getRssi());
+            params.put("isMultifunctionalKeypad", true);
+            Log.d("扫描到多功能键盘", wirelessKeypad.getAddress());
+            successCallbackCommand(TTKeyPadCommand.COMMAND_START_SCAN_KEY_PAD, params);
+          }
+
+          @Override
+          public void onScanFailed(int errorcode) {
+
+          }
+        });
+
       } else {
         LogUtil.d("no scan permission");
       }
     });
+
+
   }
 
   public void stopScanKeyPad() {
     WirelessKeypadClient.getDefault().stopScanKeyboard();
+    MultifunctionalKeypadClient.getDefault().stopScanKeypad();
   }
 
   public void initKeyPad(Map<String, Object> params) {
@@ -939,6 +1395,193 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       }
     });
   }
+
+  //MULTIFUNCTIONAL
+  public void initMultifunctionalKeyPad(Map<String, Object> params) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        MultifunctionalKeypadClient.getDefault().initializeMultifunctionalKeypad((String) params.get(TTParam.MAC),
+                (String) params.get(TTParam.LOCK_DATA), new com.ttlock.bl.sdk.mulfunkeypad.callback.InitKeypadCallback() {
+                  @Override
+                  public void onKeypadFail(MultifunctionalKeypadError multifunctionalKeypadError) {
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("errorDevice", 1);
+                    Log.d("sdk失败", multifunctionalKeypadError.toString());
+                    Log.d("sdk失败", multifunctionalKeypadError.getDescription());
+                    callbackCommand(TTKeyPadCommand.COMMAND_INIT_MULTIFUNCTIONAL_REMOTE_KEYPAD, ResultStateFail, map, 0, multifunctionalKeypadError.getDescription());
+                  }
+                  @Override
+                  public void onInitSuccess(InitMultifunctionalKeypadResult initMultifunctionalKeypadResult) {
+                    HashMap<String, Object> params = new HashMap<>();
+                    params.put("electricQuantity", initMultifunctionalKeypadResult.getBatteryLevel());
+                    params.put("wirelessKeypadFeatureValue", initMultifunctionalKeypadResult.getKeypadFeatureValue());
+                    params.put("slotNumber", initMultifunctionalKeypadResult.getSlotNumber());
+                    params.put("slotLimit", initMultifunctionalKeypadResult.getSlotLimit());
+                    successCallbackCommand(TTKeyPadCommand.COMMAND_INIT_MULTIFUNCTIONAL_REMOTE_KEYPAD, params);
+                  }
+
+                  @Override
+                  public void onLockFail(LockError lockError) {
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("errorDevice", 0);
+                    Log.d("sdk失败", lockError.toString());
+                    Log.d("sdk失败", lockError.getDescription());
+                    callbackCommand(TTKeyPadCommand.COMMAND_INIT_MULTIFUNCTIONAL_REMOTE_KEYPAD, ResultStateFail, map, 0, lockError.getDescription());
+                  }
+                });
+      } else {
+        callbackCommand(TTKeyPadCommand.COMMAND_INIT_MULTIFUNCTIONAL_REMOTE_KEYPAD, ResultStateFail, params, LockError.LOCK_NO_PERMISSION.getIntErrorCode(), "no connect permission");
+      }
+    });
+  }
+
+  public void deleteLockAtSpecifiedSlot(Map<String, Object> params) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        MultifunctionalKeypadClient.getDefault().deleteLockAtSpecifiedSlot((String) params.get(TTParam.MAC),
+                (int) params.get(TTParam.slotNumber), new DeleteLockCallback() {
+                  @Override
+                  public void onKeypadFail(MultifunctionalKeypadError multifunctionalKeypadError) {
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("errorDevice", 1);
+                    callbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_DELETE_STORED_LOCK, ResultStateFail, map, 0, multifunctionalKeypadError.getDescription());
+                  }
+
+                  @Override
+                  public void onDeleteLockSuccess() {
+                    successCallbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_DELETE_STORED_LOCK, params);
+                  }
+                });
+      } else {
+        callbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_DELETE_STORED_LOCK, ResultStateFail, params, LockError.LOCK_NO_PERMISSION.getIntErrorCode(), "no connect permission");
+      }
+    });
+  }
+
+
+  public void multifunctionalKeyPadAddFinger(Map<String, Object> params) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        String keyPadMac = (String) params.get(TTParam.MAC);
+        long startDate = Long.valueOf(params.get(TTParam.startDate).toString());
+        long endDate = Long.valueOf(params.get(TTParam.endDate).toString());
+        String lockData = (String) params.get(TTParam.LOCK_DATA);
+        String cycleJsonList =  params.get(TTParam.cycleJsonList) == null ? "" : (String) params.get(TTParam.cycleJsonList);
+        ValidityInfo info = new ValidityInfo();
+        info.setStartDate(startDate);
+        info.setEndDate(endDate);
+        if(!cycleJsonList.isEmpty())
+        {
+          List<CyclicConfig> cycleList = new Gson().fromJson(cycleJsonList, new TypeToken<List<CyclicConfig>>(){}.getType());
+          info.setCyclicConfigs(cycleList);
+          info.setModeType(ValidityInfo.CYCLIC);
+        }
+        MultifunctionalKeypadClient.getDefault().addFingerprint(keyPadMac,
+                lockData, info, new com.ttlock.bl.sdk.mulfunkeypad.callback.AddFingerprintCallback() {
+                  @Override
+                  public void onKeypadFail(MultifunctionalKeypadError multifunctionalKeypadError) {
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("errorDevice", 1);
+                    callbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT, ResultStateFail, map, 0, multifunctionalKeypadError.getDescription());
+
+                  }
+
+                  @Override
+                  public void onEnterAddingMode() {
+                    HashMap hashMap = new HashMap<>();
+                    hashMap.put("currentCount", 0);
+                    hashMap.put("totalCount", 0);
+                    callbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT,
+                            ResultStateProgress, hashMap, -1, "");
+                  }
+
+                  @Override
+                  public void onCollectFingerprint(int i, int i1) {
+                    HashMap hashMap = new HashMap<>();
+                    hashMap.put("currentCount", i);
+                    hashMap.put("totalCount", i1);
+                    callbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT,
+                            ResultStateProgress, hashMap, -1, "");
+                  }
+
+                  @Override
+                  public void onAddFingerprintFinished(long l) {
+                    HashMap hashMap = new HashMap<>();
+                    hashMap.put(TTParam.fingerprintNumber, String.valueOf(l));
+                    successCallbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT, hashMap);
+
+                  }
+
+                  @Override
+                  public void onLockFail(LockError lockError) {
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("errorDevice", 0);
+                    callbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT, ResultStateFail, map, 0, lockError.getDescription());
+
+                  }
+                });
+      } else {
+        callbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT, ResultStateFail, params, LockError.LOCK_NO_PERMISSION.getIntErrorCode(), "no connect permission");
+      }
+    });
+  }
+
+  public void multifunctionalKeyPadAddCard(Map<String, Object> params) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        long startDate = Long.valueOf(params.get(TTParam.startDate).toString());
+        long endDate = Long.valueOf(params.get(TTParam.endDate).toString());
+        String lockData = (String) params.get(TTParam.LOCK_DATA);
+        String cycleJsonList =  params.get(TTParam.cycleJsonList) == null ? "" : (String) params.get(TTParam.cycleJsonList);
+        ValidityInfo info = new ValidityInfo();
+        info.setStartDate(startDate);
+        info.setEndDate(endDate);
+        if(!cycleJsonList.isEmpty())
+        {
+          List<CyclicConfig> cycleList = new Gson().fromJson(cycleJsonList, new TypeToken<List<CyclicConfig>>(){}.getType());
+          info.setCyclicConfigs(cycleList);
+          info.setModeType(ValidityInfo.CYCLIC);
+        }
+        MultifunctionalKeypadClient.getDefault().addCard(lockData,
+                info, new AddCardCallback() {
+                  @Override
+                  public void onKeypadFail(MultifunctionalKeypadError multifunctionalKeypadError) {
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("errorDevice", 1);
+                    callbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD, ResultStateFail, map, 0, multifunctionalKeypadError.getDescription());
+
+                  }
+
+                  @Override
+                  public void onEnterAddingMode() {
+                    callbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD,
+                            ResultStateProgress, new HashMap(){}, -1, "");
+                  }
+
+                  @Override
+                  public void onAddCardSuccess(long l) {
+                    HashMap hashMap = new HashMap<>();
+                    hashMap.put("cardNumber", String.valueOf(l));
+                    successCallbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD, hashMap);
+                  }
+
+                  @Override
+                  public void onLockFail(LockError lockError) {
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("errorDevice", 0);
+                    callbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD, ResultStateFail, map, 0, lockError.getDescription());
+
+                  }
+                });
+      } else {
+        callbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD, ResultStateFail, params, LockError.LOCK_NO_PERMISSION.getIntErrorCode(), "no connect permission");
+      }
+    });
+
+  }
+
+
+  
 
   /** ---------------------- remote ------------------------- **/
 
@@ -1122,7 +1765,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     ConfigureGatewayInfo configureGatewayInfo = new ConfigureGatewayInfo();
     configureGatewayInfo.plugName = gatewayModel.gatewayName;
     configureGatewayInfo.plugVersion = gatewayModel.type + 1;
-    if (configureGatewayInfo.plugVersion == 2) {
+    if (configureGatewayInfo.plugVersion == 2 || configureGatewayInfo.plugVersion == 5) {
       configureGatewayInfo.ssid = gatewayModel.wifi;
       configureGatewayInfo.wifiPwd = gatewayModel.wifiPassword;
     }
@@ -3574,8 +4217,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     }
   }
 
+  public void errorCallbackCommand(String command, WaterMeterError waterMeterError) {
+    callbackCommand(command, ResultStateFail, null, WaterMeterErrorConvert.convert(waterMeterError), waterMeterError.getErrorMsg());
+  }
+
   public void errorCallbackCommand(String command, ElectricMeterError electricMeterError) {
-    callbackCommand(command, ResultStateFail, null, ElectricityMeterErrorConvert.convert(electricMeterError), electricMeterError.getDescription());
+    callbackCommand(command, ResultStateFail, null, ElectricityMeterErrorConvert.convert(electricMeterError), electricMeterError.getErrorMsg());
   }
 
   public void errorCallbackCommand(String command, RemoteError remoteError) {
@@ -3583,6 +4230,10 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void errorCallbackCommand(String command, KeypadError keypadError) {
+    callbackCommand(command, ResultStateFail, null, 0, keypadError.getDescription());
+  }
+
+  public void errorCallbackCommand(String command, MultifunctionalKeypadError keypadError) {
     callbackCommand(command, ResultStateFail, null, 0, keypadError.getDescription());
   }
 

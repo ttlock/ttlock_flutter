@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:ttlock_flutter/ttelectricMeter.dart';
 import 'package:ttlock_flutter/ttgateway.dart';
 import 'package:ttlock_flutter/ttlock.dart';
+import 'package:ttlock_flutter/ttremoteKeypad.dart';
 import 'package:ttlock_flutter_example/gateway_page.dart';
+import 'config.dart';
+import 'key_pad_page.dart';
 import 'wifi_page.dart';
 import 'package:bmprogresshud/progresshud.dart';
 import 'lock_page.dart';
 import 'electric_meter_page.dart';
 
-enum ScanType { lock, gateway, electricMeter }
+enum ScanType { lock, gateway, electricMeter, keyPad }
 
 class ScanPage extends StatefulWidget {
   ScanPage({required this.scanType}) : super();
@@ -34,20 +37,24 @@ class _ScanPageState extends State<ScanPage> {
       _startScanGateway();
     } else if (scanType == ScanType.electricMeter) {
       _startScanElectricMeter();
+    } else if (scanType == ScanType.keyPad) {
+      _startScanKeyPad();
     }
   }
 
   List<TTLockScanModel> _lockList = [];
   List<TTGatewayScanModel> _gatewayList = [];
   List<TTElectricMeterScanModel> _electricMeterList = [];
-
+  List<TTRemoteAccessoryScanModel> _keyPadList = [];
   void dispose() {
     if (scanType == ScanType.lock) {
       TTLock.stopScanLock();
     } else if (scanType == ScanType.gateway) {
       TTGateway.stopScan();
     } else if (scanType == ScanType.electricMeter) {
-      TTElectricmeter.stopScan();
+      TTElectricMeter.stopScan();
+    } else if (scanType == ScanType.keyPad) {
+      TTRemoteKeypad.stopScan();
     }
     super.dispose();
   }
@@ -82,7 +89,7 @@ class _ScanPageState extends State<ScanPage> {
     });
   }
 
-  void _initEelectricMeter(TTElectricMeterScanModel scanModel) async {
+  void _initElectricMeter(TTElectricMeterScanModel scanModel) async {
     print("init electric meter：" + scanModel.isInited.toString());
     if (scanModel.isInited) {
       Navigator.push(context,
@@ -98,9 +105,9 @@ class _ScanPageState extends State<ScanPage> {
       Map initParamMap = Map();
       initParamMap["mac"] = scanModel.mac;
       initParamMap["name"] = scanModel.name;
-      initParamMap["payMode"] = TTElectricMeterPayMode.postpaid.index;
+      initParamMap["payMode"] = TTMeterPayMode.postpaid.index;
       initParamMap["price"] = '1';
-      TTElectricmeter.init(initParamMap, () {
+      TTElectricMeter.init(initParamMap, () {
         _dismissLoading();
         Navigator.push(context,
             new MaterialPageRoute(builder: (BuildContext context) {
@@ -112,6 +119,48 @@ class _ScanPageState extends State<ScanPage> {
       }, (errorCode, errorMsg) {
         _dismissLoading();
       });
+    }
+  }
+
+  void _initKeyPad(TTRemoteAccessoryScanModel scanModel) async {
+    print("init keyPad");
+    var mac = scanModel.mac;
+    var lockMac = "05:46:71:31:DA:20";
+    var lockData = "";
+    if (scanModel.isMultifunctionalKeypad) {
+      assert(lockMac.isNotEmpty);
+      assert(lockData.isNotEmpty);
+      TTRemoteKeypad.multifunctionalInit(
+          mac,
+          lockMac,
+          (int electricQuantity,
+              String wirelessKeypadFeatureValue,
+              int slotNumber,
+              int slotLimit) {}, (TTLockError errorCode, String errorMsg) {
+        Navigator.push(context,
+            new MaterialPageRoute(builder: (BuildContext context) {
+          return KeyPadPage(
+            name: scanModel.name,
+            mac: scanModel.mac,
+            lockData: "",
+            lockMac: "",
+          );
+        }));
+      }, (TTRemoteKeyPadAccessoryError errorCode, String errorMsg) {});
+    } else {
+      assert(lockMac.isNotEmpty);
+      TTRemoteKeypad.init(mac, lockMac,
+          (int electricQuantity, String wirelessKeypadFeatureValue) {
+        Navigator.push(context,
+            new MaterialPageRoute(builder: (BuildContext context) {
+          return KeyPadPage(
+            name: scanModel.name,
+            mac: scanModel.mac,
+            lockData: lockData,
+            lockMac: lockMac,
+          );
+        }));
+      }, (TTRemoteAccessoryError errorCode, String errorMsg) {});
     }
   }
 
@@ -203,7 +252,7 @@ class _ScanPageState extends State<ScanPage> {
 
   void _startScanElectricMeter() {
     _electricMeterList = [];
-    TTElectricmeter.startScan((scanModel) {
+    TTElectricMeter.startScan((scanModel) {
       bool contain = false;
       for (TTElectricMeterScanModel model in _electricMeterList) {
         if (scanModel.mac == model.mac) {
@@ -219,9 +268,32 @@ class _ScanPageState extends State<ScanPage> {
     });
   }
 
+  void _startScanKeyPad() {
+    _keyPadList = [];
+    TTRemoteKeypad.startScan((scanModel) {
+      bool contain = false;
+      for (TTRemoteAccessoryScanModel model in _keyPadList) {
+        if (scanModel.mac == model.mac) {
+          contain = true;
+          break;
+        }
+      }
+      if (!contain) {
+        setState(() {
+          _keyPadList.add(scanModel);
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    String title = ['Lock', 'Gateway', 'Electric Meter'][scanType!.index];
+    String title = [
+      'Lock',
+      'Gateway',
+      'Electric Meter',
+      'Electric Meter'
+    ][scanType!.index];
     return Scaffold(
         appBar: AppBar(
           title: Text(title),
@@ -237,10 +309,12 @@ class _ScanPageState extends State<ScanPage> {
   }
 
   Widget getListView() {
-    String gatewayNote = 'please repower the gateway';
+    String gatewayNote = 'please power on again the gateway';
     String lockNote = 'please touch the keyboard of lock';
     String electricMeterNote = '';
-    String note = [lockNote, gatewayNote, electricMeterNote][scanType!.index];
+    String keypadNote = '';
+    String note =
+        [lockNote, gatewayNote, electricMeterNote, keypadNote][scanType!.index];
     return Column(
       children: <Widget>[
         Text(note),
@@ -252,12 +326,13 @@ class _ScanPageState extends State<ScanPage> {
                 itemCount: [
                   _lockList,
                   _gatewayList,
-                  _electricMeterList
+                  _electricMeterList,
+                  _keyPadList
                 ][scanType!.index]
                     .length,
                 itemBuilder: (context, index) {
-                  String title;
-                  String subtitle;
+                  String title = "";
+                  String subtitle = "";
                   Color textColor = Colors.black;
                   if (scanType == ScanType.lock) {
                     TTLockScanModel scanModel = _lockList[index];
@@ -272,7 +347,7 @@ class _ScanPageState extends State<ScanPage> {
                     TTGatewayScanModel scanModel = _gatewayList[index];
                     title = 'Gateway：${scanModel.gatewayName}';
                     subtitle = 'click to connect the gateway';
-                  } else {
+                  } else if (scanType == ScanType.electricMeter) {
                     TTElectricMeterScanModel scanModel =
                         _electricMeterList[index];
                     title = 'Meter：${scanModel.name}';
@@ -282,6 +357,9 @@ class _ScanPageState extends State<ScanPage> {
                     if (scanModel.isInited) {
                       textColor = Colors.grey;
                     }
+                  } else if (scanType == ScanType.keyPad) {
+                    TTRemoteAccessoryScanModel scanModel = _keyPadList[index];
+                    title = 'keyPad name：${scanModel.name}';
                   }
 
                   TextStyle textStyle = new TextStyle(color: textColor);
@@ -303,8 +381,13 @@ class _ScanPageState extends State<ScanPage> {
                       } else if (scanType == ScanType.electricMeter) {
                         TTElectricMeterScanModel scanModel =
                             _electricMeterList[index];
-                        TTElectricmeter.stopScan();
-                        _initEelectricMeter(scanModel);
+                        TTElectricMeter.stopScan();
+                        _initElectricMeter(scanModel);
+                      } else if (scanType == ScanType.keyPad) {
+                        TTRemoteAccessoryScanModel scanModel =
+                            _keyPadList[index];
+                        TTRemoteKeypad.stopScan();
+                        _initKeyPad(scanModel);
                       }
                     },
                   );
