@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:ttlock_flutter/ttelectricMeter.dart';
 import 'package:bmprogresshud/progresshud.dart';
 import 'package:ttlock_flutter/ttlock.dart';
 import 'package:ttlock_flutter/ttremoteKeypad.dart';
@@ -79,21 +78,18 @@ class _KeyPadState extends State<KeyPadPage> {
         });
         break;
       case Command.addFingerprint:
-        TTRemoteKeypad.addFingerprint(mac,
-            null,
-            1746673751000,
-            1746760151000,
-            lockData,
-                (int currentCount, int totalCount){
-               print("addFingerprint;;;currentCount:$currentCount;;;;totalCount:$totalCount");
-            }, (String fingerprintNumber) {
-              print("addFingerprint fingerprintNumber:$fingerprintNumber");
-            }, (errorCode, errorMsg) {
-              print("addFingerprint;;;errorCode:$errorCode;;;;errorMsg:$errorMsg");
-
-            }, (TTRemoteKeyPadAccessoryError errorCode, String errorMsg){
-              print("addFingerprint;;;errorCode:$errorCode;;;;errorMsg:$errorMsg");
-            });
+        TTRemoteKeypad.addFingerprint(
+            mac, null, 1746673751000, 1746760151000, lockData,
+            (int currentCount, int totalCount) {
+          print(
+              "addFingerprint;;;currentCount:$currentCount;;;;totalCount:$totalCount");
+        }, (String fingerprintNumber) {
+          print("addFingerprint fingerprintNumber:$fingerprintNumber");
+        }, (errorCode, errorMsg) {
+          print("addFingerprint;;;errorCode:$errorCode;;;;errorMsg:$errorMsg");
+        }, (TTRemoteKeyPadAccessoryError errorCode, String errorMsg) {
+          print("addFingerprint;;;errorCode:$errorCode;;;;errorMsg:$errorMsg");
+        });
         break;
       case Command.addCard:
         break;
