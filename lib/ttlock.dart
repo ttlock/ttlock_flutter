@@ -1,8 +1,8 @@
 import 'package:flutter/services.dart';
 import 'package:ttlock_flutter/ttdoorSensor.dart';
 import 'package:ttlock_flutter/ttelectricMeter.dart';
+import 'package:ttlock_flutter/ttremoteKey.dart';
 import 'package:ttlock_flutter/ttremoteKeypad.dart';
-import 'package:ttlock_flutter/ttremotekey.dart';
 import 'package:ttlock_flutter/ttwaterMeter.dart';
 import 'dart:convert' as convert;
 import 'ttgateway.dart';
@@ -1655,8 +1655,6 @@ class TTLock {
     List<Map> commandList = _commandMap[command] ?? [];
     dynamic callBack =
         commandList.length > 0 ? commandList.first[CALLBACK_FAIL] : null;
-    if (callBack != null) {
-      // print("失败删除指令：" + command);
     dynamic otherCallBack =
         commandList.length > 0 ? commandList.first[CALLBACK_OTHER_FAIL] : null;
     if (commandList.length > 0) {
@@ -1698,23 +1696,19 @@ class TTLock {
                 .COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT ||
         command ==
             TTRemoteKeypad.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD) {
-
-      if(data["errorDevice"] == TTErrorDevice.keyPad.index)
-        {
-          TTRemoteKeypadFailedCallback? failedCallback = otherCallBack;
-          TTRemoteKeyPadAccessoryError error =
-          TTRemoteKeyPadAccessoryError.values[errorCode];
-          if (failedCallback != null) {
-            failedCallback(error, errorMessage);
-          }
-        }else
-          {
-            if(errorCode<0)
-            {
-              errorCode = 0;
-            }
-            callBack?.call(TTLockError.values[errorCode], errorMessage);
-          }
+      if (data["errorDevice"] == TTErrorDevice.keyPad.index) {
+        TTRemoteKeypadFailedCallback? failedCallback = otherCallBack;
+        TTRemoteKeyPadAccessoryError error =
+            TTRemoteKeyPadAccessoryError.values[errorCode];
+        if (failedCallback != null) {
+          failedCallback(error, errorMessage);
+        }
+      } else {
+        if (errorCode < 0) {
+          errorCode = 0;
+        }
+        callBack?.call(TTLockError.values[errorCode], errorMessage);
+      }
     }
 
     //蓝牙水电表失败处理

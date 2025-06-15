@@ -1,5 +1,4 @@
 import 'package:ttlock_flutter/ttlock.dart';
-import 'dart:convert' as convert;
 
 class TTWaterMeter {
   static const String COMMAND_CONFIG_SERVER_WATER_METER =
