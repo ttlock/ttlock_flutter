@@ -811,7 +811,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       if(success)
       {
         WaterMeterClient.getDefault().setTotalUsage(params.get(TTParam.MAC).toString(),
-                (int) params.get(TTParam.totalM3), new SetTotalUsageCallback() {
+                Double.parseDouble(params.get(TTParam.totalM3).toString()), new SetTotalUsageCallback() {
                   @Override
                   public void onSetSuccess() {
                     successCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_SET_TOTAL_USAGE, new HashMap<>());
