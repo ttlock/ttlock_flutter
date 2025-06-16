@@ -2134,7 +2134,7 @@ enum TTGatewayError {
   failInvalidIp
 }
 
-enum TTGatewayType { g1, g2, g3, g4 }
+enum TTGatewayType { g1, g2, g3, g4, g5 }
 
 enum TTIpSettingType { STATIC_IP, DHCP }
 
