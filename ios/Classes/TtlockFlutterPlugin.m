@@ -489,7 +489,7 @@ typedef NS_ENUM(NSInteger, ResultState) {
         paramDict[@"companyId"] = dict[@"companyId"];
         paramDict[@"gatewayName"] = dict[@"gatewayName"];
         paramDict[@"branchId"] = dict[@"branchId"];
-        if (gatewayType > TTGateWayTypeG2) {
+        if (gatewayType == TTGateWayTypeG2 || gatewayType == TTGateWayTypeG4) {
             paramDict[@"SSID"] = @"1";
             paramDict[@"wifiPwd"] = @"1";
         }
