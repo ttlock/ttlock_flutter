@@ -1696,23 +1696,19 @@ class TTLock {
                 .COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT ||
         command ==
             TTRemoteKeypad.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD) {
-
-      if(data["errorDevice"] == TTErrorDevice.keyPad.index)
-        {
-          TTRemoteKeypadFailedCallback? failedCallback = otherCallBack;
-          TTRemoteKeyPadAccessoryError error =
-          TTRemoteKeyPadAccessoryError.values[errorCode];
-          if (failedCallback != null) {
-            failedCallback(error, errorMessage);
-          }
-        }else
-          {
-            if(errorCode<0)
-            {
-              errorCode = 0;
-            }
-            callBack?.call(TTLockError.values[errorCode], errorMessage);
-          }
+      if (data["errorDevice"] == TTErrorDevice.keyPad.index) {
+        TTRemoteKeypadFailedCallback? failedCallback = otherCallBack;
+        TTRemoteKeyPadAccessoryError error =
+            TTRemoteKeyPadAccessoryError.values[errorCode];
+        if (failedCallback != null) {
+          failedCallback(error, errorMessage);
+        }
+      } else {
+        if (errorCode < 0) {
+          errorCode = 0;
+        }
+        callBack?.call(TTLockError.values[errorCode], errorMessage);
+      }
     }
 
     //蓝牙水电表失败处理
