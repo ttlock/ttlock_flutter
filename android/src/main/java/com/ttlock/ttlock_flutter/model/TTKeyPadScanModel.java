@@ -12,6 +12,7 @@ public class TTKeyPadScanModel {
     public String mac;
     public int rssi;
 
+
     public TTKeyPadScanModel toObject(Map<String, Object> params) {
         Field[] fields = this.getClass().getDeclaredFields();
         try {

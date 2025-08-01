@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:ttlock_premise_flutter/ttlock.dart';
 import 'package:bmprogresshud/progresshud.dart';
 
+import 'key_pad/scan_key_pad_page.dart';
+
 class LockPage extends StatefulWidget {
   LockPage(
       {Key? key,
@@ -82,7 +84,8 @@ enum Command {
   // configWifi,
   // configServer,
   // getWifiInfo,
-  configIp
+  configIp,
+  keypad
 }
 
 class _LockPageState extends State<LockPage> {
@@ -155,7 +158,8 @@ class _LockPageState extends State<LockPage> {
     // {"Wifi lock config wifi": Command.configWifi},
     // {"Wifi lock config server": Command.configServer},
     // {"Wifi lock get wifi info": Command.getWifiInfo},
-    {"Wifi lock config ip": Command.configIp}
+    {"Wifi lock config ip": Command.configIp},
+    {"Keypad": Command.keypad},
   ];
 
   String note =
@@ -716,6 +720,16 @@ class _LockPageState extends State<LockPage> {
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
+        break;
+      case Command.keypad:
+        _showSuccessAndDismiss("keypad success");
+        Navigator.push(context,
+            new MaterialPageRoute(builder: (BuildContext context) {
+              return ScanKeyPadPage(
+                lockData: lockData,
+                lockMac: widget.lockMac,
+              );
+            }));
         break;
       default:
     }

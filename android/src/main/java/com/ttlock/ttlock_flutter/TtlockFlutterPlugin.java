@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.ttlock.bl.sdk.api.ExtendedBluetoothDevice;
 import com.ttlock.bl.sdk.api.TTLockClient;
@@ -131,6 +132,11 @@ import com.ttlock.bl.sdk.keypad.ScanKeypadCallback;
 import com.ttlock.bl.sdk.keypad.WirelessKeypadClient;
 import com.ttlock.bl.sdk.keypad.model.InitKeypadResult;
 import com.ttlock.bl.sdk.keypad.model.KeypadError;
+import com.ttlock.bl.sdk.mulfunkeypad.api.MultifunctionalKeypadClient;
+import com.ttlock.bl.sdk.mulfunkeypad.callback.AddCardCallback;
+import com.ttlock.bl.sdk.mulfunkeypad.callback.DeleteLockCallback;
+import com.ttlock.bl.sdk.mulfunkeypad.model.InitMultifunctionalKeypadResult;
+import com.ttlock.bl.sdk.mulfunkeypad.model.MultifunctionalKeypadError;
 import com.ttlock.bl.sdk.remote.api.RemoteClient;
 import com.ttlock.bl.sdk.remote.callback.InitRemoteCallback;
 import com.ttlock.bl.sdk.remote.callback.ScanRemoteCallback;
@@ -176,6 +182,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+import io.flutter.Log;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
@@ -242,6 +249,15 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
   private Handler handler = new Handler();
 
+  private void initSdk() {
+    TTLockClient.getDefault().prepareBTService(activity);
+    GatewayClient.getDefault().prepareBTService(activity);
+    RemoteClient.getDefault().prepareBTService(activity);
+    WirelessKeypadClient.getDefault().prepareBTService(activity);
+    MultifunctionalKeypadClient.getDefault().prepareBTService(activity);
+    WirelessDoorSensorClient.getDefault().prepareBTService(activity);
+  }
+
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
     channel = new MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), TTLockCommand.METHOD_CHANNEL_NAME);
@@ -253,6 +269,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
+    initSdk();
     if (GatewayCommand.isGatewayCommand(call.method)) {//gateway
       commandType = CommandType.GATEWAY;
       gatewayCommand(call);
@@ -373,6 +390,21 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       case TTKeyPadCommand.COMMAND_INIT_KEY_PAD:
         initKeyPad(params);
         break;
+      case TTKeyPadCommand.COMMAND_INIT_MULTIFUNCTIONAL_REMOTE_KEYPAD:
+        initMultifunctionalKeyPad(params);
+        break;
+      case TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_DELETE_STORED_LOCK:
+        deleteLockAtSpecifiedSlot(params);
+        break;
+      case TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_GET_STORED_LOCK:
+
+        break;
+      case TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT:
+        multifunctionalKeyPadAddFinger(params);
+        break;
+      case TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD:
+        multifunctionalKeyPadAddCard(params);
+        break;
     }
   }
 
@@ -453,9 +485,11 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   public void startScanKeyPad() {
     PermissionUtils.doWithScanPermission(activity, success -> {
       if (success) {
+        LogUtil.d("扫描键盘：1111");
         WirelessKeypadClient.getDefault().startScanKeyboard(new ScanKeypadCallback() {
           @Override
           public void onScanKeyboardSuccess(WirelessKeypad wirelessKeypad) {
+            LogUtil.d("扫描键盘：1111"+wirelessKeypad.getAddress());
             TTKeyPadScanModel ttKeyPadScanModel = new TTKeyPadScanModel();
             ttKeyPadScanModel.mac = wirelessKeypad.getAddress();
             ttKeyPadScanModel.name = wirelessKeypad.getName();
@@ -465,9 +499,28 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
           @Override
           public void onScanFailed(int errorcode) {
+            LogUtil.d("扫描键盘：222:"+ String.valueOf(errorcode));
+          }
+        });
+
+        MultifunctionalKeypadClient.getDefault().startScanKeypad(new ScanKeypadCallback() {
+          @Override
+          public void onScanKeyboardSuccess(WirelessKeypad wirelessKeypad) {
+            HashMap<String, Object> params = new HashMap<>();
+            params.put("mac", wirelessKeypad.getAddress());
+            params.put("name", wirelessKeypad.getName());
+            params.put("rssi", wirelessKeypad.getRssi());
+            params.put("isMultifunctionalKeypad", true);
+            Log.d("扫描到多功能键盘", wirelessKeypad.getAddress());
+            successCallbackCommand(TTKeyPadCommand.COMMAND_START_SCAN_KEY_PAD, params);
+          }
+
+          @Override
+          public void onScanFailed(int errorcode) {
 
           }
         });
+
       } else {
         LogUtil.d("no scan permission");
       }
@@ -503,6 +556,191 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       }
     });
   }
+
+  //MULTIFUNCTIONAL
+  public void initMultifunctionalKeyPad(Map<String, Object> params) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        MultifunctionalKeypadClient.getDefault().initializeMultifunctionalKeypad((String) params.get(TTParam.MAC),
+                (String) params.get(TTParam.LOCK_DATA), new com.ttlock.bl.sdk.mulfunkeypad.callback.InitKeypadCallback() {
+                  @Override
+                  public void onKeypadFail(MultifunctionalKeypadError multifunctionalKeypadError) {
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("errorDevice", 1);
+                    Log.d("sdk失败", multifunctionalKeypadError.toString());
+                    Log.d("sdk失败", multifunctionalKeypadError.getDescription());
+                    callbackCommand(TTKeyPadCommand.COMMAND_INIT_MULTIFUNCTIONAL_REMOTE_KEYPAD, ResultStateFail, map, 0, multifunctionalKeypadError.getDescription());
+                  }
+                  @Override
+                  public void onInitSuccess(InitMultifunctionalKeypadResult initMultifunctionalKeypadResult) {
+                    HashMap<String, Object> params = new HashMap<>();
+                    params.put("electricQuantity", initMultifunctionalKeypadResult.getBatteryLevel());
+                    params.put("wirelessKeypadFeatureValue", initMultifunctionalKeypadResult.getKeypadFeatureValue());
+                    params.put("slotNumber", initMultifunctionalKeypadResult.getSlotNumber());
+                    params.put("slotLimit", initMultifunctionalKeypadResult.getSlotLimit());
+                    successCallbackCommand(TTKeyPadCommand.COMMAND_INIT_MULTIFUNCTIONAL_REMOTE_KEYPAD, params);
+                  }
+
+                  @Override
+                  public void onLockFail(LockError lockError) {
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("errorDevice", 0);
+                    Log.d("sdk失败", lockError.toString());
+                    Log.d("sdk失败", lockError.getDescription());
+                    callbackCommand(TTKeyPadCommand.COMMAND_INIT_MULTIFUNCTIONAL_REMOTE_KEYPAD, ResultStateFail, map, 0, lockError.getDescription());
+                  }
+                });
+      } else {
+        callbackCommand(TTKeyPadCommand.COMMAND_INIT_MULTIFUNCTIONAL_REMOTE_KEYPAD, ResultStateFail, params, LockError.LOCK_NO_PERMISSION.getIntErrorCode(), "no connect permission");
+      }
+    });
+  }
+
+  public void deleteLockAtSpecifiedSlot(Map<String, Object> params) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        MultifunctionalKeypadClient.getDefault().deleteLockAtSpecifiedSlot((String) params.get(TTParam.MAC),
+                (int) params.get(TTParam.slotNumber), new DeleteLockCallback() {
+                  @Override
+                  public void onKeypadFail(MultifunctionalKeypadError multifunctionalKeypadError) {
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("errorDevice", 1);
+                    callbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_DELETE_STORED_LOCK, ResultStateFail, map, 0, multifunctionalKeypadError.getDescription());
+                  }
+
+                  @Override
+                  public void onDeleteLockSuccess() {
+                    successCallbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_DELETE_STORED_LOCK, params);
+                  }
+                });
+      } else {
+        callbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_DELETE_STORED_LOCK, ResultStateFail, params, LockError.LOCK_NO_PERMISSION.getIntErrorCode(), "no connect permission");
+      }
+    });
+  }
+
+
+  public void multifunctionalKeyPadAddFinger(Map<String, Object> params) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        String keyPadMac = (String) params.get(TTParam.MAC);
+        long startDate = Long.valueOf(params.get(TTParam.startDate).toString());
+        long endDate = Long.valueOf(params.get(TTParam.endDate).toString());
+        String lockData = (String) params.get(TTParam.LOCK_DATA);
+        String cycleJsonList =  params.get(TTParam.cycleJsonList) == null ? "" : (String) params.get(TTParam.cycleJsonList);
+        ValidityInfo info = new ValidityInfo();
+        info.setStartDate(startDate);
+        info.setEndDate(endDate);
+        if(!cycleJsonList.isEmpty())
+        {
+          List<CyclicConfig> cycleList = new Gson().fromJson(cycleJsonList, new TypeToken<List<CyclicConfig>>(){}.getType());
+          info.setCyclicConfigs(cycleList);
+          info.setModeType(ValidityInfo.CYCLIC);
+        }
+        MultifunctionalKeypadClient.getDefault().addFingerprint(keyPadMac,
+                lockData, info, new com.ttlock.bl.sdk.mulfunkeypad.callback.AddFingerprintCallback() {
+                  @Override
+                  public void onKeypadFail(MultifunctionalKeypadError multifunctionalKeypadError) {
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("errorDevice", 1);
+                    callbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT, ResultStateFail, map, 0, multifunctionalKeypadError.getDescription());
+
+                  }
+
+                  @Override
+                  public void onEnterAddingMode() {
+                    HashMap hashMap = new HashMap<>();
+                    hashMap.put("currentCount", 0);
+                    hashMap.put("totalCount", 0);
+                    callbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT,
+                            ResultStateProgress, hashMap, -1, "");
+                  }
+
+                  @Override
+                  public void onCollectFingerprint(int i, int i1) {
+                    HashMap hashMap = new HashMap<>();
+                    hashMap.put("currentCount", i);
+                    hashMap.put("totalCount", i1);
+                    callbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT,
+                            ResultStateProgress, hashMap, -1, "");
+                  }
+
+                  @Override
+                  public void onAddFingerprintFinished(long l) {
+                    HashMap hashMap = new HashMap<>();
+                    hashMap.put(TTParam.fingerprintNumber, String.valueOf(l));
+                    successCallbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT, hashMap);
+
+                  }
+
+                  @Override
+                  public void onLockFail(LockError lockError) {
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("errorDevice", 0);
+                    callbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT, ResultStateFail, map, 0, lockError.getDescription());
+
+                  }
+                });
+      } else {
+        callbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT, ResultStateFail, params, LockError.LOCK_NO_PERMISSION.getIntErrorCode(), "no connect permission");
+      }
+    });
+  }
+
+  public void multifunctionalKeyPadAddCard(Map<String, Object> params) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        long startDate = Long.valueOf(params.get(TTParam.startDate).toString());
+        long endDate = Long.valueOf(params.get(TTParam.endDate).toString());
+        String lockData = (String) params.get(TTParam.LOCK_DATA);
+        String cycleJsonList =  params.get(TTParam.cycleJsonList) == null ? "" : (String) params.get(TTParam.cycleJsonList);
+        ValidityInfo info = new ValidityInfo();
+        info.setStartDate(startDate);
+        info.setEndDate(endDate);
+        if(!cycleJsonList.isEmpty())
+        {
+          List<CyclicConfig> cycleList = new Gson().fromJson(cycleJsonList, new TypeToken<List<CyclicConfig>>(){}.getType());
+          info.setCyclicConfigs(cycleList);
+          info.setModeType(ValidityInfo.CYCLIC);
+        }
+        MultifunctionalKeypadClient.getDefault().addCard(lockData,
+                info, new AddCardCallback() {
+                  @Override
+                  public void onKeypadFail(MultifunctionalKeypadError multifunctionalKeypadError) {
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("errorDevice", 1);
+                    callbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD, ResultStateFail, map, 0, multifunctionalKeypadError.getDescription());
+
+                  }
+
+                  @Override
+                  public void onEnterAddingMode() {
+                    callbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD,
+                            ResultStateProgress, new HashMap(){}, -1, "");
+                  }
+
+                  @Override
+                  public void onAddCardSuccess(long l) {
+                    HashMap hashMap = new HashMap<>();
+                    hashMap.put("cardNumber", String.valueOf(l));
+                    successCallbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD, hashMap);
+                  }
+
+                  @Override
+                  public void onLockFail(LockError lockError) {
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("errorDevice", 0);
+                    callbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD, ResultStateFail, map, 0, lockError.getDescription());
+
+                  }
+                });
+      } else {
+        callbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD, ResultStateFail, params, LockError.LOCK_NO_PERMISSION.getIntErrorCode(), "no connect permission");
+      }
+    });
+
+  }
+
 
   /** ---------------------- remote ------------------------- **/
 

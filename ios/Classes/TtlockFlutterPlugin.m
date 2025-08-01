@@ -1063,6 +1063,7 @@ else if ([command isEqualToString:command_recover_card]) {
             dict[@"name"] = model.keypadName;
             dict[@"rssi"] = @(model.RSSI);
             dict[@"mac"] = model.keypadMac;
+            dict[@"isMultifunctionalKeypad"] = @(model.isMultifunctionalKeypad);
             [weakSelf successCallbackCommand:command data:dict];
         }];
     }
@@ -1079,6 +1080,72 @@ else if ([command isEqualToString:command_recover_card]) {
             }else{
                 [weakSelf errorCallbackCommand:command code:status details:nil];
             }
+        }];
+    }
+    else if ([command isEqualToString:command_mutifuctional_remote_keypad_init]) {
+        [TTWirelessKeypad initializeMultifunctionalKeypadWithKeypadMac:lockModel.mac lockData:lockModel.lockData success:^(NSString *wirelessKeypadFeatureValue, int electricQuantity, int slotNumber, int slotLimit, TTSystemInfoModel *systemInfoModel) {
+            NSMutableDictionary *dict = @{}.mutableCopy;
+            dict[@"electricQuantity"] = @(electricQuantity);
+            dict[@"wirelessKeypadFeatureValue"] = wirelessKeypadFeatureValue;
+            dict[@"slotNumber"] = @(slotNumber);
+            dict[@"slotLimit"] = @(slotLimit);
+            dict[@"systemInfoModel"] = [weakSelf dicFromObject:systemInfoModel];
+            [weakSelf successCallbackCommand:command data:dict];
+        } lockFailure:^(TTError errorCode, NSString *errorMsg) {
+            NSDictionary *errorData = @{@"errorDevice": @(ErrorDeviceLock)};
+            [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg data:errorData];
+        } keypadFailure:^(TTKeypadStatus status) {
+            NSDictionary *errorData = @{@"errorDevice": @(ErrorDeviceKeyPad)};
+            [weakSelf errorCallbackCommand:command code:status msg:nil data:errorData];
+        }];
+    }
+    else if ([command isEqualToString:command_mutifuctional_remote_keypad_get_locks]) {
+        [TTWirelessKeypad getAllStoredLocksWithKeypadMac:lockModel.mac success:^(NSArray<NSString *> *lockMacs) {
+            NSMutableDictionary *dict = @{}.mutableCopy;
+            dict[@"lockMacs"] = lockMacs;
+            [weakSelf successCallbackCommand:command data:dict];
+        } failure:^(TTKeypadStatus status) {
+        [weakSelf errorCallbackCommand:command code:status msg:nil];
+    }];
+    }
+    else if ([command isEqualToString:command_mutifuctional_remote_keypad_delete_lock]) {
+        [TTWirelessKeypad deleteLockAtSpecifiedSlotWithKeypadMac:lockModel.mac slotNumber:lockModel.slotNumber.intValue success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTKeypadStatus status) {
+            [weakSelf errorCallbackCommand:command code:status msg:nil];
+        }];
+    }
+    else if ([command isEqualToString:command_mutifuctional_remote_keypad_add_fingerprint]) {
+        NSArray *cycleConfigArray = (NSArray *)[self dictFromJsonStr:lockModel.cycleJsonList];
+        [TTWirelessKeypad addFingerprintWithCyclicConfig:cycleConfigArray startDate:lockModel.startDate.longLongValue endDate:lockModel.endDate.longLongValue keypadMac:lockModel.mac lockData:lockModel.lockData progress:^(int currentCount, int totalCount) {
+            TtlockModel *progressData = [TtlockModel new];
+            progressData.totalCount = @(totalCount);
+            progressData.currentCount = @(currentCount);
+            [weakSelf progressCallbackCommand:command data:progressData];
+        } success:^(NSString *fingerprintNumber) {
+            TtlockModel *successData = [TtlockModel new];
+            successData.fingerprintNumber = fingerprintNumber;
+            [weakSelf successCallbackCommand:command data:successData];
+        } lockFailure:^(TTError errorCode, NSString *errorMsg) {
+            NSDictionary *errorData = @{@"errorDevice": @(ErrorDeviceLock)};
+            [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg data:errorData];
+        } keypadFailure:^(TTKeypadStatus status) {
+            NSDictionary *errorData = @{@"errorDevice": @(ErrorDeviceKeyPad)};
+            [weakSelf errorCallbackCommand:command code:status msg:nil data:errorData];
+        }];
+    }
+    else if ([command isEqualToString:command_mutifuctional_remote_keypad_add_card]) {
+        NSArray *cycleConfigArray = (NSArray *)[self dictFromJsonStr:lockModel.cycleJsonList];
+        [TTWirelessKeypad addCardWithCyclicConfig:cycleConfigArray startDate:lockModel.startDate.longLongValue endDate:lockModel.endDate.longLongValue lockData:lockModel.lockData progress:^(TTAddICState state) {
+            TtlockModel *progressData = [TtlockModel new];
+            progressData.state = @(state);
+            [weakSelf progressCallbackCommand:command data:progressData];
+        } success:^(NSString *cardNumber) {
+            TtlockModel *successData = [TtlockModel new];
+            successData.cardNumber = cardNumber;
+            [weakSelf successCallbackCommand:command data:successData];
+        } lockFailure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];
         }];
     }
 }

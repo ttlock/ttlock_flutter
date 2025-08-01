@@ -152,6 +152,13 @@
 #define command_remote_keypad_stop_scan @"remoteKeypadStopScan"
 #define command_remote_keypad_init @"remoteKeypadInit"
 
+#define command_mutifuctional_remote_keypad_init @"multifunctionalRemoteKeypadInit"
+#define command_mutifuctional_remote_keypad_delete_lock @"multifunctionalRemoteKeypadDeleteLock"
+#define command_mutifuctional_remote_keypad_get_locks @"multifunctionalRemoteKeypadGetLocks"
+#define command_mutifuctional_remote_keypad_add_fingerprint @"multifunctionalRemoteKeypadAddFingerprint"
+#define command_mutifuctional_remote_keypad_add_card @"multifunctionalRemoteKeypadAddCard"
+
+
 #pragma mark - 酒店锁
 #define command_set_hotel_card_sector @"setHotelCardSector"
 #define command_set_hotel_info @"setHotelInfo"

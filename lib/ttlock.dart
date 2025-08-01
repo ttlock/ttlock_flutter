@@ -15,6 +15,7 @@ class TTLock {
   static const String CALLBACK_SUCCESS = "callback_success";
   static const String CALLBACK_PROGRESS = "callback_progress";
   static const String CALLBACK_FAIL = "callback_fail";
+  static const String CALLBACK_OTHER_FAIL = "callback_other_fail";
 
   static const String COMMAND_START_SCAN_LOCK = "startScanLock";
   static const String COMMAND_STOP_SCAN_LOCK = "stopScanLock";
@@ -1229,7 +1230,10 @@ class TTLock {
   ];
 
   static void invoke(String command, Object? parameter, Object? success,
-      {Object? progress, Object? fail}) {
+      {Object? progress, Object? fail,
+        //TODO 多功能键盘会有键盘错误，用这个表示
+        Object? otherFail
+      }) {
     if (!isListenEvent) {
       isListenEvent = true;
       _listenChannel
@@ -1269,6 +1273,7 @@ class TTLock {
       callbackMap[CALLBACK_SUCCESS] = success;
       callbackMap[CALLBACK_PROGRESS] = progress;
       callbackMap[CALLBACK_FAIL] = fail;
+      callbackMap[CALLBACK_OTHER_FAIL] = otherFail;
       commandMap[command] = callbackMap;
       _commandQueue.add(commandMap);
     }
@@ -1417,11 +1422,13 @@ class TTLock {
         break;
 
       case COMMAND_ADD_CARD:
+      case TTRemoteKeypad.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD:
         TTCardNumberCallback addCardCallback = callBack;
         addCardCallback(data[TTResponse.cardNumber]);
         break;
 
       case COMMAND_ADD_FINGERPRINT:
+      case TTRemoteKeypad.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT:
         TTAddFingerprintCallback addFingerprintCallback = callBack;
         addFingerprintCallback(data[TTResponse.fingerprintNumber]);
         break;
@@ -1570,6 +1577,20 @@ class TTLock {
         remoteKeypadInitSuccessCallback(data[TTResponse.electricQuantity],
             data[TTResponse.wirelessKeypadFeatureValue]);
         break;
+      case TTRemoteKeypad.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_GET_STORED_LOCK:
+        TTRemoteKeypadGetStoredLockSuccessCallback getStoredLocks = callBack;
+        getStoredLocks(data["lockMacs"]);
+        break;
+      case TTRemoteKeypad.COMMAND_INIT_MULTIFUNCTIONAL_REMOTE_KEYPAD:
+        print(data["systemInfoModel"]);
+        TTMultifunctionalRemoteKeypadInitSuccessCallback initSuccessCallback =
+            callBack;
+        initSuccessCallback(
+            data["electricQuantity"],
+            data["wirelessKeypadFeatureValue"],
+            data["slotNumber"],
+            data["slotLimit"]);
+        break;
       case COMMAND_ADD_FACE:
       case COMMAND_ADD_FACE_DATA:
         TTAddFaceSuccessCallback addFaceSuccessCallback = callBack;
@@ -1593,10 +1614,12 @@ class TTLock {
     }
     switch (command) {
       case COMMAND_ADD_CARD:
+      case TTRemoteKeypad.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD:
         TTAddCardProgressCallback progressCallback = callBack;
         progressCallback();
         break;
       case COMMAND_ADD_FINGERPRINT:
+      case TTRemoteKeypad.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT:
         TTAddFingerprintProgressCallback progressCallback = callBack;
         progressCallback(
             data[TTResponse.currentCount], data[TTResponse.totalCount]);
@@ -1611,7 +1634,7 @@ class TTLock {
   }
 
   static void _errorCallback(
-      String command, int errorCode, String errorMessage) {
+      String command, int errorCode, String errorMessage, Map data) {
     if (errorCode == TTLockError.lockIsBusy.index) {
       errorMessage =
           "The TTLock SDK can only communicate with one lock at a time";
@@ -1621,19 +1644,30 @@ class TTLock {
     }
 
     dynamic callBack;
-    int index = -1;
-    for (var i = 0; i < _commandQueue.length; i++) {
-      Map map = _commandQueue[i];
-      String key = map.keys.first;
-      if (key.compareTo(command) == 0) {
-        callBack = map[command][CALLBACK_FAIL];
-        index = i;
-        break;
+    dynamic otherCallBack;
+    //多功能键盘添加指纹时返回重复指纹失败时，不移除
+    if (_commandQueue.length > 0 &&
+        !(command == TTRemoteKeypad.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT &&
+            data["errorDevice"] == TTErrorDevice.keyPad.index
+            && errorCode == TTRemoteKeyPadAccessoryError.duplicateFingerprint.index)
+    ) {
+      print("sdk指纹录入过程:移除方法:$command;;;errorDevice:${data["errorDevice"]};;;;errorCode:${data["errorCode"]}");
+      int index = -1;
+      for (var i = 0; i < _commandQueue.length; i++) {
+        Map map = _commandQueue[i];
+        String key = map.keys.first;
+        if (key.compareTo(command) == 0) {
+          callBack = map[command][CALLBACK_FAIL];
+          otherCallBack = map[command][CALLBACK_OTHER_FAIL];
+          index = i;
+          break;
+        }
+      }
+      if (index > -1) {
+        _commandQueue.removeAt(index);
       }
     }
-    if (index > -1) {
-      _commandQueue.removeAt(index);
-    }
+
 
     if (command == TTGateway.COMMAND_GET_SURROUND_WIFI ||
         command == TTGateway.COMMAND_INIT_GATEWAY ||
@@ -1651,6 +1685,38 @@ class TTLock {
       TTRemoteAccessoryError error = TTRemoteAccessoryError.values[errorCode];
       if (failedCallback != null) {
         failedCallback(error, errorMessage);
+      }
+    } // 多功能键盘失败处理
+    else if ((command ==
+        TTRemoteKeypad.COMMAND_INIT_MULTIFUNCTIONAL_REMOTE_KEYPAD) ||
+        command ==
+            TTRemoteKeypad
+                .COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_DELETE_STORED_LOCK ||
+        command ==
+            TTRemoteKeypad
+                .COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_GET_STORED_LOCK ||
+        command ==
+            TTRemoteKeypad
+                .COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT ||
+        command ==
+            TTRemoteKeypad.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD) {
+
+
+      if(data["errorDevice"] == TTErrorDevice.keyPad.index)
+      {
+        TTRemoteKeypadFailedCallback? failedCallback = otherCallBack;
+        TTRemoteKeyPadAccessoryError error =
+        TTRemoteKeyPadAccessoryError.values[errorCode];
+        if (failedCallback != null) {
+          failedCallback(error, errorMessage);
+        }
+      }else
+      {
+        if(errorCode<0)
+        {
+          errorCode = 0;
+        }
+        callBack?.call(TTLockError.values[errorCode], errorMessage);
       }
     } else {
       TTFailedCallback? failedCallback = callBack;
@@ -1677,7 +1743,7 @@ class TTLock {
       String errorMessage = map[TTResponse.errorMessage] == null
           ? ""
           : map[TTResponse.errorMessage];
-      _errorCallback(command, errorCode, errorMessage);
+      _errorCallback(command, errorCode, errorMessage, data);
     } else if (resultState == TTLockReuslt.progress.index) {
       //中间状态的回调（添加 IC卡、指纹）
       _progressCallback(command, data);
@@ -1974,6 +2040,8 @@ enum TTLockError {
   wrongWifiPassword
 }
 
+enum TTErrorDevice { lock, keyPad, key }
+
 enum TTLiftWorkActivateType { allFloors, specificFloors }
 
 enum TTPowerSaverWorkType { allCards, hotelCard, roomCard }
@@ -2054,8 +2122,23 @@ typedef TTRemoteAccessoryScanCallback = void Function(
 typedef TTGetLockAccessoryElectricQuantity = void Function(
     int electricQuantity, int updateDate);
 
+typedef TTRemoteKeypadSuccessCallback = void Function();
+
 typedef TTRemoteKeypadInitSuccessCallback = void Function(
     int electricQuantity, String wirelessKeypadFeatureValue);
+
+typedef TTMultifunctionalRemoteKeypadInitSuccessCallback = void Function(
+    int electricQuantity,
+    String wirelessKeypadFeatureValue,
+    int slotNumber,
+    int slotLimit);
+
+typedef TTRemoteKeypadGetStoredLockSuccessCallback = void Function(
+    List lockMacs);
+
+typedef TTRemoteKeypadFailedCallback = void Function(
+    TTRemoteKeyPadAccessoryError errorCode, String errorMsg);
+
 
 typedef TTAddFaceProgressCallback = void Function(
     TTFaceState state, TTFaceErrorCode faceErrorCode);
@@ -2066,11 +2149,15 @@ class TTRemoteAccessoryScanModel {
   String name = '';
   String mac = '';
   int rssi = -1;
+  bool isMultifunctionalKeypad = false;
+  Map advertisementData = {};
 
   TTRemoteAccessoryScanModel(Map map) {
     this.name = map["name"];
     this.mac = map["mac"];
     this.rssi = map["rssi"];
+    this.isMultifunctionalKeypad = map["isMultifunctionalKeypad"] ?? false;
+    this.advertisementData = map["advertisementData"] ?? {};
   }
 }
 
@@ -2141,6 +2228,15 @@ enum TTIpSettingType { STATIC_IP, DHCP }
 enum TTGatewayConnectStatus { timeout, success, faile }
 
 enum TTRemoteAccessoryError { fail, wrongCrc, connectTimeout }
+
+enum TTRemoteKeyPadAccessoryError {
+  fail,
+  wrongCrc,
+  connectTimeout,
+  factoryDate,
+  duplicateFingerprint,
+  lackOfStorageSpace
+}
 
 enum TTLockFuction {
   passcode,
