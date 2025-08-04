@@ -580,7 +580,8 @@ typedef NS_ENUM(NSInteger, ResultState) {
                     @(TTLockFeatureValuePalmVein),
                     @(TTLockFeatureValueWifiArea),
                     @(TTLockFeatureValueXiaoCaoCamera),
-                    @(TTLockFeatureValueResetLockByCode)
+                    @(TTLockFeatureValueResetLockByCode),
+                    @(TTLockFeatureValueMultifunctionalKeypad),
                 ];
                 
                 

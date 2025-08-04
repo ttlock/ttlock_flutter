@@ -2305,7 +2305,8 @@ enum TTLockFuction {
   palmVein,
   wifiArea,
   xiaoCaoCamera,
-  resetLockByCode
+  resetLockByCode,
+  multiFunctionKeypad
 }
 
 enum TTFaceState { canStartAdd, error }

@@ -72,7 +72,8 @@ public enum TTLockFunction {
     palmVein,
     wifiArea,
     xiaoCaoCamera,
-    resetLockByCode;
+    resetLockByCode,
+    multiFunctionKeypad;
 
     public static int flutter2Native(int index) {
         TTLockFunction ttLockFunction = null;
@@ -189,6 +190,8 @@ public enum TTLockFunction {
                 return FeatureValue.PALM_VEIN;
 //            case resetLockByCode:
 //                return FeatureValue.RESET_LOCK_BY_CODE;
+            case multiFunctionKeypad:
+                return FeatureValue.SUPPORT_MULTI_FUNCTION_KEYPAD;
             default:
                 return -1;
         }
