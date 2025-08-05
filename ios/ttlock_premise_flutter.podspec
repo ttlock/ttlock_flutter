@@ -16,11 +16,11 @@ A new flutter plugin project.
   s.source_files = 'Classes/**/*'
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
-  s.platform = :ios, '9.0'
+  s.platform = :ios, '12.0'
   # s.vendored_frameworks = "Frameworks/**/*.framework"
-  s.dependency 'TTLockOnPremise', '2.1.2'
+  s.dependency 'TTLockOnPremise', '2.1.7'
   s.static_framework = true
-  s.public_header_files = 'Classes/**/*.h'
+
 
   # Flutter.framework does not contain a i386 slice. Only x86_64 simulators are supported.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'VALID_ARCHS[sdk=iphonesimulator*]' => 'x86_64' }

@@ -1231,6 +1231,19 @@ else if ([command isEqualToString:command_recover_card]) {
     return isGatewayStatus;
 }
 
+- (Boolean) isRemoteKeyCommand:(NSString *)command{
+    NSArray *remoteKeyCommandArray = @[command_remote_key_init];
+    
+    bool isRemoteKeyCommand = false;
+    for (NSString *remoteKeyCommand in remoteKeyCommandArray) {
+        if([command isEqual:remoteKeyCommand]){
+            isRemoteKeyCommand = true;
+            break;
+        }
+    }
+    return isRemoteKeyCommand;
+}
+
 
 - (Boolean) isRemoteKeypadCommand:(NSString *)command data:(NSObject *) data{
     NSArray *remoteKeyCommandArray = @[command_remote_keypad_init,
