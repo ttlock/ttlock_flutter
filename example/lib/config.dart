@@ -7,3 +7,8 @@ class GatewayConfig {
   static String gatewayName = 'My gateway 1';
 }
 
+class LockConfig {
+  static String lockData = "";
+  static String lockMac = "";
+}
+

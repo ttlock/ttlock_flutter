@@ -96,6 +96,21 @@ class _KeyPadState extends State<KeyPadPage> {
             });
         break;
       case Command.addCard:
+        TTRemoteKeypad.addCard(
+            null,
+            0,
+            0,
+            lockData,
+                (){
+              print("addCard;;;请刷卡");
+            }, (String cardNumber) {
+              print("addCard fingerprintNumber:$cardNumber");
+              _showSuccessAndDismiss("addCard success");
+            }, (errorCode, errorMsg) {
+              print("addCard;;;errorCode:$errorCode;;;;errorMsg:$errorMsg");
+              ProgressHud.of(_context!)!.showErrorAndDismiss(
+                  text: 'errorCode:$errorCode errorMessage:$errorMsg');
+            });
         break;
       default:
     }

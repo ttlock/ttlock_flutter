@@ -201,7 +201,7 @@ class _LockPageState extends State<LockPage> {
   @override
   void dispose() {
     //You need to reset lock, otherwise the lock will can't be initialized again
-    TTLock.resetLock(lockData, () {}, (errorCode, errorMsg) {});
+   // TTLock.resetLock(lockData, () {}, (errorCode, errorMsg) {});
     super.dispose();
   }
 

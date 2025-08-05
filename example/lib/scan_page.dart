@@ -11,6 +11,7 @@ import 'package:bmprogresshud/progresshud.dart';
 import 'lock_page.dart';
 import 'electric_meter_page.dart';
 
+
 enum ScanType { lock, gateway, electricMeter, keyPad }
 
 class ScanPage extends StatefulWidget {
@@ -76,6 +77,8 @@ class _ScanPageState extends State<ScanPage> {
     map["isInited"] = scanModel.isInited;
     TTLock.initLock(map, (lockData) {
       _dismissLoading();
+      LockConfig.lockData = lockData;
+      LockConfig.lockMac = scanModel.lockMac;
       Navigator.push(context,
           new MaterialPageRoute(builder: (BuildContext context) {
         return LockPage(
@@ -125,27 +128,31 @@ class _ScanPageState extends State<ScanPage> {
   void _initKeyPad(TTRemoteAccessoryScanModel scanModel) async {
     print("init keyPad");
     var mac = scanModel.mac;
-    var lockMac = "05:46:71:31:DA:20";
-    var lockData = "";
+    var lockMac = LockConfig.lockMac;
+    var lockData = LockConfig.lockData;
+    print("多功能键盘lockData:$lockData");
+    print("多功能键盘：$lockMac");
     if (scanModel.isMultifunctionalKeypad) {
       assert(lockMac.isNotEmpty);
       assert(lockData.isNotEmpty);
       TTRemoteKeypad.multifunctionalInit(
           mac,
-          lockMac,
+          lockData,
           (int electricQuantity,
               String wirelessKeypadFeatureValue,
               int slotNumber,
-              int slotLimit) {}, (TTLockError errorCode, String errorMsg) {
-        Navigator.push(context,
-            new MaterialPageRoute(builder: (BuildContext context) {
-          return KeyPadPage(
-            name: scanModel.name,
-            mac: scanModel.mac,
-            lockData: "",
-            lockMac: "",
-          );
-        }));
+              int slotLimit) {
+            Navigator.push(context,
+                new MaterialPageRoute(builder: (BuildContext context) {
+                  return KeyPadPage(
+                    name: scanModel.name,
+                    mac: scanModel.mac,
+                    lockData: lockData,
+                    lockMac: lockMac,
+                  );
+                }));
+          }, (TTLockError errorCode, String errorMsg) {
+
       }, (TTRemoteKeyPadAccessoryError errorCode, String errorMsg) {});
     } else {
       assert(lockMac.isNotEmpty);
