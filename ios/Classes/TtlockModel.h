@@ -132,6 +132,7 @@
 
 @property (nonatomic, strong) NSString *faceFeatureData;
 
+@property (nonatomic, strong) NSNumber *slotNumber;
 
 + (TtlockModel *)modelWithDict:(NSDictionary *)dict;
 - (NSDictionary *)toDictionary;
