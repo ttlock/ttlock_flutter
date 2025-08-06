@@ -22,7 +22,7 @@ rootProject.allprojects {
         google()
         jcenter()
         flatDir {
-            dirs 'libs'
+            dirs project(':ttlock_flutter').file('libs')
         }
     }
 }
@@ -30,6 +30,11 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
+
+    if (project.android.hasProperty("namespace")) {
+        namespace 'com.ttlock.ttlock_flutter'
+    }
+
     compileSdkVersion 31
     namespace 'com.ttlock.ttlock_flutter'
     defaultConfig {

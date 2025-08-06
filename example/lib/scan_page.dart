@@ -4,7 +4,6 @@ import 'package:ttlock_flutter/ttgateway.dart';
 import 'package:ttlock_flutter/ttlock.dart';
 import 'package:ttlock_flutter/ttremoteKeypad.dart';
 import 'package:ttlock_flutter_example/gateway_page.dart';
-import 'config.dart';
 import 'key_pad_page.dart';
 import 'wifi_page.dart';
 import 'package:bmprogresshud/progresshud.dart';
