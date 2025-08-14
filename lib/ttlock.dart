@@ -1643,26 +1643,27 @@ class TTLock {
       errorCode = TTLockError.fail.index;
     }
 
+
     dynamic callBack;
     dynamic otherCallBack;
+    int index = -1;
+    for (var i = 0; i < _commandQueue.length; i++) {
+      Map map = _commandQueue[i];
+      String key = map.keys.first;
+      if (key.compareTo(command) == 0) {
+        callBack = map[command][CALLBACK_FAIL];
+        otherCallBack = map[command][CALLBACK_OTHER_FAIL];
+        index = i;
+        break;
+      }
+    }
     //多功能键盘添加指纹时返回重复指纹失败时，不移除
     if (_commandQueue.length > 0 &&
         !(command == TTRemoteKeypad.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT &&
             data["errorDevice"] == TTErrorDevice.keyPad.index
             && errorCode == TTRemoteKeyPadAccessoryError.duplicateFingerprint.index)
     ) {
-      print("sdk指纹录入过程:移除方法:$command;;;errorDevice:${data["errorDevice"]};;;;errorCode:${data["errorCode"]}");
-      int index = -1;
-      for (var i = 0; i < _commandQueue.length; i++) {
-        Map map = _commandQueue[i];
-        String key = map.keys.first;
-        if (key.compareTo(command) == 0) {
-          callBack = map[command][CALLBACK_FAIL];
-          otherCallBack = map[command][CALLBACK_OTHER_FAIL];
-          index = i;
-          break;
-        }
-      }
+      print("移除方法:$command;;;errorDevice:${data["errorDevice"]};;;;errorCode:${data["errorCode"]}");
       if (index > -1) {
         _commandQueue.removeAt(index);
       }
