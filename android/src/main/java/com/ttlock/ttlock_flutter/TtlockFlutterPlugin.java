@@ -643,7 +643,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
                   public void onKeypadFail(MultifunctionalKeypadError multifunctionalKeypadError) {
                     HashMap<String, Object> map = new HashMap<>();
                     map.put("errorDevice", 1);
-                    callbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT, ResultStateFail, map, 0, multifunctionalKeypadError.getDescription());
+                    int errorCode = 0;
+                    if(multifunctionalKeypadError.getErrorCode() == 257)
+                    {
+                      errorCode = 4;
+                    }
+                    callbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT, ResultStateFail, map, errorCode, multifunctionalKeypadError.getDescription());
 
                   }
 
