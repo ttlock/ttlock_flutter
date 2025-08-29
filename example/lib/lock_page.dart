@@ -88,7 +88,8 @@ enum Command {
   addFaceData,
   modifyFace,
   deleteFace,
-  clearFace
+  clearFace,
+  setLockWorkingTime
 }
 
 class _LockPageState extends State<LockPage> {
@@ -166,7 +167,8 @@ class _LockPageState extends State<LockPage> {
     {"Add face": Command.addFace},
     {"Modify face": Command.modifyFace},
     {"Delete Face": Command.deleteFace},
-    {"Clear Face": Command.clearFace}
+    {"Clear Face": Command.clearFace},
+    {"Set Lock Working Time": Command.setLockWorkingTime}
   ];
 
   String note =
@@ -770,6 +772,15 @@ class _LockPageState extends State<LockPage> {
       case Command.clearFace:
         TTLock.clearFace(lockData, () {
           _showSuccessAndDismiss("clear face success");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+      case Command.setLockWorkingTime:
+        var start = DateTime(2025,8,29).millisecond;
+        var end = DateTime(2026,8,29).millisecond;
+        TTLock.setLockWorkingTime(start,end, lockData,() {
+          _showSuccessAndDismiss("set lock working time success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
