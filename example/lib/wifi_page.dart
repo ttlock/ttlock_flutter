@@ -16,6 +16,11 @@ class _WifiPageState extends State<WifiPage> {
   // BuildContext _context;
 
   _WifiPageState() {
+    // state initialization moved to initState
+  }
+
+  @override
+  void initState() {
     super.initState();
     _getNearbyWifi();
   }

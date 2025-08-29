@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:ttlock_flutter/ttelectricMeter.dart';
 import 'package:bmprogresshud/progresshud.dart';
 import 'package:ttlock_flutter/ttlock.dart';
 import 'package:ttlock_flutter/ttremoteKeypad.dart';
@@ -39,11 +38,15 @@ class _KeyPadState extends State<KeyPadPage> {
   BuildContext? _context;
 
   _KeyPadState(String name, String mac, String lockMac, String lockData) {
-    super.initState();
     this.name = name;
     this.mac = mac;
     this.lockMac = lockMac;
     this.lockData = lockData;
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   void _showLoading(String text) {
@@ -79,38 +82,30 @@ class _KeyPadState extends State<KeyPadPage> {
         });
         break;
       case Command.addFingerprint:
-        TTRemoteKeypad.addFingerprint(mac,
-            null,
-            1746673751000,
-            1746760151000,
-            lockData,
-                (int currentCount, int totalCount){
-               print("addFingerprint;;;currentCount:$currentCount;;;;totalCount:$totalCount");
-            }, (String fingerprintNumber) {
-              print("addFingerprint fingerprintNumber:$fingerprintNumber");
-            }, (errorCode, errorMsg) {
-              print("addFingerprint;;;errorCode:$errorCode;;;;errorMsg:$errorMsg");
-
-            }, (TTRemoteKeyPadAccessoryError errorCode, String errorMsg){
-              print("addFingerprint;;;errorCode:$errorCode;;;;errorMsg:$errorMsg");
-            });
+        TTRemoteKeypad.addFingerprint(
+            mac, null, 1746673751000, 1746760151000, lockData,
+            (int currentCount, int totalCount) {
+          print(
+              "addFingerprint;;;currentCount:$currentCount;;;;totalCount:$totalCount");
+        }, (String fingerprintNumber) {
+          print("addFingerprint fingerprintNumber:$fingerprintNumber");
+        }, (errorCode, errorMsg) {
+          print("addFingerprint;;;errorCode:$errorCode;;;;errorMsg:$errorMsg");
+        }, (TTRemoteKeyPadAccessoryError errorCode, String errorMsg) {
+          print("addFingerprint;;;errorCode:$errorCode;;;;errorMsg:$errorMsg");
+        });
         break;
       case Command.addCard:
-        TTRemoteKeypad.addCard(
-            null,
-            0,
-            0,
-            lockData,
-                (){
-              print("addCard;;;请刷卡");
-            }, (String cardNumber) {
-              print("addCard fingerprintNumber:$cardNumber");
-              _showSuccessAndDismiss("addCard success");
-            }, (errorCode, errorMsg) {
-              print("addCard;;;errorCode:$errorCode;;;;errorMsg:$errorMsg");
-              ProgressHud.of(_context!)!.showErrorAndDismiss(
-                  text: 'errorCode:$errorCode errorMessage:$errorMsg');
-            });
+        TTRemoteKeypad.addCard(null, 0, 0, lockData, () {
+          print("addCard;;;请刷卡");
+        }, (String cardNumber) {
+          print("addCard fingerprintNumber:$cardNumber");
+          _showSuccessAndDismiss("addCard success");
+        }, (errorCode, errorMsg) {
+          print("addCard;;;errorCode:$errorCode;;;;errorMsg:$errorMsg");
+          ProgressHud.of(_context!)!.showErrorAndDismiss(
+              text: 'errorCode:$errorCode errorMessage:$errorMsg');
+        });
         break;
       default:
     }

@@ -1,36 +1,22 @@
+plugins {
+    id 'com.android.library'
+}
+
 group 'com.ttlock.ttlock_flutter'
 version '1.0'
-
-buildscript {
-    ext {
-        agp_version = '4.1.2'
-    }
-    repositories {
-        mavenCentral()
-        google()
-        jcenter()
-    }
-
-    dependencies {
-        classpath "com.android.tools.build:gradle:$agp_version"
-    }
-}
 
 rootProject.allprojects {
     repositories {
         mavenCentral()
         google()
-        jcenter()
         flatDir {
             dirs 'libs'
         }
     }
 }
 
-apply plugin: 'com.android.library'
-
 android {
-    compileSdkVersion 31
+    compileSdkVersion 34
     namespace 'com.ttlock.ttlock_flutter'
     defaultConfig {
         minSdkVersion 18

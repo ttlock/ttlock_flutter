@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ttlock_flutter/TTElectricMeter.dart';
+import 'package:ttlock_flutter/ttelectricMeter.dart';
 import 'package:bmprogresshud/progresshud.dart';
 import 'package:ttlock_flutter/ttlock.dart';
 
@@ -44,9 +44,13 @@ class _ElectricMeterState extends State<ElectricMeterPage> {
   BuildContext? _context;
 
   _ElectricMeterState(String name, String mac) {
-    super.initState();
     this.name = name;
     this.mac = mac;
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   void _showLoading(String text) {

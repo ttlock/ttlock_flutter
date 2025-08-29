@@ -180,9 +180,13 @@ class _LockPageState extends State<LockPage> {
   BuildContext? _context;
 
   _LockPageState(String lockData, String lockMac) {
-    super.initState();
     this.lockData = lockData;
     this.lockMac = lockMac;
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   void _showLoading(String text) {
@@ -201,7 +205,7 @@ class _LockPageState extends State<LockPage> {
   @override
   void dispose() {
     //You need to reset lock, otherwise the lock will can't be initialized again
-   // TTLock.resetLock(lockData, () {}, (errorCode, errorMsg) {});
+    // TTLock.resetLock(lockData, () {}, (errorCode, errorMsg) {});
     super.dispose();
   }
 
@@ -214,7 +218,7 @@ class _LockPageState extends State<LockPage> {
       case Command.resetLock:
         TTLock.resetLock(lockData, () {
           print("Reset lock success");
-          Navigator.popAndPushNamed(context, '/');
+          Navigator.of(context).pop();
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });

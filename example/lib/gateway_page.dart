@@ -19,9 +19,13 @@ class _GatewayPageState extends State<GatewayPage> {
   String? _wifiPassword;
   TTGatewayType? _type;
   _GatewayPageState(TTGatewayType type, String? wifi) {
-    super.initState();
     _wifi = wifi;
     _type = type;
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   void _showLoading() {
@@ -33,8 +37,9 @@ class _GatewayPageState extends State<GatewayPage> {
   }
 
   void _initGateway_2(String? wifi, String? wifiPassword) {
-    if (_wifi == null || _wifiPassword != null || _wifiPassword!.length == 0) {
+    if (_wifi == null || _wifiPassword == null || _wifiPassword!.isEmpty) {
       _showAndDismiss(ProgressHudType.error, '"wifi or password cant be empty');
+      return;
     }
 
     Map paramMap = Map();
