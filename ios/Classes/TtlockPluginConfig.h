@@ -87,6 +87,10 @@
 
 #define command_clear_remote_key @"clearRemoteKey"
 
+#define command_set_lock_work_time @"setLockWorkingTime"
+
+
+
 
 
 #pragma mark - 网关指令

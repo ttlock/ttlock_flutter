@@ -586,23 +586,24 @@ typedef NS_ENUM(NSInteger, ErrorDevice) {
                     @(TTLockFeatureValueWifiLock),
                     @(TTLockFeatureValueWifiLockStaticIP),
                     @(TTLockFeatureValuePasscodeKeyNumber),
-                    @(TTLockFeatureValueMeariCamera),
+                    @(TTLockFeatureValueXiaoCaoCamera),
                     @(TTLockFeatureValueStandAloneActivation),
                     @(TTLockFeatureValueDoubleAuth),
                     @(TTLockFeatureValueAuthorizedUnlock),
                     @(TTLockFeatureValueGatewayAuthorizedUnlock),
                     @(TTLockFeatureValueNoEkeyUnlock),
-                    @(TTLockFeatureValueXiongMaiCamera),
+                    @(TTLockFeatureValueXiaoCaoCamera),
                     @(TTLockFeatureValueZhiAnPhotoFace),
                     @(TTLockFeatureValuePalmVein),
                     @(TTLockFeatureValueWifiArea),
                     @(TTLockFeatureValueXiaoCaoCamera),
-                    @(TTLockFeatureValueResetLockByCode)
+                    @(TTLockFeatureValueResetLockByCode),
+                    @(TTLockFeatureValueWorkingTime),
                 ];
                 
                 
                 TTLockFeatureValue featureValue = [functionArray[index] intValue];
-                bool isSupport = [TTUtil lockFeatureValue:lockModel.lockData suportFunction:featureValue];
+                bool isSupport = [TTUtil isSupportFeature:featureValue lockData:lockModel.lockData];
                 TtlockModel *data = [TtlockModel new];
                 data.isSupport = @(isSupport);
                 [weakSelf successCallbackCommand:command data:data];
@@ -892,7 +893,14 @@ typedef NS_ENUM(NSInteger, ErrorDevice) {
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];
         }];
+    }else if ([command isEqualToString:command_set_lock_work_time]) {
+        [TTLock setLockWorkingTimeWithStartDate:lockModel.startDate.longLongValue endDate:lockModel.endDate.longLongValue lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];
+        }];
     }
+    
     
     
 #pragma mark - 人脸识别

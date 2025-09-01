@@ -150,7 +150,6 @@ class TTLock {
   static const String COMMAND_CLEAR_FACE = "faceClear";
   static const String COMMAND_SET_WORKING_TIME = "setLockWorkingTime";
 
-
   // static const String COMMAND_GET_PASSCODE_VERIFICATION_PARAMS = "getPasscodeVerificationParams";
 
   static Map<String, List<Map>> _commandMap = Map();
@@ -1257,9 +1256,9 @@ class TTLock {
     map[TTResponse.lockData] = lockData;
     map[TTResponse.startDate] = startDate;
     map[TTResponse.endDate] = endDate;
-    invoke(COMMAND_SET_WORKING_TIME, map, callback, fail_callback: failedCallback);
+    invoke(COMMAND_SET_WORKING_TIME, map, callback,
+        fail_callback: failedCallback);
   }
-
 
 //执行方法
   static bool isListenEvent = false;
@@ -1708,23 +1707,19 @@ class TTLock {
                 .COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT ||
         command ==
             TTRemoteKeypad.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD) {
-
-      if(data["errorDevice"] == TTErrorDevice.keyPad.index)
-        {
-          TTRemoteKeypadFailedCallback? failedCallback = otherCallBack;
-          TTRemoteKeyPadAccessoryError error =
-          TTRemoteKeyPadAccessoryError.values[errorCode];
-          if (failedCallback != null) {
-            failedCallback(error, errorMessage);
-          }
-        }else
-          {
-            if(errorCode<0)
-            {
-              errorCode = 0;
-            }
-            callBack?.call(TTLockError.values[errorCode], errorMessage);
-          }
+      if (data["errorDevice"] == TTErrorDevice.keyPad.index) {
+        TTRemoteKeypadFailedCallback? failedCallback = otherCallBack;
+        TTRemoteKeyPadAccessoryError error =
+            TTRemoteKeyPadAccessoryError.values[errorCode];
+        if (failedCallback != null) {
+          failedCallback(error, errorMessage);
+        }
+      } else {
+        if (errorCode < 0) {
+          errorCode = 0;
+        }
+        callBack?.call(TTLockError.values[errorCode], errorMessage);
+      }
     }
 
     //蓝牙水电表失败处理
@@ -2355,7 +2350,8 @@ enum TTLockFunction {
   palmVein,
   wifiArea,
   xiaoCaoCamera,
-  resetLockByCode
+  resetLockByCode,
+  workingTime
 }
 
 enum TTFaceState { canStartAdd, error }
