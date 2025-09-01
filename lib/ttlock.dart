@@ -148,6 +148,8 @@ class TTLock {
   static const String COMMAND_MODIFY_FACE = "faceModify";
   static const String COMMAND_DELETE_FACE = "faceDelete";
   static const String COMMAND_CLEAR_FACE = "faceClear";
+  static const String COMMAND_SET_WORKING_TIME = "setLockWorkingTime";
+
 
   // static const String COMMAND_GET_PASSCODE_VERIFICATION_PARAMS = "getPasscodeVerificationParams";
 
@@ -1248,6 +1250,16 @@ class TTLock {
     map[TTResponse.faceNumber] = faceNumber;
     invoke(COMMAND_DELETE_FACE, map, callback, fail_callback: failedCallback);
   }
+
+  static void setLockWorkingTime(int startDate, int endDate, String lockData,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.lockData] = lockData;
+    map[TTResponse.startDate] = startDate;
+    map[TTResponse.endDate] = endDate;
+    invoke(COMMAND_SET_WORKING_TIME, map, callback, fail_callback: failedCallback);
+  }
+
 
 //执行方法
   static bool isListenEvent = false;
