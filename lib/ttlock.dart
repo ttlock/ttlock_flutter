@@ -1668,7 +1668,12 @@ class TTLock {
         commandList.length > 0 ? commandList.first[CALLBACK_FAIL] : null;
     dynamic otherCallBack =
         commandList.length > 0 ? commandList.first[CALLBACK_OTHER_FAIL] : null;
-    if (commandList.length > 0) {
+    //多功能键盘添加指纹时返回重复指纹失败时，不移除
+    if (commandList.length > 0 &&
+        !(command == TTRemoteKeypad.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT &&
+            data["errorDevice"] == TTErrorDevice.keyPad.index
+            && errorCode == TTRemoteKeyPadAccessoryError.duplicateFingerprint.index)
+    ) {
       commandList.removeAt(0);
     }
     //网关失败处理
