@@ -84,7 +84,7 @@ import com.ttlock.bl.sdk.callback.SetLockSoundWithSoundVolumeCallback;
 import com.ttlock.bl.sdk.callback.SetLockTimeCallback;
 import com.ttlock.bl.sdk.callback.SetNBAwakeModesCallback;
 import com.ttlock.bl.sdk.callback.SetNBAwakeTimesCallback;
-import com.ttlock.bl.sdk.constant.LockConfigType;
+import com.ttlock.bl.sdk.entity.TTLockConfigType;
 import com.ttlock.bl.sdk.entity.ControlLockResult;
 import com.ttlock.bl.sdk.callback.SetNBServerCallback;
 import com.ttlock.bl.sdk.callback.SetPassageModeCallback;
@@ -4071,12 +4071,11 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   public void setLockWorkingTime(final TtlockModel ttlockModel) {
     PermissionUtils.doWithConnectPermission(activity, success -> {
         if (success) {
-            // Use the new setLockConfig method with the WORK_MODE type
+            // Use the new setLockConfig method with the CORRECT class name
             TTLockClient.getDefault().setLockConfig(
-                LockConfigType.WORK_MODE, ttlockModel.lockData, new ControlLockCallback() {
+                TTLockConfigType.WORK_MODE, ttlockModel.lockData, new ControlLockCallback() {
                     @Override
                     public void onControlLockSuccess(ControlLockResult result) {
-                        // This is the correct success method signature.
                         apiSuccess(ttlockModel);
                     }
 
