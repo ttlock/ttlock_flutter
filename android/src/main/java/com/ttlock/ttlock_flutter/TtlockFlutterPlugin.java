@@ -82,7 +82,6 @@ import com.ttlock.bl.sdk.callback.SetLiftWorkModeCallback;
 import com.ttlock.bl.sdk.callback.SetLockConfigCallback;
 import com.ttlock.bl.sdk.callback.SetLockSoundWithSoundVolumeCallback;
 import com.ttlock.bl.sdk.callback.SetLockTimeCallback;
-import com.ttlock.bl.sdk.callback.SetLockWorkingTimeCallback;
 import com.ttlock.bl.sdk.callback.SetNBAwakeModesCallback;
 import com.ttlock.bl.sdk.callback.SetNBAwakeTimesCallback;
 import com.ttlock.bl.sdk.callback.SetNBServerCallback;
@@ -4069,24 +4068,27 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
   public void setLockWorkingTime(final TtlockModel ttlockModel) {
     PermissionUtils.doWithConnectPermission(activity, success -> {
-      if (success) {
-        TTLockClient.getDefault().setLockWorkingTime(
-                ttlockModel.startDate, ttlockModel.endDate, ttlockModel.lockData, new SetLockWorkingTimeCallback() {
-                  @Override
-                  public void onSetSuccess() {
-                    apiSuccess(ttlockModel);
-                  }
+        if (success) {
+            TTLockClient.getDefault().setLockWorkingTime(
+                ttlockModel.startDate, ttlockModel.endDate, ttlockModel.lockData, new ControlLockCallback() {
+                    @Override
+                    public void onControlLockSuccess(int lockAction, int battery, int uniqueId) {
+                        // This is the new success method.
+                        // We are calling your original success function.
+                        apiSuccess(ttlockModel);
+                    }
 
-                  @Override
-                  public void onFail(LockError lockError) {
-                    apiFail(lockError);
-                  }
+                    @Override
+                    public void onFail(LockError lockError) {
+                        // The onFail method is the same.
+                        apiFail(lockError);
+                    }
                 });
-      } else {
-        apiFail(LockError.LOCK_NO_PERMISSION);
-      }
+        } else {
+            apiFail(LockError.LOCK_NO_PERMISSION);
+        }
     });
-  }
+}
 
 
   public void setAdminErasePasscode(final TtlockModel ttlockModel) {
