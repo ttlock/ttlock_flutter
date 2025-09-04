@@ -1323,7 +1323,7 @@ class TTLock {
     } else {
       if (command == COMMAND_START_SCAN_LOCK ||
           command == TTGateway.COMMAND_START_SCAN_GATEWAY ||
-          command == TTRemoteKey.COMMAND_START_SCAN_REMOTE_KEY ||
+          command == TTRemotekey.COMMAND_START_SCAN_REMOTE_KEY ||
           command == TTRemoteKeypad.COMMAND_START_SCAN_REMOTE_KEYPAD ||
           command == TTDoorSensor.COMMAND_START_SCAN_DOOR_SENSOR ||
           command == TTWaterMeter.COMMAND_START_SCAN_WATER_METER ||
@@ -1367,7 +1367,7 @@ class TTLock {
         scanCallback(TTGatewayScanModel(data));
         break;
 
-      case TTRemoteKey.COMMAND_START_SCAN_REMOTE_KEY:
+      case TTRemotekey.COMMAND_START_SCAN_REMOTE_KEY:
       case TTRemoteKeypad.COMMAND_START_SCAN_REMOTE_KEYPAD:
       case TTDoorSensor.COMMAND_START_SCAN_DOOR_SENSOR:
         TTRemoteAccessoryScanCallback scanCallback = callBack;
@@ -1401,7 +1401,7 @@ class TTLock {
         lockDirectionCallback(TTLockDirection.values[direction]);
         break;
       case COMMAND_GET_LOCK_SYSTEM_INFO:
-      case TTRemoteKey.COMMAND_INIT_REMOTE_KEY:
+      case TTRemotekey.COMMAND_INIT_REMOTE_KEY:
       case TTDoorSensor.COMMAND_INIT_DOOR_SENSOR:
         TTGetLockSystemCallback getLockSystemCallback = callBack;
         getLockSystemCallback(TTLockSystemModel(data));
@@ -1683,7 +1683,7 @@ class TTLock {
       }
     }
     //普通键盘和遥控钥匙失败处理
-    else if (command == TTRemoteKey.COMMAND_INIT_REMOTE_KEY ||
+    else if (command == TTRemotekey.COMMAND_INIT_REMOTE_KEY ||
         command == TTDoorSensor.COMMAND_INIT_DOOR_SENSOR ||
         command == TTRemoteKeypad.COMMAND_INIT_REMOTE_KEYPAD) {
       TTRemoteKeypadFailedCallback? failedCallback = callBack;
