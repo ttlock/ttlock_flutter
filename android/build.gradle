@@ -45,9 +45,9 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.ttlock:ttlock:3.5.0'
-    implementation 'com.google.code.gson:gson:2.6.2'
-   // implementation(name: 'ttlock-release', ext: 'aar')
-    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.ttlock:ttlock:3.5.0'
+    implementation 'com.google.code.gson:gson:2.6.2'
+    // implementation(name: 'ttlock-release', ext: 'aar')
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
 }
