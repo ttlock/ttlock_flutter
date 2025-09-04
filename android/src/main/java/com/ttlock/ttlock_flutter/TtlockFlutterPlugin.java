@@ -84,6 +84,8 @@ import com.ttlock.bl.sdk.callback.SetLockSoundWithSoundVolumeCallback;
 import com.ttlock.bl.sdk.callback.SetLockTimeCallback;
 import com.ttlock.bl.sdk.callback.SetNBAwakeModesCallback;
 import com.ttlock.bl.sdk.callback.SetNBAwakeTimesCallback;
+import com.ttlock.bl.sdk.constant.LockConfigType;
+import com.ttlock.bl.sdk.entity.ControlLockResult;
 import com.ttlock.bl.sdk.callback.SetNBServerCallback;
 import com.ttlock.bl.sdk.callback.SetPassageModeCallback;
 import com.ttlock.bl.sdk.callback.SetPowerSaverControlableLockCallback;
@@ -4069,18 +4071,17 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   public void setLockWorkingTime(final TtlockModel ttlockModel) {
     PermissionUtils.doWithConnectPermission(activity, success -> {
         if (success) {
-            TTLockClient.getDefault().setLockWorkingTime(
-                ttlockModel.startDate, ttlockModel.endDate, ttlockModel.lockData, new ControlLockCallback() {
+            // Use the new setLockConfig method with the WORK_MODE type
+            TTLockClient.getDefault().setLockConfig(
+                LockConfigType.WORK_MODE, ttlockModel.lockData, new ControlLockCallback() {
                     @Override
-                    public void onControlLockSuccess(int lockAction, int battery, int uniqueId) {
-                        // This is the new success method.
-                        // We are calling your original success function.
+                    public void onControlLockSuccess(ControlLockResult result) {
+                        // This is the correct success method signature.
                         apiSuccess(ttlockModel);
                     }
 
                     @Override
                     public void onFail(LockError lockError) {
-                        // The onFail method is the same.
                         apiFail(lockError);
                     }
                 });
