@@ -1683,7 +1683,7 @@ class TTLock {
       }
     }
     //普通键盘和遥控钥匙失败处理
-    else if (command == TTRemotekey.COMMAND_INIT_REMOTE_KEY ||
+    else if (command == TTRemoteKey.COMMAND_INIT_REMOTE_KEY ||
         command == TTDoorSensor.COMMAND_INIT_DOOR_SENSOR ||
         command == TTRemoteKeypad.COMMAND_INIT_REMOTE_KEYPAD) {
       TTRemoteKeypadFailedCallback? failedCallback = callBack;
