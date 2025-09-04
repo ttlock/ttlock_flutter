@@ -4071,19 +4071,31 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   public void setLockWorkingTime(final TtlockModel ttlockModel) {
     PermissionUtils.doWithConnectPermission(activity, success -> {
         if (success) {
-            // Use the new setLockConfig method with the CORRECT class name
-            TTLockClient.getDefault().setLockConfig(
-                TTLockConfigType.WORK_MODE, ttlockModel.lockData, new ControlLockCallback() {
-                    @Override
-                    public void onControlLockSuccess(ControlLockResult result) {
-                        apiSuccess(ttlockModel);
-                    }
+            // Create the configuration object for passage mode.
+            PassageModeConfig passageModeConfig = new PassageModeConfig();
 
-                    @Override
-                    public void onFail(LockError lockError) {
-                        apiFail(lockError);
-                    }
-                });
+            // The type is 'Weekly' for a recurring work schedule.
+            passageModeConfig.setModeType(PassageModeType.Weekly);
+
+            // The 'lockData' for this command contains the JSON string for the weekly repeat days.
+            passageModeConfig.setRepeatWeekOrDays(ttlockModel.lockData);
+
+            // Set the start and end times for the passage mode.
+            passageModeConfig.setStartDate((int) ttlockModel.startDate);
+            passageModeConfig.setEndDate((int) ttlockModel.endDate);
+
+            // Call the correct SDK method: setPassageMode
+            TTLockClient.getDefault().setPassageMode(passageModeConfig, ttlockModel.lockData, ttlockModel.lockMac, new SetPassageModeCallback() {
+                @Override
+                public void onSetPassageModeSuccess() {
+                    apiSuccess(ttlockModel);
+                }
+
+                @Override
+                public void onFail(LockError lockError) {
+                    apiFail(lockError);
+                }
+            });
         } else {
             apiFail(LockError.LOCK_NO_PERMISSION);
         }
