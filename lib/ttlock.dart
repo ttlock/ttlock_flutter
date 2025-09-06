@@ -172,9 +172,8 @@ class TTLock {
   static void stopScanLock() {
     invoke(COMMAND_STOP_SCAN_LOCK, null, null);
   }
-// Add this entire function
-static Future<void> prepareBTService() async {
-  await _channel.invokeMethod('prepareBTService');
+static void prepareBTService() {
+  invoke(COMMAND_PREPARE_BT_SERVICE, null, null);
 }
   // ignore: slash_for_doc_comments
 /**
