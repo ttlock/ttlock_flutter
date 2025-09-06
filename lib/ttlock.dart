@@ -22,6 +22,7 @@ class TTLock {
   static const String COMMAND_START_SCAN_LOCK = "startScanLock";
   static const String COMMAND_STOP_SCAN_LOCK = "stopScanLock";
   static const String COMMAND_GET_BLUETOOTH_STATE = "getBluetoothState";
+  static const String COMMAND_PREPARE_BT_SERVICE = "prepareBTService";
   static const String COMMAND_INIT_LOCK = "initLock";
   static const String COMMAND_RESET_LOCK = "resetLock";
 
