@@ -171,7 +171,10 @@ class TTLock {
   static void stopScanLock() {
     invoke(COMMAND_STOP_SCAN_LOCK, null, null);
   }
-
+// Add this entire function
+static Future<void> prepareBTService() async {
+  await _channel.invokeMethod('prepareBTService');
+}
   // ignore: slash_for_doc_comments
 /**
    * Current Phone/Pad Bluetooth state
