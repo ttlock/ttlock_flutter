@@ -294,13 +294,16 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   // THIS IS THE CORRECTED onMethodCall FUNCTION
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
-    // First, check for our new custom command.
+    // --- THIS IS THE CRITICAL FIX ---
+    // First, we check for our new manual initialization command.
     if (call.method.equals("prepareBTService")) {
         prepareBTService(result);
-        return; // Stop here after handling our command
+        return; // We stop here because our job is done.
     }
+    // -----------------------------
 
-    // This is the original logic from the package.
+    // This is the original logic from the package that handles all other commands.
+    // It remains unchanged.
     if (!sdkIsInit) {
         initSdk();
     }
@@ -327,7 +330,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         commandType = CommandType.DOOR_LOCK;
         doorLockCommand(call);
     }
-  }
+}
 
   private void initSdk() {
     TTLockClient.getDefault().prepareBTService(activity);
