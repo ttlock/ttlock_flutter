@@ -2127,37 +2127,27 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
   public void startScan() {
     PermissionUtils.doWithScanPermission(activity, success -> {
-      if (success) {
-        TTLockClient.getDefault().startScanLock(new ScanLockCallback() {
-          @Override
-          public void onScanLockSuccess(ExtendedBluetoothDevice extendedBluetoothDevice) {
-            TtlockModel data = new TtlockModel();
-            data.electricQuantity = extendedBluetoothDevice.getBatteryCapacity();
-            data.lockName = extendedBluetoothDevice.getName();
-            data.lockMac = extendedBluetoothDevice.getAddress();
-            data.isInited = !extendedBluetoothDevice.isSettingMode();
-            data.isAllowUnlock = extendedBluetoothDevice.isTouch();
-            data.lockVersion = extendedBluetoothDevice.getLockVersionJson();
-            data.rssi = extendedBluetoothDevice.getRssi();
-            data.timestamp = extendedBluetoothDevice.getDate();
-            successCallbackCommand(TTLockCommand.COMMAND_START_SCAN_LOCK, data.toMap());
-//            data.lockSwitchState = @(scanModel.lockSwitchState);
-//            data.oneMeterRssi = @(scanModel.oneMeterRSSI);
-            if (extendedBluetoothDevice.isSettingMode()) {
-              LogUtil.d("lockVersion:" + extendedBluetoothDevice.getLockVersionJson());
-            }
-          }
+        if (success) {
+            // This is the complete and correct callback implementation.
+            TTLockClient.getDefault().startScanLock(new ScanLockCallback() {
+                @Override
+                public void onScanLock(ScanLockResult scanLockResult) {
+                    // This is the only "success" method needed.
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("lockName", scanLockResult.getLockName());
+                    map.put("lockMac", scanLockResult.getLockMac());
+                    map.put("rssi", scanLockResult.getRssi());
+                    channel.invokeMethod("onScanLock", map);
+                }
 
-          @Override
-          public void onFail(LockError lockError) {//todo:
-            LogUtil.d("lockError:" + lockError);
-          }
-        });
-      } else {
-        LogUtil.d("no scan permission");
-      }
+                @Override
+                public void onFail(LockError error) {
+                    // This is the only "fail" method needed.
+                }
+            });
+        }
     });
-  }
+}
 
   public void stopScan() {
     TTLockClient.getDefault().stopScanLock();
