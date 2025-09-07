@@ -174,9 +174,6 @@ static Future<void> prepareBTService() async {
   static void stopScanLock() {
     invoke(COMMAND_STOP_SCAN_LOCK, null, null);
   }
-static void prepareBTService() {
-  invoke(COMMAND_PREPARE_BT_SERVICE, null, null);
-}
   // ignore: slash_for_doc_comments
 /**
    * Current Phone/Pad Bluetooth state
