@@ -2125,24 +2125,25 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     }
   }
 
-  public void startScan() {
+ public void startScan() {
     PermissionUtils.doWithScanPermission(activity, success -> {
         if (success) {
-            // This is the complete and correct callback implementation.
+            // This is the final version, using the correct callback for your SDK.
             TTLockClient.getDefault().startScanLock(new ScanLockCallback() {
                 @Override
-                public void onScanLock(ScanLockResult scanLockResult) {
-                    // This is the only "success" method needed.
+                public void onScanLockSuccess(ExtendedBluetoothDevice extendedBluetoothDevice) {
+                    // This is the correct success method for your version.
                     HashMap<String, Object> map = new HashMap<>();
-                    map.put("lockName", scanLockResult.getLockName());
-                    map.put("lockMac", scanLockResult.getLockMac());
-                    map.put("rssi", scanLockResult.getRssi());
+                    map.put("lockName", extendedBluetoothDevice.getName());
+                    map.put("lockMac", extendedBluetoothDevice.getAddress());
+                    map.put("rssi", extendedBluetoothDevice.getRssi());
+                    // We are now using the correct callback and sending the data back to FlutterFlow.
                     channel.invokeMethod("onScanLock", map);
                 }
 
                 @Override
                 public void onFail(LockError error) {
-                    // This is the only "fail" method needed.
+                    // The onFail method is also required by the "contract".
                 }
             });
         }
