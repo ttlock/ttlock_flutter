@@ -18,7 +18,10 @@ class TTLock {
   static const String CALLBACK_PROGRESS = "callback_progress";
   static const String CALLBACK_FAIL = "callback_fail";
   static const String CALLBACK_OTHER_FAIL = "callback_other_fail";
-static Future<void> prepareBTService() async {
+  static Future<void> init() async {
+    await _commandChannel.invokeMethod('init');
+  }
+  static Future<void> prepareBTService() async {
     await _commandChannel.invokeMethod('prepareBTService');
   }
   static const String COMMAND_START_SCAN_LOCK = "startScanLock";
