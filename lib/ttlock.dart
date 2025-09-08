@@ -9,6 +9,17 @@ import 'ttgateway.dart';
 
 class TTLock {
   static bool isOnPremise = false;
+  static Future<String> getLockTimeDirect({
+    @required String lockData,
+    @required String lockMac,
+}) async {
+    Map<String, dynamic> params = {
+        "lockData": lockData,
+        "lockMac": lockMac,
+    };
+    // This will now return the time string on success or throw an error on failure.
+    return await _commandChannel.invokeMethod('getLockTimeDirect', params);
+}
 
   static MethodChannel _commandChannel =
       MethodChannel("com.ttlock/command/ttlock");
