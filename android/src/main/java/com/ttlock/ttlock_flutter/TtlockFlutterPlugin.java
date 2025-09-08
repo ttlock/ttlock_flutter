@@ -305,24 +305,24 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   // THIS IS THE CORRECTED onMethodCall FUNCTION
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
-    
-    // We handle our pre-scan checks here, at the top level.
+    // --- THIS IS THE FINAL, CORRECTED VERSION ---
     if (call.method.equals("isLocationEnabled")) {
-            boolean isLocationOn = isLocationServiceEnabled(this.context);
-            result.success(isLocationOn);
-            return;
-        } else if (call.method.equals("isBLEEnabled")) {
-            boolean isBleOn = TTLockClient.getDefault().isBLEEnabled(activity);
-            result.success(isBleOn);
-            return;
-        } else if (call.method.equals("requestBleEnable")) {
-            TTLockClient.getDefault().requestBleEnable(activity);
-            result.success(null);
-            return;
-        } else if (call.method.equals("prepareBTService")) {
-            prepareBTService(result);
-            return;
-        }
+        // We now correctly use the 'activity' variable, which is a valid Context
+        boolean isLocationOn = isLocationServiceEnabled(activity);
+        result.success(isLocationOn);
+        return;
+    } else if (call.method.equals("isBLEEnabled")) {
+        boolean isBleOn = TTLockClient.getDefault().isBLEEnabled(activity);
+        result.success(isBleOn);
+        return;
+    } else if (call.method.equals("requestBleEnable")) {
+        TTLockClient.getDefault().requestBleEnable(activity);
+        result.success(null);
+        return;
+    } else if (call.method.equals("prepareBTService")) {
+        prepareBTService(result);
+        return;
+    }
 
     // This is the original logic from the package that handles all other commands.
     // It remains unchanged.
