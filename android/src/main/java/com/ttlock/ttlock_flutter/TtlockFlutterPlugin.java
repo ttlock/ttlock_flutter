@@ -308,7 +308,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     
     // We handle our pre-scan checks here, at the top level.
     if (call.method.equals("isLocationEnabled")) {
-            boolean isLocationOn = isLocationServiceEnabled(context);
+            boolean isLocationOn = isLocationServiceEnabled(this.context);
             result.success(isLocationOn);
             return;
         } else if (call.method.equals("isBLEEnabled")) {
