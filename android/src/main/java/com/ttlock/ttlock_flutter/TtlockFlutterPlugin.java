@@ -10,6 +10,8 @@ import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.location.LocationManager;
+import android.content.Context;
+import android.location.LocationManager;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -307,7 +309,25 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   // THIS IS THE CORRECTED onMethodCall FUNCTION
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
-    // --- THIS IS THE CRITICAL FIX ---
+    
+    // We handle our pre-scan checks here, at the top level.
+    if (call.method.equals("isLocationEnabled")) {
+        boolean isLocationOn = isLocationServiceEnabled(context);
+        result.success(isLocationOn);
+        return;
+    } else if (call.method.equals("isBLEEnabled")) {
+        boolean isBleOn = TTLockClient.getDefault().isBLEEnabled(activity);
+        result.success(isBleOn);
+        return;
+    } else if (call.method.equals("requestBleEnable")) {
+        TTLockClient.getDefault().requestBleEnable(activity);
+        result.success(null);
+        return;
+    } else if (call.method.equals("prepareBTService")) {
+        // Your existing prepareBTService call
+        prepareBTService(result);
+        return;
+    }
     // First, we check for our new manual initialization command.
     if (call.method.equals("prepareBTService")) {
         prepareBTService(result);
@@ -377,18 +397,6 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
           startScan();
 //        }
         break;
-        case "isBLEEnabled":
-    boolean isEnabled = TTLockClient.getDefault().isBLEEnabled(activity);
-    result.success(isEnabled);
-    break;
-        case "requestBleEnable":
-    TTLockClient.getDefault().requestBleEnable(activity);
-    result.success(null);
-    break;
-        case "isLocationEnabled":
-    boolean isEnabled = isLocationServiceEnabled(context);
-    result.success(isEnabled);
-    break;
       case TTLockCommand.COMMAND_STOP_SCAN_LOCK:
         stopScan();
         break;
