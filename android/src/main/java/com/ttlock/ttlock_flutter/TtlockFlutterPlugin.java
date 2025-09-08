@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
+import android.location.LocationManager;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -233,6 +234,18 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   private EventChannel.EventSink events;
 //  private TtlockModel ttlockModel = new TtlockModel();
   private GatewayModel gatewayModel = new GatewayModel();
+  public boolean isLocationServiceEnabled(Context context) {
+    LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+    if (locationManager == null) {
+        return false;
+    }
+    boolean gps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    boolean network = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+    if (gps || network) {
+        return true;
+    }
+    return false;
+}
 
   //lock command que
   private Queue<CommandObj> commandQue = new ArrayDeque<>();
@@ -307,6 +320,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     if (!sdkIsInit) {
         initSdk();
     }
+    
     if (GatewayCommand.isGatewayCommand(call.method)) {//gateway
         commandType = CommandType.GATEWAY;
         gatewayCommand(call);
@@ -370,6 +384,10 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         case "requestBleEnable":
     TTLockClient.getDefault().requestBleEnable(activity);
     result.success(null);
+    break;
+        case "isLocationEnabled":
+    boolean isEnabled = isLocationServiceEnabled(context);
+    result.success(isEnabled);
     break;
       case TTLockCommand.COMMAND_STOP_SCAN_LOCK:
         stopScan();
