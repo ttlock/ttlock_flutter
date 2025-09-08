@@ -13,7 +13,13 @@ class TTLock {
   static MethodChannel _commandChannel =
       MethodChannel("com.ttlock/command/ttlock");
   static EventChannel _listenChannel = EventChannel("com.ttlock/listen/ttlock");
-
+  static Future<bool> isBLEEnabled() async {
+    // Note: The 'activity' parameter is handled on the native side.
+    return await _commandChannel.invokeMethod('isBLEEnabled');
+  }
+  static Future<void> requestBleEnable() async {
+    await _commandChannel.invokeMethod('requestBleEnable');
+  }
   static const String CALLBACK_SUCCESS = "callback_success";
   static const String CALLBACK_PROGRESS = "callback_progress";
   static const String CALLBACK_FAIL = "callback_fail";
@@ -23,6 +29,10 @@ class TTLock {
   }
   static Future<void> prepareBTService() async {
     await _commandChannel.invokeMethod('prepareBTService');
+  }
+  static Future<bool> isLocationEnabled() async {
+    final bool isEnabled = await _commandChannel.invokeMethod('isLocationEnabled');
+    return isEnabled;
   }
   static const String COMMAND_START_SCAN_LOCK = "startScanLock";
   static const String COMMAND_STOP_SCAN_LOCK = "stopScanLock";
