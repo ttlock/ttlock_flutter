@@ -11,7 +11,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.location.LocationManager;
 import android.content.Context;
-import android.location.LocationManager;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -237,17 +236,14 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 //  private TtlockModel ttlockModel = new TtlockModel();
   private GatewayModel gatewayModel = new GatewayModel();
   public boolean isLocationServiceEnabled(Context context) {
-    LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-    if (locationManager == null) {
-        return false;
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        if (locationManager == null) {
+            return false;
+        }
+        boolean gps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        boolean network = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        return gps || network;
     }
-    boolean gps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-    boolean network = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-    if (gps || network) {
-        return true;
-    }
-    return false;
-}
 
   //lock command que
   private Queue<CommandObj> commandQue = new ArrayDeque<>();
@@ -312,22 +308,21 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     
     // We handle our pre-scan checks here, at the top level.
     if (call.method.equals("isLocationEnabled")) {
-        boolean isLocationOn = isLocationServiceEnabled(context);
-        result.success(isLocationOn);
-        return;
-    } else if (call.method.equals("isBLEEnabled")) {
-        boolean isBleOn = TTLockClient.getDefault().isBLEEnabled(activity);
-        result.success(isBleOn);
-        return;
-    } else if (call.method.equals("requestBleEnable")) {
-        TTLockClient.getDefault().requestBleEnable(activity);
-        result.success(null);
-        return;
-    } else if (call.method.equals("prepareBTService")) {
-        // Your existing prepareBTService call
-        prepareBTService(result);
-        return;
-    }
+            boolean isLocationOn = isLocationServiceEnabled(context);
+            result.success(isLocationOn);
+            return;
+        } else if (call.method.equals("isBLEEnabled")) {
+            boolean isBleOn = TTLockClient.getDefault().isBLEEnabled(activity);
+            result.success(isBleOn);
+            return;
+        } else if (call.method.equals("requestBleEnable")) {
+            TTLockClient.getDefault().requestBleEnable(activity);
+            result.success(null);
+            return;
+        } else if (call.method.equals("prepareBTService")) {
+            prepareBTService(result);
+            return;
+        }
 
     // This is the original logic from the package that handles all other commands.
     // It remains unchanged.
@@ -374,17 +369,17 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
   public void doorLockCommand(MethodCall call) {
     Object arguments = call.arguments;
-    TtlockModel ttlockModel = new TtlockModel();
-    if (arguments instanceof Map) {
-      ttlockModel.toObject((Map<String, Object>) arguments);
-    } else {
-      ttlockModel.lockData = (String) arguments;
-    }
-    switch (call.method) {
-      case TTLockCommand.COMMAND_SUPPORT_FEATURE:
-        isSupportFeature(ttlockModel);
-        break;
-      case TTLockCommand.COMMAND_SETUP_PLUGIN:
+        TtlockModel ttlockModel = new TtlockModel();
+        if (arguments instanceof Map) {
+            ttlockModel.toObject((Map<String, Object>) arguments);
+        } else {
+            ttlockModel.lockData = (String) arguments;
+        }
+        switch (call.method) {
+            case TTLockCommand.COMMAND_SUPPORT_FEATURE:
+                isSupportFeature(ttlockModel);
+                break;
+            case TTLockCommand.COMMAND_SETUP_PUGIN:
         setupPlug(ttlockModel);
         break;
       case TTLockCommand.COMMAND_START_SCAN_LOCK:
@@ -2154,30 +2149,27 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     }
   }
 
- public void startScan() {
-    PermissionUtils.doWithScanPermission(activity, success -> {
-        if (success) {
-            // This is the final version, using the correct callback for your SDK.
-            TTLockClient.getDefault().startScanLock(new ScanLockCallback() {
-                @Override
-                public void onScanLockSuccess(ExtendedBluetoothDevice extendedBluetoothDevice) {
-                    // This is the correct success method for your version.
-                    HashMap<String, Object> map = new HashMap<>();
-                    map.put("lockName", extendedBluetoothDevice.getName());
-                    map.put("lockMac", extendedBluetoothDevice.getAddress());
-                    map.put("rssi", extendedBluetoothDevice.getRssi());
-                    // We are now using the correct callback and sending the data back to FlutterFlow.
-                    channel.invokeMethod("onScanLock", map);
-                }
+private void startScan() {
+        PermissionUtils.doWithScanPermission(activity, success -> {
+            if (success) {
+                TTLockClient.getDefault().startScanLock(new ScanLockCallback() {
+                    @Override
+                    public void onScanLockSuccess(ExtendedBluetoothDevice extendedBluetoothDevice) {
+                        HashMap<String, Object> map = new HashMap<>();
+                        map.put("lockName", extendedBluetoothDevice.getName());
+                        map.put("lockMac", extendedBluetoothDevice.getAddress());
+                        map.put("rssi", extendedBluetoothDevice.getRssi());
+                        channel.invokeMethod("onScanLock", map);
+                    }
 
-                @Override
-                public void onFail(LockError error) {
-                    // The onFail method is also required by the "contract".
-                }
-            });
-        }
-    });
-}
+                    @Override
+                    public void onFail(LockError error) {
+                        // The onFail method is also required by the "contract".
+                    }
+                });
+            }
+        });
+    }
 
   public void stopScan() {
     TTLockClient.getDefault().stopScanLock();
