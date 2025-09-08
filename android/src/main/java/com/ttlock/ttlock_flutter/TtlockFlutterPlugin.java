@@ -356,6 +356,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     }
     else {//door lock
         commandType = CommandType.DOOR_LOCK;
+        // Notice we are back to just passing 'call'
         doorLockCommand(call);
     }
 }
@@ -383,7 +384,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       case TTLockCommand.COMMAND_SUPPORT_FEATURE:
         isSupportFeature(ttlockModel);
         break;
-      case TTLockCommand.COMMAND_SETUP_PUGIN:
+      case TTLockCommand.COMMAND_SETUP_PLUGIN:
         setupPlug(ttlockModel);
         break;
       case TTLockCommand.COMMAND_START_SCAN_LOCK:
