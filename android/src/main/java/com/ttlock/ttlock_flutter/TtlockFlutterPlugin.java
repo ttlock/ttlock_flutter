@@ -363,6 +363,14 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
           startScan();
 //        }
         break;
+        case "isBLEEnabled":
+    boolean isEnabled = TTLockClient.getDefault().isBLEEnabled(activity);
+    result.success(isEnabled);
+    break;
+        case "requestBleEnable":
+    TTLockClient.getDefault().requestBleEnable(activity);
+    result.success(null);
+    break;
       case TTLockCommand.COMMAND_STOP_SCAN_LOCK:
         stopScan();
         break;
