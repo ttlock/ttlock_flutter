@@ -10,8 +10,8 @@ import 'ttgateway.dart';
 class TTLock {
   static bool isOnPremise = false;
   static Future<String> getLockTimeDirect({
-    @required String lockData,
-    @required String lockMac,
+    required String lockData,
+    required String lockMac,
 }) async {
     Map<String, dynamic> params = {
         "lockData": lockData,
