@@ -52,6 +52,8 @@ import com.ttlock.bl.sdk.callback.GetLockSoundWithSoundVolumeCallback;
 import com.ttlock.bl.sdk.callback.GetLockStatusCallback;
 import com.ttlock.bl.sdk.callback.GetLockSystemInfoCallback;
 import com.ttlock.bl.sdk.callback.GetLockTimeCallback;
+import com.ttlock.bl.sdk.callback.GetLockTimeCallback;
+import com.ttlock.bl.sdk.entity.LockError;
 import com.ttlock.bl.sdk.callback.GetLockVersionCallback;
 import com.ttlock.bl.sdk.callback.GetNBAwakeModesCallback;
 import com.ttlock.bl.sdk.callback.GetNBAwakeTimesCallback;
@@ -305,7 +307,25 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   // THIS IS THE CORRECTED onMethodCall FUNCTION
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
-    // --- THIS IS THE FINAL, CORRECTED VERSION ---
+   if (call.method.equals("getLockTimeDirect")) {
+        String lockData = call.argument("lockData");
+        String lockMac = call.argument("lockMac");
+
+        TTLockClient.getDefault().getLockTime(lockData, lockMac, new GetLockTimeCallback() {
+            @Override
+            public void onGetLockTimeSuccess(long lockTime) {
+                // Success: send the time back to Flutter
+                result.success(String.valueOf(lockTime));
+            }
+
+            @Override
+            public void onFail(LockError error) {
+                // Fail: send the error code and message back to Flutter
+                result.error(String.valueOf(error.getErrorCode()), error.getErrorMsg(), null);
+            }
+        });
+        return; // Exit here
+    }
     if (call.method.equals("isLocationEnabled")) {
         // We now correctly use the 'activity' variable, which is a valid Context
         boolean isLocationOn = isLocationServiceEnabled(activity);
