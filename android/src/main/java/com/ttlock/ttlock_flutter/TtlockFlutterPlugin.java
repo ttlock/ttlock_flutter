@@ -328,12 +328,6 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         prepareBTService(result);
         return;
     }
-    // First, we check for our new manual initialization command.
-    if (call.method.equals("prepareBTService")) {
-        prepareBTService(result);
-        return; // We stop here because our job is done.
-    }
-    // -----------------------------
 
     // This is the original logic from the package that handles all other commands.
     // It remains unchanged.
