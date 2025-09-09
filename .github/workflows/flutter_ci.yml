@@ -1,0 +1,66 @@
+# A descriptive name for the workflow
+name: Flutter CI on Pull Request
+
+# --- TRIGGERS ---
+# This workflow will run automatically on every pull request that targets
+# your 'main' or 'development' branches.
+on:
+  pull_request:
+    branches: [ main, development ]
+
+# --- JOBS ---
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build_and_test:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Step 1: Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout repository code
+        uses: actions/checkout@v3
+
+      # Step 2: Sets up the specific version of Java needed for Android builds
+      - name: Set up Java Development Kit (JDK)
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # Step 3: Sets up the Flutter SDK environment
+      - name: Set up Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      # IMPROVEMENT: Cache Flutter dependencies to speed up subsequent runs
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-
+
+      # Step 4: Gets all the dependencies listed in the pubspec.yaml file
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      # IMPROVEMENT: Add a check for code formatting to enforce a consistent style
+      - name: Check for formatting issues
+        run: flutter format --output=none --set-exit-if-changed .
+
+      # Step 5: Analyzes the project's Dart code for errors, warnings, and style issues
+      - name: Analyze Dart code
+        run: flutter analyze
+
+      # Step 6: Runs all the unit and widget tests in the project
+      - name: Run Flutter tests
+        run: flutter test
+
+      # Step 7: Builds a debug version of the Android app to ensure it compiles successfully
+      - name: Build Android APK (debug version)
+        run: flutter build apk --debug
