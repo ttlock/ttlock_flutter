@@ -24,6 +24,14 @@ typedef NS_ENUM(NSInteger, ErrorDevice) {
 @end
 
 @implementation TtlockFlutterPlugin
+/**
+ * The main plugin class for the TTLock Flutter plugin.
+ *
+ * This class handles the communication between the Flutter and native iOS layers.
+ * It receives method calls from the Flutter side, and invokes the appropriate methods
+ * in the TTLock iOS SDK. It also sends events back to the Flutter side, such as
+ * scan results and command callbacks.
+ */
 
 
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {

@@ -1,122 +1,140 @@
-## Developers Email list
-ttlock-developers-email-list@googlegroups.com
+# TTLock Flutter Plugin
 
+A Flutter plugin for interfacing with TTLock smart locks and accessories. This plugin provides a comprehensive API to manage and interact with TTLock devices, including locks, gateways, remote keypads, and various smart meters.
 
-### ttlock_flutter
+## Purpose
 
+This plugin abstracts the native TTLock SDKs for both Android and iOS, offering a unified Dart interface for Flutter applications. It enables developers to build apps that can:
 
+- Scan for and discover nearby TTLock devices.
+- Initialize and configure locks, gateways, and other accessories.
+- Perform core lock operations like locking and unlocking.
+- Manage access credentials, including passcodes, IC cards, and fingerprints.
+- Read device status, such as battery level, operation records, and configuration settings.
+- Support for a wide range of TTLock accessories like door sensors, remote keypads, and smart meters (water and electric).
 
-##### Config
+## Getting Started
 
-iOS: 
-1. In XCode,Add Key`Privacy - Bluetooth Peripheral Usage Description` Value `your description for bluetooth` to your project's `info` ➜ `Custom iOS Target Projectes`
+To use this plugin, add `ttlock_flutter` as a dependency in your `pubspec.yaml` file.
 
-Android:
-AndroidManifest.xml configuration:
-1. add 'xmlns:tools="http://schemas.android.com/tools"' to <manifest> element
-2. add 'tools:replace="android:label"' to <application> element
-3. additional permissions:
-```  
-<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-<uses-permission android:name="android.permission.BLUETOOTH" />
-<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+```yaml
+dependencies:
+  ttlock_flutter:
 ```
-4. in MainActivity extends FlutterActivity, you need add permissions result to ttlock plugin. 
-       
-first add import
+Please check the [GitHub repository](https://github.com/ttlock/ttlock_flutter) for the latest version.
 
-```
-import com.ttlock.ttlock_flutter.TtlockFlutterPlugin
+### iOS Configuration
+
+In your `Info.plist` file, add the following key-value pair to describe why your app needs Bluetooth access:
+
+```xml
+<key>Privacy - Bluetooth Peripheral Usage Description</key>
+<string>Your description for bluetooth</string>
 ```
 
-second add below callback code:   
-java code:
+### Android Configuration
 
-```
-@Override
-public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+1.  In your `AndroidManifest.xml`, add the following:
+    - Add `xmlns:tools="http://schemas.android.com/tools"` to the `<manifest>` element.
+    - Add `tools:replace="android:label"` to the `<application>` element.
+    - Add the required permissions:
+      ```xml
+      <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+      <uses-permission android:name="android.permission.BLUETOOTH" />
+      <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+      <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+      ```
+
+2.  In your `MainActivity.java` or `MainActivity.kt`, you need to forward the permission result to the plugin.
+
+    **Java:**
+    ```java
+    import com.ttlock.ttlock_flutter.TtlockFlutterPlugin;
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         TtlockFlutterPlugin ttlockflutterpluginPlugin = (TtlockFlutterPlugin) getFlutterEngine().getPlugins().get(TtlockFlutterPlugin.class);
         if (ttlockflutterpluginPlugin != null) {
             ttlockflutterpluginPlugin.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
-```
-kotlin code:
-```
-override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+    ```
+
+    **Kotlin:**
+    ```kotlin
+    import com.ttlock.ttlock_flutter.TtlockFlutterPlugin
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         val ttlockflutterpluginPlugin = flutterEngine!!.plugins[TtlockFlutterPlugin::class.java] as TtlockFlutterPlugin?
         ttlockflutterpluginPlugin?.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
-```
+    ```
 
-5.you need config buildTypes in build.gradle file.like this:
-
-```
+3.  In your app-level `build.gradle` file, ensure `minifyEnabled` and `shrinkResources` are set to `false` for the release build type:
+    ```groovy
     buildTypes {
         release {
             minifyEnabled false
             shrinkResources false
         }
     }
-```
+    ```
 
-##### Ussage
-```
+## Usage
+
+Here's a basic example of how to use the plugin to scan for locks and perform an unlock action.
+
+```dart
 import 'package:ttlock_flutter/ttlock.dart';
 
-// Print TTLock Log
+// Enable logging for debugging
 TTLock.printLog = true;
 
-TTLock.controlLock(lockData, TTControlAction.unlock,(lockTime, electricQuantity, uniqueId) {
-    print('success');
-}, (errorCode, errorMsg) {
-    print('errorCode');      
+// Start scanning for locks
+TTLock.startScanLock((scanModel) {
+  print('Found lock: ${scanModel.lockName}');
+  // Once you have the lockData, you can perform actions
+  // For example, to unlock:
+  TTLock.controlLock(lockData, TTControlAction.unlock, (lockTime, electricQuantity, uniqueId, lockData) {
+      print('Unlock successful!');
+  }, (errorCode, errorMsg) {
+      print('Unlock failed: $errorCode - $errorMsg');
+  });
 });
 ```
-If you want to get log and set time immediately after unlocking, you can do the following:
 
-```
-void unlockAndGetLogAndSetTime() {
+### Checking for Feature Support
 
-     //unlock
-    TTLock.controlLock(lockData, TTControlAction.unlock,(lockTime, electricQuantity, uniqueId) {
-        print('success');
-    }, (errorCode, errorMsg) {
-        print('errorCode');      
-    });
-    
-     //get log
-    TTLock.getLockOperateRecord(TTOperateRecordType.latest, lockData,(operateRecord) {
-        print('$operateRecord');
-    }, (errorCode, errorMsg) {
-        print('errorCode');
-    });
-     //set time
-    int timestamp = DateTime.now().millisecondsSinceEpoch;
-    TTLock.setLockTime(timestamp, lockData, () {
-        print('$timestamp');
-    }, (errorCode, errorMsg) {
-        print('errorCode');
-    });
-}
+Before performing an operation, you can check if the lock supports it:
 
-```
-##### How to determine the function of a lock
-```
- TTLock.supportFunction(TTLockFuction.managePasscode, lockData,(isSupport) {
+```dart
+TTLock.supportFunction(TTLockFunction.managePasscode, lockData, (isSupport) {
     if (isSupport) {
-        TTLock.modifyPasscode("6666", "7777", startDate, endDate, lockData,() {
-            print('success');
-        }, (errorCode, errorMsg) {
-            print('errorCode');
-        });
+        // The lock supports managing passcodes
     } else {
-        print('Not support modify passcode');
+        print('This lock does not support managing passcodes.');
     }
 });
 ```
 
+## API Overview
 
+The plugin is organized into several classes, each corresponding to a type of TTLock device:
 
+- `TTLock`: The main class for interacting with smart locks. It includes methods for scanning, initialization, control, and management of passcodes, cards, and fingerprints.
+- `TTGateway`: For managing TTLock gateways.
+- `TTDoorSensor`: For interacting with door sensors.
+- `TTRemoteKey`: For managing remote key fobs.
+- `TTRemoteKeypad`: For wireless keypads.
+- `TTElectricMeter`: For smart electric meters.
+- `TTWaterMeter`: For smart water meters.
 
+All interactions are asynchronous and use callbacks to handle success and failure scenarios.
+
+**Note:** While the Dart code in the `lib/` directory is fully documented, the native Android and iOS code is not. The native code is complex and relies heavily on the underlying TTLock SDKs.
+
+## Development
+
+For questions, bug reports, or feature requests, please use the issue tracker on the repository.
+
+You can also reach out to the developers via the Google Group: [ttlock-developers-email-list@googlegroups.com](mailto:ttlock-developers-email-list@googlegroups.com)

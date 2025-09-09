@@ -4,8 +4,12 @@ import 'package:ttlock_flutter/ttelectricMeter.dart';
 import 'scan_page.dart';
 import 'config.dart';
 
+/// The home page of the application.
+///
+/// This page displays a list of device types that can be scanned.
 class HomePage extends StatefulWidget {
-  HomePage() : super();
+  /// Creates a [HomePage] widget.
+  HomePage({Key? key}) : super(key: key);
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -15,7 +19,7 @@ class _HomePageState extends State<HomePage> {
 
   void _startScanGateway() {
     if (GatewayConfig.uid == 0 ||
-        GatewayConfig.ttlockLoginPassword.length == 0) {
+        GatewayConfig.ttlockLoginPassword.isEmpty) {
       String text = 'Please config the ttlockUid and the ttlockLoginPassword';
       ProgressHud.of(_context!)!.showAndDismiss(ProgressHudType.error, text);
 
@@ -31,9 +35,6 @@ class _HomePageState extends State<HomePage> {
   void _startScanElectricMeter() {
     ElectricMeterServerParamMode electricMeterServerParamMode =
         ElectricMeterServerParamMode();
-    // electricMeterServerParamMode.url = 'https://cntestservlet.sciener.cn/lock/electricMeterCommand/executeCommand';
-    // electricMeterServerParamMode.clientId = '607ab4bcc9504a5da58c43575a1b3746';
-    // electricMeterServerParamMode.accessToken = 'VgC8yDPW/jr6V31nNAcCEkFLNA6o27cQ6OZDjF4iNbKbSz1kU5LcoMh0I4xgbZNZ';
     electricMeterServerParamMode.url = "https://cntestservlet.sciener.cn";
     electricMeterServerParamMode.clientId = '607ab4bcc9504a5da58c43575a1b3746';
     electricMeterServerParamMode.accessToken =
@@ -43,37 +44,36 @@ class _HomePageState extends State<HomePage> {
     _startScan(ScanType.electricMeter);
   }
 
-
   void _startKeyPadPage() {
     _startScan(ScanType.keyPad);
   }
 
   void _startScan(ScanType scanType) {
     Navigator.push(context,
-        new MaterialPageRoute(builder: (BuildContext context) {
+        MaterialPageRoute(builder: (BuildContext context) {
       return ScanPage(
         scanType: scanType,
       );
     }));
   }
 
-  Widget getChild() {
+  Widget _getChild() {
     return Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
       ElevatedButton(
-        child: Text('Lock', style: TextStyle(fontWeight: FontWeight.w600)),
+        child: const Text('Lock', style: TextStyle(fontWeight: FontWeight.w600)),
         onPressed: _startScanLock,
       ),
       ElevatedButton(
-        child: Text('Gateway', style: TextStyle(fontWeight: FontWeight.w600)),
+        child: const Text('Gateway', style: TextStyle(fontWeight: FontWeight.w600)),
         onPressed: _startScanGateway,
       ),
       ElevatedButton(
-        child: Text('Electric Meter',
+        child: const Text('Electric Meter',
             style: TextStyle(fontWeight: FontWeight.w600)),
         onPressed: _startScanElectricMeter,
       ),
       ElevatedButton(
-        child: Text('Key Pad',
+        child: const Text('Key Pad',
             style: TextStyle(fontWeight: FontWeight.w600)),
         onPressed: _startKeyPadPage,
       ),

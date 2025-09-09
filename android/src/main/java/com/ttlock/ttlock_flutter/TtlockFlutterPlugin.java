@@ -228,7 +228,14 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import com.ttlock.bl.sdk.entity.LockData;
 
-/** TtlockFlutterPlugin */
+/**
+ * The main plugin class for the TTLock Flutter plugin.
+ *
+ * This class handles the communication between the Flutter and native Android layers.
+ * It receives method calls from the Flutter side, and invokes the appropriate methods
+ * in the TTLock Android SDK. It also sends events back to the Flutter side, such as
+ * scan results and command callbacks.
+ */
 public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware, EventChannel.StreamHandler {
   private static final int PERMISSIONS_REQUEST_CODE = 0;
   private MethodChannel channel;

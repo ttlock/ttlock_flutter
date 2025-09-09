@@ -12,22 +12,36 @@ import 'lock_page.dart';
 import 'electric_meter_page.dart';
 
 
-enum ScanType { lock, gateway, electricMeter, keyPad }
+/// An enum to represent the type of device to scan for.
+enum ScanType {
+  /// A lock.
+  lock,
+  /// A gateway.
+  gateway,
+  /// An electric meter.
+  electricMeter,
+  /// A keypad.
+  keyPad
+}
 
+/// A page that displays a list of scanned devices.
 class ScanPage extends StatefulWidget {
-  ScanPage({required this.scanType}) : super();
+  /// Creates a [ScanPage] widget.
+  const ScanPage({Key? key, required this.scanType}) : super(key: key);
+  /// The type of device to scan for.
   final ScanType scanType;
   @override
-  _ScanPageState createState() => _ScanPageState(scanType);
+  _ScanPageState createState() => _ScanPageState();
 }
 
 class _ScanPageState extends State<ScanPage> {
   ScanType? scanType;
   BuildContext? _context;
 
-  _ScanPageState(ScanType scanType) {
+  @override
+  void initState() {
     super.initState();
-    this.scanType = scanType;
+    scanType = widget.scanType;
 
     // Print TTLock Log
     TTLock.printLog = true;
@@ -43,10 +57,11 @@ class _ScanPageState extends State<ScanPage> {
     }
   }
 
-  List<TTLockScanModel> _lockList = [];
-  List<TTGatewayScanModel> _gatewayList = [];
-  List<TTElectricMeterScanModel> _electricMeterList = [];
-  List<TTRemoteAccessoryScanModel> _keyPadList = [];
+  final List<TTLockScanModel> _lockList = [];
+  final List<TTGatewayScanModel> _gatewayList = [];
+  final List<TTElectricMeterScanModel> _electricMeterList = [];
+  final List<TTRemoteAccessoryScanModel> _keyPadList = [];
+  @override
   void dispose() {
     if (scanType == ScanType.lock) {
       TTLock.stopScanLock();
@@ -68,10 +83,10 @@ class _ScanPageState extends State<ScanPage> {
     ProgressHud.of(_context!)!.dismiss();
   }
 
-  void _initLock(TTLockScanModel scanModel) async {
+  void _initLock(TTLockScanModel scanModel) {
     _showLoading();
 
-    Map map = Map();
+    Map map = {};
     map["lockMac"] = scanModel.lockMac;
     map["lockVersion"] = scanModel.lockVersion;
     map["isInited"] = scanModel.isInited;
@@ -80,7 +95,7 @@ class _ScanPageState extends State<ScanPage> {
       LockConfig.lockData = lockData;
       LockConfig.lockMac = scanModel.lockMac;
       Navigator.push(context,
-          new MaterialPageRoute(builder: (BuildContext context) {
+          MaterialPageRoute(builder: (BuildContext context) {
         return LockPage(
           title: scanModel.lockName,
           lockData: lockData,
@@ -92,11 +107,10 @@ class _ScanPageState extends State<ScanPage> {
     });
   }
 
-  void _initElectricMeter(TTElectricMeterScanModel scanModel) async {
-    print("init electric meter：" + scanModel.isInited.toString());
+  void _initElectricMeter(TTElectricMeterScanModel scanModel) {
     if (scanModel.isInited) {
       Navigator.push(context,
-          new MaterialPageRoute(builder: (BuildContext context) {
+          MaterialPageRoute(builder: (BuildContext context) {
         return ElectricMeterPage(
           name: scanModel.name,
           mac: scanModel.mac,
@@ -105,7 +119,7 @@ class _ScanPageState extends State<ScanPage> {
     } else {
       _showLoading();
 
-      Map initParamMap = Map();
+      Map initParamMap = {};
       initParamMap["mac"] = scanModel.mac;
       initParamMap["name"] = scanModel.name;
       initParamMap["payMode"] = TTMeterPayMode.postpaid.index;
@@ -113,7 +127,7 @@ class _ScanPageState extends State<ScanPage> {
       TTElectricMeter.init(initParamMap, () {
         _dismissLoading();
         Navigator.push(context,
-            new MaterialPageRoute(builder: (BuildContext context) {
+            MaterialPageRoute(builder: (BuildContext context) {
           return ElectricMeterPage(
             name: scanModel.name,
             mac: scanModel.mac,
@@ -125,13 +139,10 @@ class _ScanPageState extends State<ScanPage> {
     }
   }
 
-  void _initKeyPad(TTRemoteAccessoryScanModel scanModel) async {
-    print("init keyPad");
+  void _initKeyPad(TTRemoteAccessoryScanModel scanModel) {
     var mac = scanModel.mac;
     var lockMac = LockConfig.lockMac;
     var lockData = LockConfig.lockData;
-    print("多功能键盘lockData:$lockData");
-    print("多功能键盘：$lockMac");
     if (scanModel.isMultifunctionalKeypad) {
       assert(lockMac.isNotEmpty);
       assert(lockData.isNotEmpty);
@@ -143,7 +154,7 @@ class _ScanPageState extends State<ScanPage> {
               int slotNumber,
               int slotLimit) {
             Navigator.push(context,
-                new MaterialPageRoute(builder: (BuildContext context) {
+                MaterialPageRoute(builder: (BuildContext context) {
                   return KeyPadPage(
                     name: scanModel.name,
                     mac: scanModel.mac,
@@ -159,7 +170,7 @@ class _ScanPageState extends State<ScanPage> {
       TTRemoteKeypad.init(mac, lockMac,
           (int electricQuantity, String wirelessKeypadFeatureValue) {
         Navigator.push(context,
-            new MaterialPageRoute(builder: (BuildContext context) {
+            MaterialPageRoute(builder: (BuildContext context) {
           return KeyPadPage(
             name: scanModel.name,
             mac: scanModel.mac,
@@ -171,14 +182,14 @@ class _ScanPageState extends State<ScanPage> {
     }
   }
 
-  void _connectGateway(String mac, TTGatewayType type) async {
+  void _connectGateway(String mac, TTGatewayType type) {
     _showLoading();
     TTGateway.connect(mac, (status) {
       _dismissLoading();
       if (status == TTGatewayConnectStatus.success) {
         //for test
         _configIp(mac);
-        StatefulWidget? widget;
+        Widget? widget;
         if (type == TTGatewayType.g2) {
           widget = WifiPage(mac: mac);
         } else if (type == TTGatewayType.g3 || type == TTGatewayType.g4) {
@@ -186,7 +197,7 @@ class _ScanPageState extends State<ScanPage> {
         }
 
         Navigator.push(context,
-            new MaterialPageRoute(builder: (BuildContext context) {
+            MaterialPageRoute(builder: (BuildContext context) {
           return widget!;
         }));
       }
@@ -194,26 +205,17 @@ class _ScanPageState extends State<ScanPage> {
   }
 
   void _configIp(String mac) {
-    Map paramMap = Map();
+    Map paramMap = {};
     paramMap["mac"] = mac;
     paramMap["type"] = TTIpSettingType.DHCP.index;
-    //for static ip setting
-    // paramMap["type"] = TTIpSettingType.STATIC_IP.index;
-    // paramMap["ipAddress"] = "192.168.1.100";
-    // paramMap["subnetMask"] = "255.255.255.0";
-    // paramMap["router"] = "192.168.1.1";
-    // paramMap["preferredDns"] = "xxx.xxx.xxx.xxx";
-    // paramMap["alternateDns"] = "xxx.xxx.xxx.xxx";
 
     TTGateway.configIp(paramMap, () {
-      print("config ip success");
     }, (errorCode, errorMsg) {
-      print('config ip errorCode:$errorCode msg:$errorMsg');
     });
   }
 
-  void _startScanLock() async {
-    _lockList = [];
+  void _startScanLock() {
+    _lockList.clear();
     TTLock.startScanLock((scanModel) {
       bool contain = false;
       bool initStateChanged = false;
@@ -240,7 +242,7 @@ class _ScanPageState extends State<ScanPage> {
   }
 
   void _startScanGateway() {
-    _gatewayList = [];
+    _gatewayList.clear();
     TTGateway.startScan((scanModel) {
       bool contain = false;
       for (TTGatewayScanModel model in _gatewayList) {
@@ -258,7 +260,7 @@ class _ScanPageState extends State<ScanPage> {
   }
 
   void _startScanElectricMeter() {
-    _electricMeterList = [];
+    _electricMeterList.clear();
     TTElectricMeter.startScan((scanModel) {
       bool contain = false;
       for (TTElectricMeterScanModel model in _electricMeterList) {
@@ -276,7 +278,7 @@ class _ScanPageState extends State<ScanPage> {
   }
 
   void _startScanKeyPad() {
-    _keyPadList = [];
+    _keyPadList.clear();
     TTRemoteKeypad.startScan((scanModel) {
       bool contain = false;
       for (TTRemoteAccessoryScanModel model in _keyPadList) {
