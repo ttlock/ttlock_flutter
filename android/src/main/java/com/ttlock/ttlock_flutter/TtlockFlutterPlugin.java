@@ -261,7 +261,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   public static final int ResultStateSuccess = 0;
   public static final int ResultStateProgress = 1;
   public static final int ResultStateFail = 2;
-
+  private static boolean isGloballyInitialized = false;
   private int commandType;
 
   /**
@@ -314,6 +314,10 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   // THIS IS THE CORRECTED onMethodCall FUNCTION
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
+    if (!isGloballyInitialized && context != null) {
+        TTLockClient.getDefault().prepareBTService(context);
+        isGloballyInitialized = true;
+    }
     if (call.method.equals("getLockTimeDirect")) {
         String lockData = call.argument("lockData");
         String lockMac = call.argument("lockMac");
@@ -4369,6 +4373,19 @@ private void startScan() {
       TTLockClient.getDefault().prepareBTService(activity);
       result.success(null);
   }
-  
+  /**
+ * Ensure TTLock is initialized before any operation
+ */
+private void ensureInitialized() {
+    if (!isGloballyInitialized && context != null) {
+        try {
+            TTLockClient.getDefault().prepareBTService(context);
+            isGloballyInitialized = true;
+            android.util.Log.d("TtlockFlutterPlugin", "TTLock SDK initialized successfully");
+        } catch (Exception e) {
+            android.util.Log.e("TtlockFlutterPlugin", "Failed to initialize TTLock SDK", e);
+        }
+    }
+}
 
 }
