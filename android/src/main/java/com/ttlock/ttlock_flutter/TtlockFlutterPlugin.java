@@ -240,10 +240,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   private static final int PERMISSIONS_REQUEST_CODE = 0;
   private MethodChannel channel;
   private EventChannel eventChannel;
- // private static Activity activity;
-  private static boolean isGloballyInitialized = false;
-  private Activity activity;
-  private static final String TAG = "TtlockFlutterPlugin";
+  private static Activity activity;
   private EventChannel.EventSink events;
 //  private TtlockModel ttlockModel = new TtlockModel();
   private GatewayModel gatewayModel = new GatewayModel();
@@ -312,15 +309,11 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     eventChannel = new EventChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), TTLockCommand.EVENT_CHANNEL_NAME);
     eventChannel.setStreamHandler(this);
     LogUtil.setDBG(true);
-    performGlobalInitialization();
   }
 
   // THIS IS THE CORRECTED onMethodCall FUNCTION
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
-   if (!isGloballyInitialized) {
-        performGlobalInitialization();
-    }
     if (call.method.equals("getLockTimeDirect")) {
         String lockData = call.argument("lockData");
         String lockMac = call.argument("lockMac");
@@ -4230,7 +4223,6 @@ private void startScan() {
       // other 'case' lines to check for other
       // permissions this app might request.
     }
-    return false;
   }
 
   @Override
@@ -4377,51 +4369,6 @@ private void startScan() {
       TTLockClient.getDefault().prepareBTService(activity);
       result.success(null);
   }
-  /**
- * Performs the global TTLock SDK initialization that should happen once per app launch
- */
-private void performGlobalInitialization() {
-    if (!isGloballyInitialized && activity != null) {
-        try {
-            Log.d(TAG, "Performing global TTLock SDK initialization...");
-            
-            // This is the crucial initialization that was missing
-            TTLockClient.getDefault().prepare(activity);
-            
-            isGloballyInitialized = true;
-            Log.d(TAG, "TTLock SDK globally initialized successfully");
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to globally initialize TTLock SDK", e);
-            isGloballyInitialized = false;
-        }
-    }
-}
-
-@Override
-public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
-    activity = binding.getActivity();
-    
-    // Ensure initialization happens with activity context
-    performGlobalInitialization();
-    
-    // Set up permission handling if your existing code needs it
-    binding.addRequestPermissionsResultListener(this::onRequestPermissionsResult);
-}
-
-@Override
-public void onDetachedFromActivityForConfigChanges() {
-    activity = null;
-}
-
-@Override
-public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
-    activity = binding.getActivity();
-    binding.addRequestPermissionsResultListener(this::onRequestPermissionsResult);
-}
-
-@Override
-public void onDetachedFromActivity() {
-    activity = null;
-}
+  
 
 }
