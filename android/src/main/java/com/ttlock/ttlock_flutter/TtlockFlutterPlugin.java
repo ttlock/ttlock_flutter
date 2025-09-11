@@ -462,6 +462,9 @@ private boolean ensureSDKInitialized() {
           startScan();
 //        }
         break;
+      case "controlLockWithMac":
+          controlLockWithMac(ttlockModel);
+          break;
       case TTLockCommand.COMMAND_STOP_SCAN_LOCK:
         stopScan();
         break;
@@ -478,7 +481,56 @@ private boolean ensureSDKInitialized() {
         break;
     }
   }
+public void controlLockWithMac(final TtlockModel ttlockModel) {
+    Log.d("TtlockFlutterPlugin", "=== controlLockWithMac called, lockMac: " + ttlockModel.lockMac);
+    
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+        if (success) {
+            // Validate that we have both lockData and lockMac
+            if (ttlockModel.lockData == null || ttlockModel.lockData.isEmpty()) {
+                Log.e("TtlockFlutterPlugin", "=== controlLockWithMac: lockData is null or empty");
+                apiFail(LockError.DATA_FORMAT_ERROR);
+                return;
+            }
+            
+            if (ttlockModel.lockMac == null || ttlockModel.lockMac.isEmpty()) {
+                Log.e("TtlockFlutterPlugin", "=== controlLockWithMac: lockMac is null or empty");
+                apiFail(LockError.DATA_FORMAT_ERROR);
+                return;
+            }
+            
+            Log.d("TtlockFlutterPlugin", "=== Calling TTLockClient.controlLock with MAC: " + ttlockModel.lockMac);
+            Log.d("TtlockFlutterPlugin", "=== Control action: " + ttlockModel.getControlActionValue());
+            Log.d("TtlockFlutterPlugin", "=== Lock data length: " + ttlockModel.lockData.length());
+            
+            TTLockClient.getDefault().controlLock(
+                ttlockModel.getControlActionValue(), 
+                ttlockModel.lockData, 
+                ttlockModel.lockMac,  // Explicitly pass MAC address
+                new ControlLockCallback() {
+                    @Override
+                    public void onControlLockSuccess(ControlLockResult controlLockResult) {
+                        Log.d("TtlockFlutterPlugin", "=== controlLockWithMac SUCCESS: Battery " + controlLockResult.battery + "%");
+                        ttlockModel.lockTime = controlLockResult.lockTime;
+                        ttlockModel.controlAction = controlLockResult.controlAction;
+                        ttlockModel.electricQuantity = controlLockResult.battery;
+                        ttlockModel.uniqueId = controlLockResult.uniqueid;
+                        apiSuccess(ttlockModel);
+                    }
 
+                    @Override
+                    public void onFail(LockError lockError) {
+                        Log.e("TtlockFlutterPlugin", "=== controlLockWithMac FAILED: " + lockError.getErrorMsg());
+                        apiFail(lockError);
+                    }
+                }
+            );
+        } else {
+            Log.e("TtlockFlutterPlugin", "=== controlLockWithMac: No connect permission");
+            apiFail(LockError.LOCK_NO_PERMISSION);
+        }
+    });
+}
   public void gatewayCommand(MethodCall call) {
     String command = call.method;
     gatewayModel.toObject((Map<String, Object>) call.arguments);
