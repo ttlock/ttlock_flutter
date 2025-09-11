@@ -314,33 +314,27 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   // THIS IS THE CORRECTED onMethodCall FUNCTION
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
-    if (!isGloballyInitialized && activity != null) {
-        TTLockClient.getDefault().prepareBTService(activity);
-        isGloballyInitialized = true;
-    }
-    if (call.method.equals("getLockTimeDirect")) {
-        if (!sdkIsInit) {
+    if (!sdkIsInit) {
         initSdk();
         sdkIsInit = true;
     }
     
+    if (call.method.equals("getLockTimeDirect")) {
         String lockData = call.argument("lockData");
         String lockMac = call.argument("lockMac");
 
         TTLockClient.getDefault().getLockTime(lockData, lockMac, new GetLockTimeCallback() {
             @Override
             public void onGetLockTimeSuccess(long lockTime) {
-                // Success: send the time back to Flutter
                 result.success(String.valueOf(lockTime));
             }
 
             @Override
             public void onFail(LockError error) {
-                // Fail: send the error code and message back to Flutter
                 result.error(String.valueOf(error.getErrorCode()), error.getErrorMsg(), null);
             }
         });
-        return; // Exit here
+        return;
     }
     if (call.method.equals("isLocationEnabled")) {
         // We now correctly use the 'activity' variable, which is a valid Context
