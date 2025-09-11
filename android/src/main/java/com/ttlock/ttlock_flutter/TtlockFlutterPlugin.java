@@ -237,6 +237,9 @@ import com.ttlock.bl.sdk.entity.LockData;
  * scan results and command callbacks.
  */
 public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware, EventChannel.StreamHandler {
+  public TtlockFlutterPlugin() {
+    Log.e("TtlockFlutterPlugin", "🚀 PLUGIN CONSTRUCTOR CALLED - Plugin is loading");
+  }
   private static final int PERMISSIONS_REQUEST_CODE = 0;
   private MethodChannel channel;
   private EventChannel eventChannel;
