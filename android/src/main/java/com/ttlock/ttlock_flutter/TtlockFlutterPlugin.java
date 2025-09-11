@@ -313,12 +313,19 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   // THIS IS THE CORRECTED onMethodCall FUNCTION
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
+    Log.d("TtlockFlutterPlugin", "=== onMethodCall called, method: " + call.method + ", sdkIsInit: " + sdkIsInit);
+    
     if (!sdkIsInit) {
+        Log.d("TtlockFlutterPlugin", "SDK not initialized, calling initSdk()");
         initSdk();
         sdkIsInit = true;
+        Log.d("TtlockFlutterPlugin", "initSdk() completed, sdkIsInit now: " + sdkIsInit);
+    } else {
+        Log.d("TtlockFlutterPlugin", "SDK already initialized, skipping initSdk()");
     }
     
     if (call.method.equals("getLockTimeDirect")) {
+        Log.d("TtlockFlutterPlugin", "Starting getLockTimeDirect execution");
         String lockData = call.argument("lockData");
         String lockMac = call.argument("lockMac");
 
@@ -386,7 +393,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 }
 
   private void initSdk() {
+   Log.d("TtlockFlutterPlugin", "=== initSdk() starting, activity: " + (activity != null ? "available" : "null"));
     TTLockClient.getDefault().prepareBTService(activity);
+    Log.d("TtlockFlutterPlugin", "TTLockClient.prepareBTService() completed");
     GatewayClient.getDefault().prepareBTService(activity);
     RemoteClient.getDefault().prepareBTService(activity);
     WirelessKeypadClient.getDefault().prepareBTService(activity);
@@ -394,6 +403,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     WirelessDoorSensorClient.getDefault().prepareBTService(activity);
     ElectricMeterClient.getDefault().prepareBTService(activity);
     WaterMeterClient.getDefault().prepareBTService(activity);
+    Log.d("TtlockFlutterPlugin", "=== initSdk() completed successfully");
   }
 
   public void doorLockCommand(MethodCall call) {
@@ -4375,6 +4385,7 @@ private void startScan() {
  * Ensure TTLock is initialized before any operation
  */
 private void ensureInitialized() {
+    Log.d("TtlockFlutterPlugin", "ensureInitialized called, sdkIsInit: " + sdkIsInit);
     if (!sdkIsInit && activity != null) {
         try {
             initSdk();
