@@ -325,7 +325,6 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     }
     
         String lockData = call.argument("lockData");
-        String lockData = call.argument("lockData");
         String lockMac = call.argument("lockMac");
 
         TTLockClient.getDefault().getLockTime(lockData, lockMac, new GetLockTimeCallback() {
