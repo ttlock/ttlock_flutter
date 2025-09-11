@@ -313,6 +313,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   // THIS IS THE CORRECTED onMethodCall FUNCTION
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
+    Log.e("TtlockFlutterPlugin", "🔥 PLUGIN IS RUNNING - Method: " + call.method);
     Log.d("TtlockFlutterPlugin", "=== onMethodCall called, method: " + call.method + ", sdkIsInit: " + sdkIsInit);
     
     if (!sdkIsInit) {
