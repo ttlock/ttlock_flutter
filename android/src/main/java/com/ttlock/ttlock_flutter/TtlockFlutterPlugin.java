@@ -399,7 +399,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     }
 }
 
- private boolean ensureSDKInitialized() {
+private boolean ensureSDKInitialized() {
     if (sdkInitialized) {
         Log.d("TtlockFlutterPlugin", "=== SDK already initialized");
         return true;
@@ -421,11 +421,20 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     }
     
     try {
-        // TTLock SDK V3: Single initialization call for ALL clients
-        Log.d("TtlockFlutterPlugin", "=== Calling TTLockClient.prepareBTService()");
+        // TTLock SDK V3: Initialize ALL clients (like original initSdk but V3 compatible)
+        Log.d("TtlockFlutterPlugin", "=== Calling prepareBTService() for all clients");
+        
         TTLockClient.getDefault().prepareBTService(activity);
+        GatewayClient.getDefault().prepareBTService(activity);
+        RemoteClient.getDefault().prepareBTService(activity);
+        WirelessKeypadClient.getDefault().prepareBTService(activity);
+        MultifunctionalKeypadClient.getDefault().prepareBTService(activity);
+        WirelessDoorSensorClient.getDefault().prepareBTService(activity);
+        ElectricMeterClient.getDefault().prepareBTService(activity);
+        WaterMeterClient.getDefault().prepareBTService(activity);
+        
         sdkInitialized = true;
-        Log.d("TtlockFlutterPlugin", "=== SDK initialization completed successfully");
+        Log.d("TtlockFlutterPlugin", "=== SDK initialization completed successfully - all clients initialized");
         return true;
     } catch (Exception e) {
         Log.e("TtlockFlutterPlugin", "=== SDK initialization failed: " + e.getMessage());
