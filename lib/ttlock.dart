@@ -55,7 +55,21 @@ class TTLock {
     // Note: The 'activity' parameter is handled on the native side.
     return await _commandChannel.invokeMethod('isBLEEnabled');
   }
-
+// Controls the lock's state with explicit MAC address (Android V3 compatibility).
+///
+/// [lockData] The lock data string used to operate the lock.
+/// [lockMac] The MAC address of the lock.
+/// [controlAction] The desired action, either [TTControlAction.lock] or [TTControlAction.unlock].
+/// [callback] A callback that provides lock time, electric quantity, and a unique ID on success.
+/// [failedCallback] A callback invoked when the control action fails.
+static void controlLockWithMac(String lockData, String lockMac, TTControlAction controlAction,
+    TTControlLockCallback callback, TTFailedCallback failedCallback) {
+  Map map = Map();
+  map[TTResponse.lockData] = lockData;
+  map[TTResponse.lockMac] = lockMac;  // Add MAC parameter
+  map[TTResponse.controlAction] = controlAction.index;
+  invoke("controlLockWithMac", map, callback, fail_callback: failedCallback);
+}
   /// Requests the user to enable Bluetooth.
   ///
   /// This method will trigger a system dialog asking the user to turn on Bluetooth.
