@@ -407,13 +407,11 @@ private boolean ensureSDKInitialized() {
     
     Log.d("TtlockFlutterPlugin", "=== ensureSDKInitialized starting, activity: " + (activity != null ? "available" : "null"));
     
-    // Check if we have activity context
     if (activity == null) {
         Log.e("TtlockFlutterPlugin", "=== Cannot initialize SDK: activity is null");
         return false;
     }
     
-    // Check Bluetooth adapter
     BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
     if (adapter == null || !adapter.isEnabled()) {
         Log.e("TtlockFlutterPlugin", "=== Cannot initialize SDK: Bluetooth not available or disabled");
@@ -421,7 +419,6 @@ private boolean ensureSDKInitialized() {
     }
     
     try {
-        // TTLock SDK V3: Initialize ALL clients (like original initSdk but V3 compatible)
         Log.d("TtlockFlutterPlugin", "=== Calling prepareBTService() for all clients");
         
         TTLockClient.getDefault().prepareBTService(activity);
@@ -433,7 +430,10 @@ private boolean ensureSDKInitialized() {
         ElectricMeterClient.getDefault().prepareBTService(activity);
         WaterMeterClient.getDefault().prepareBTService(activity);
         
+        // FIX: Set BOTH flags
         sdkInitialized = true;
+        sdkIsInit = true;  // <-- ADD THIS LINE
+        
         Log.d("TtlockFlutterPlugin", "=== SDK initialization completed successfully - all clients initialized");
         return true;
     } catch (Exception e) {
@@ -489,7 +489,7 @@ case "controlLockWithMac":
         macLockModel.controlAction = controlAction != null ? controlAction : TtlockModel.CONTROL_ACTION_UNLOCK;
         
         // Call the method
-        controlLockWithMac(macLockModel);
+        controlLock(macLockModel); 
     } else {
         Log.e("TtlockFlutterPlugin", "=== controlLockWithMac: arguments is not a Map, type: " + 
               (callArguments != null ? callArguments.getClass().getSimpleName() : "null"));
