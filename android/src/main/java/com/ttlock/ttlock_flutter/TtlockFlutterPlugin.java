@@ -241,6 +241,8 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     Log.e("TtlockFlutterPlugin", "🚀 PLUGIN CONSTRUCTOR CALLED - Plugin is loading");
   }
   private static final int PERMISSIONS_REQUEST_CODE = 0;
+  private static boolean sdkInitialized = false;
+  private Context applicationContext;
   private MethodChannel channel;
   private EventChannel eventChannel;
   private static Activity activity;
@@ -319,13 +321,14 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     Log.e("TtlockFlutterPlugin", "🔥 PLUGIN IS RUNNING - Method: " + call.method);
     Log.d("TtlockFlutterPlugin", "=== onMethodCall called, method: " + call.method + ", sdkIsInit: " + sdkIsInit);
     
-    if (!sdkIsInit) {
-        Log.d("TtlockFlutterPlugin", "SDK not initialized, calling initSdk()");
-        initSdk();
-        sdkIsInit = true;
-        Log.d("TtlockFlutterPlugin", "initSdk() completed, sdkIsInit now: " + sdkIsInit);
-    } else {
-        Log.d("TtlockFlutterPlugin", "SDK already initialized, skipping initSdk()");
+    // Auto-initialize SDK on first method call (TTLock V3 pattern)
+    if (!sdkInitialized && activity != null) {
+        Log.d("TtlockFlutterPlugin", "=== Auto-initializing SDK for method: " + call.method);
+        if (!ensureSDKInitialized()) {
+            Log.e("TtlockFlutterPlugin", "=== SDK initialization failed for method: " + call.method);
+            result.error("0x405", "SDK initialization failed - bluetooth may be disabled", null);
+            return;
+        }
     }
     
     if (call.method.equals("getLockTimeDirect")) {
@@ -367,7 +370,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     // This is the original logic from the package that handles all other commands.
     // It remains unchanged.
     if (!sdkIsInit) {
-        initSdk();
+        ensureSDKInitialized();
     }
     
     if (GatewayCommand.isGatewayCommand(call.method)) {//gateway
@@ -398,32 +401,34 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
  private boolean ensureSDKInitialized() {
     if (sdkInitialized) {
-        Log.d("TtlockFlutterPlugin", "SDK already initialized");
+        Log.d("TtlockFlutterPlugin", "=== SDK already initialized");
         return true;
     }
     
-    Log.d("TtlockFlutterPlugin", "=== ensureSDKInitialized starting, applicationContext: " + (applicationContext != null ? "available" : "null"));
+    Log.d("TtlockFlutterPlugin", "=== ensureSDKInitialized starting, activity: " + (activity != null ? "available" : "null"));
     
-    // Check Bluetooth availability
-    BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-    if (adapter == null) {
-        Log.e("TtlockFlutterPlugin", "Bluetooth not supported on this device");
+    // Check if we have activity context
+    if (activity == null) {
+        Log.e("TtlockFlutterPlugin", "=== Cannot initialize SDK: activity is null");
         return false;
     }
     
-    if (!adapter.isEnabled()) {
-        Log.e("TtlockFlutterPlugin", "Bluetooth is disabled");
+    // Check Bluetooth adapter
+    BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+    if (adapter == null || !adapter.isEnabled()) {
+        Log.e("TtlockFlutterPlugin", "=== Cannot initialize SDK: Bluetooth not available or disabled");
         return false;
     }
     
     try {
-        // SINGLE initialization call for ALL clients (V3 pattern)
-        TTLockClient.getDefault().prepareBTService(applicationContext);
+        // TTLock SDK V3: Single initialization call for ALL clients
+        Log.d("TtlockFlutterPlugin", "=== Calling TTLockClient.prepareBTService()");
+        TTLockClient.getDefault().prepareBTService(activity);
         sdkInitialized = true;
-        Log.d("TtlockFlutterPlugin", "=== SDK initialized successfully with V3 pattern");
+        Log.d("TtlockFlutterPlugin", "=== SDK initialization completed successfully");
         return true;
     } catch (Exception e) {
-        Log.e("TtlockFlutterPlugin", "SDK initialization failed", e);
+        Log.e("TtlockFlutterPlugin", "=== SDK initialization failed: " + e.getMessage());
         return false;
     }
 }
@@ -4410,7 +4415,7 @@ private void ensureInitialized() {
     Log.d("TtlockFlutterPlugin", "ensureInitialized called, sdkIsInit: " + sdkIsInit);
     if (!sdkIsInit && activity != null) {
         try {
-            initSdk();
+            ensureSDKInitialized();
             sdkIsInit = true;
             android.util.Log.d("TtlockFlutterPlugin", "TTLock SDK initialized successfully");
         } catch (Exception e) {
