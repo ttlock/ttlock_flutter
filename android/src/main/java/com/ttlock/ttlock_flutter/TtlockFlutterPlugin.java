@@ -315,7 +315,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
     if (!isGloballyInitialized && context != null) {
-        TTLockClient.getDefault().prepareBTService(context);
+        TTLockClient.getDefault().prepareBTService(activity);
         isGloballyInitialized = true;
     }
     if (call.method.equals("getLockTimeDirect")) {
@@ -4379,7 +4379,7 @@ private void startScan() {
 private void ensureInitialized() {
     if (!isGloballyInitialized && context != null) {
         try {
-            TTLockClient.getDefault().prepareBTService(context);
+            TTLockClient.getDefault().prepareBTService(activity );
             isGloballyInitialized = true;
             android.util.Log.d("TtlockFlutterPlugin", "TTLock SDK initialized successfully");
         } catch (Exception e) {
