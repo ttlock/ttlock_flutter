@@ -396,19 +396,37 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     }
 }
 
-  private void initSdk() {
-   Log.d("TtlockFlutterPlugin", "=== initSdk() starting, activity: " + (activity != null ? "available" : "null"));
-    TTLockClient.getDefault().prepareBTService(activity);
-    Log.d("TtlockFlutterPlugin", "TTLockClient.prepareBTService() completed");
-    GatewayClient.getDefault().prepareBTService(activity);
-    RemoteClient.getDefault().prepareBTService(activity);
-    WirelessKeypadClient.getDefault().prepareBTService(activity);
-    MultifunctionalKeypadClient.getDefault().prepareBTService(activity);
-    WirelessDoorSensorClient.getDefault().prepareBTService(activity);
-    ElectricMeterClient.getDefault().prepareBTService(activity);
-    WaterMeterClient.getDefault().prepareBTService(activity);
-    Log.d("TtlockFlutterPlugin", "=== initSdk() completed successfully");
-  }
+ private boolean ensureSDKInitialized() {
+    if (sdkInitialized) {
+        Log.d("TtlockFlutterPlugin", "SDK already initialized");
+        return true;
+    }
+    
+    Log.d("TtlockFlutterPlugin", "=== ensureSDKInitialized starting, applicationContext: " + (applicationContext != null ? "available" : "null"));
+    
+    // Check Bluetooth availability
+    BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+    if (adapter == null) {
+        Log.e("TtlockFlutterPlugin", "Bluetooth not supported on this device");
+        return false;
+    }
+    
+    if (!adapter.isEnabled()) {
+        Log.e("TtlockFlutterPlugin", "Bluetooth is disabled");
+        return false;
+    }
+    
+    try {
+        // SINGLE initialization call for ALL clients (V3 pattern)
+        TTLockClient.getDefault().prepareBTService(applicationContext);
+        sdkInitialized = true;
+        Log.d("TtlockFlutterPlugin", "=== SDK initialized successfully with V3 pattern");
+        return true;
+    } catch (Exception e) {
+        Log.e("TtlockFlutterPlugin", "SDK initialization failed", e);
+        return false;
+    }
+}
 
   public void doorLockCommand(MethodCall call) {
     Object arguments = call.arguments;
