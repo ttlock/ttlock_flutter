@@ -466,9 +466,10 @@ case "controlLockWithMac":
     Log.d("TtlockFlutterPlugin", "=== controlLockWithMac case triggered");
     
     // Extract parameters manually to ensure proper mapping
-    Object arguments = call.arguments;
-    if (arguments instanceof Map) {
-        Map<String, Object> params = (Map<String, Object>) arguments;
+    // Use different variable names to avoid conflicts with existing variables
+    Object callArguments = call.arguments;
+    if (callArguments instanceof Map) {
+        Map<String, Object> params = (Map<String, Object>) callArguments;
         
         // Extract each parameter explicitly
         String lockData = (String) params.get("lockData");
@@ -481,16 +482,17 @@ case "controlLockWithMac":
         Log.d("TtlockFlutterPlugin", "    controlAction: " + controlAction);
         
         // Create fresh TtlockModel and populate it
-        TtlockModel ttlockModel = new TtlockModel();
-        ttlockModel.lockData = lockData;
-        ttlockModel.lockMac = lockMac;
-        ttlockModel.controlAction = controlAction != null ? controlAction : TtlockModel.CONTROL_ACTION_UNLOCK;
+        // Use different variable name to avoid conflict
+        TtlockModel macLockModel = new TtlockModel();
+        macLockModel.lockData = lockData;
+        macLockModel.lockMac = lockMac;
+        macLockModel.controlAction = controlAction != null ? controlAction : TtlockModel.CONTROL_ACTION_UNLOCK;
         
         // Call the method
-        controlLockWithMac(ttlockModel);
+        controlLockWithMac(macLockModel);
     } else {
         Log.e("TtlockFlutterPlugin", "=== controlLockWithMac: arguments is not a Map, type: " + 
-              (arguments != null ? arguments.getClass().getSimpleName() : "null"));
+              (callArguments != null ? callArguments.getClass().getSimpleName() : "null"));
         apiFail(LockError.DATA_FORMAT_ERROR);
     }
     break;
