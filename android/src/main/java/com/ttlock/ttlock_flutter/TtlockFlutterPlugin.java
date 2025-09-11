@@ -319,6 +319,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         isGloballyInitialized = true;
     }
     if (call.method.equals("getLockTimeDirect")) {
+        if (!sdkIsInit) {
+        initSdk();
+        sdkIsInit = true;
+    }
+    
+        String lockData = call.argument("lockData");
         String lockData = call.argument("lockData");
         String lockMac = call.argument("lockMac");
 
