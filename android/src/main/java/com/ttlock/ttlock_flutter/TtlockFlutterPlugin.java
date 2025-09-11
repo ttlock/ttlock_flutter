@@ -314,7 +314,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   // THIS IS THE CORRECTED onMethodCall FUNCTION
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
-    if (!isGloballyInitialized && context != null) {
+    if (!isGloballyInitialized && activity != null) {
         TTLockClient.getDefault().prepareBTService(activity);
         isGloballyInitialized = true;
     }
@@ -4377,7 +4377,7 @@ private void startScan() {
  * Ensure TTLock is initialized before any operation
  */
 private void ensureInitialized() {
-    if (!isGloballyInitialized && context != null) {
+    if (!isGloballyInitialized && activity != null) {
         try {
             TTLockClient.getDefault().prepareBTService(activity );
             isGloballyInitialized = true;
