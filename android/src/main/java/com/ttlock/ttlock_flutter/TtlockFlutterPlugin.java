@@ -462,9 +462,38 @@ private boolean ensureSDKInitialized() {
           startScan();
 //        }
         break;
-      case "controlLockWithMac":
-          controlLockWithMac(ttlockModel);
-          break;
+case "controlLockWithMac":
+    Log.d("TtlockFlutterPlugin", "=== controlLockWithMac case triggered");
+    
+    // Extract parameters manually to ensure proper mapping
+    Object arguments = call.arguments;
+    if (arguments instanceof Map) {
+        Map<String, Object> params = (Map<String, Object>) arguments;
+        
+        // Extract each parameter explicitly
+        String lockData = (String) params.get("lockData");
+        String lockMac = (String) params.get("lockMac");
+        Integer controlAction = (Integer) params.get("controlAction");
+        
+        Log.d("TtlockFlutterPlugin", "=== Extracted parameters:");
+        Log.d("TtlockFlutterPlugin", "    lockData: " + (lockData != null ? "length " + lockData.length() : "null"));
+        Log.d("TtlockFlutterPlugin", "    lockMac: " + lockMac);
+        Log.d("TtlockFlutterPlugin", "    controlAction: " + controlAction);
+        
+        // Create fresh TtlockModel and populate it
+        TtlockModel ttlockModel = new TtlockModel();
+        ttlockModel.lockData = lockData;
+        ttlockModel.lockMac = lockMac;
+        ttlockModel.controlAction = controlAction != null ? controlAction : TtlockModel.CONTROL_ACTION_UNLOCK;
+        
+        // Call the method
+        controlLockWithMac(ttlockModel);
+    } else {
+        Log.e("TtlockFlutterPlugin", "=== controlLockWithMac: arguments is not a Map, type: " + 
+              (arguments != null ? arguments.getClass().getSimpleName() : "null"));
+        apiFail(LockError.DATA_FORMAT_ERROR);
+    }
+    break;
       case TTLockCommand.COMMAND_STOP_SCAN_LOCK:
         stopScan();
         break;
@@ -482,7 +511,10 @@ private boolean ensureSDKInitialized() {
     }
   }
 public void controlLockWithMac(final TtlockModel ttlockModel) {
-    Log.d("TtlockFlutterPlugin", "=== controlLockWithMac called, lockMac: " + ttlockModel.lockMac);
+    Log.d("TtlockFlutterPlugin", "=== controlLockWithMac method called");
+    Log.d("TtlockFlutterPlugin", "    ttlockModel.lockMac: " + ttlockModel.lockMac);
+    Log.d("TtlockFlutterPlugin", "    ttlockModel.lockData: " + (ttlockModel.lockData != null ? "length " + ttlockModel.lockData.length() : "null"));
+    Log.d("TtlockFlutterPlugin", "    ttlockModel.controlAction: " + ttlockModel.controlAction);
     
     PermissionUtils.doWithConnectPermission(activity, success -> {
         if (success) {
@@ -499,9 +531,11 @@ public void controlLockWithMac(final TtlockModel ttlockModel) {
                 return;
             }
             
-            Log.d("TtlockFlutterPlugin", "=== Calling TTLockClient.controlLock with MAC: " + ttlockModel.lockMac);
-            Log.d("TtlockFlutterPlugin", "=== Control action: " + ttlockModel.getControlActionValue());
-            Log.d("TtlockFlutterPlugin", "=== Lock data length: " + ttlockModel.lockData.length());
+            Log.d("TtlockFlutterPlugin", "=== All validations passed, calling TTLockClient.controlLock");
+            Log.d("TtlockFlutterPlugin", "=== Parameters for SDK call:");
+            Log.d("TtlockFlutterPlugin", "    controlAction: " + ttlockModel.getControlActionValue());
+            Log.d("TtlockFlutterPlugin", "    lockData: " + ttlockModel.lockData.substring(0, Math.min(50, ttlockModel.lockData.length())) + "...");
+            Log.d("TtlockFlutterPlugin", "    lockMac: " + ttlockModel.lockMac);
             
             TTLockClient.getDefault().controlLock(
                 ttlockModel.getControlActionValue(), 
@@ -510,7 +544,11 @@ public void controlLockWithMac(final TtlockModel ttlockModel) {
                 new ControlLockCallback() {
                     @Override
                     public void onControlLockSuccess(ControlLockResult controlLockResult) {
-                        Log.d("TtlockFlutterPlugin", "=== controlLockWithMac SUCCESS: Battery " + controlLockResult.battery + "%");
+                        Log.d("TtlockFlutterPlugin", "=== controlLockWithMac SUCCESS!");
+                        Log.d("TtlockFlutterPlugin", "    Battery: " + controlLockResult.battery + "%");
+                        Log.d("TtlockFlutterPlugin", "    Lock Time: " + controlLockResult.lockTime);
+                        Log.d("TtlockFlutterPlugin", "    Unique ID: " + controlLockResult.uniqueid);
+                        
                         ttlockModel.lockTime = controlLockResult.lockTime;
                         ttlockModel.controlAction = controlLockResult.controlAction;
                         ttlockModel.electricQuantity = controlLockResult.battery;
@@ -520,7 +558,9 @@ public void controlLockWithMac(final TtlockModel ttlockModel) {
 
                     @Override
                     public void onFail(LockError lockError) {
-                        Log.e("TtlockFlutterPlugin", "=== controlLockWithMac FAILED: " + lockError.getErrorMsg());
+                        Log.e("TtlockFlutterPlugin", "=== controlLockWithMac FAILED:");
+                        Log.e("TtlockFlutterPlugin", "    Error code: " + lockError.getErrorCode());
+                        Log.e("TtlockFlutterPlugin", "    Error message: " + lockError.getErrorMsg());
                         apiFail(lockError);
                     }
                 }
