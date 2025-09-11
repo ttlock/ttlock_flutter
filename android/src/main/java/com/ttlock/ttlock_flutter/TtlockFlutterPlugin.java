@@ -261,7 +261,6 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   public static final int ResultStateSuccess = 0;
   public static final int ResultStateProgress = 1;
   public static final int ResultStateFail = 2;
-  private static boolean isGloballyInitialized = false;
   private int commandType;
 
   /**
@@ -4376,10 +4375,10 @@ private void startScan() {
  * Ensure TTLock is initialized before any operation
  */
 private void ensureInitialized() {
-    if (!isGloballyInitialized && activity != null) {
+    if (!sdkIsInit && activity != null) {
         try {
-            TTLockClient.getDefault().prepareBTService(activity );
-            isGloballyInitialized = true;
+            initSdk();
+            sdkIsInit = true;
             android.util.Log.d("TtlockFlutterPlugin", "TTLock SDK initialized successfully");
         } catch (Exception e) {
             android.util.Log.e("TtlockFlutterPlugin", "Failed to initialize TTLock SDK", e);
