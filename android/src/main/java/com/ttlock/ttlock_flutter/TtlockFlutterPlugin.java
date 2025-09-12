@@ -540,7 +540,7 @@ public void controlLockWithMac(final TtlockModel ttlockModel) {
             Log.d("TtlockFlutterPlugin", "    lockMac: " + ttlockModel.lockMac);
             
             TTLockClient.getDefault().controlLock(
-                1, // Try hardcoded 1 for unlock
+                ttlockModel.controlAction + 1, // ✅ Match iOS implementation
                 ttlockModel.lockData, 
                 ttlockModel.lockMac,  // Explicitly pass MAC address
                 new ControlLockCallback() {
