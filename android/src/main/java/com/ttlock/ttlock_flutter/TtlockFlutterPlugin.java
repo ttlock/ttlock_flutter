@@ -517,46 +517,44 @@ case "controlLockWithMac":
     }
   }
 public void controlLockWithMac(final TtlockModel ttlockModel) {
-    Log.d("TtlockFlutterPlugin", "=== controlLockWithMac starting ===");
-    Log.d("TtlockFlutterPlugin", "lockData length: " + ttlockModel.lockData.length());
-    Log.d("TtlockFlutterPlugin", "lockMac: " + ttlockModel.lockMac);
-    Log.d("TtlockFlutterPlugin", "controlAction: " + ttlockModel.controlAction);
+    Log.d("TtlockFlutterPlugin", "=== controlLockWithMac SIMPLIFIED ===");
     
-    // Stop any existing BT service to force clean restart
-    TTLockClient.getDefault().stopBTService();
+    // Ensure Bluetooth is enabled first
+    if (!TTLockClient.getDefault().isBLEEnabled(activity)) {
+        Log.e("TtlockFlutterPlugin", "Bluetooth not enabled");
+        apiFail(LockError.BLE_SERVER_NOT_INIT);
+        return;
+    }
     
-    // Small delay for cleanup
-    new Handler(Looper.getMainLooper()).postDelayed(() -> {
-        Log.d("TtlockFlutterPlugin", "=== Reinitializing BT service");
-        
-        // Reinitialize with application context
-        TTLockClient.getDefault().prepareBTService(activity.getApplicationContext());
-        
-        // Wait for BLE service to be ready
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            // Check if BLE is enabled
-            boolean bleEnabled = TTLockClient.getDefault().isBLEEnabled(activity);
-            Log.d("TtlockFlutterPlugin", "=== BLE enabled: " + bleEnabled);
-            
-            if (!bleEnabled) {
-                Log.e("TtlockFlutterPlugin", "BLE not enabled after initialization");
-                apiFail(LockError.BLE_SERVER_NOT_INIT);
-                return;
+    // The SDK expects 1 for unlock, 2 for lock
+    // Flutter sends 0 for unlock, 1 for lock
+    int controlAction = ttlockModel.controlAction + 1;
+    
+    Log.d("TtlockFlutterPlugin", "Control action: " + controlAction);
+    Log.d("TtlockFlutterPlugin", "Lock MAC: " + ttlockModel.lockMac);
+    
+    // Direct call just like the demo
+    TTLockClient.getDefault().controlLock(
+        controlAction,
+        ttlockModel.lockData,
+        ttlockModel.lockMac,
+        new ControlLockCallback() {
+            @Override
+            public void onControlLockSuccess(ControlLockResult result) {
+                Log.d("TtlockFlutterPlugin", "=== SUCCESS ===");
+                ttlockModel.lockTime = result.lockTime;
+                ttlockModel.electricQuantity = result.battery;
+                ttlockModel.uniqueId = result.uniqueid;
+                apiSuccess(ttlockModel);
             }
             
-            // Add command to queue and execute
-            Log.d("TtlockFlutterPlugin", "=== Adding CONTROL_LOCK to command queue");
-            commandQue.add(new CommandObj(TTLockCommand.COMMAND_CONTROL_LOCK, ttlockModel));
-            Log.d("TtlockFlutterPlugin", "Command queue size: " + commandQue.size());
-            
-            if (commandQue.size() == 1) {
-                tryAgain = true;
-                Log.d("TtlockFlutterPlugin", "=== Calling doNextCommandAction");
-                doNextCommandAction();
+            @Override
+            public void onFail(LockError error) {
+                Log.e("TtlockFlutterPlugin", "=== FAILED: " + error.getDescription());
+                apiFail(error);
             }
-            
-        }, 2000); // 2 seconds for BLE initialization
-    }, 500); // 500ms for cleanup
+        }
+    );
 }
   
   public void gatewayCommand(MethodCall call) {
