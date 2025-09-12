@@ -13,6 +13,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.location.LocationManager;
 import android.content.Context;
+import android.content.Intent;
+import android.app.ActivityManager;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -521,18 +523,21 @@ public void controlLockWithMac(final TtlockModel ttlockModel) {
     Log.d("TtlockFlutterPlugin", "controlAction (Flutter): " + ttlockModel.controlAction);
     Log.d("TtlockFlutterPlugin", "controlAction + 1 (SDK): " + (ttlockModel.controlAction + 1));
     
-    // Reset the SDK state to force re-initialization
-    Log.d("TtlockFlutterPlugin", "=== Resetting SDK state for fresh initialization");
-    TTLockClient.getDefault().stopBTService();
-    sdkInitialized = false;
-    sdkIsInit = false;
+    // START THE BLUETOOTH SERVICE DIRECTLY
+    try {
+        Log.d("TtlockFlutterPlugin", "=== Starting BluetoothLeService directly");
+        Intent serviceIntent = new Intent(activity, com.ttlock.bl.sdk.service.BluetoothLeService.class);
+        activity.startService(serviceIntent);
+    } catch (Exception e) {
+        Log.e("TtlockFlutterPlugin", "Failed to start BluetoothLeService: " + e.getMessage());
+    }
     
-    // Wait a bit for cleanup
+    // Wait for service to start, then initialize SDK
     new Handler(Looper.getMainLooper()).postDelayed(() -> {
-        Log.d("TtlockFlutterPlugin", "=== Re-initializing BT service after reset");
+        Log.d("TtlockFlutterPlugin", "=== After service start delay, calling prepareBTService");
         TTLockClient.getDefault().prepareBTService(activity.getApplicationContext());
         
-        // Now wait for it to be ready
+        // Now wait for BLE to be ready
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             // Check if BLE is actually enabled
             boolean bleEnabled = TTLockClient.getDefault().isBLEEnabled(activity);
@@ -563,13 +568,6 @@ public void controlLockWithMac(final TtlockModel ttlockModel) {
                                 long endTime = System.currentTimeMillis();
                                 Log.d("TtlockFlutterPlugin", "=== CONTROL LOCK SUCCESS ===");
                                 Log.d("TtlockFlutterPlugin", "Response time: " + (endTime - startTime) + "ms");
-                                Log.d("TtlockFlutterPlugin", "Lock time: " + controlLockResult.lockTime);
-                                Log.d("TtlockFlutterPlugin", "Electric quantity: " + controlLockResult.battery);
-                                Log.d("TtlockFlutterPlugin", "Unique ID: " + controlLockResult.uniqueid);
-                                
-                                // Mark SDK as initialized for next time
-                                sdkInitialized = true;
-                                sdkIsInit = true;
                                 
                                 ttlockModel.lockTime = controlLockResult.lockTime;
                                 ttlockModel.electricQuantity = controlLockResult.battery;
@@ -599,7 +597,7 @@ public void controlLockWithMac(final TtlockModel ttlockModel) {
                 }
             });
         }, 1500); // 1.5 seconds for BLE service initialization
-    }, 200); // 200ms for cleanup
+    }, 500); // 500ms for service to start
 }
   
   public void gatewayCommand(MethodCall call) {
