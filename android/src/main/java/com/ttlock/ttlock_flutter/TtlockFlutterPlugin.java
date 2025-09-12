@@ -517,91 +517,39 @@ case "controlLockWithMac":
     }
   }
 public void controlLockWithMac(final TtlockModel ttlockModel) {
-    Log.d("TtlockFlutterPlugin", "=== ENHANCED CONTROL LOCK DEBUGGING ===");
+    Log.d("TtlockFlutterPlugin", "=== controlLockWithMac starting ===");
     Log.d("TtlockFlutterPlugin", "lockData length: " + ttlockModel.lockData.length());
     Log.d("TtlockFlutterPlugin", "lockMac: " + ttlockModel.lockMac);
-    Log.d("TtlockFlutterPlugin", "controlAction (Flutter): " + ttlockModel.controlAction);
-    Log.d("TtlockFlutterPlugin", "controlAction + 1 (SDK): " + (ttlockModel.controlAction + 1));
+    Log.d("TtlockFlutterPlugin", "controlAction: " + ttlockModel.controlAction);
     
-    // START THE BLUETOOTH SERVICE DIRECTLY
-   try {
-        Log.d("TtlockFlutterPlugin", "=== Attempting to start BluetoothLeService via reflection");
-        Class<?> serviceClass = Class.forName("com.ttlock.bl.sdk.service.BluetoothLeService");
-        Intent serviceIntent = new Intent(activity, serviceClass);
-        activity.startService(serviceIntent);
-        Log.d("TtlockFlutterPlugin", "=== BluetoothLeService start command sent successfully");
-    } catch (ClassNotFoundException e) {
-        Log.e("TtlockFlutterPlugin", "BluetoothLeService class not found: " + e.getMessage());
-    } catch (Exception e) {
-        Log.e("TtlockFlutterPlugin", "Failed to start BluetoothLeService: " + e.getMessage());
-    }
+    // Stop any existing BT service to force clean restart
+    TTLockClient.getDefault().stopBTService();
     
-    // Wait for service to start, then initialize SDK
+    // Small delay for cleanup
     new Handler(Looper.getMainLooper()).postDelayed(() -> {
-        Log.d("TtlockFlutterPlugin", "=== After service start delay, calling prepareBTService");
+        Log.d("TtlockFlutterPlugin", "=== Reinitializing BT service");
+        
+        // Reinitialize with application context
         TTLockClient.getDefault().prepareBTService(activity.getApplicationContext());
         
-        // Now wait for BLE to be ready
+        // Wait for BLE service to be ready
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            // Check if BLE is actually enabled
+            // Check if BLE is enabled
             boolean bleEnabled = TTLockClient.getDefault().isBLEEnabled(activity);
-            Log.d("TtlockFlutterPlugin", "=== BLE enabled check: " + bleEnabled);
+            Log.d("TtlockFlutterPlugin", "=== BLE enabled: " + bleEnabled);
             
             if (!bleEnabled) {
-                Log.e("TtlockFlutterPlugin", "=== BLE still not enabled after initialization!");
+                Log.e("TtlockFlutterPlugin", "BLE not enabled after initialization");
                 apiFail(LockError.BLE_SERVER_NOT_INIT);
                 return;
             }
             
-            Log.d("TtlockFlutterPlugin", "=== BLE confirmed enabled, proceeding with control");
+            // Now delegate to the existing controlLock method
+            Log.d("TtlockFlutterPlugin", "=== Delegating to controlLock method");
+            controlLock(ttlockModel);
             
-            PermissionUtils.doWithConnectPermission(activity, success -> {
-                if (success) {
-                    Log.d("TtlockFlutterPlugin", "Permission check passed - proceeding to controlLock");
-                    Log.d("TtlockFlutterPlugin", "Calling TTLockClient.controlLock with action: " + (ttlockModel.controlAction + 1));
-                    
-                    long startTime = System.currentTimeMillis();
-                    
-                    TTLockClient.getDefault().controlLock(
-                        ttlockModel.controlAction + 1,
-                        ttlockModel.lockData, 
-                        ttlockModel.lockMac,
-                        new ControlLockCallback() {
-                            @Override
-                            public void onControlLockSuccess(ControlLockResult controlLockResult) {
-                                long endTime = System.currentTimeMillis();
-                                Log.d("TtlockFlutterPlugin", "=== CONTROL LOCK SUCCESS ===");
-                                Log.d("TtlockFlutterPlugin", "Response time: " + (endTime - startTime) + "ms");
-                                
-                                ttlockModel.lockTime = controlLockResult.lockTime;
-                                ttlockModel.electricQuantity = controlLockResult.battery;
-                                ttlockModel.uniqueId = controlLockResult.uniqueid;
-                                ttlockModel.lockData = ttlockModel.lockData;
-                                apiSuccess(ttlockModel);
-                            }
-
-                            @Override
-                            public void onFail(LockError lockError) {
-                                long endTime = System.currentTimeMillis();
-                                Log.e("TtlockFlutterPlugin", "=== CONTROL LOCK FAILED ===");
-                                Log.e("TtlockFlutterPlugin", "Response time: " + (endTime - startTime) + "ms");
-                                Log.e("TtlockFlutterPlugin", "Lock error: " + lockError.name());
-                                Log.e("TtlockFlutterPlugin", "Error description: " + lockError.getDescription());
-                                Log.e("TtlockFlutterPlugin", "Error code: " + lockError.getErrorCode());
-                                apiFail(lockError);
-                            }
-                        }
-                    );
-                    
-                    Log.d("TtlockFlutterPlugin", "controlLock() call initiated - waiting for callback...");
-                    
-                } else {
-                    Log.e("TtlockFlutterPlugin", "Permission check FAILED - cannot proceed");
-                    apiFail(LockError.LOCK_NO_PERMISSION);
-                }
-            });
-        }, 1500); // 1.5 seconds for BLE service initialization
-    }, 500); // 500ms for service to start
+        }, 2000); // 2 seconds for BLE initialization
+    }, 500); // 500ms for cleanup
 }
   
   public void gatewayCommand(MethodCall call) {
