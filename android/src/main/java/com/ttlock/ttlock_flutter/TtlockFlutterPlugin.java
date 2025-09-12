@@ -491,7 +491,7 @@ case "controlLockWithMac":
         macLockModel.controlAction = controlAction != null ? controlAction : TtlockModel.CONTROL_ACTION_UNLOCK;
         
         // Call the method
-        controlLock(macLockModel); 
+        controlLockWithMac(macLockModel);
     } else {
         Log.e("TtlockFlutterPlugin", "=== controlLockWithMac: arguments is not a Map, type: " + 
               (callArguments != null ? callArguments.getClass().getSimpleName() : "null"));
