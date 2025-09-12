@@ -544,9 +544,16 @@ public void controlLockWithMac(final TtlockModel ttlockModel) {
                 return;
             }
             
-            // Now delegate to the existing controlLock method
-            Log.d("TtlockFlutterPlugin", "=== Delegating to controlLock method");
-            controlLock(ttlockModel);
+            // Add command to queue and execute
+            Log.d("TtlockFlutterPlugin", "=== Adding CONTROL_LOCK to command queue");
+            commandQue.add(new CommandObj(TTLockCommand.COMMAND_CONTROL_LOCK, ttlockModel));
+            Log.d("TtlockFlutterPlugin", "Command queue size: " + commandQue.size());
+            
+            if (commandQue.size() == 1) {
+                tryAgain = true;
+                Log.d("TtlockFlutterPlugin", "=== Calling doNextCommandAction");
+                doNextCommandAction();
+            }
             
         }, 2000); // 2 seconds for BLE initialization
     }, 500); // 500ms for cleanup
