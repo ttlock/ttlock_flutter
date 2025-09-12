@@ -564,7 +564,7 @@ public void controlLockWithMac(final TtlockModel ttlockModel) {
                             Log.e("TtlockFlutterPlugin", "Response time: " + (endTime - startTime) + "ms");
                             Log.e("TtlockFlutterPlugin", "Lock error: " + lockError.name());
                             Log.e("TtlockFlutterPlugin", "Error description: " + lockError.getDescription());
-                            Log.e("TtlockFlutterPlugin", "Error code: 0x" + Integer.toHexString(lockError.getErrorCode()));
+                            Log.e("TtlockFlutterPlugin", "Error code: " + lockError.getErrorCode());
                             apiFail(lockError);
                         }
                     }
