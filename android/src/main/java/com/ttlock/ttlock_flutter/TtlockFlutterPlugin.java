@@ -563,14 +563,14 @@ public void controlLockWithMac(final TtlockModel ttlockModel) {
                         long endTime = System.currentTimeMillis();
                         Log.d("TtlockFlutterPlugin", "=== CONTROL LOCK SUCCESS ===");
                         Log.d("TtlockFlutterPlugin", "Response time: " + (endTime - startTime) + "ms");
-                        Log.d("TtlockFlutterPlugin", "Lock time: " + controlLockResult.getLockTime());
-                        Log.d("TtlockFlutterPlugin", "Electric quantity: " + controlLockResult.getElectricQuantity());
-                        Log.d("TtlockFlutterPlugin", "Unique ID: " + controlLockResult.getUniqueId());
+                        Log.d("TtlockFlutterPlugin", "Lock time: " + controlLockResult.lockTime);
+                        Log.d("TtlockFlutterPlugin", "Electric quantity: " + controlLockResult.battery);
+                        Log.d("TtlockFlutterPlugin", "Unique ID: " + controlLockResult.uniqueid);
                         
-                        ttlockModel.lockTime = controlLockResult.getLockTime();
-                        ttlockModel.electricQuantity = controlLockResult.getElectricQuantity();
-                        ttlockModel.uniqueId = controlLockResult.getUniqueId();
-                        ttlockModel.lockData = controlLockResult.getLockData();
+                        ttlockModel.lockTime = controlLockResult.lockTime;
+                        ttlockModel.electricQuantity = controlLockResult.battery;
+                        ttlockModel.uniqueId = controlLockResult.uniqueid;
+                        ttlockModel.lockData = ttlockModel.lockData; // Keep original lockData
                         apiSuccess(ttlockModel);
                     }
 
