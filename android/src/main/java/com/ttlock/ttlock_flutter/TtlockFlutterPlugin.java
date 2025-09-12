@@ -524,10 +524,14 @@ public void controlLockWithMac(final TtlockModel ttlockModel) {
     Log.d("TtlockFlutterPlugin", "controlAction + 1 (SDK): " + (ttlockModel.controlAction + 1));
     
     // START THE BLUETOOTH SERVICE DIRECTLY
-    try {
-        Log.d("TtlockFlutterPlugin", "=== Starting BluetoothLeService directly");
-        Intent serviceIntent = new Intent(activity, com.ttlock.bl.sdk.service.BluetoothLeService.class);
+   try {
+        Log.d("TtlockFlutterPlugin", "=== Attempting to start BluetoothLeService via reflection");
+        Class<?> serviceClass = Class.forName("com.ttlock.bl.sdk.service.BluetoothLeService");
+        Intent serviceIntent = new Intent(activity, serviceClass);
         activity.startService(serviceIntent);
+        Log.d("TtlockFlutterPlugin", "=== BluetoothLeService start command sent successfully");
+    } catch (ClassNotFoundException e) {
+        Log.e("TtlockFlutterPlugin", "BluetoothLeService class not found: " + e.getMessage());
     } catch (Exception e) {
         Log.e("TtlockFlutterPlugin", "Failed to start BluetoothLeService: " + e.getMessage());
     }
