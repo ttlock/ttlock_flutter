@@ -521,88 +521,61 @@ public void controlLockWithMac(final TtlockModel ttlockModel) {
     Log.d("TtlockFlutterPlugin", "controlAction (Flutter): " + ttlockModel.controlAction);
     Log.d("TtlockFlutterPlugin", "controlAction + 1 (SDK): " + (ttlockModel.controlAction + 1));
     
-    // Check Bluetooth state
-    try {
-        BluetoothManager bluetoothManager = (BluetoothManager) activity.getSystemService(Context.BLUETOOTH_SERVICE);
-        BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
-        Log.d("TtlockFlutterPlugin", "Bluetooth enabled: " + bluetoothAdapter.isEnabled());
-        Log.d("TtlockFlutterPlugin", "Bluetooth state: " + bluetoothAdapter.getState());
-    } catch (Exception e) {
-        Log.e("TtlockFlutterPlugin", "Error checking Bluetooth state: " + e.getMessage());
-    }
-    
-    // Check permissions (Android 12+)
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        boolean hasBluetoothConnect = ContextCompat.checkSelfPermission(activity, 
-            android.Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED;
-        boolean hasBluetoothScan = ContextCompat.checkSelfPermission(activity, 
-            android.Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED;
-        Log.d("TtlockFlutterPlugin", "BLUETOOTH_CONNECT permission: " + hasBluetoothConnect);
-        Log.d("TtlockFlutterPlugin", "BLUETOOTH_SCAN permission: " + hasBluetoothScan);
-    }
-    
-    // Check location permission
-    boolean hasLocationPermission = ContextCompat.checkSelfPermission(activity, 
-        android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-    Log.d("TtlockFlutterPlugin", "LOCATION permission: " + hasLocationPermission);
-
-    PermissionUtils.doWithConnectPermission(activity, success -> {
-        if (success) {
-            Log.d("TtlockFlutterPlugin", "Permission check passed - proceeding to controlLock");
-            Log.d("TtlockFlutterPlugin", "Calling TTLockClient.controlLock with action: " + (ttlockModel.controlAction + 1));
-            
-            long startTime = System.currentTimeMillis();
-            
-            TTLockClient.getDefault().controlLock(
-                ttlockModel.controlAction + 1, // Using +1 like iOS
-                ttlockModel.lockData, 
-                ttlockModel.lockMac, // Explicitly pass MAC address
-                new ControlLockCallback() {
-                    @Override
-                    public void onControlLockSuccess(ControlLockResult controlLockResult) {
-                        long endTime = System.currentTimeMillis();
-                        Log.d("TtlockFlutterPlugin", "=== CONTROL LOCK SUCCESS ===");
-                        Log.d("TtlockFlutterPlugin", "Response time: " + (endTime - startTime) + "ms");
-                        Log.d("TtlockFlutterPlugin", "Lock time: " + controlLockResult.lockTime);
-                        Log.d("TtlockFlutterPlugin", "Electric quantity: " + controlLockResult.battery);
-                        Log.d("TtlockFlutterPlugin", "Unique ID: " + controlLockResult.uniqueid);
-                        
-                        ttlockModel.lockTime = controlLockResult.lockTime;
-                        ttlockModel.electricQuantity = controlLockResult.battery;
-                        ttlockModel.uniqueId = controlLockResult.uniqueid;
-                        ttlockModel.lockData = ttlockModel.lockData; // Keep original lockData
-                        apiSuccess(ttlockModel);
-                    }
-
-                    @Override
-                    public void onFail(LockError lockError) {
-                        long endTime = System.currentTimeMillis();
-                        Log.e("TtlockFlutterPlugin", "=== CONTROL LOCK FAILED ===");
-                        Log.e("TtlockFlutterPlugin", "Response time: " + (endTime - startTime) + "ms");
-                        Log.e("TtlockFlutterPlugin", "Lock error: " + lockError.name());
-                        Log.e("TtlockFlutterPlugin", "Error description: " + lockError.getDescription());
-                        Log.e("TtlockFlutterPlugin", "Error code: " + lockError.ordinal());
-                        
-                        // Try to get more error details
-                        try {
-                            Log.e("TtlockFlutterPlugin", "Error toString: " + lockError.toString());
-                        } catch (Exception e) {
-                            Log.e("TtlockFlutterPlugin", "Could not get error details: " + e.getMessage());
+    // Ensure SDK is initialized with delay before proceeding
+    ensureSDKInitializedWithDelay(() -> {
+        Log.d("TtlockFlutterPlugin", "=== SDK and BLE service ready, proceeding with control lock");
+        
+        PermissionUtils.doWithConnectPermission(activity, success -> {
+            if (success) {
+                Log.d("TtlockFlutterPlugin", "Permission check passed - proceeding to controlLock");
+                Log.d("TtlockFlutterPlugin", "Calling TTLockClient.controlLock with action: " + (ttlockModel.controlAction + 1));
+                
+                long startTime = System.currentTimeMillis();
+                
+                TTLockClient.getDefault().controlLock(
+                    ttlockModel.controlAction + 1,
+                    ttlockModel.lockData, 
+                    ttlockModel.lockMac,
+                    new ControlLockCallback() {
+                        @Override
+                        public void onControlLockSuccess(ControlLockResult controlLockResult) {
+                            long endTime = System.currentTimeMillis();
+                            Log.d("TtlockFlutterPlugin", "=== CONTROL LOCK SUCCESS ===");
+                            Log.d("TtlockFlutterPlugin", "Response time: " + (endTime - startTime) + "ms");
+                            Log.d("TtlockFlutterPlugin", "Lock time: " + controlLockResult.lockTime);
+                            Log.d("TtlockFlutterPlugin", "Electric quantity: " + controlLockResult.battery);
+                            Log.d("TtlockFlutterPlugin", "Unique ID: " + controlLockResult.uniqueid);
+                            
+                            ttlockModel.lockTime = controlLockResult.lockTime;
+                            ttlockModel.electricQuantity = controlLockResult.battery;
+                            ttlockModel.uniqueId = controlLockResult.uniqueid;
+                            ttlockModel.lockData = ttlockModel.lockData;
+                            apiSuccess(ttlockModel);
                         }
-                        
-                        apiFail(lockError);
+
+                        @Override
+                        public void onFail(LockError lockError) {
+                            long endTime = System.currentTimeMillis();
+                            Log.e("TtlockFlutterPlugin", "=== CONTROL LOCK FAILED ===");
+                            Log.e("TtlockFlutterPlugin", "Response time: " + (endTime - startTime) + "ms");
+                            Log.e("TtlockFlutterPlugin", "Lock error: " + lockError.name());
+                            Log.e("TtlockFlutterPlugin", "Error description: " + lockError.getDescription());
+                            Log.e("TtlockFlutterPlugin", "Error code: " + lockError.getErrorCode());
+                            apiFail(lockError);
+                        }
                     }
-                }
-            );
-            
-            Log.d("TtlockFlutterPlugin", "controlLock() call initiated - waiting for callback...");
-            
-        } else {
-            Log.e("TtlockFlutterPlugin", "Permission check FAILED - cannot proceed");
-            apiFail(LockError.LOCK_NO_PERMISSION);
-        }
+                );
+                
+                Log.d("TtlockFlutterPlugin", "controlLock() call initiated - waiting for callback...");
+                
+            } else {
+                Log.e("TtlockFlutterPlugin", "Permission check FAILED - cannot proceed");
+                apiFail(LockError.LOCK_NO_PERMISSION);
+            }
+        });
     });
 }
+  
   public void gatewayCommand(MethodCall call) {
     String command = call.method;
     gatewayModel.toObject((Map<String, Object>) call.arguments);
@@ -632,6 +605,50 @@ public void controlLockWithMac(final TtlockModel ttlockModel) {
         break;
     }
   }
+  private void ensureSDKInitializedWithDelay(Runnable onComplete) {
+    if (sdkInitialized && TTLockClient.getDefault().isBLEEnabled(activity)) {
+        Log.d("TtlockFlutterPlugin", "=== SDK already initialized and BLE ready");
+        if (onComplete != null) onComplete.run();
+        return;
+    }
+    
+    Log.d("TtlockFlutterPlugin", "=== Initializing SDK with delay for BLE service");
+    
+    if (activity == null) {
+        Log.e("TtlockFlutterPlugin", "=== Cannot initialize SDK: activity is null");
+        return;
+    }
+    
+    BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+    if (adapter == null || !adapter.isEnabled()) {
+        Log.e("TtlockFlutterPlugin", "=== Cannot initialize SDK: Bluetooth not available or disabled");
+        return;
+    }
+    
+    try {
+        // Initialize all clients
+        TTLockClient.getDefault().prepareBTService(activity);
+        GatewayClient.getDefault().prepareBTService(activity);
+        RemoteClient.getDefault().prepareBTService(activity);
+        WirelessKeypadClient.getDefault().prepareBTService(activity);
+        MultifunctionalKeypadClient.getDefault().prepareBTService(activity);
+        WirelessDoorSensorClient.getDefault().prepareBTService(activity);
+        ElectricMeterClient.getDefault().prepareBTService(activity);
+        WaterMeterClient.getDefault().prepareBTService(activity);
+        
+        sdkInitialized = true;
+        sdkIsInit = true;
+        
+        // Add a small delay to ensure BLE service is ready
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            Log.d("TtlockFlutterPlugin", "=== BLE service should be ready now");
+            if (onComplete != null) onComplete.run();
+        }, 500); // 500ms delay
+        
+    } catch (Exception e) {
+        Log.e("TtlockFlutterPlugin", "=== SDK initialization failed: " + e.getMessage());
+    }
+}
 
   public void remoteCommand(MethodCall call) {
     String command = call.method;
