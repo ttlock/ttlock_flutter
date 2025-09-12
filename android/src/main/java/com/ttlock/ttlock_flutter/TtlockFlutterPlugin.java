@@ -521,9 +521,13 @@ public void controlLockWithMac(final TtlockModel ttlockModel) {
     Log.d("TtlockFlutterPlugin", "controlAction (Flutter): " + ttlockModel.controlAction);
     Log.d("TtlockFlutterPlugin", "controlAction + 1 (SDK): " + (ttlockModel.controlAction + 1));
     
-    // Ensure SDK is initialized with delay before proceeding
-    ensureSDKInitializedWithDelay(() -> {
-        Log.d("TtlockFlutterPlugin", "=== SDK and BLE service ready, proceeding with control lock");
+    // ALWAYS ensure BT service is ready, even if SDK claims initialized
+    TTLockClient.getDefault().prepareBTService(activity);
+    Log.d("TtlockFlutterPlugin", "=== Called prepareBTService, waiting for BLE to be ready...");
+    
+    // Always apply delay to ensure BLE service is ready
+    new Handler(Looper.getMainLooper()).postDelayed(() -> {
+        Log.d("TtlockFlutterPlugin", "=== After 1000ms delay, BLE should be ready");
         
         PermissionUtils.doWithConnectPermission(activity, success -> {
             if (success) {
@@ -560,7 +564,7 @@ public void controlLockWithMac(final TtlockModel ttlockModel) {
                             Log.e("TtlockFlutterPlugin", "Response time: " + (endTime - startTime) + "ms");
                             Log.e("TtlockFlutterPlugin", "Lock error: " + lockError.name());
                             Log.e("TtlockFlutterPlugin", "Error description: " + lockError.getDescription());
-                            Log.e("TtlockFlutterPlugin", "Error code: " + lockError.getErrorCode());
+                            Log.e("TtlockFlutterPlugin", "Error code: 0x" + Integer.toHexString(lockError.getErrorCode()));
                             apiFail(lockError);
                         }
                     }
@@ -573,7 +577,7 @@ public void controlLockWithMac(final TtlockModel ttlockModel) {
                 apiFail(LockError.LOCK_NO_PERMISSION);
             }
         });
-    });
+    }, 1000); // 1000ms delay to ensure BLE is ready
 }
   
   public void gatewayCommand(MethodCall call) {
