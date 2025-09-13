@@ -492,46 +492,92 @@ case "controlLockWithMac":
     }
   }
 public void controlLockWithMac(final TtlockModel ttlockModel) {
-    Log.d("TtlockFlutterPlugin", "=== controlLockWithMac FIXED ===");
+    Log.d("TtlockFlutterPlugin", "=== controlLockWithMac EMERGENCY FIX ===");
+    Log.d("TtlockFlutterPlugin", "lockData length: " + ttlockModel.lockData.length());
+    Log.d("TtlockFlutterPlugin", "lockMac: " + ttlockModel.lockMac);
+    Log.d("TtlockFlutterPlugin", "controlAction input: " + ttlockModel.controlAction);
     
-    // Ensure Bluetooth is enabled
-    if (!TTLockClient.getDefault().isBLEEnabled(activity)) {
-        Log.e("TtlockFlutterPlugin", "Bluetooth not enabled");
-        apiFail(LockError.BLE_SERVER_NOT_INIT);
-        return;
+    // FORCE reinitialize SDK every time (emergency fix)
+    try {
+        TTLockClient.getDefault().prepareBTService(activity.getApplicationContext());
+        Thread.sleep(100); // Small delay for initialization
+    } catch (Exception e) {
+        Log.e("TtlockFlutterPlugin", "Failed to prepare BT service: " + e.getMessage());
     }
     
-    // Use ControlAction constants directly like native app
-    int controlAction = ttlockModel.controlAction == 0 ? 
-        ControlAction.UNLOCK : ControlAction.LOCK;
+    // Check Bluetooth state after initialization
+    boolean bleEnabled = TTLockClient.getDefault().isBLEEnabled(activity);
+    Log.d("TtlockFlutterPlugin", "=== BLE enabled after init: " + bleEnabled);
     
-    Log.d("TtlockFlutterPlugin", "Using ControlAction: " + controlAction);
-    Log.d("TtlockFlutterPlugin", "Lock MAC: " + ttlockModel.lockMac);
+    if (!bleEnabled) {
+        // Try one more time with regular activity context
+        TTLockClient.getDefault().prepareBTService(activity);
+        try {
+            Thread.sleep(100);
+        } catch (Exception e) {}
+        bleEnabled = TTLockClient.getDefault().isBLEEnabled(activity);
+        Log.d("TtlockFlutterPlugin", "=== BLE enabled after second init: " + bleEnabled);
+    }
     
-    // Call exactly like native app
+    // FIX: Correct the control action mapping
+    // In Flutter: 0 = unlock, 1 = lock
+    // In SDK: UNLOCK = 1, LOCK = 2
+    int controlAction;
+    if (ttlockModel.controlAction == 0) {
+        controlAction = 1; // ControlAction.UNLOCK
+        Log.d("TtlockFlutterPlugin", "Flutter sent 0, using SDK UNLOCK (1)");
+    } else {
+        controlAction = 2; // ControlAction.LOCK  
+        Log.d("TtlockFlutterPlugin", "Flutter sent 1, using SDK LOCK (2)");
+    }
+    
+    Log.d("TtlockFlutterPlugin", "=== Final ControlAction for SDK: " + controlAction);
+    
+    // Direct call without checking BLE state (let SDK handle it)
     TTLockClient.getDefault().controlLock(
         controlAction,
-        ttlockModel.lockData,
+        ttlockModel.lockData, 
         ttlockModel.lockMac,
         new ControlLockCallback() {
             @Override
-            public void onControlLockSuccess(ControlLockResult result) {
-                Log.d("TtlockFlutterPlugin", "=== SUCCESS ===");
-                ttlockModel.lockTime = result.lockTime;
-                ttlockModel.electricQuantity = result.battery;
-                ttlockModel.uniqueId = result.uniqueid;
-                apiSuccess(ttlockModel);
+            public void onControlLockSuccess(ControlLockResult controlLockResult) {
+                Log.d("TtlockFlutterPlugin", "=== Control lock SUCCESS!");
+                
+                HashMap<String, Object> resultMap = new HashMap<>();
+                resultMap.put("lockTime", controlLockResult.lockTime);
+                resultMap.put("electricQuantity", controlLockResult.battery);
+                resultMap.put("uniqueId", controlLockResult.uniqueid);
+                resultMap.put("controlAction", controlLockResult.controlAction);
+                
+                successCallbackCommand(TTLockCommand.COMMAND_CONTROL_LOCK, resultMap);
             }
-            
+
             @Override
-            public void onFail(LockError error) {
-                Log.e("TtlockFlutterPlugin", "=== FAILED: " + error.getDescription());
-                apiFail(error);
+            public void onFail(LockError lockError) {
+                Log.e("TtlockFlutterPlugin", "=== Control lock FAILED: " + lockError.getErrorCode() + " - " + lockError.getDescription());
+                
+                // If BLE_SERVER_NOT_INIT, log more details
+                if (lockError == LockError.BLE_SERVER_NOT_INIT) {
+                    Log.e("TtlockFlutterPlugin", "BLE_SERVER_NOT_INIT - Bluetooth state: " + 
+                          TTLockClient.getDefault().isBLEEnabled(activity));
+                    Log.e("TtlockFlutterPlugin", "Activity is null? " + (activity == null));
+                }
+                
+                errorCallbackCommand(TTLockCommand.COMMAND_CONTROL_LOCK, lockError);
             }
         }
     );
 }
-  
+  public void checkSDKState() {
+    Log.d("TtlockFlutterPlugin", "=== SDK STATE CHECK ===");
+    Log.d("TtlockFlutterPlugin", "sdkInitialized: " + sdkInitialized);
+    Log.d("TtlockFlutterPlugin", "sdkIsInit: " + sdkIsInit);
+    Log.d("TtlockFlutterPlugin", "activity: " + (activity != null ? "EXISTS" : "NULL"));
+    Log.d("TtlockFlutterPlugin", "BLE enabled: " + (activity != null ? TTLockClient.getDefault().isBLEEnabled(activity) : "N/A"));
+    
+    BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+    Log.d("TtlockFlutterPlugin", "System Bluetooth: " + (adapter != null && adapter.isEnabled() ? "ON" : "OFF"));
+}
   public void gatewayCommand(MethodCall call) {
     String command = call.method;
     gatewayModel.toObject((Map<String, Object>) call.arguments);
