@@ -213,6 +213,7 @@ import com.ttlock.ttlock_flutter.model.TtlockModel;
 import com.ttlock.ttlock_flutter.model.WaterMeterErrorConvert;
 import com.ttlock.ttlock_flutter.util.PermissionUtils;
 import com.ttlock.ttlock_flutter.util.Utils;
+import com.ttlock.bl.sdk.constant.ControlAction;
 
 import java.time.LocalDateTime;
 import java.util.ArrayDeque;
@@ -405,45 +406,19 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
 private boolean ensureSDKInitialized() {
     if (sdkInitialized) {
-        Log.d("TtlockFlutterPlugin", "=== SDK already initialized");
         return true;
     }
-    
-    Log.d("TtlockFlutterPlugin", "=== ensureSDKInitialized starting, activity: " + (activity != null ? "available" : "null"));
     
     if (activity == null) {
-        Log.e("TtlockFlutterPlugin", "=== Cannot initialize SDK: activity is null");
+        Log.e("TtlockFlutterPlugin", "Activity is null");
         return false;
     }
     
-    BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-    if (adapter == null || !adapter.isEnabled()) {
-        Log.e("TtlockFlutterPlugin", "=== Cannot initialize SDK: Bluetooth not available or disabled");
-        return false;
-    }
-    
-    try {
-        Log.d("TtlockFlutterPlugin", "=== Calling prepareBTService() for all clients");
-        
-        TTLockClient.getDefault().prepareBTService(activity);
-        GatewayClient.getDefault().prepareBTService(activity);
-        RemoteClient.getDefault().prepareBTService(activity);
-        WirelessKeypadClient.getDefault().prepareBTService(activity);
-        MultifunctionalKeypadClient.getDefault().prepareBTService(activity);
-        WirelessDoorSensorClient.getDefault().prepareBTService(activity);
-        ElectricMeterClient.getDefault().prepareBTService(activity);
-        WaterMeterClient.getDefault().prepareBTService(activity);
-        
-        // FIX: Set BOTH flags
-        sdkInitialized = true;
-        sdkIsInit = true;  // <-- ADD THIS LINE
-        
-        Log.d("TtlockFlutterPlugin", "=== SDK initialization completed successfully - all clients initialized");
-        return true;
-    } catch (Exception e) {
-        Log.e("TtlockFlutterPlugin", "=== SDK initialization failed: " + e.getMessage());
-        return false;
-    }
+    TTLockClient.getDefault().prepareBTService(activity.getApplicationContext());
+    sdkInitialized = true;
+    sdkIsInit = true;
+    Log.d("TtlockFlutterPlugin", "SDK initialized");
+    return true;
 }
 
   public void doorLockCommand(MethodCall call) {
@@ -517,23 +492,23 @@ case "controlLockWithMac":
     }
   }
 public void controlLockWithMac(final TtlockModel ttlockModel) {
-    Log.d("TtlockFlutterPlugin", "=== controlLockWithMac SIMPLIFIED ===");
+    Log.d("TtlockFlutterPlugin", "=== controlLockWithMac FIXED ===");
     
-    // Ensure Bluetooth is enabled first
+    // Ensure Bluetooth is enabled
     if (!TTLockClient.getDefault().isBLEEnabled(activity)) {
         Log.e("TtlockFlutterPlugin", "Bluetooth not enabled");
         apiFail(LockError.BLE_SERVER_NOT_INIT);
         return;
     }
     
-    // The SDK expects 1 for unlock, 2 for lock
-    // Flutter sends 0 for unlock, 1 for lock
-    int controlAction = ttlockModel.controlAction + 1;
+    // Use ControlAction constants directly like native app
+    int controlAction = ttlockModel.controlAction == 0 ? 
+        ControlAction.UNLOCK : ControlAction.LOCK;
     
-    Log.d("TtlockFlutterPlugin", "Control action: " + controlAction);
+    Log.d("TtlockFlutterPlugin", "Using ControlAction: " + controlAction);
     Log.d("TtlockFlutterPlugin", "Lock MAC: " + ttlockModel.lockMac);
     
-    // Direct call just like the demo
+    // Call exactly like native app
     TTLockClient.getDefault().controlLock(
         controlAction,
         ttlockModel.lockData,
@@ -4398,7 +4373,12 @@ private void startScan() {
   @Override
   public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
     activity = binding.getActivity();
-  }
+    // Use application context exactly like native test
+    TTLockClient.getDefault().prepareBTService(activity.getApplicationContext());
+    sdkInitialized = true;
+    sdkIsInit = true;
+    Log.d("TtlockFlutterPlugin", "SDK initialized with application context");
+}
 
   @Override
   public void onDetachedFromActivityForConfigChanges() {
