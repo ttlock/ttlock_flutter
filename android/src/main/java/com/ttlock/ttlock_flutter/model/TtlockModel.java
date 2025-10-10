@@ -149,6 +149,8 @@ public class TtlockModel {
 
     public String faceNumber;
 
+    public int sensitivityValue;
+
     @Override
     public String toString() {
         return "TtlockModel{" +
@@ -209,6 +211,7 @@ public class TtlockModel {
                 ", passcodeListString='" + passcodeListString + '\'' +
                 ", cardListString='" + cardListString + '\'' +
                 ", fingerprintListString='" + fingerprintListString + '\'' +
+                ", sensitivityValue='" + sensitivityValue + '\'' +
                 '}';
     }
 

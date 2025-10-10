@@ -148,4 +148,6 @@ public class TTLockCommand {
     public static final String COMMAND_MODIFY_FACE = "faceModify";
     public static final String COMMAND_CLEAR_FACE = "faceClear";
 
+    public static final String COMMAND_SET_SENSITIVITY = "setSensitivity";
+
 }

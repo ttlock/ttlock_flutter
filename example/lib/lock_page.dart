@@ -85,7 +85,8 @@ enum Command {
   // configServer,
   // getWifiInfo,
   configIp,
-  keypad
+  keypad,
+  setSensitivity
 }
 
 class _LockPageState extends State<LockPage> {
@@ -160,6 +161,7 @@ class _LockPageState extends State<LockPage> {
     // {"Wifi lock get wifi info": Command.getWifiInfo},
     {"Wifi lock config ip": Command.configIp},
     {"Keypad": Command.keypad},
+    {"setSensitivity":Command.setSensitivity}
   ];
 
   String note =
@@ -730,6 +732,21 @@ class _LockPageState extends State<LockPage> {
                 lockMac: widget.lockMac,
               );
             }));
+        break;
+      case Command.setSensitivity:
+        TTLock.supportFunction(TTLockFuction.sensitivity, lockData, (bool support){
+          if(support)
+            {
+              TTLock.setSensitivity(lockData, 0, () {
+                _showSuccessAndDismiss("setSensitivity success");
+              }, (errorCode, errorMsg) {
+                _showErrorAndDismiss(errorCode, errorMsg);
+              });
+            }else
+              {
+                _showErrorAndDismiss(TTLockError.fail, 'unSupport');
+              }
+        });
         break;
       default:
     }

@@ -147,6 +147,8 @@ class TTLock {
   static const String COMMAND_DELETE_FACE = "faceDelete";
   static const String COMMAND_CLEAR_FACE = "faceClear";
 
+  static const String COMMAND_SET_SENSITIVITY = "setSensitivity";
+
   // static const String COMMAND_GET_PASSCODE_VERIFICATION_PARAMS = "getPasscodeVerificationParams";
 
   static List _commandQueue = [];
@@ -1215,6 +1217,21 @@ class TTLock {
     invoke(COMMAND_DELETE_FACE, map, callback, fail: failedCallback);
   }
 
+  // enum TTSensitivityValue {
+//   off = 0,
+//   low = 1,
+//   medium = 2,
+//   high = 3,
+// };
+  static void setSensitivity(String lockData, int value, TTSuccessCallback callback,
+      TTFailedCallback failedCallback)
+  {
+    Map map = new Map();
+    map[TTResponse.lockData] = lockData;
+    map[TTResponse.sensitivityValue] = value;
+    invoke(COMMAND_SET_SENSITIVITY, map, callback, fail: failedCallback);
+  }
+
   static bool isListenEvent = false;
   static var scanCommandList = [
     COMMAND_START_SCAN_LOCK,
@@ -1863,6 +1880,9 @@ class TTResponse {
   static const String alertTime = "alertTime";
   static const String wirelessKeypadFeatureValue = "wirelessKeypadFeatureValue";
   static const String resetCode = "resetCode";
+
+  static const String sensitivityValue = "sensitivityValue";
+
 }
 
 class TTLockScanModel {

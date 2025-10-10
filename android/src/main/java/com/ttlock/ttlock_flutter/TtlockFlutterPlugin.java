@@ -88,6 +88,7 @@ import com.ttlock.bl.sdk.callback.SetPassageModeCallback;
 import com.ttlock.bl.sdk.callback.SetPowerSaverControlableLockCallback;
 import com.ttlock.bl.sdk.callback.SetPowerSaverWorkModeCallback;
 import com.ttlock.bl.sdk.callback.SetRemoteUnlockSwitchCallback;
+import com.ttlock.bl.sdk.callback.SetSensitivityCallback;
 import com.ttlock.bl.sdk.callback.SetUnlockDirectionCallback;
 import com.ttlock.bl.sdk.callback.VerifyLockCallback;
 import com.ttlock.bl.sdk.constant.RecoveryData;
@@ -943,6 +944,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         gatewayInfoMap.put("modelNum", deviceInfo.modelNum);
         gatewayInfoMap.put("hardwareRevision", deviceInfo.hardwareRevision);
         gatewayInfoMap.put("firmwareRevision", deviceInfo.firmwareRevision);
+        gatewayInfoMap.put("networkMac", deviceInfo.networkMac);
         successCallbackCommand(GatewayCommand.COMMAND_INIT_GATEWAY, gatewayInfoMap);
       }
 
@@ -1196,6 +1198,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         break;
       case TTLockCommand.COMMAND_CLEAR_FACE:
         clearFace(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_SET_SENSITIVITY:
+        setSensitivity(ttlockModel);
         break;
       default:
         apiFail(LockError.INVALID_COMMAND);
@@ -2842,6 +2847,26 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         TTLockClient.getDefault().clearFace(ttlockModel.lockData, new ClearFaceCallback() {
           @Override
           public void onClearSuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void setSensitivity(final TtlockModel ttlockModel) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().setSensitivity(ttlockModel.lockData, ttlockModel.sensitivityValue, new SetSensitivityCallback() {
+          @Override
+          public void onSetSuccess() {
             apiSuccess(ttlockModel);
           }
 
