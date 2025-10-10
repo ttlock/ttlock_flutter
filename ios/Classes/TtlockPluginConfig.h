@@ -169,6 +169,7 @@
 #define command_face_modify @"faceModify"
 #define command_face_delete @"faceDelete"
 #define command_face_clear @"faceClear"
+#define command_face_sensitivity @"setSensitivity"
 
 #define command_get_all_valid_passcode @"getAllValidPasscode"
 #define command_get_all_valid_fingerprint @"getAllValidFingerprint"
