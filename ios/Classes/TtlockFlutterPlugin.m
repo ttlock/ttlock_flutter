@@ -503,10 +503,14 @@ ErrorDeviceKey
         }
         [TTGateway initializeGatewayWithInfoDic:paramDict block:^(TTSystemInfoModel *systemInfoModel, TTGatewayStatus status) {
              if (status == TTGatewaySuccess) {
+                 NSString* mac = [TTGateway getNetworkMac];
+                 
                  NSMutableDictionary *resultDict = @{}.mutableCopy;
                  resultDict[@"modelNum"] = systemInfoModel.modelNum;
                  resultDict[@"hardwareRevision"] = systemInfoModel.hardwareRevision;
                  resultDict[@"firmwareRevision"] = systemInfoModel.firmwareRevision;
+                 resultDict[@"networkMac"] = mac;
+                 
                  [weakSelf successCallbackCommand:command data:resultDict];
              }else{
                 [weakSelf errorCallbackCommand:command code:status msg:nil];
