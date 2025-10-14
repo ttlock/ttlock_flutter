@@ -1,53 +1,49 @@
-group 'com.ttlock.ttlock_flutter'
-version '1.0'
-
-buildscript {
-    ext {
-        agp_version = '4.1.2'
-    }
-    repositories {
-        mavenCentral()
-        google()
-        jcenter()
-    }
-
-    dependencies {
-        classpath "com.android.tools.build:gradle:$agp_version"
-    }
+plugins {
+    id 'com.android.library'
 }
 
-rootProject.allprojects {
-    repositories {
-        mavenCentral()
-        google()
-        jcenter()
-        flatDir {
-            dirs 'libs'
+group = 'com.ttlock.ttlock_flutter'
+version = '1.0'
+
+android {
+    namespace 'com.ttlock.ttlock_flutter'
+    compileSdk = 35
+    ndkVersion "28.0.12674087"
+
+    defaultConfig {
+        minSdk = 18
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    lint {
+        disable 'InvalidPackage'
+    }
+
+    packaging {
+        jniLibs {
+            useLegacyPackaging = false
         }
     }
 }
 
-apply plugin: 'com.android.library'
-
-android {
-    compileSdkVersion 31
-    namespace 'com.ttlock.ttlock_flutter'
-    defaultConfig {
-        minSdkVersion 18
-    }
-    lintOptions {
-        disable 'InvalidPackage'
-    }
-    compileOptions {
-        targetCompatibility JavaVersion.VERSION_1_8
-        sourceCompatibility JavaVersion.VERSION_1_8
+repositories {
+    google()
+    mavenCentral()
+    jcenter()
+    flatDir {
+        dirs 'libs'
     }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-   // implementation 'com.ttlock:ttlock:3.5.0'
+    // implementation(name: 'ttlock-release', ext: 'aar')
+    // implementation files('libs/ttlock-release.aar')
+    implementation files('libs/ttlock-classes.jar')
     implementation 'com.google.code.gson:gson:2.6.2'
-    implementation(name: 'ttlock-release', ext: 'aar')
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
 }
