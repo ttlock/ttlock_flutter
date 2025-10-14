@@ -22,6 +22,12 @@ android {
     lint {
         disable 'InvalidPackage'
     }
+
+    packaging {
+        jniLibs {
+            useLegacyPackaging = false
+        }
+    }
 }
 
 repositories {
@@ -35,7 +41,8 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation(name: 'ttlock-release', ext: 'aar')
+    // implementation(name: 'ttlock-release', ext: 'aar')
+    implementation files('libs/ttlock-release.aar')
     implementation 'com.google.code.gson:gson:2.6.2'
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
 }
