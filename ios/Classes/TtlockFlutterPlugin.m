@@ -735,7 +735,7 @@ typedef NS_ENUM(NSInteger, ErrorDevice) {
     else if ([command isEqualToString:command_recover_password]) {
         [TTLock recoverPasscode:lockModel.passcode
                     newPasscode:lockModel.passcodeNew
-                   passcodeType:lockModel.passcodeType.intValue + 1
+                   passcodeType:lockModel.type.intValue + 1
                       startDate:lockModel.startDate.longLongValue
                         endDate:lockModel.endDate.longLongValue
                       cycleType:lockModel.cycleType.intValue
