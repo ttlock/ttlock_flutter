@@ -19,6 +19,7 @@
 @property (nonatomic, strong) NSNumber *startDate;
 @property (nonatomic, strong) NSNumber *endDate;
 @property (nonatomic, strong) NSNumber * passcodeType;
+@property (nonatomic, strong) NSNumber * type;
 @property (nonatomic, strong) NSNumber * cycleType;
 @property (nonatomic, strong) NSNumber * remoteAccessory;
 @property (nonatomic, strong) NSString * resetCode;
