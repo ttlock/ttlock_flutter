@@ -579,6 +579,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
                     params.put("wirelessKeypadFeatureValue", initMultifunctionalKeypadResult.getKeypadFeatureValue());
                     params.put("slotNumber", initMultifunctionalKeypadResult.getSlotNumber());
                     params.put("slotLimit", initMultifunctionalKeypadResult.getSlotLimit());
+                    params.put(TTParam.MODEL_NUM, initMultifunctionalKeypadResult.getFirmwareInfo().getModelNum());
+                    params.put(TTParam.HARD_WARE_REVISION, initMultifunctionalKeypadResult.getFirmwareInfo().getHardwareRevision());
+                    params.put(TTParam.FIRMWARE_REVISION, initMultifunctionalKeypadResult.getFirmwareInfo().getFirmwareRevision());
                     successCallbackCommand(TTKeyPadCommand.COMMAND_INIT_MULTIFUNCTIONAL_REMOTE_KEYPAD, params);
                   }
 

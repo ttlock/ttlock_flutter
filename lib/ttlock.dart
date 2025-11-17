@@ -1606,7 +1606,11 @@ class TTLock {
             data["electricQuantity"],
             data["wirelessKeypadFeatureValue"],
             data["slotNumber"],
-            data["slotLimit"]);
+            data["slotLimit"],
+            data["modelNum"],
+            data["hardwareRevision"],
+            data["firmwareRevision"],
+        );
         break;
       case COMMAND_ADD_FACE:
       case COMMAND_ADD_FACE_DATA:
@@ -2152,7 +2156,10 @@ typedef TTMultifunctionalRemoteKeypadInitSuccessCallback = void Function(
     int electricQuantity,
     String wirelessKeypadFeatureValue,
     int slotNumber,
-    int slotLimit);
+    int slotLimit,
+    String? modelNum,
+    String? hardwareRevision,
+    String? firmwareRevision);
 
 typedef TTRemoteKeypadGetStoredLockSuccessCallback = void Function(
     List lockMacs);

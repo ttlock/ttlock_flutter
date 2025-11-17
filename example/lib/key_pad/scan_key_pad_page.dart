@@ -65,7 +65,11 @@ class _ScanKeyPadPageState extends State<ScanKeyPadPage> {
                             int electricQuantity,
                             String wirelessKeypadFeatureValue,
                             int slotNumber,
-                            int slotLimit){
+                            int slotLimit,
+                            String? modelNum,
+                            String? hardwareRevision,
+                            String? firmwareRevision
+                            ){
                           if(mounted)
                             {
                               setState(() {
