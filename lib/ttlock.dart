@@ -1599,7 +1599,8 @@ class TTLock {
         getStoredLocks(data["lockMacs"]);
         break;
       case TTRemoteKeypad.COMMAND_INIT_MULTIFUNCTIONAL_REMOTE_KEYPAD:
-        print(data["systemInfoModel"]);
+
+        var systemInfoModelMap = data["systemInfoModel"]??{};
         TTMultifunctionalRemoteKeypadInitSuccessCallback initSuccessCallback =
             callBack;
         initSuccessCallback(
@@ -1607,9 +1608,9 @@ class TTLock {
             data["wirelessKeypadFeatureValue"],
             data["slotNumber"],
             data["slotLimit"],
-            data["modelNum"],
-            data["hardwareRevision"],
-            data["firmwareRevision"],
+            systemInfoModelMap["modelNum"],
+            systemInfoModelMap["hardwareRevision"],
+            systemInfoModelMap["firmwareRevision"],
         );
         break;
       case COMMAND_ADD_FACE:
