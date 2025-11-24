@@ -31,7 +31,7 @@ class TTRemoteKeypad {
     String mac,
     String lockMac,
     TTRemoteKeypadInitSuccessCallback callback,
-    TTRemoteFailedCallback failedCallback,
+    TTRemoteKeypadFailedCallback failedCallback,
   ) {
     Map map = Map();
     map[TTResponse.mac] = mac;
