@@ -69,7 +69,7 @@ class TTElectricMeter {
       paramMap["mac"] = scanModel.mac;
       paramMap["price"] = scanModel.price;
       paramMap["payMode"] = TTElectricMeterPayMode.postpaid.index;
-      paramMap["name"] = scanModel.name;
+      paramMap["number"] = scanModel.name;
    */
   static void init(
     Map paramMap,
