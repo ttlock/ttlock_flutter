@@ -1691,9 +1691,9 @@ class TTLock {
     else if (command == TTRemoteKey.COMMAND_INIT_REMOTE_KEY ||
         command == TTDoorSensor.COMMAND_INIT_DOOR_SENSOR ||
         command == TTRemoteKeypad.COMMAND_INIT_REMOTE_KEYPAD) {
-      TTRemoteKeypadFailedCallback? failedCallback = callBack;
-      TTRemoteKeyPadAccessoryError error =
-          TTRemoteKeyPadAccessoryError.values[errorCode];
+      TTRemoteFailedCallback? failedCallback = callBack;
+      TTRemoteAccessoryError error =
+      TTRemoteAccessoryError.values[0];
       if (failedCallback != null) {
         failedCallback(error, errorMessage);
       }
