@@ -3,7 +3,9 @@ import 'package:ttlock_flutter/ttelectricMeter.dart';
 import 'package:ttlock_flutter/ttgateway.dart';
 import 'package:ttlock_flutter/ttlock.dart';
 import 'package:ttlock_flutter/ttremoteKeypad.dart';
+import 'package:ttlock_flutter/ttwaterMeter.dart';
 import 'package:ttlock_flutter_example/gateway_page.dart';
+import 'package:ttlock_flutter_example/water_meter_page.dart';
 import 'config.dart';
 import 'key_pad_page.dart';
 import 'wifi_page.dart';
@@ -12,7 +14,7 @@ import 'lock_page.dart';
 import 'electric_meter_page.dart';
 
 
-enum ScanType { lock, gateway, electricMeter, keyPad }
+enum ScanType { lock, gateway, electricMeter, keyPad, waterMeter }
 
 class ScanPage extends StatefulWidget {
   ScanPage({required this.scanType}) : super();
@@ -40,6 +42,8 @@ class _ScanPageState extends State<ScanPage> {
       _startScanElectricMeter();
     } else if (scanType == ScanType.keyPad) {
       _startScanKeyPad();
+    } else if (scanType == ScanType.waterMeter) {
+      _startScanWaterMeter();
     }
   }
 
@@ -47,6 +51,7 @@ class _ScanPageState extends State<ScanPage> {
   List<TTGatewayScanModel> _gatewayList = [];
   List<TTElectricMeterScanModel> _electricMeterList = [];
   List<TTRemoteAccessoryScanModel> _keyPadList = [];
+  List<TTWaterMeterScanModel> _waterMeterList = [];
   void dispose() {
     if (scanType == ScanType.lock) {
       TTLock.stopScanLock();
@@ -56,6 +61,8 @@ class _ScanPageState extends State<ScanPage> {
       TTElectricMeter.stopScan();
     } else if (scanType == ScanType.keyPad) {
       TTRemoteKeypad.stopScan();
+    }else if (scanType == ScanType.waterMeter) {
+      TTWaterMeter.stopScan();
     }
     super.dispose();
   }
@@ -170,6 +177,40 @@ class _ScanPageState extends State<ScanPage> {
       }, (TTRemoteAccessoryError errorCode, String errorMsg) {});
     }
   }
+
+  void _initWaterMeter(TTWaterMeterScanModel scanModel) async {
+    print("init electric meter：" + scanModel.isInited.toString());
+    if (scanModel.isInited) {
+      Navigator.push(context,
+          new MaterialPageRoute(builder: (BuildContext context) {
+            return WaterMeterPage(
+              name: scanModel.name,
+              mac: scanModel.mac,
+            );
+          }));
+    } else {
+      _showLoading();
+
+      Map initParamMap = Map();
+      initParamMap["mac"] = scanModel.mac;
+      initParamMap["number"] = scanModel.name;
+      initParamMap["payMode"] = TTMeterPayMode.postpaid.index;
+      initParamMap["price"] = '1';
+      TTWaterMeter.init(initParamMap, () {
+        _dismissLoading();
+        Navigator.push(context,
+            new MaterialPageRoute(builder: (BuildContext context) {
+              return WaterMeterPage(
+                name: scanModel.name,
+                mac: scanModel.mac,
+              );
+            }));
+      }, (errorCode, errorMsg) {
+        _dismissLoading();
+      });
+    }
+  }
+
 
   void _connectGateway(String mac, TTGatewayType type) async {
     _showLoading();
@@ -293,13 +334,32 @@ class _ScanPageState extends State<ScanPage> {
     });
   }
 
+  void _startScanWaterMeter() {
+    _waterMeterList = [];
+    TTWaterMeter.startScan((scanModel) {
+      bool contain = false;
+      for (TTWaterMeterScanModel model in _waterMeterList) {
+        if (scanModel.mac == model.mac) {
+          contain = true;
+          break;
+        }
+      }
+      if (!contain) {
+        setState(() {
+          _waterMeterList.add(scanModel);
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     String title = [
       'Lock',
       'Gateway',
       'Electric Meter',
-      'Electric Meter'
+      'Key Pad',
+      'Water Meter'
     ][scanType!.index];
     return Scaffold(
         appBar: AppBar(
@@ -320,8 +380,9 @@ class _ScanPageState extends State<ScanPage> {
     String lockNote = 'please touch the keyboard of lock';
     String electricMeterNote = '';
     String keypadNote = '';
+    String waterMeterNote = '';
     String note =
-        [lockNote, gatewayNote, electricMeterNote, keypadNote][scanType!.index];
+        [lockNote, gatewayNote, electricMeterNote, keypadNote, waterMeterNote][scanType!.index];
     return Column(
       children: <Widget>[
         Text(note),
@@ -334,7 +395,8 @@ class _ScanPageState extends State<ScanPage> {
                   _lockList,
                   _gatewayList,
                   _electricMeterList,
-                  _keyPadList
+                  _keyPadList,
+                  _waterMeterList
                 ][scanType!.index]
                     .length,
                 itemBuilder: (context, index) {
@@ -367,6 +429,16 @@ class _ScanPageState extends State<ScanPage> {
                   } else if (scanType == ScanType.keyPad) {
                     TTRemoteAccessoryScanModel scanModel = _keyPadList[index];
                     title = 'keyPad name：${scanModel.name}';
+                  } else if (scanType == ScanType.waterMeter) {
+                    TTWaterMeterScanModel scanModel =
+                    _waterMeterList[index];
+                    title = 'Meter：${scanModel.name}';
+                    subtitle = scanModel.isInited
+                        ? 'meter has been inited'
+                        : 'click to init the meter';
+                    if (scanModel.isInited) {
+                      textColor = Colors.grey;
+                    }
                   }
 
                   TextStyle textStyle = new TextStyle(color: textColor);
@@ -395,6 +467,11 @@ class _ScanPageState extends State<ScanPage> {
                             _keyPadList[index];
                         TTRemoteKeypad.stopScan();
                         _initKeyPad(scanModel);
+                      }else if (scanType == ScanType.waterMeter) {
+                        TTWaterMeterScanModel scanModel =
+                        _waterMeterList[index];
+                        TTWaterMeter.stopScan();
+                        _initWaterMeter(scanModel);
                       }
                     },
                   );
