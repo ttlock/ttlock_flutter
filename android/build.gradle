@@ -35,7 +35,7 @@ android {
         namespace 'com.ttlock.ttlock_flutter'
     }
 
-    compileSdkVersion 31
+    compileSdkVersion 36
     namespace 'com.ttlock.ttlock_flutter'
     defaultConfig {
         minSdkVersion 18
