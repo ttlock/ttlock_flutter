@@ -30,7 +30,7 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
-
+    ndkVersion "29.0.13113456 rc1"
     if (project.android.hasProperty("namespace")) {
         namespace 'com.ttlock.ttlock_flutter'
     }
