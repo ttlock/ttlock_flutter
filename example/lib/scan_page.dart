@@ -196,6 +196,7 @@ class _ScanPageState extends State<ScanPage> {
       initParamMap["number"] = scanModel.name;
       initParamMap["payMode"] = TTMeterPayMode.postpaid.index;
       initParamMap["price"] = '1';
+      initParamMap["date"] = DateTime.now().millisecondsSinceEpoch;
       TTWaterMeter.init(initParamMap, () {
         _dismissLoading();
         Navigator.push(context,

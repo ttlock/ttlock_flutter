@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:bmprogresshud/progresshud.dart';
 import 'package:ttlock_flutter/ttelectricMeter.dart';
+import 'package:ttlock_flutter/ttwaterMeter.dart';
 import 'scan_page.dart';
 import 'config.dart';
 
@@ -43,6 +44,26 @@ class _HomePageState extends State<HomePage> {
     _startScan(ScanType.electricMeter);
   }
 
+  void _startScanWaterMeter() {
+    WaterMeterServerParamMode waterMeterServerParamMode =
+    WaterMeterServerParamMode();
+
+    waterMeterServerParamMode.url =
+    "https://cnapi.ttlock.com/v3/waterMeter/executeCommand";
+    waterMeterServerParamMode.clientId = '8fdb192b4f0245cd99323f7dd714783e';
+    waterMeterServerParamMode.accessToken =
+    '731480c3e35c567add6a5f6e7531c292';
+
+    waterMeterServerParamMode.url =
+    "https://cnapi.ttlock.com/v3/waterMeter/executeCommand";
+    waterMeterServerParamMode.clientId = '8fdb192b4f0245cd99323f7dd714783e';
+    waterMeterServerParamMode.accessToken =
+    '731480c3e35c567add6a5f6e7531c292';
+
+    TTWaterMeter.configServer(waterMeterServerParamMode);
+    _startScan(ScanType.waterMeter);
+  }
+
 
   void _startKeyPadPage() {
     _startScan(ScanType.keyPad);
@@ -76,6 +97,11 @@ class _HomePageState extends State<HomePage> {
         child: Text('Key Pad',
             style: TextStyle(fontWeight: FontWeight.w600)),
         onPressed: _startKeyPadPage,
+      ),
+      ElevatedButton(
+        child: Text('Water Meter',
+            style: TextStyle(fontWeight: FontWeight.w600)),
+        onPressed: _startScanWaterMeter,
       ),
     ]);
   }
