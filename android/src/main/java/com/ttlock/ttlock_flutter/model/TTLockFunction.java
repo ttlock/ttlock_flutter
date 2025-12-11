@@ -60,14 +60,12 @@ public enum TTLockFunction {
     wifiLock,
     wifiLockStaticIP,
     passcodeKeyNumber,
-
-    meariCamera,
+    
     standAloneActivation,
     doubleAuth,
     authorizedUnlock,
     gatewayAuthorizedUnlock,
     noEkeyUnlock,
-    xiongMaiCamera,
     zhiAnPhotoFace,
     palmVein,
     wifiArea,
@@ -182,8 +180,6 @@ public enum TTLockFunction {
                 return FeatureValue.GATEWAY_AUTH_UNLOCK;
             case noEkeyUnlock:
                 return FeatureValue.DO_NOT_SUPPORT_APP_AND_GATEWAY_UNLOCK;
-            case xiongMaiCamera:
-                return FeatureValue.SUPPORT_XM;
             case zhiAnPhotoFace:
                 return FeatureValue.ZHI_AN_FACE_DELIVERY;
             case palmVein:

@@ -2323,13 +2323,11 @@ enum TTLockFuction {
   wifiLockStaticIP,
   passcodeKeyNumber,
 
-  meariCamera,
   standAloneActivation,
   doubleAuth,
   authorizedUnlock,
   gatewayAuthorizedUnlock,
   noEkeyUnlock,
-  xiongMaiCamera,
   zhiAnPhotoFace,
   palmVein,
   wifiArea,
