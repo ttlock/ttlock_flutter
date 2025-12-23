@@ -44,22 +44,12 @@ class _HomePageState extends State<HomePage> {
     _startScan(ScanType.electricMeter);
   }
 
-  void _startScanWaterMeter() {
+  void _startWaterPage() {
     WaterMeterServerParamMode waterMeterServerParamMode =
     WaterMeterServerParamMode();
-
-    waterMeterServerParamMode.url =
-    "https://cnapi.ttlock.com/v3/waterMeter/executeCommand";
-    waterMeterServerParamMode.clientId = '8fdb192b4f0245cd99323f7dd714783e';
-    waterMeterServerParamMode.accessToken =
-    '731480c3e35c567add6a5f6e7531c292';
-
-    waterMeterServerParamMode.url =
-    "https://cnapi.ttlock.com/v3/waterMeter/executeCommand";
-    waterMeterServerParamMode.clientId = '8fdb192b4f0245cd99323f7dd714783e';
-    waterMeterServerParamMode.accessToken =
-    '731480c3e35c567add6a5f6e7531c292';
-
+    // electricMeterServerParamMode.url = 'https://cnapi.ttlock.com/v3/waterMeter/executeCommand';
+    // electricMeterServerParamMode.clientId = '607ab4bcc9504a5da58c43575a1b3746';
+    // electricMeterServerParamMode.accessToken = 'VgC8yDPW/jr6V31nNAcCEkFLNA6o27cQ6OZDjF4iNbKbSz1kU5LcoMh0I4xgbZNZ';
     TTWaterMeter.configServer(waterMeterServerParamMode);
     _startScan(ScanType.waterMeter);
   }
@@ -68,7 +58,7 @@ class _HomePageState extends State<HomePage> {
   void _startKeyPadPage() {
     _startScan(ScanType.keyPad);
   }
-
+  
   void _startScan(ScanType scanType) {
     Navigator.push(context,
         new MaterialPageRoute(builder: (BuildContext context) {
@@ -101,7 +91,7 @@ class _HomePageState extends State<HomePage> {
       ElevatedButton(
         child: Text('Water Meter',
             style: TextStyle(fontWeight: FontWeight.w600)),
-        onPressed: _startScanWaterMeter,
+        onPressed: _startWaterPage,
       ),
     ]);
   }

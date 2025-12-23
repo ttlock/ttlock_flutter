@@ -4,7 +4,8 @@ import 'package:ttlock_flutter/ttlock.dart';
 import 'package:ttlock_flutter/ttwaterMeter.dart';
 
 enum Command {
-  reset
+  reset,
+  recharge
 }
 
 class WaterMeterPage extends StatefulWidget {
@@ -26,7 +27,7 @@ class _WaterMeterPageState extends State<WaterMeterPage> {
     // {"Clear remainder kwh": Command.clearRemainderKwh},
     // {"Set max power": Command.setMaxPower},
     // {"Set pay mode": Command.setPayMode},
-    // {"Recharge": Command.recharge},
+    {"Recharge": Command.recharge},
     // {"Read feature value": Command.readFeatureValue}
   ];
 
@@ -58,6 +59,13 @@ class _WaterMeterPageState extends State<WaterMeterPage> {
         TTWaterMeter.delete(mac, () {
           _showSuccessAndDismiss("Reset success");
           Navigator.popAndPushNamed(context, '/');
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+      case Command.recharge:
+        TTWaterMeter.recharge(mac, "50", "100", () {
+          _showSuccessAndDismiss("recharge success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
         });

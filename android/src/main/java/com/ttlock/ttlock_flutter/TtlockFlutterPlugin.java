@@ -540,7 +540,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
             params.put(TTParam.onOff, waterMeter.getOnOff() == 1);
             params.put(TTParam.RSSI, waterMeter.getRssi());
             params.put(TTParam.magneticInterference, String.valueOf(waterMeter.getMagneticInterference()));
-            params.put(TTParam.electricQuantity, waterMeter.getBatteryCapacity());
+            params.put(TTParam.electricQuantity, waterMeter.getElectricQuantity());
             params.put(TTParam.waterValveFailure, waterMeter.getWaterValveMalfunction());
             params.put(TTParam.payMode, waterMeter.getPayMode());
             params.put(TTParam.scanTime, System.currentTimeMillis());
@@ -776,15 +776,15 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
   }
 
-  //TODO m3  和 chargeAmount顺序
   public void waterMeterCharge(Map<String, Object> params)
   {
     PermissionUtils.doWithConnectPermission(activity, (success) -> {
       if(success)
       {
         WaterMeterClient.getDefault().recharge(params.get(TTParam.MAC).toString(),
-                Double.parseDouble(params.get("m3").toString()),
-                Double.parseDouble(params.get("chargeAmount").toString()), new RechargeCallback() {
+                //
+                Double.parseDouble(params.get("chargeAmount").toString()),
+                Double.parseDouble(params.get("m3").toString()), new RechargeCallback() {
                   @Override
                   public void onRechargeSuccess() {
                     successCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_CHARGE, new HashMap<>());
