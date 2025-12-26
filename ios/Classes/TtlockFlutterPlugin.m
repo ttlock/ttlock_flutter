@@ -999,7 +999,14 @@ typedef NS_ENUM(NSInteger, ErrorDevice) {
     }
     
     else if ([command isEqualToString:command_lock_get_remote_accessory_electric_quantity]) {
-        TTAccessoryType remoteAccessory = lockModel.remoteAccessory.intValue + 1;
+        TTAccessoryType remoteAccessory;
+        if(lockModel.remoteAccessory.intValue== 0){
+            remoteAccessory = TTAccessoryTypeWirelessKeyFob;
+        } else if (lockModel.remoteAccessory.intValue == 1){
+            remoteAccessory = TTAccessoryTypeWirelessKeypad;
+        } else {
+            remoteAccessory = TTAccessoryTypeDoorSensor;
+        }
         [TTLock getAccessoryElectricQuantityWithType:remoteAccessory accessoryMac:lockModel.mac lockData:lockModel.lockData success:^(NSInteger electricQuantity, long long updateDate) {
             TtlockModel *data = [TtlockModel new];
             data.electricQuantity = @(electricQuantity);
