@@ -531,71 +531,93 @@ ErrorDeviceKey
             }
        }];
     }else if ([command isEqualToString:command_function_support]) {
-        NSInteger index = lockModel.supportFunction.integerValue;
-                NSArray *functionArray = @[
-                    @(TTLockFeatureValuePasscode),
-                    @(TTLockFeatureValueICCard),
-                    @(TTLockFeatureValueFingerprint),
-                    @(TTLockFeatureValueWristband),
-                    @(TTLockFeatureValueAutoLock),
-                    @(TTLockFeatureValueDeletePasscode),
-                    @(TTLockFeatureValueManagePasscode),
-                    @(TTLockFeatureValueLocking),
-                    @(TTLockFeatureValuePasscodeVisible),
-                    @(TTLockFeatureValueGatewayUnlock),
-                    @(TTLockFeatureValueLockFreeze),
-                    @(TTLockFeatureValueCyclePassword),
-                    @(TTLockFeatureValueRemoteUnlockSwicth),
-                    @(TTLockFeatureValueAudioSwitch),
-                    @(TTLockFeatureValueNBIoT),
-                    @(TTLockFeatureValueGetAdminPasscode),
-                    @(TTLockFeatureValueHotelCard),
-                    @(TTLockFeatureValueNoClock),
-                    @(TTLockFeatureValueNoBroadcastInNormal),
-                    @(TTLockFeatureValuePassageMode),
-                    @(TTLockFeatureValueTurnOffAutoLock),
-                    @(TTLockFeatureValueWirelessKeypad),
-                    @(TTLockFeatureValueLight),
-                    @(TTLockFeatureValueHotelCardBlacklist),
-                    @(TTLockFeatureValueIdentityCard),
-                    @(TTLockFeatureValueTamperAlert),
-                    @(TTLockFeatureValueResetButton),
-                    @(TTLockFeatureValuePrivacyLock),
-                    @(TTLockFeatureValueDeadLock),
-                    @(TTLockFeatureValueCyclicCardOrFingerprint),
-                    @(TTLockFeatureValueFingerVein),
-                    @(TTLockFeatureValueBle5G),
-                    @(TTLockFeatureValueNBAwake),
-                    @(TTLockFeatureValueRecoverCyclePasscode),
-                    @(TTLockFeatureValueWirelessKeyFob),
-                    @(TTLockFeatureValueGetAccessoryElectricQuantity),
-                    @(TTLockFeatureValueSoundVolume),
-                    @(TTLockFeatureValueQRCode),
-                    @(TTLockFeatureValueSensorState),
-                    @(TTLockFeatureValuePassageModeAutoUnlock),
-                    @(TTLockFeatureValueDoorSensor),
-                    @(TTLockFeatureValueDoorSensorAlert),
-                    @(TTLockFeatureValueSensitivity),
-                    @(TTLockFeatureValueFace),
-                    @(TTLockFeatureValueCpuCard),
-                    @(TTLockFeatureValueWifiLock),
-                    @(TTLockFeatureValueWifiLockStaticIP),
-                    @(TTLockFeatureValuePasscodeKeyNumber),
-                    @(TTLockFeatureValueStandAloneActivation),
-                    @(TTLockFeatureValueDoubleAuth),
-                    @(TTLockFeatureValueAuthorizedUnlock),
-                    @(TTLockFeatureValueGatewayAuthorizedUnlock),
-                    @(TTLockFeatureValueNoEkeyUnlock),
-                    @(TTLockFeatureValueZhiAnPhotoFace),
-                    @(TTLockFeatureValuePalmVein),
-                    @(TTLockFeatureValueWifiArea),
-                    @(TTLockFeatureValueXiaoCaoCamera),
-                    @(TTLockFeatureValueResetLockByCode),
-                    @(TTLockFeatureValueMultifunctionalKeypad),
-                ];
-                
-                
-                TTLockFeatureValue featureValue = [functionArray[index] intValue];
+        NSInteger value = lockModel.supportFunction.integerValue;
+        // 现在 Flutter 端使用增强枚举，直接传入 FeatureValue 值
+        // 为了兼容旧代码（可能还有使用索引的情况），先尝试按索引查找
+        NSArray *functionArray = @[
+            @(TTLockFeatureValuePasscode),
+            @(TTLockFeatureValueICCard),
+            @(TTLockFeatureValueFingerprint),
+            @(TTLockFeatureValueWristband),
+            @(TTLockFeatureValueAutoLock),
+            @(TTLockFeatureValueDeletePasscode),
+            @(TTLockFeatureValueManagePasscode),
+            @(TTLockFeatureValueLocking),
+            @(TTLockFeatureValuePasscodeVisible),
+            @(TTLockFeatureValueGatewayUnlock),
+            @(TTLockFeatureValueLockFreeze),
+            @(TTLockFeatureValueCyclePassword),
+            @(TTLockFeatureValueRemoteUnlockSwicth),
+            @(TTLockFeatureValueAudioSwitch),
+            @(TTLockFeatureValueNBIoT),
+            @(TTLockFeatureValueGetAdminPasscode),
+            @(TTLockFeatureValueHotelCard),
+            @(TTLockFeatureValueNoClock),
+            @(TTLockFeatureValueNoBroadcastInNormal),
+            @(TTLockFeatureValuePassageMode),
+            @(TTLockFeatureValueTurnOffAutoLock),
+            @(TTLockFeatureValueWirelessKeypad),
+            @(TTLockFeatureValueLight),
+            @(TTLockFeatureValueHotelCardBlacklist),
+            @(TTLockFeatureValueIdentityCard),
+            @(TTLockFeatureValueTamperAlert),
+            @(TTLockFeatureValueResetButton),
+            @(TTLockFeatureValuePrivacyLock),
+            @(TTLockFeatureValueDeadLock),
+            @(TTLockFeatureValueCyclicCardOrFingerprint),
+            @(TTLockFeatureValueFingerVein),
+            @(TTLockFeatureValueBle5G),
+            @(TTLockFeatureValueNBAwake),
+            @(TTLockFeatureValueRecoverCyclePasscode),
+            @(TTLockFeatureValueWirelessKeyFob),
+            @(TTLockFeatureValueGetAccessoryElectricQuantity),
+            @(TTLockFeatureValueSoundVolume),
+            @(TTLockFeatureValueQRCode),
+            @(TTLockFeatureValueSensorState),
+            @(TTLockFeatureValuePassageModeAutoUnlock),
+            @(TTLockFeatureValueDoorSensor),
+            @(TTLockFeatureValueDoorSensorAlert),
+            @(TTLockFeatureValueSensitivity),
+            @(TTLockFeatureValueFace),
+            @(TTLockFeatureValueCpuCard),
+            @(TTLockFeatureValueWifiLock),
+            @(TTLockFeatureValueWifiLockStaticIP),
+            @(TTLockFeatureValuePasscodeKeyNumber),
+            @(TTLockFeatureValueStandAloneActivation),
+            @(TTLockFeatureValueDoubleAuth),
+            @(TTLockFeatureValueAuthorizedUnlock),
+            @(TTLockFeatureValueGatewayAuthorizedUnlock),
+            @(TTLockFeatureValueNoEkeyUnlock),
+            @(TTLockFeatureValueZhiAnPhotoFace),
+            @(TTLockFeatureValuePalmVein),
+            @(TTLockFeatureValueWifiArea),
+            @(TTLockFeatureValueXiaoCaoCamera),
+            @(TTLockFeatureValueResetLockByCode),
+            @(TTLockFeatureValueMultifunctionalKeypad),
+        ];
+        
+        TTLockFeatureValue featureValue;
+        // 如果传入的值在数组索引范围内，尝试按索引查找（兼容旧代码）
+        if (value >= 0 && value < functionArray.count) {
+            NSInteger arrayValue = [functionArray[value] intValue];
+            // 如果数组中的值等于传入值，说明传入的是索引
+            // 如果数组中的值不等于传入值，说明传入的是直接的 FeatureValue 值
+            if (arrayValue == value) {
+                featureValue = arrayValue;
+            } else {
+                // 传入的值可能是直接的 FeatureValue 值，直接使用
+                // 但如果传入的值在常见的 FeatureValue 范围内（> 60），直接使用
+                if (value > 60 || value == -1) {
+                    featureValue = (TTLockFeatureValue)value;
+                } else {
+                    // 为了兼容，使用数组中的值
+                    featureValue = arrayValue;
+                }
+            }
+        } else {
+            // 如果传入的值超出数组索引范围，直接使用（认为是 FeatureValue 值）
+            featureValue = (TTLockFeatureValue)value;
+        }
                 bool isSupport = [TTUtil lockFeatureValue:lockModel.lockData suportFunction:featureValue];
                 TtlockModel *data = [TtlockModel new];
                 data.isSupport = @(isSupport);
@@ -831,12 +853,21 @@ else if ([command isEqualToString:command_recover_card]) {
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];
         }];
-    }
-    
-    else if ([command isEqualToString:command_config_lock_server_ip]) {
+    }else if ([command isEqualToString:command_config_lock_server_ip]) {
         NSDictionary *infoDict = [self dictFromJsonStr:lockModel.ipSettingJsonStr];
         [TTLock configIpWithInfo:infoDict lockData:lockModel.lockData success:^{
             [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];
+        }];
+    }else if ([command isEqualToString:command_config_camera_lock_wifi]) {
+        NSDictionary *infoDict = [self dictFromJsonStr:lockModel.ipSettingJsonStr];
+        [TTLock configCameraLockWifiWithSSID:lockModel.wifiName wifiPassword:lockModel.wifiPassword secCode:nil lockData:lockModel.lockData success:^(NSString *cameraSerialNumber, NSString *wifiMac, NSInteger wifiRssi) {
+            NSMutableDictionary *dict = @{}.mutableCopy;
+            dict[@"wifiName"] = wifiMac;
+            dict[@"wifiRssi"] = @(wifiRssi);
+            dict[@"videoModuleSerialNumber"] = cameraSerialNumber;
+            [weakSelf successCallbackCommand:command data:dict];
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];
         }];

@@ -114,6 +114,8 @@ public class TTLockCommand {
     public static final String COMMAND_GET_WIFI_INFO = "getWifiInfo";
     public static final String COMMAND_CONFIG_IP = "configIp";
 
+    public static final String COMMAND_CONFIG_CAMERA_LOCK_WIFI = "configCameraLockWifi";
+
     public static final String COMMAND_SET_LOCK_SOUND_WITH_SOUND_VOLUME = "setLockSoundWithSoundVolume";
     public static final String COMMAND_GET_LOCK_SOUND_WITH_SOUND_VOLUME = "getLockSoundWithSoundVolume";
 

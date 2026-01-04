@@ -2,8 +2,8 @@ PODS:
   - Flutter (1.0.0)
   - ttlock_premise_flutter (0.0.1):
     - Flutter
-    - TTLockOnPremise (= 2.1.2)
-  - TTLockOnPremise (2.1.2)
+    - TTLockOnPremise (= 2.2.0)
+  - TTLockOnPremise (2.2.0)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
@@ -21,9 +21,9 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  ttlock_premise_flutter: a765309efdd4f18d96eb36681855cc04cb0b372d
-  TTLockOnPremise: 57a4865ebdad82427ca1439239fa243f960c494e
+  ttlock_premise_flutter: f26a99835de17cb22bcd0469c0ffc68709f7eae9
+  TTLockOnPremise: 818fb233b9f09bec94a8b9dc47f6bf5194a9b09b
 
-PODFILE CHECKSUM: b1f7a399522c118a74b177b13c01eca692aa7e6d
+PODFILE CHECKSUM: cf0c950f7e9a456b4e325f5b8fc0f98906a3705a
 
 COCOAPODS: 1.16.2

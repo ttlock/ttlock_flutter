@@ -1,6 +1,10 @@
 
 .DS_Store
-.vscode/launch.json
+.vscode/
 .idea
 .packages
 .dart_tool/package_config.json
+
+# FVM Version Cache
+.fvm/
+.fvmrc

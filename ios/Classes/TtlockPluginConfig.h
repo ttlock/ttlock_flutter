@@ -120,6 +120,7 @@
 #define command_config_lock_wifi_server @"configServer"
 #define command_get_lock_wifi_info @"getWifiInfo"
 #define command_config_lock_server_ip @"configIp"
+#define command_config_camera_lock_wifi @"configCameraLockWifi"
 
 
 #pragma mark - 门禁
