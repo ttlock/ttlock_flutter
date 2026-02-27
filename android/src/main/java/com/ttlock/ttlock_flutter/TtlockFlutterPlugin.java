@@ -136,6 +136,7 @@ import com.ttlock.bl.sdk.entity.ValidityInfo;
 import com.ttlock.bl.sdk.entity.WifiLockInfo;
 import com.ttlock.bl.sdk.gateway.api.GatewayClient;
 import com.ttlock.bl.sdk.gateway.callback.ConfigIpCallback;
+import com.ttlock.bl.sdk.gateway.callback.GetNetworkMacCallback;
 import com.ttlock.bl.sdk.gateway.callback.ConnectCallback;
 import com.ttlock.bl.sdk.gateway.callback.InitGatewayCallback;
 import com.ttlock.bl.sdk.gateway.callback.ScanGatewayCallback;
@@ -395,6 +396,10 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       case GatewayCommand.COMMAND_CONFIG_IP:
         gatewayConfigIp(gatewayModel);
         break;
+      case GatewayCommand.COMMAND_GET_NETWORK_MAC:
+        getNetworkMac(gatewayModel);
+        break;
+
     }
   }
 
@@ -1721,6 +1726,24 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       } else {
         noConnectPermissionLog();
         errorCallbackCommand(GatewayCommand.COMMAND_CONFIG_IP, GatewayError.FAILED);
+      }
+    });
+  }
+
+   public void getNetworkMac(final GatewayModel gatewayModel) {
+    GatewayClient.getDefault().getNetworkMac(new GetNetworkMacCallback() {
+      @Override
+      public void onGetNetworkMacSuccess(String mac) {
+        HashMap<String, Object> resultMap = new HashMap<>();
+        resultMap.put("networkMac", mac);
+        successCallbackCommand(GatewayCommand.COMMAND_GET_NETWORK_MAC, resultMap);
+      }
+
+      @Override
+      public void onFail(GatewayError gatewayError) {
+        HashMap<String, Object> resultMap = new HashMap<>();
+        resultMap.put("networkMac", "");
+        successCallbackCommand(GatewayCommand.COMMAND_GET_NETWORK_MAC, resultMap);
       }
     });
   }
