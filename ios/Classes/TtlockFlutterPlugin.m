@@ -1426,7 +1426,7 @@ typedef NS_ENUM(NSInteger, ErrorDevice) {
         }];
     }
     else if ([command isEqualToString:command_water_meter_set_power_on_off]) {
-        [TTWaterMeter setWaterOnOffWithMac:lockModel.mac onOff:lockModel.isOn ? 1 : 0 success:^{
+        [TTWaterMeter setWaterOnOffWithMac:lockModel.mac onOff:lockModel.isOn.boolValue ? 1 : 0 success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTWaterMeterError error, NSString * _Nonnull errorMsg) {
             [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
