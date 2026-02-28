@@ -25,6 +25,15 @@ class TTWaterMeter {
       "waterMeterGetFeatureValue";
   static const String COMMAND_WATER_METER_ENTER_UPGRADE_MODE =
       "waterMeterEnterUpgradeMode";
+  static const String COMMAND_WATER_METER_GET_DEVICE_INFO =
+      "waterMeterGetDeviceInfo";
+  static const String COMMAND_WATER_METER_SUPPORT_FUNCTION =
+      "waterMeterIsSupportFunction";
+
+  static const String COMMAND_WATER_METER_CONFIG_APN = "waterMeterConfigApn";
+  static const String COMMAND_WATER_METER_CONFIG_METER_SERVER =
+      "waterMeterConfigMeterServer";
+  static const String COMMAND_WATER_METER_RESET = "waterMeterReset";
 
   static void configServer(WaterMeterServerParamMode paramMode) {
     Map map = Map();
@@ -66,7 +75,7 @@ class TTWaterMeter {
    */
   static void init(
     Map paramMap,
-    TTSuccessCallback successCallback,
+    TTWaterMeterSuccessResultCallback successCallback,
     TTMeterFailedCallback failedCallback,
   ) {
     TTLock.invoke(COMMAND_WATER_METER_INIT, paramMap, successCallback,
@@ -198,6 +207,59 @@ class TTWaterMeter {
   //       COMMAND_WATER_METER_ENTER_UPGRADE_MODE, map, successCallback,
   //       fail: failedCallback);
   // }
+
+  static void isSupportFunction(
+    String featureValue,
+    TTWaterMeterFeature waterMeterFeature,
+    TTFunctionSupportCallback callback,
+  ) {
+    Map map = Map();
+    map[TTResponse.featureValue] = featureValue;
+    map[TTResponse.supportFunction] = waterMeterFeature.index;
+    TTLock.invoke(
+      COMMAND_WATER_METER_SUPPORT_FUNCTION,
+      map,
+      callback,
+    );
+  }
+
+  static void getWaterMeterDeviceInfo(
+    String mac,
+    TTWaterMeterDeviceInfoCallback callback,
+    TTMeterFailedCallback failedCallback,
+  ) {
+    Map map = Map();
+    map[TTResponse.mac] = mac;
+    TTLock.invoke(COMMAND_WATER_METER_GET_DEVICE_INFO, map, callback,
+        fail_callback: failedCallback);
+  }
+
+  static void configApn(String mac, String apn, TTSuccessCallback callback,
+      TTMeterFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.mac] = mac;
+    map[TTResponse.apn] = apn;
+    TTLock.invoke(COMMAND_WATER_METER_CONFIG_APN, map, callback,
+        fail_callback: failedCallback);
+  }
+
+  static void configMeterServer(String mac, String ip, String port,
+      TTSuccessCallback callback, TTMeterFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.mac] = mac;
+    map[TTResponse.ip] = ip;
+    map[TTResponse.port] = port;
+    TTLock.invoke(COMMAND_WATER_METER_CONFIG_METER_SERVER, map, callback,
+        fail_callback: failedCallback);
+  }
+
+  static void resetWaterMeter(
+      String mac, TTSuccessCallback callback, TTMeterFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.mac] = mac;
+    TTLock.invoke(COMMAND_WATER_METER_RESET, map, callback,
+        fail_callback: failedCallback);
+  }
 }
 
 class WaterMeterServerParamMode {
@@ -227,19 +289,47 @@ class TTWaterMeterScanModel {
   TTMeterPayMode payMode = TTMeterPayMode.postpaid;
   int scanTime = 0;
 
+  String executeResponse = '';
+
   TTWaterMeterScanModel(Map map) {
     this.name = map[TTResponse.name];
     this.mac = map[TTResponse.mac];
-    this.isInited = map[TTResponse.isInited];
-    this.totalM3 = map[TTResponse.totalM3];
-    this.remainderM3 = map[TTResponse.remainderM3];
-    this.electricQuantity = map[TTResponse.electricQuantity];
-    this.waterValveFailure = map[TTResponse.waterValveFailure];
-    this.rssi = map[TTResponse.rssi];
-    this.onOff = map[TTResponse.onOff];
+    this.isInited = map[TTResponse.isInited] ?? true;
+    this.totalM3 = map[TTResponse.totalM3] ?? "";
+    this.remainderM3 = map[TTResponse.remainderM3] ?? "";
+    this.electricQuantity = map[TTResponse.electricQuantity] ?? -1;
+    this.waterValveFailure = map[TTResponse.waterValveFailure] ?? 0;
+    this.rssi = map[TTResponse.rssi] ?? -1;
+    this.onOff = map[TTResponse.onOff] ?? true;
     this.payMode = map[TTResponse.payMode] == 0
         ? TTMeterPayMode.postpaid
         : TTMeterPayMode.prepaid;
-    this.scanTime = map[TTResponse.scanTime];
+    this.scanTime =
+        map[TTResponse.scanTime] ?? DateTime.now().millisecondsSinceEpoch;
+    this.executeResponse = map[TTResponse.executeResponse] ?? "";
   }
 }
+
+class TTWaterDeviceInfoModel {
+  String modelNum = '';
+  String hardwareRevision = '';
+  String firmwareRevision = '';
+  String catOneOperator = '';
+  String catOneNodeId = '';
+  String catOneCardNumber = '';
+  String catOneRssi = '';
+  String catOneImsi = '';
+
+  TTWaterDeviceInfoModel(Map map) {
+    this.modelNum = map[TTResponse.modelNum]??'';
+    this.hardwareRevision = map[TTResponse.hardwareRevision]??'';
+    this.firmwareRevision = map[TTResponse.firmwareRevision]??'';
+    this.catOneOperator = map[TTResponse.catOneOperator]??'';
+    this.catOneNodeId = map[TTResponse.catOneNodeId]??'';
+    this.catOneCardNumber = map[TTResponse.catOneCardNumber]??'';
+    this.catOneRssi = map[TTResponse.catOneRssi]??'';
+    this.catOneImsi = map[TTResponse.catOneImsi]??'';
+  }
+}
+
+enum TTWaterMeterFeature { TTWaterMeterFeatureCatOne }

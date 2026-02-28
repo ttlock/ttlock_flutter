@@ -46,19 +46,24 @@ class _HomePageState extends State<HomePage> {
 
   void _startWaterPage() {
     WaterMeterServerParamMode waterMeterServerParamMode =
-    WaterMeterServerParamMode();
-    // electricMeterServerParamMode.url = 'https://cnapi.ttlock.com/v3/waterMeter/executeCommand';
-    // electricMeterServerParamMode.clientId = '607ab4bcc9504a5da58c43575a1b3746';
-    // electricMeterServerParamMode.accessToken = 'VgC8yDPW/jr6V31nNAcCEkFLNA6o27cQ6OZDjF4iNbKbSz1kU5LcoMh0I4xgbZNZ';
+        WaterMeterServerParamMode();
+    waterMeterServerParamMode.url = "https://cntestservlet.sciener.cn";
+    waterMeterServerParamMode.clientId = '607ab4bcc9504a5da58c43575a1b3746';
+    waterMeterServerParamMode.accessToken =
+        'fj81Mf4Mnglw5knoaTmjLG8c4H2fdhpWB37wwFJh2dI=';
+    // waterMeterServerParamMode.url =
+    //     'https://cnapi.ttlock.com/v3/waterMeter/executeCommand';
+    // waterMeterServerParamMode.clientId = '607ab4bcc9504a5da58c43575a1b3746';
+    // waterMeterServerParamMode.accessToken =
+    //     'VgC8yDPW/jr6V31nNAcCEkFLNA6o27cQ6OZDjF4iNbKbSz1kU5LcoMh0I4xgbZNZ';
     TTWaterMeter.configServer(waterMeterServerParamMode);
     _startScan(ScanType.waterMeter);
   }
 
-
   void _startKeyPadPage() {
     _startScan(ScanType.keyPad);
   }
-  
+
   void _startScan(ScanType scanType) {
     Navigator.push(context,
         new MaterialPageRoute(builder: (BuildContext context) {
@@ -84,13 +89,12 @@ class _HomePageState extends State<HomePage> {
         onPressed: _startScanElectricMeter,
       ),
       ElevatedButton(
-        child: Text('Key Pad',
-            style: TextStyle(fontWeight: FontWeight.w600)),
+        child: Text('Key Pad', style: TextStyle(fontWeight: FontWeight.w600)),
         onPressed: _startKeyPadPage,
       ),
       ElevatedButton(
-        child: Text('Water Meter',
-            style: TextStyle(fontWeight: FontWeight.w600)),
+        child:
+            Text('Water Meter', style: TextStyle(fontWeight: FontWeight.w600)),
         onPressed: _startWaterPage,
       ),
     ]);

@@ -103,6 +103,7 @@
 #define command_config_gateway_ip @"gatewayConfigIp"
 #define command_upgrade_gateway @"upgradeGateway"
 #define command_gateway_config_apn @"gatewayConfigApn"
+#define command_gateway_get_network_mac @"getNetworkMac"
 
 
 #pragma mark - 梯控
@@ -151,6 +152,14 @@
 #define command_lock_set_door_sensor_alert_time @"lockSetDoorSensorAlertTime"
 #define command_lock_add_door_sensor @"lockAddDoorSensor"
 #define command_lock_delete_door_sensor @"lockDeleteDoorSensor"
+
+#pragma mark - 独立门磁
+#define command_standalone_door_sensor_start_scan @"standaloneDoorSensorStartScan"
+#define command_standalone_door_sensor_stop_scan @"standaloneDoorSensorStopScan"
+#define command_standalone_door_sensor_init @"standaloneDoorSensorInit"
+#define command_standalone_door_sensor_get_feature_value @"standaloneDoorGetFeatureValue"
+#define command_standalone_door_sensor_support_function @"standaloneDoorIsSupportFunction"
+
 
 
 #pragma mark - 无线键盘
@@ -218,6 +227,11 @@
 #define command_water_meter_get_feature_value @"waterMeterGetFeatureValue"
 #define command_water_meter_enter_upgrade_mode @"waterMeterEnterUpgradeMode"
 
+#define command_water_meter_get_device_info @"waterMeterGetDeviceInfo"
+#define command_water_meter_support_function @"waterMeterIsSupportFunction"
+#define command_water_meter_config_apn @"waterMeterConfigApn"
+#define command_water_meter_config_meter_server @"waterMeterConfigMeterServer"
+#define command_water_meter_reset @"waterMeterReset"
 
 
 

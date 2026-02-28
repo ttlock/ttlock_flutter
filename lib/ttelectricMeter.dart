@@ -73,7 +73,7 @@ class TTElectricMeter {
    */
   static void init(
     Map paramMap,
-    TTSuccessCallback successCallback,
+    TTElectricMeterSuccessResultCallback successCallback,
     TTMeterFailedCallback failedCallback,
   ) {
     TTLock.invoke(COMMAND_ELECTRIC_METER_INIT, paramMap, successCallback,

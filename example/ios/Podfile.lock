@@ -1,9 +1,9 @@
 PODS:
   - Flutter (1.0.0)
-  - TTLock (3.6.0)
+  - TTLock (3.6.2)
   - ttlock_flutter (0.0.1):
     - Flutter
-    - TTLock (= 3.6.0)
+    - TTLock (= 3.6.2)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
@@ -20,10 +20,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/ttlock_flutter/ios"
 
 SPEC CHECKSUMS:
-  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
-  TTLock: d998d8cfa3fd07dcf58054bd6f60fb2c7106871a
-  ttlock_flutter: b587bd00478d0dada4287bc1bc48b0e918360573
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  TTLock: 0b0a0673437c83bfffa450829afa707deda70d8f
+  ttlock_flutter: 2eec7a4f9dbb7452235a0be3fc2dc0841281d422
 
 PODFILE CHECKSUM: 53026eaf67b63baa2e316e457f9701dbdf33f41a
 
-COCOAPODS: 1.12.0
+COCOAPODS: 1.15.2

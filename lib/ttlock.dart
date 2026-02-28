@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:ttlock_flutter/ttdoorSensor.dart';
+import 'package:ttlock_flutter/ttstandalonedoorsensor.dart';
 import 'package:ttlock_flutter/ttelectricMeter.dart';
 import 'package:ttlock_flutter/ttremoteKey.dart';
 import 'package:ttlock_flutter/ttremoteKeypad.dart';
@@ -1326,6 +1327,9 @@ class TTLock {
           command == TTRemoteKey.COMMAND_START_SCAN_REMOTE_KEY ||
           command == TTRemoteKeypad.COMMAND_START_SCAN_REMOTE_KEYPAD ||
           command == TTDoorSensor.COMMAND_START_SCAN_DOOR_SENSOR ||
+          command ==
+              TTStandaloneDoorSensor
+                  .COMMAND_START_SCAN_STANDALONE_DOOR_SENSOR ||
           command == TTWaterMeter.COMMAND_START_SCAN_WATER_METER ||
           command == TTElectricMeter.COMMAND_START_SCAN_ELECTRIC_METER) {
         removeCommand = false;
@@ -1369,18 +1373,10 @@ class TTLock {
 
       case TTRemoteKey.COMMAND_START_SCAN_REMOTE_KEY:
       case TTRemoteKeypad.COMMAND_START_SCAN_REMOTE_KEYPAD:
-      case TTDoorSensor.COMMAND_START_SCAN_DOOR_SENSOR:
         TTRemoteAccessoryScanCallback scanCallback = callBack;
         scanCallback(TTRemoteAccessoryScanModel(data));
         break;
-      case TTElectricMeter.COMMAND_START_SCAN_ELECTRIC_METER:
-        TTElectricMeterScanCallback scanCallback = callBack;
-        scanCallback(TTElectricMeterScanModel(data));
-        break;
-      case TTWaterMeter.COMMAND_START_SCAN_WATER_METER:
-        TTWaterMeterScanCallback scanCallback = callBack;
-        scanCallback(TTWaterMeterScanModel(data));
-        break;
+
       case COMMAND_GET_AUTOMATIC_LOCK_PERIODIC_TIME:
         TTGetLockAutomaticLockingPeriodicTimeCallback
             getLockAutomaticLockingPeriodicTimeCallback = callBack;
@@ -1402,7 +1398,6 @@ class TTLock {
         break;
       case COMMAND_GET_LOCK_SYSTEM_INFO:
       case TTRemoteKey.COMMAND_INIT_REMOTE_KEY:
-      case TTDoorSensor.COMMAND_INIT_DOOR_SENSOR:
         TTGetLockSystemCallback getLockSystemCallback = callBack;
         getLockSystemCallback(TTLockSystemModel(data));
         break;
@@ -1590,6 +1585,11 @@ class TTLock {
         TTGatewayInitCallback gatewayInitCallback = callBack;
         gatewayInitCallback(data);
         break;
+      case TTGateway.COMMAND_GET_NETWORK_MAC:
+        TTGatewayGetNetWorkMacCallback gatewayGetNetWorkMacCallback = callBack;
+        gatewayGetNetWorkMacCallback(data['networkMac'] ?? "");
+        break;
+
       case COMMAND_GET_LOCK_REMOTE_ACCESSORY_ELECTRIC_QUANTITY:
         TTGetLockAccessoryElectricQuantity getLockAccessoryElectricQuantity =
             callBack;
@@ -1620,6 +1620,69 @@ class TTLock {
       case COMMAND_ADD_FACE_DATA:
         TTAddFaceSuccessCallback addFaceSuccessCallback = callBack;
         addFaceSuccessCallback(data[TTResponse.faceNumber]);
+        break;
+
+      case TTElectricMeter.COMMAND_START_SCAN_ELECTRIC_METER:
+        TTElectricMeterScanCallback scanCallback = callBack;
+        scanCallback(TTElectricMeterScanModel(data));
+        break;
+
+      case TTElectricMeter.COMMAND_ELECTRIC_METER_INIT:
+        TTElectricMeterSuccessResultCallback resultCallback = callBack;
+        resultCallback(data[TTResponse.electricMeterId]);
+        break;
+
+      case TTWaterMeter.COMMAND_START_SCAN_WATER_METER:
+        TTWaterMeterScanCallback scanCallback = callBack;
+        scanCallback(TTWaterMeterScanModel(data));
+        break;
+
+      case TTWaterMeter.COMMAND_WATER_METER_INIT:
+        TTWaterMeterSuccessResultCallback resultCallback = callBack;
+        resultCallback(
+            data[TTResponse.waterMeterId], data[TTResponse.featureValue]);
+        break;
+
+      case TTWaterMeter.COMMAND_WATER_METER_GET_DEVICE_INFO:
+        TTWaterMeterDeviceInfoCallback resultCallback = callBack;
+        resultCallback(TTWaterDeviceInfoModel(data));
+        break;
+
+      case TTWaterMeter.COMMAND_WATER_METER_SUPPORT_FUNCTION:
+        TTFunctionSupportCallback functionSupportCallback = callBack;
+        functionSupportCallback(data[TTResponse.isSupport]);
+        break;
+
+      case TTDoorSensor.COMMAND_START_SCAN_DOOR_SENSOR:
+        TTDoorSensorScanCallback scanCallback = callBack;
+        scanCallback(TTDoorSensorScanModel(data));
+        break;
+
+      case TTDoorSensor.COMMAND_INIT_DOOR_SENSOR:
+        TTGetLockSystemCallback getLockSystemCallback = callBack;
+        getLockSystemCallback(TTLockSystemModel(data));
+        break;
+
+      case TTStandaloneDoorSensor.COMMAND_START_SCAN_STANDALONE_DOOR_SENSOR:
+        TTDoorSensorScanCallback scanCallback = callBack;
+        scanCallback(TTDoorSensorScanModel(data));
+        break;
+
+      case TTStandaloneDoorSensor.COMMAND_INIT_STANDALONE_DOOR_SENSOR:
+        TTStandaloneDoorSensorInitSuccessResultCallback initSuccessCallback =
+            callBack;
+        initSuccessCallback(TTStandaloneDoorSensorInfo(data));
+        break;
+
+      case TTStandaloneDoorSensor.COMMAND_STANDALONE_DOOR_SUPPORT_FUNCTION:
+        TTFunctionSupportCallback supportFunctionCallback = callBack;
+        supportFunctionCallback(data[TTResponse.isSupport]);
+        break;
+
+      case TTStandaloneDoorSensor.COMMAND_STANDALONE_DOOR_GET_FEATURE_VALUE:
+        TTStandaloneDoorSensorGetFeatureValueCallback getFeatureValueCallback =
+            callBack;
+        getFeatureValueCallback(data[TTResponse.standaloneDoorFeature]);
         break;
 
       default:
@@ -1670,10 +1733,12 @@ class TTLock {
         commandList.length > 0 ? commandList.first[CALLBACK_OTHER_FAIL] : null;
     //多功能键盘添加指纹时返回重复指纹失败时，不移除
     if (commandList.length > 0 &&
-        !(command == TTRemoteKeypad.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT &&
-            data["errorDevice"] == TTErrorDevice.keyPad.index
-            && errorCode == TTRemoteKeyPadAccessoryError.duplicateFingerprint.index)
-    ) {
+        !(command ==
+                TTRemoteKeypad
+                    .COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT &&
+            data["errorDevice"] == TTErrorDevice.keyPad.index &&
+            errorCode ==
+                TTRemoteKeyPadAccessoryError.duplicateFingerprint.index)) {
       commandList.removeAt(0);
     }
     //网关失败处理
@@ -1692,8 +1757,18 @@ class TTLock {
         command == TTDoorSensor.COMMAND_INIT_DOOR_SENSOR ||
         command == TTRemoteKeypad.COMMAND_INIT_REMOTE_KEYPAD) {
       TTRemoteFailedCallback? failedCallback = callBack;
-      TTRemoteAccessoryError error =
-      TTRemoteAccessoryError.values[0];
+      TTRemoteAccessoryError error = TTRemoteAccessoryError.values[0];
+      if (failedCallback != null) {
+        failedCallback(error, errorMessage);
+      }
+    }
+
+    //独立门磁失败处理
+    else if (command ==
+        TTStandaloneDoorSensor.COMMAND_INIT_STANDALONE_DOOR_SENSOR) {
+      TTStandaloneDoorSensorFailedCallback? failedCallback = callBack;
+      TTStandaloneDoorSensorErrorCode error =
+          TTStandaloneDoorSensorErrorCode.values[errorCode];
       if (failedCallback != null) {
         failedCallback(error, errorMessage);
       }
@@ -1886,6 +1961,7 @@ class TTResponse {
   static const String wirelessKeypadFeatureValue = "wirelessKeypadFeatureValue";
   static const String resetCode = "resetCode";
 
+  static const String electricMeterId = "electricMeterId";
   static const String totalKwh = "totalKwh";
   static const String remainderKwh = "remainderKwh";
   static const String voltage = "voltage";
@@ -1900,6 +1976,22 @@ class TTResponse {
   static const String remainderM3 = "remainderM3";
   static const String magneticInterference = "magneticInterference";
   static const String waterValveFailure = "waterValveFailure";
+
+  static const String executeResponse = "executeResponse";
+  static const String waterMeterId = "waterMeterId";
+  static const String featureValue = "featureValue";
+
+  static const String catOneOperator = 'catOneOperator';
+  static const String catOneNodeId = 'catOneNodeId';
+  static const String catOneCardNumber = 'catOneCardNumber';
+  static const String catOneRssi = 'catOneRssi';
+  static const String catOneImsi = 'catOneImsi';
+  static const String apn = 'apn';
+
+  static const String standaloneInfoStr = "standaloneInfoStr";
+  static const String standaloneDoorFeature = "standaloneDoorFeature";
+  static const String doorSensorData = "doorSensorData";
+  static const String wifiMac = "wifiMac";
 }
 
 class TTLockScanModel {
@@ -2136,6 +2228,7 @@ typedef TTGatewayDisconnectCallback = void Function();
 typedef TTGatewayGetAroundWifiCallback = void Function(
     bool finished, List wifiList);
 typedef TTGatewayInitCallback = void Function(Map map);
+typedef TTGatewayGetNetWorkMacCallback = void Function(String networkMac);
 typedef TTFunctionSupportCallback = void Function(bool isSupport);
 
 typedef TTLiftCallback = void Function(
@@ -2188,12 +2281,26 @@ typedef TTAddFaceSuccessCallback = void Function(String faceNumber);
 
 typedef TTElectricMeterScanCallback = void Function(
     TTElectricMeterScanModel scanModel);
+typedef TTElectricMeterSuccessResultCallback = void Function(
+    int electricMeterId);
 
 typedef TTMeterFailedCallback = void Function(
     TTMeterErrorCode errorCode, String message);
-
 typedef TTWaterMeterScanCallback = void Function(
     TTWaterMeterScanModel scanModel);
+typedef TTWaterMeterSuccessResultCallback = void Function(
+    int waterMeterId, String featureValue);
+typedef TTWaterMeterDeviceInfoCallback = void Function(
+    TTWaterDeviceInfoModel deviceInfoModel);
+
+typedef TTDoorSensorScanCallback = void Function(
+    TTDoorSensorScanModel scanModel);
+typedef TTStandaloneDoorSensorInitSuccessResultCallback = void Function(
+    TTStandaloneDoorSensorInfo standaloneDoorSensorInfo);
+typedef TTStandaloneDoorSensorFailedCallback = void Function(
+    TTStandaloneDoorSensorErrorCode errorCode, String errorMsg);
+typedef TTStandaloneDoorSensorGetFeatureValueCallback = void Function(
+    String featureValue);
 
 class TTRemoteAccessoryScanModel {
   String name = '';
@@ -2215,11 +2322,13 @@ class TTDoorSensorScanModel {
   String name = '';
   String mac = '';
   int rssi = -1;
+  int scanTime = 0;
 
   TTDoorSensorScanModel(Map map) {
     this.name = map["name"];
     this.mac = map["mac"];
     this.rssi = map["rssi"];
+    this.scanTime = map["scanTime"] ?? 0;
   }
 }
 
@@ -2396,4 +2505,20 @@ enum TTMeterErrorCode {
   netError,
   serverError,
   meterExistedInServer
+}
+
+enum TTStandaloneDoorSensorFeature {
+  Wifi24G,
+  Wifi5G,
+  AuthCode,
+}
+
+enum TTStandaloneDoorSensorErrorCode {
+  bluetoothPowerOff,
+  connectTimeout,
+  disconnect,
+  Fail,
+  WrongCRC,
+  WrongSSID,
+  WrongWifiPassword,
 }
