@@ -95,6 +95,7 @@ import com.ttlock.bl.sdk.callback.VerifyLockCallback;
 import com.ttlock.bl.sdk.constant.LogType;
 import com.ttlock.bl.sdk.constant.RecoveryData;
 import com.ttlock.bl.sdk.device.Remote;
+import com.ttlock.bl.sdk.device.StandaloneDoorSensor;
 import com.ttlock.bl.sdk.device.WirelessDoorSensor;
 import com.ttlock.bl.sdk.device.WirelessKeypad;
 import com.ttlock.bl.sdk.electricmeter.api.ElectricMeterClient;
@@ -160,26 +161,36 @@ import com.ttlock.bl.sdk.remote.callback.InitRemoteCallback;
 import com.ttlock.bl.sdk.remote.callback.ScanRemoteCallback;
 import com.ttlock.bl.sdk.remote.model.InitRemoteResult;
 import com.ttlock.bl.sdk.remote.model.RemoteError;
+import com.ttlock.bl.sdk.standalonedoorsensor.api.StandaloneDoorSensorClient;
+import com.ttlock.bl.sdk.standalonedoorsensor.callback.InitCallback;
+import com.ttlock.bl.sdk.standalonedoorsensor.model.InitModel;
+import com.ttlock.bl.sdk.standalonedoorsensor.model.StandaloneDoorSensorConfigInfo;
+import com.ttlock.bl.sdk.standalonedoorsensor.model.StandaloneDoorSensorError;
 import com.ttlock.bl.sdk.util.DigitUtil;
 import com.ttlock.bl.sdk.util.FeatureValueUtil;
 import com.ttlock.bl.sdk.util.GsonUtil;
 import com.ttlock.bl.sdk.util.LogUtil;
 import com.ttlock.bl.sdk.watermeter.api.WaterMeterClient;
 import com.ttlock.bl.sdk.watermeter.callback.ClearRemainingWaterCallback;
+import com.ttlock.bl.sdk.watermeter.callback.ConfigApnCallback;
+import com.ttlock.bl.sdk.watermeter.callback.GetDeviceInfoCallback;
 import com.ttlock.bl.sdk.watermeter.callback.RechargeCallback;
 import com.ttlock.bl.sdk.watermeter.callback.SetRemainingWaterCallback;
 import com.ttlock.bl.sdk.watermeter.callback.SetTotalUsageCallback;
 import com.ttlock.bl.sdk.watermeter.callback.SetWaterOnOffCallback;
 import com.ttlock.bl.sdk.watermeter.model.WaterMeter;
 import com.ttlock.bl.sdk.watermeter.model.WaterMeterError;
+import com.ttlock.bl.sdk.watermeter.model.WaterMeterInfo;
 import com.ttlock.bl.sdk.wirelessdoorsensor.WirelessDoorSensorClient;
 import com.ttlock.bl.sdk.wirelessdoorsensor.callback.InitDoorSensorCallback;
 import com.ttlock.bl.sdk.wirelessdoorsensor.callback.ScanWirelessDoorSensorCallback;
 import com.ttlock.bl.sdk.wirelessdoorsensor.model.DoorSensorError;
 import com.ttlock.bl.sdk.wirelessdoorsensor.model.InitDoorSensorResult;
+import com.ttlock.bl.sdk.standalonedoorsensor.callback.ScanStandaloneDoorSensorCallback;
 import com.ttlock.ttlock_flutter.constant.CommandType;
 import com.ttlock.ttlock_flutter.constant.GatewayCommand;
 import com.ttlock.ttlock_flutter.constant.TTDoorSensorCommand;
+import com.ttlock.ttlock_flutter.constant.TTStandaloneDoorSensorCommand;
 import com.ttlock.ttlock_flutter.constant.TTElectricityMeterCommand;
 import com.ttlock.ttlock_flutter.constant.TTGatewayConnectStatus;
 import com.ttlock.ttlock_flutter.constant.TTKeyPadCommand;
@@ -308,6 +319,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     } else if (TTDoorSensorCommand.isDoorSensorCommand(call.method)) {
       commandType = CommandType.DOOR_SENSOR;
       doorSensorCommand(call);
+    } else if (TTStandaloneDoorSensorCommand.isStandaloneDoorSensorCommand(call.method)) {
+      commandType = CommandType.STANDALONE_DOOR_SENSOR;
+      standaloneDoorSensorCommand(call);
     } else if (TTElectricityMeterCommand.isElectricityMeterCommand(call.method)) {
       commandType = CommandType.ELECTRICITY_METER;
       electricityCommand(call);
@@ -328,6 +342,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     WirelessKeypadClient.getDefault().prepareBTService(activity);
     MultifunctionalKeypadClient.getDefault().prepareBTService(activity);
     WirelessDoorSensorClient.getDefault().prepareBTService(activity);
+    StandaloneDoorSensorClient.getDefault().prepareBTService(activity);
     ElectricMeterClient.getDefault().prepareBTService(activity);
     WaterMeterClient.getDefault().prepareBTService(activity);
   }
@@ -466,6 +481,29 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     }
   }
 
+  /** 独立门磁（Standalone Door Sensor）命令，与 WiFi 门磁 doorSensorCommand 区分 */
+  public void standaloneDoorSensorCommand(MethodCall call) {
+    String command = call.method;
+    Map<String, Object> params = call.arguments != null ? (Map<String, Object>) call.arguments : new HashMap<>();
+    switch (command) {
+      case TTStandaloneDoorSensorCommand.COMMAND_START_SCAN_STANDALONE_DOOR_SENSOR:
+        startScanStandaloneDoorSensor();
+        break;
+      case TTStandaloneDoorSensorCommand.COMMAND_STOP_SCAN_STANDALONE_DOOR_SENSOR:
+        stopScanStandaloneDoorSensor();
+        break;
+      case TTStandaloneDoorSensorCommand.COMMAND_INIT_STANDALONE_DOOR_SENSOR:
+        initStandaloneDoorSensor(params);
+        break;
+      case TTStandaloneDoorSensorCommand.COMMAND_STANDALONE_DOOR_GET_FEATURE_VALUE:
+        standaloneDoorGetFeatureValue(params);
+        break;
+      case TTStandaloneDoorSensorCommand.COMMAND_STANDALONE_DOOR_SUPPORT_FUNCTION:
+        standaloneDoorIsSupportFunction(params);
+        break;
+    }
+  }
+
   public void waterMeterCommand(MethodCall call) {
     String command = call.method;
     Map<String, Object> params = (Map<String, Object>) call.arguments;
@@ -518,6 +556,21 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       case TTWaterMeterCommand.COMMAND_WATER_METER_ENTER_UPGRADE_MODE:
         waterMeterEnterUpgradeMode(params);
         break;
+      case TTWaterMeterCommand.COMMAND_WATER_METER_GET_DEVICE_INFO:
+        waterMeterGetDeviceInfo(params);
+        break;
+      case TTWaterMeterCommand.COMMAND_WATER_METER_SUPPORT_FUNCTION:
+        waterMeterIsSupportFunction(params);
+        break;
+      case TTWaterMeterCommand.COMMAND_WATER_METER_CONFIG_APN:
+        waterMeterConfigApn(params);
+        break;
+      case TTWaterMeterCommand.COMMAND_WATER_METER_CONFIG_METER_SERVER:
+        waterMeterConfigMeterServer(params);
+        break;
+      case TTWaterMeterCommand.COMMAND_WATER_METER_RESET:
+        waterMeterReset(params);
+        break;
     }
   }
 
@@ -549,6 +602,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
             params.put(TTParam.waterValveFailure, waterMeter.getWaterValveMalfunction());
             params.put(TTParam.payMode, waterMeter.getPayMode());
             params.put(TTParam.scanTime, System.currentTimeMillis());
+            params.put(TTParam.executeResponse, waterMeter.getExecuteResponse());
             successCallbackCommand(TTWaterMeterCommand.COMMAND_START_SCAN_WATER_METER, params);
           }
         });
@@ -612,8 +666,11 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 //    Log.d("打印价格", String.valueOf(price));
         WaterMeterClient.getDefault().add(map, new com.ttlock.bl.sdk.watermeter.callback.AddCallback() {
           @Override
-          public void onAddSuccess(FirmwareInfo firmwareInfo) {
-            successCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_INIT, new HashMap<>());
+          public void onAddSuccess(WaterMeterInfo var1) {
+            HashMap<String, Object> map = new HashMap<>();
+            map.put(TTParam.featureValue, var1.getFeatureValue());
+            map.put(TTParam.waterMeterId, var1.getWaterMeterId());
+            successCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_INIT, map);
 
           }
 
@@ -869,6 +926,125 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
   }
 
+  public void waterMeterGetDeviceInfo(Map<String, Object> params)
+  {
+    PermissionUtils.doWithConnectPermission(activity, (success) -> {
+      if(success)
+      {
+        WaterMeterClient.getDefault().getDeviceInfo(params.get(TTParam.MAC).toString(), new GetDeviceInfoCallback() {
+          @Override
+          public void onGetSuccess(com.ttlock.bl.sdk.watermeter.model.DeviceInfo deviceInfo) {
+            Map<String, Object> params = new HashMap<>();
+            //TODO 后面按需加入
+            params.put("modelNum", "");
+            //TODO 后面按需加入
+            params.put("hardwareRevision", "");
+            //TODO 后面按需加入
+            params.put("firmwareRevision", "");
+            params.put("catOneOperator", deviceInfo.getCatOneOperator());
+            params.put("catOneNodeId", deviceInfo.getCatOneNodeId());
+            params.put("catOneCardNumber", deviceInfo.getCatOneCardNumber());
+            params.put("catOneRssi", deviceInfo.getCatOneRssi());
+            params.put("catOneImsi", deviceInfo.getCatOneImsi());
+            successCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_GET_DEVICE_INFO, params);
+          }
+
+          @Override
+          public void onFail(WaterMeterError waterMeterError) {
+            errorCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_GET_DEVICE_INFO, waterMeterError);
+          }
+        });
+
+      }else
+      {
+        callbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_GET_DEVICE_INFO, ResultStateFail, null, WaterMeterErrorConvert.bluetoothPowerOff,"no connect permission" );
+      }
+    });
+  }
+
+  public void waterMeterIsSupportFunction(Map<String, Object> params)
+  {
+    boolean isSupport = FeatureValueUtil.isSupportFeature(params.get("featureValue").toString(), Integer.parseInt(params.get("supportFunction").toString()));
+    HashMap<String,Object> map = new HashMap<>();
+    map.put("isSupport",isSupport);
+    successCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_SUPPORT_FUNCTION, map);
+  }
+
+  public void waterMeterConfigApn(Map<String, Object> params)
+  {
+    PermissionUtils.doWithConnectPermission(activity, (success) -> {
+      if(success)
+      {
+        WaterMeterClient.getDefault().configApn(params.get(TTParam.MAC).toString(), params.get("apn").toString(), new ConfigApnCallback() {
+          @Override
+          public void onConfigSuccess() {
+            successCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_CONFIG_APN, new HashMap());
+          }
+
+          @Override
+          public void onFail(WaterMeterError waterMeterError) {
+            callbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_CONFIG_APN, ResultStateFail, null, WaterMeterErrorConvert.bluetoothPowerOff,"no connect permission" );
+          }
+        });
+
+      }else
+      {
+        callbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_CONFIG_APN, ResultStateFail, null, WaterMeterErrorConvert.bluetoothPowerOff,"no connect permission" );
+      }
+    });
+  }
+
+  public void waterMeterConfigMeterServer(Map<String, Object> params)
+  {
+    PermissionUtils.doWithConnectPermission(activity, (success) -> {
+      if(success)
+      {
+        String mac = params.get(TTParam.MAC).toString();
+        String serverAddress = params.get("ip").toString();
+        int port = Integer.parseInt(params.get("port").toString());
+        WaterMeterClient.getDefault().configServer(mac, serverAddress, port, new com.ttlock.bl.sdk.watermeter.callback.ConfigServerCallback() {
+          @Override
+          public void onConfigSuccess() {
+            successCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_CONFIG_METER_SERVER, new HashMap<>());
+          }
+
+          @Override
+          public void onFail(WaterMeterError waterMeterError) {
+            errorCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_CONFIG_METER_SERVER, waterMeterError);
+          }
+        });
+      }
+      else
+      {
+        callbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_CONFIG_METER_SERVER, ResultStateFail, null, WaterMeterErrorConvert.bluetoothPowerOff, "no connect permission");
+      }
+    });
+  }
+
+  public void waterMeterReset(Map<String, Object> params)
+  {
+    PermissionUtils.doWithConnectPermission(activity, (success) -> {
+      if(success)
+      {
+        WaterMeterClient.getDefault().reset(params.get(TTParam.MAC).toString(), new com.ttlock.bl.sdk.watermeter.callback.ResetCallback() {
+          @Override
+          public void onResetSuccess() {
+            successCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_RESET, new HashMap<>());
+          }
+
+          @Override
+          public void onFail(WaterMeterError waterMeterError) {
+            errorCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_RESET, waterMeterError);
+          }
+        });
+      }
+      else
+      {
+        callbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_RESET, ResultStateFail, null, WaterMeterErrorConvert.bluetoothPowerOff, "no connect permission");
+      }
+    });
+  }
+
   public void electricityCommand(MethodCall call) {
     String command = call.method;
     Map<String, Object> params = (Map<String, Object>) call.arguments;
@@ -1021,7 +1197,11 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         ElectricMeterClient.getDefault().add(map, new AddCallback() {
           @Override
           public void onAddSuccess(FirmwareInfo firmwareInfo) {
-            successCallbackCommand(TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_INIT, new HashMap<>());
+            //TODO 返回需要增加 electricMeterld
+            Map<String, Object> map = new HashMap<>();
+            //            dict[@"electricMeterId"] = @(result.electricMeterId);
+            map.put("electricMeterId", -1);
+            successCallbackCommand(TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_INIT, map);
           }
 
           @Override
@@ -1323,6 +1503,102 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         callbackCommand(TTKeyPadCommand.COMMAND_INIT_KEY_PAD, ResultStateFail, params, LockError.LOCK_NO_PERMISSION.getIntErrorCode(), "no connect permission");
       }
     });
+  }
+
+  /**------------StandaloneDoorSensor-------- 独立门磁 Standalone Door Sensor（与 WiFi 门磁区分）----------------------------**/
+  public void startScanStandaloneDoorSensor() {
+    PermissionUtils.doWithScanPermission(activity, success -> {
+      if (success) {
+        StandaloneDoorSensorClient.getDefault().startScan(new ScanStandaloneDoorSensorCallback() {
+          @Override
+          public void onScan(StandaloneDoorSensor standaloneDoorSensor) {
+            Map<String, Object> params = new HashMap<>();
+            params.put(TTParam.NAME, standaloneDoorSensor.getName());
+            params.put(TTParam.MAC, standaloneDoorSensor.getAddress());
+            params.put(TTParam.RSSI, standaloneDoorSensor.getRssi());
+            params.put("scanTime", System.currentTimeMillis());
+            successCallbackCommand(TTStandaloneDoorSensorCommand.COMMAND_START_SCAN_STANDALONE_DOOR_SENSOR, params);
+          }
+        });
+      } else {
+        LogUtil.d("no scan permission");
+      }
+    });
+  }
+
+  public void stopScanStandaloneDoorSensor() {
+    StandaloneDoorSensorClient.getDefault().stopScan();
+  }
+
+  public void initStandaloneDoorSensor(Map<String, Object> params) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        String mac = (String) params.get(TTParam.MAC);
+        String standaloneInfoStr = (String) params.get("standaloneInfoStr");
+        StandaloneDoorSensorConfigInfo info = new StandaloneDoorSensorConfigInfo();
+        if (!TextUtils.isEmpty(standaloneInfoStr)) {
+          try {
+            info = new Gson().fromJson(standaloneInfoStr, new TypeToken<StandaloneDoorSensorConfigInfo>(){}.getType());
+          } catch (Exception e) {
+            LogUtil.d("parse standaloneInfoStr fail: " + e.getMessage());
+          }
+        }
+        StandaloneDoorSensorClient.getDefault().init(info, new InitCallback() {
+          @Override
+          public void onInitSuccess(InitModel result) {
+            Map<String, Object> resultParams = new HashMap<>();
+            resultParams.put(TTParam.doorSensorData, result.getDoorSensorData());
+            resultParams.put(TTParam.electricQuantity, result.getDeviceInfo().getElectricQuantity());
+            resultParams.put(TTParam.featureValue, result.getDeviceInfo().getFeatureValue());
+            resultParams.put(TTParam.wifiMac, result.getDeviceInfo().getWifiMac());
+            resultParams.put(TTParam.MODEL_NUM, result.getDeviceInfo().getModelNum());
+            resultParams.put(TTParam.HARD_WARE_REVISION, result.getDeviceInfo().getHardwareRevision());
+            resultParams.put(TTParam.FIRMWARE_REVISION, result.getDeviceInfo().getFirmwareRevision());
+            successCallbackCommand(TTStandaloneDoorSensorCommand.COMMAND_INIT_STANDALONE_DOOR_SENSOR, resultParams);
+          }
+
+          @Override
+          public void onFail(StandaloneDoorSensorError error) {
+            errorCallbackCommand(TTStandaloneDoorSensorCommand.COMMAND_INIT_STANDALONE_DOOR_SENSOR, error);
+          }
+        });
+      } else {
+        callbackCommand(TTStandaloneDoorSensorCommand.COMMAND_INIT_STANDALONE_DOOR_SENSOR, ResultStateFail, null,
+            LockError.LOCK_NO_PERMISSION.getIntErrorCode(), "no connect permission");
+      }
+    });
+  }
+
+  public void standaloneDoorGetFeatureValue(Map<String, Object> params) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        String mac = (String) params.get(TTParam.MAC);
+        StandaloneDoorSensorClient.getDefault().getDeviceInfo(mac, new com.ttlock.bl.sdk.standalonedoorsensor.callback.GetDeviceInfoCallback() {
+          @Override
+          public void onFail(StandaloneDoorSensorError standaloneDoorSensorError) {
+            errorCallbackCommand(TTStandaloneDoorSensorCommand.COMMAND_STANDALONE_DOOR_GET_FEATURE_VALUE, standaloneDoorSensorError);
+          }
+
+          @Override
+          public void onGetDeviceInfoSuccess(com.ttlock.bl.sdk.standalonedoorsensor.model.DeviceInfo deviceInfo) {
+            Map<String, Object> resultParams = new HashMap<>();
+            resultParams.put("standaloneDoorFeature", deviceInfo.getFeatureValue());
+            successCallbackCommand(TTStandaloneDoorSensorCommand.COMMAND_STANDALONE_DOOR_GET_FEATURE_VALUE, resultParams);
+          }
+
+        });
+      } else {
+        callbackCommand(TTStandaloneDoorSensorCommand.COMMAND_STANDALONE_DOOR_GET_FEATURE_VALUE, ResultStateFail, null,
+            LockError.LOCK_NO_PERMISSION.getIntErrorCode(), "no connect permission");
+      }
+    });
+  }
+
+  public void standaloneDoorIsSupportFunction(Map<String, Object> params) {
+    boolean isSupport = FeatureValueUtil.isSupportFeature(params.get("standaloneDoorFeature").toString(), Integer.parseInt(params.get("supportFunction").toString()));
+    HashMap<String,Object> map = new HashMap<>();
+    map.put("isSupport",isSupport);
+    successCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_SUPPORT_FUNCTION, map);
   }
 
   /**--------------------------- keypad -------------------------- **/
@@ -4288,6 +4564,10 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
   public void errorCallbackCommand(String command, DoorSensorError doorSensorError) {
     callbackCommand(command, ResultStateFail, null, 0, doorSensorError.getDescription());
+  }
+
+  public void errorCallbackCommand(String command, StandaloneDoorSensorError doorSensorError) {
+    callbackCommand(command, ResultStateFail, null, 0, doorSensorError.toString());
   }
 
   public void errorCallbackCommand(String command, GatewayError gatewayError) {

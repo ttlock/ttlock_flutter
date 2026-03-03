@@ -27,6 +27,16 @@ public class TTWaterMeterCommand {
     public static final String COMMAND_WATER_METER_ENTER_UPGRADE_MODE =
             "waterMeterEnterUpgradeMode";
 
+    public static final String COMMAND_WATER_METER_GET_DEVICE_INFO =
+            "waterMeterGetDeviceInfo";
+    public static final String COMMAND_WATER_METER_SUPPORT_FUNCTION =
+            "waterMeterIsSupportFunction";
+
+    public static final String COMMAND_WATER_METER_CONFIG_APN = "waterMeterConfigApn";
+    public static final String COMMAND_WATER_METER_CONFIG_METER_SERVER =
+            "waterMeterConfigMeterServer";
+    public static final String COMMAND_WATER_METER_RESET = "waterMeterReset";
+
     public static boolean isWaterMeterCommand(String command) {
         Field[] fields = TTWaterMeterCommand.class.getDeclaredFields();
         try {

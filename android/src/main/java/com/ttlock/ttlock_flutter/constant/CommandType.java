@@ -12,4 +12,7 @@ public class CommandType {
     public static final int ELECTRICITY_METER = 5;
     public static final int WATER_METER = 6;
 
+    /** 独立门磁（Standalone Door Sensor），与 WiFi 门磁 DOOR_SENSOR 区分 */
+    public static final int STANDALONE_DOOR_SENSOR = 7;
+
 }
