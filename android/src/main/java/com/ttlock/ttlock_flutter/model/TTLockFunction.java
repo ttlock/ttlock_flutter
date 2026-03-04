@@ -118,7 +118,7 @@ public enum TTLockFunction {
             case noClock:
                 return FeatureValue.LOCK_NO_CLOCK_CHIP;
             case noBroadcastInNormal:
-                return FeatureValue.CAN_NOT_CLICK_UNLOCK;
+                return FeatureValue.SUPPORT_CLOSE_BLUETOOTH_ADVERTISING;
             case passageMode:
                 return FeatureValue.PASSAGE_MODE;
             case turnOffAutoLock:
