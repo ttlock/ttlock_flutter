@@ -1477,6 +1477,8 @@ class TTLock {
         break;
 
       case COMMAND_FUNCTION_SUPPORT:
+      case TTWaterMeter.COMMAND_WATER_METER_SUPPORT_FUNCTION:
+      case TTStandaloneDoorSensor.COMMAND_STANDALONE_DOOR_SUPPORT_FUNCTION:
         TTFunctionSupportCallback functionSupportCallback = callBack;
         functionSupportCallback(data[TTResponse.isSupport]);
         break;
