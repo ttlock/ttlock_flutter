@@ -964,7 +964,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
   public void waterMeterIsSupportFunction(Map<String, Object> params)
   {
-    boolean isSupport = FeatureValueUtil.isSupportFeature(params.get("featureValue").toString(), Integer.parseInt(params.get("supportFunction").toString()));
+    boolean isSupport = FeatureValueUtil.isSupportFeatureValue(params.get("featureValue").toString(), Integer.parseInt(params.get("supportFunction").toString()));
     HashMap<String,Object> map = new HashMap<>();
     map.put("isSupport",isSupport);
     successCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_SUPPORT_FUNCTION, map);
@@ -1595,10 +1595,10 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void standaloneDoorIsSupportFunction(Map<String, Object> params) {
-    boolean isSupport = FeatureValueUtil.isSupportFeature(params.get("standaloneDoorFeature").toString(), Integer.parseInt(params.get("supportFunction").toString()));
+    boolean isSupport = FeatureValueUtil.isSupportFeatureValue(params.get("standaloneDoorFeature").toString(), Integer.parseInt(params.get("supportFunction").toString()));
     HashMap<String,Object> map = new HashMap<>();
     map.put("isSupport",isSupport);
-    successCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_SUPPORT_FUNCTION, map);
+    successCallbackCommand(TTStandaloneDoorSensorCommand.COMMAND_STANDALONE_DOOR_SUPPORT_FUNCTION, map);
   }
 
   /**--------------------------- keypad -------------------------- **/
