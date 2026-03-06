@@ -1229,19 +1229,13 @@ class TTLock {
     map[TTResponse.faceNumber] = faceNumber;
     invoke(COMMAND_DELETE_FACE, map, callback, fail: failedCallback);
   }
-
-  // enum TTSensitivityValue {
-//   off = 0,
-//   low = 1,
-//   medium = 2,
-//   high = 3,
-// };
-  static void setSensitivity(String lockData, int value, TTSuccessCallback callback,
+  
+  static void setSensitivity(String lockData, TTSensitivityValue value, TTSuccessCallback callback,
       TTFailedCallback failedCallback)
   {
     Map map = new Map();
     map[TTResponse.lockData] = lockData;
-    map[TTResponse.sensitivityValue] = value;
+    map[TTResponse.sensitivityValue] = value.value;
     invoke(COMMAND_SET_SENSITIVITY, map, callback, fail: failedCallback);
   }
 
@@ -1752,7 +1746,7 @@ class TTLock {
         if (failedCallback != null) {
           failedCallback(error, errorMessage);
         }
-      }else
+      } else
       {
         if(errorCode<0)
         {
@@ -2041,6 +2035,17 @@ enum TTSoundVolumeType {
   fifthLevel,
   off,
   on
+}
+
+enum TTSensitivityValue {
+  off(0),
+  low(1),
+  medium(2),
+  high(3);
+  
+  final int value;
+  
+  const TTSensitivityValue(this.value);
 }
 
 enum TTLockError {

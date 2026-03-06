@@ -727,7 +727,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
                             public void onKeypadFail(MultifunctionalKeypadError multifunctionalKeypadError) {
                                 HashMap<String, Object> map = new HashMap<>();
                                 map.put("errorDevice", 1);
-                                callbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD, ResultStateFail, map, 0, multifunctionalKeypadError.getDescription());
+                                callbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD, ResultStateFail, map, multifunctionalKeypadError.getErrorCode(), multifunctionalKeypadError.getDescription());
 
                             }
 
@@ -749,7 +749,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
                             public void onLockFail(LockError lockError) {
                                 HashMap<String, Object> map = new HashMap<>();
                                 map.put("errorDevice", 0);
-                                callbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD, ResultStateFail, map, 0, lockError.getDescription());
+                                callbackCommand(TTKeyPadCommand.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD, ResultStateFail, map, lockError.getIntErrorCode(), lockError.getDescription());
 
                             }
                         });
@@ -2287,7 +2287,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         TTLockClient.getDefault().scanWifi(ttlockModel.lockData, new ScanWifiCallback() {
             @Override
             public void onScanWifi(List<WiFi> wiFis, int status) {
-                List<HashMap<String, Object>> mapList = new ArrayList<HashMap<String, Object>>();
+                List<HashMap<String, Object>> mapList = new ArrayList<>();
                 for (WiFi wiFi : wiFis) {
                     HashMap<String, Object> wifiMap = new HashMap<>();
                     wifiMap.put("wifi", wiFi.ssid);
@@ -2391,7 +2391,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
                 @Override
                 public void onConfigSuccess(CameraLockWifiInfo cameraLockWifiInfo) {
-                    Map<String, Object> map = Utils.object2Map(cameraLockWifiInfo);
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("wifiName",cameraLockWifiInfo.getWifiMac());
+                    map.put("videoModuleSerialNumber", cameraLockWifiInfo.getVideoModuleSerialNumber());
                     apiSuccess(map);
                 }
 
