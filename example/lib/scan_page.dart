@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ttlock_premise_flutter/ttgateway.dart';
 import 'package:ttlock_premise_flutter/ttlock.dart';
+import 'package:ttlock_premise_flutter/ttlock_models.dart';
 import 'package:ttlock_flutter_example/gateway_page.dart';
 import 'wifi_page.dart';
 import 'package:bmprogresshud/progresshud.dart';
@@ -56,11 +57,12 @@ class _ScanPageState extends State<ScanPage> {
   void _initLock(TTLockScanModel scanModel) async {
     _showLoading();
 
-    Map map = Map();
-    map["lockMac"] = scanModel.lockMac;
-    map["lockVersion"] = scanModel.lockVersion;
-    map["isInited"] = scanModel.isInited;
-    TTLock.initLock(map, (lockData) {
+    final params = TTLockInitParams(
+      lockMac: scanModel.lockMac,
+      lockVersion: scanModel.lockVersion,
+      isInited: scanModel.isInited,
+    );
+    TTLock.initLockWithParams(params, (lockData) {
       _dismissLoading();
       Navigator.push(context,
           new MaterialPageRoute(builder: (BuildContext context) {

@@ -4,6 +4,7 @@ import 'package:ttlock_premise_flutter/ttremoteKey.dart';
 import 'package:ttlock_premise_flutter/ttremoteKeypad.dart';
 import 'dart:convert' as convert;
 import 'ttgateway.dart';
+import 'ttlock_models.dart';
 
 class TTLock {
   static bool isOnPremise = true;
@@ -185,9 +186,16 @@ class TTLock {
  * Initialize the lock
  * map {"lockMac": string, "lockVersion": string, "isInited": bool}
  */
+  @Deprecated('Use initLockWithParams(TTLockInitParams params, ...) instead')
   static void initLock(
       Map map, TTLockDataCallback callback, TTFailedCallback failedCallback) {
     invoke(COMMAND_INIT_LOCK, map, callback, fail: failedCallback);
+  }
+
+  /// Initialize the lock with typed parameters.
+  static void initLockWithParams(
+      TTLockInitParams params, TTLockDataCallback callback, TTFailedCallback failedCallback) {
+    invoke(COMMAND_INIT_LOCK, params.toMap(), callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -991,6 +999,7 @@ class TTLock {
     invoke(COMMAND_GET_WIFI_INFO, lockData, callback, fail: failedCallback);
   }
 
+  @Deprecated('Use configIpWithParams(TTIpSetting ipSetting, String lockData, ...) instead')
   static void configIp(
     Map map,
     String lockData,
@@ -999,6 +1008,19 @@ class TTLock {
   ) {
     map[TTResponse.lockData] = lockData;
     map[TTResponse.ipSettingJsonStr] = convert.jsonEncode(map);
+    TTLock.invoke(COMMAND_CONFIG_IP, map, callback, fail: failedCallback);
+  }
+
+  /// Configure lock IP with typed parameters.
+  static void configIpWithParams(
+    TTIpSetting ipSetting,
+    String lockData,
+    TTSuccessCallback callback,
+    TTFailedCallback failedCallback,
+  ) {
+    final map = Map<String, dynamic>.from(ipSetting.toMap());
+    map[TTResponse.lockData] = lockData;
+    map[TTResponse.ipSettingJsonStr] = convert.jsonEncode(ipSetting.toMap());
     TTLock.invoke(COMMAND_CONFIG_IP, map, callback, fail: failedCallback);
   }
 

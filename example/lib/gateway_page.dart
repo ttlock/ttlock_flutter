@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:bmprogresshud/progresshud.dart';
 import 'package:ttlock_premise_flutter/ttgateway.dart';
 import 'package:ttlock_premise_flutter/ttlock.dart';
+import 'package:ttlock_premise_flutter/ttlock_models.dart';
 
 import 'config.dart';
 
@@ -37,34 +38,30 @@ class _GatewayPageState extends State<GatewayPage> {
       _showAndDismiss(ProgressHudType.error, '"wifi or password cant be empty');
     }
 
-    Map paramMap = Map();
-    paramMap["wifi"] = wifi;
-    paramMap["wifiPassword"] = wifiPassword;
-    paramMap["type"] = _type!.index;
-    paramMap["gatewayName"] = Config.gatewayName;
-    paramMap["uid"] = Config.uid;
-    if (Config.gatewayServerIp.isNotEmpty &&
-        Config.gatewayServerPort.isNotEmpty) {
-      paramMap["serverIp"] = Config.gatewayServerIp;
-      paramMap["serverPort"] = Config.gatewayServerPort;
-    }
-    _initGateway(paramMap);
+    final params = TTGatewayInitParams(
+      type: _type!.index,
+      ttlockUid: Config.uid,
+      gatewayName: Config.gatewayName,
+      wifi: wifi,
+      wifiPassword: wifiPassword,
+      serverIp: Config.gatewayServerIp.isNotEmpty ? Config.gatewayServerIp : null,
+      serverPort: Config.gatewayServerPort.isNotEmpty ? Config.gatewayServerPort : null,
+    );
+    _initGatewayWithParams(params);
   }
 
   void _initGateway_3_4() {
-    Map paramMap = Map();
-    paramMap["type"] = _type!.index;
-    paramMap["gatewayName"] = Config.gatewayName;
-    paramMap["uid"] = Config.uid;
-    if (Config.gatewayServerIp.isNotEmpty &&
-        Config.gatewayServerPort.isNotEmpty) {
-      paramMap["serverIp"] = Config.gatewayServerIp;
-      paramMap["serverPort"] = Config.gatewayServerPort;
-    }
-    _initGateway(paramMap);
+    final params = TTGatewayInitParams(
+      type: _type!.index,
+      ttlockUid: Config.uid,
+      gatewayName: Config.gatewayName,
+      serverIp: Config.gatewayServerIp.isNotEmpty ? Config.gatewayServerIp : null,
+      serverPort: Config.gatewayServerPort.isNotEmpty ? Config.gatewayServerPort : null,
+    );
+    _initGatewayWithParams(params);
   }
 
-  void _initGateway(Map paramMap) {
+  void _initGatewayWithParams(TTGatewayInitParams params) {
     // test account.  ttlockUid = 17498, ttlockLoginPassword = "1111111"
     // if (Config.ttlockUid == 17498) {
     //   String errorDesc =
@@ -75,7 +72,7 @@ class _GatewayPageState extends State<GatewayPage> {
     // }
 
     _showLoading();
-    TTGateway.init(paramMap, (map) {
+    TTGateway.initWithParams(params, (map) {
       print(map);
       _showAndDismiss(ProgressHudType.success, 'Init Gateway Success');
     }, (errorCode, errorMsg) {

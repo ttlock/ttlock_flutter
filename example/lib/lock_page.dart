@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ttlock_premise_flutter/ttlock.dart';
+import 'package:ttlock_premise_flutter/ttlock_models.dart';
 import 'package:bmprogresshud/progresshud.dart';
 
 import 'key_pad/scan_key_pad_page.dart';
@@ -707,17 +708,9 @@ class _LockPageState extends State<LockPage> {
       //   });
       //   break;
       case Command.configIp:
-        Map paramMap = Map();
-        paramMap["type"] = TTIpSettingType.DHCP.index;
-        //for static ip setting
-        // paramMap["type"] = TTIpSettingType.STATIC_IP.index;
-        // paramMap["ipAddress"] = "192.168.1.100";
-        // paramMap["subnetMask"] = "255.255.255.0";
-        // paramMap["router"] = "192.168.1.1";
-        // paramMap["preferredDns"] = "xxx.xxx.xxx.xxx";
-        // paramMap["alternateDns"] = "xxx.xxx.xxx.xxx";
-
-        TTLock.configIp(paramMap, lockData, () {
+        final ipSetting = TTIpSetting(type: TTIpSettingType.DHCP.index);
+        // For static IP: TTIpSetting(type: TTIpSettingType.STATIC_IP.index, ipAddress: "192.168.1.100", subnetMask: "255.255.255.0", router: "192.168.1.1", ...)
+        TTLock.configIpWithParams(ipSetting, lockData, () {
           _showSuccessAndDismiss("config ip success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
@@ -737,7 +730,7 @@ class _LockPageState extends State<LockPage> {
         TTLock.supportFunction(TTLockFuction.sensitivity, lockData, (bool support){
           if(support)
             {
-              TTLock.setSensitivity(lockData, 0, () {
+              TTLock.setSensitivity(lockData, TTSensitivityValue.off, () {
                 _showSuccessAndDismiss("setSensitivity success");
               }, (errorCode, errorMsg) {
                 _showErrorAndDismiss(errorCode, errorMsg);
