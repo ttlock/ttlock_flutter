@@ -16,12 +16,18 @@ class TTLock {
   static bool get printLog => TTLockChannel.printLog;
   static set printLog(bool v) => TTLockChannel.printLog = v;
 
+  static void _invoke(String command, Object? parameter, Object? success,
+      {Object? progress, Object? fail, Object? otherFail}) {
+    TTLockChannel.invoke(command, parameter, success,
+        progress: progress, fail: fail, otherFail: otherFail);
+  }
+
   // ignore: slash_for_doc_comments
 /**
    * Scan the smart lock being broadcast
    */
   static void startScanLock(TTLockScanCallback scanCallback) {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_START_SCAN_LOCK, null, scanCallback);
+    _invoke(TTLockCommands.COMMAND_START_SCAN_LOCK, null, scanCallback);
   }
 
   // ignore: slash_for_doc_comments
@@ -29,7 +35,7 @@ class TTLock {
    * Stop scan the smart lock being broadcast
    */
   static void stopScanLock() {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_STOP_SCAN_LOCK, null, null);
+    _invoke(TTLockCommands.COMMAND_STOP_SCAN_LOCK, null, null);
   }
 
   // ignore: slash_for_doc_comments
@@ -37,7 +43,7 @@ class TTLock {
    * Current Phone/Pad Bluetooth state
    */
   static void getBluetoothState(TTBluetoothStateCallback stateCallback) {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_BLUETOOTH_STATE, null, stateCallback);
+    _invoke(TTLockCommands.COMMAND_GET_BLUETOOTH_STATE, null, stateCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -48,13 +54,13 @@ class TTLock {
   @Deprecated('Use initLockWithParams(TTLockInitParams params, ...) instead')
   static void initLock(
       Map map, TTLockDataCallback callback, TTFailedCallback failedCallback) {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_INIT_LOCK, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_INIT_LOCK, map, callback, fail: failedCallback);
   }
 
   /// Initialize the lock with typed parameters.
   static void initLockWithParams(
       TTLockInitParams params, TTLockDataCallback callback, TTFailedCallback failedCallback) {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_INIT_LOCK, params.toMap(), callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_INIT_LOCK, params.toMap(), callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -63,7 +69,7 @@ class TTLock {
  */
   static void resetLock(String lockData, TTSuccessCallback callback,
       TTFailedCallback failedCallback) {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_RESET_LOCK, lockData, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_RESET_LOCK, lockData, callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -72,7 +78,7 @@ class TTLock {
  */
   static void resetEkey(String lockData, TTLockDataCallback callback,
       TTFailedCallback failedCallback) {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_RESET_EKEY, lockData, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_RESET_EKEY, lockData, callback, fail: failedCallback);
   }
 
   // ignore: slash_for_doc_comments
@@ -84,7 +90,7 @@ class TTLock {
     Map map = Map();
     map[TTResponse.lockData] = lockData;
     map[TTResponse.supportFunction] = fuction.value;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_FUNCTION_SUPPORT, map, callback);
+    _invoke(TTLockCommands.COMMAND_FUNCTION_SUPPORT, map, callback);
   }
 
 // ignore: slash_for_doc_comments
@@ -96,7 +102,7 @@ class TTLock {
     Map map = Map();
     map[TTResponse.lockData] = lockData;
     map[TTResponse.controlAction] = controlAction.index;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_CONTROL_LOCK, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_CONTROL_LOCK, map, callback, fail: failedCallback);
   }
 
   // ignore: slash_for_doc_comments
@@ -122,7 +128,7 @@ class TTLock {
     map[TTResponse.startDate] = startDate;
     map[TTResponse.endDate] = endDate;
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_CREATE_CUSTOM_PASSCODE, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_CREATE_CUSTOM_PASSCODE, map, callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -148,7 +154,7 @@ class TTLock {
     map[TTResponse.startDate] = startDate;
     map[TTResponse.endDate] = endDate;
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_MODIFY_PASSCODE, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_MODIFY_PASSCODE, map, callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -163,7 +169,7 @@ class TTLock {
     Map map = Map();
     map[TTResponse.passcode] = passcode;
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_DELETE_PASSCODE, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_DELETE_PASSCODE, map, callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -172,7 +178,7 @@ class TTLock {
  */
   static void resetPasscode(String lockData, TTLockDataCallback callback,
       TTFailedCallback failedCallback) {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_RESET_PASSCODE, lockData, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_RESET_PASSCODE, lockData, callback, fail: failedCallback);
   }
 
   // ignore: slash_for_doc_comments
@@ -183,7 +189,7 @@ class TTLock {
  */
   static void getAdminPasscode(String lockData,
       TTGetAdminPasscodeCallback callback, TTFailedCallback failedCallback) {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_ADMIN_PASSCODE, lockData, callback,
+    _invoke(TTLockCommands.COMMAND_GET_ADMIN_PASSCODE, lockData, callback,
         fail: failedCallback);
   }
 
@@ -192,13 +198,13 @@ class TTLock {
     Map map = new Map();
     map[TTResponse.erasePasscode] = erasePasscode;
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_ADMIN_ERASE_PASSCODE, map, callback,
+    _invoke(TTLockCommands.COMMAND_SET_ADMIN_ERASE_PASSCODE, map, callback,
         fail: failedCallback);
   }
 
   static void getAllValidPasscode(String lockData,
       TTGetAllPasscodeCallback callback, TTFailedCallback failedCallback) {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_ALL_VALID_PASSCODE, lockData, callback,
+    _invoke(TTLockCommands.COMMAND_GET_ALL_VALID_PASSCODE, lockData, callback,
         fail: failedCallback);
   }
 
@@ -220,7 +226,7 @@ class TTLock {
     map[TTResponse.lockData] = lockData;
     map[TTResponse.startDate] = startDate;
     map[TTResponse.endDate] = endDate;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_RECOVER_PASSCODE, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_RECOVER_PASSCODE, map, callback, fail: failedCallback);
   }
 
   // ignore: slash_for_doc_comments
@@ -231,7 +237,7 @@ class TTLock {
  */
   static void getLockSwitchState(String lockData,
       TTGetLockStatusCallback callback, TTFailedCallback failedCallback) {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_LOCK_SWITCH_STATE, lockData, callback,
+    _invoke(TTLockCommands.COMMAND_GET_LOCK_SWITCH_STATE, lockData, callback,
         fail: failedCallback);
   }
 
@@ -259,7 +265,7 @@ class TTLock {
     if (cycleList != null && cycleList.length > 0) {
       map[TTResponse.cycleJsonList] = convert.jsonEncode(cycleList);
     }
-    TTLockChannel.invoke(TTLockCommands.COMMAND_ADD_CARD, map, callback,
+    _invoke(TTLockCommands.COMMAND_ADD_CARD, map, callback,
         progress: progressCallback, fail: failedCallback);
   }
 
@@ -289,7 +295,7 @@ class TTLock {
     if (cycleList != null && cycleList.length > 0) {
       map[TTResponse.cycleJsonList] = convert.jsonEncode(cycleList);
     }
-    TTLockChannel.invoke(TTLockCommands.COMMAND_MODIFY_CARD, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_MODIFY_CARD, map, callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -304,7 +310,7 @@ class TTLock {
     Map map = Map();
     map[TTResponse.cardNumber] = cardNumber;
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_DELETE_CARD, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_DELETE_CARD, map, callback, fail: failedCallback);
   }
 
   // ignore: slash_for_doc_comments
@@ -315,7 +321,7 @@ class TTLock {
  */
   static void getAllValidCards(String lockData, TTGetAllCardsCallback callback,
       TTFailedCallback failedCallback) {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_ALL_VALID_CARD, lockData, callback,
+    _invoke(TTLockCommands.COMMAND_GET_ALL_VALID_CARD, lockData, callback,
         fail: failedCallback);
   }
 
@@ -327,7 +333,7 @@ class TTLock {
  */
   static void clearAllCards(String lockData, TTSuccessCallback callback,
       TTFailedCallback failedCallback) {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_CLEAR_ALL_CARD, lockData, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_CLEAR_ALL_CARD, lockData, callback, fail: failedCallback);
   }
 
   static void recoverCard(
@@ -342,7 +348,7 @@ class TTLock {
     map[TTResponse.lockData] = lockData;
     map[TTResponse.startDate] = startDate;
     map[TTResponse.endDate] = endDate;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_RECOVER_CARD, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_RECOVER_CARD, map, callback, fail: failedCallback);
   }
 
   // static void reportLossCard(String cardNumber, String lockData,
@@ -350,7 +356,7 @@ class TTLock {
   //   Map map = Map();
   //   map[TTResponse.cardNumber] = cardNumber;
   //   map[TTResponse.lockData] = lockData;
-  //   TTLockChannel.invoke(TTLockCommands.COMMAND_REPORT_LOSS_CARD, map, callback, fail: failedCallback);
+  //   _invoke(TTLockCommands.COMMAND_REPORT_LOSS_CARD, map, callback, fail: failedCallback);
   // }
 
 // ignore: slash_for_doc_comments
@@ -377,7 +383,7 @@ class TTLock {
     if (cycleList != null && cycleList.length > 0) {
       map[TTResponse.cycleJsonList] = convert.jsonEncode(cycleList);
     }
-    TTLockChannel.invoke(TTLockCommands.COMMAND_ADD_FINGERPRINT, map, callback,
+    _invoke(TTLockCommands.COMMAND_ADD_FINGERPRINT, map, callback,
         progress: progressCallback, fail: failedCallback);
   }
 
@@ -407,7 +413,7 @@ class TTLock {
     if (cycleList != null && cycleList.length > 0) {
       map[TTResponse.cycleJsonList] = convert.jsonEncode(cycleList);
     }
-    TTLockChannel.invoke(TTLockCommands.COMMAND_MODIFY_FINGERPRINT, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_MODIFY_FINGERPRINT, map, callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -422,7 +428,7 @@ class TTLock {
     Map map = Map();
     map[TTResponse.fingerprintNumber] = fingerprintNumber;
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_DELETE_FINGERPRINT, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_DELETE_FINGERPRINT, map, callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -433,7 +439,7 @@ class TTLock {
  */
   static void clearAllFingerprints(String lockData, TTSuccessCallback callback,
       TTFailedCallback failedCallback) {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_CLEAR_ALL_FINGERPRINT, lockData, callback,
+    _invoke(TTLockCommands.COMMAND_CLEAR_ALL_FINGERPRINT, lockData, callback,
         fail: failedCallback);
   }
 
@@ -445,13 +451,13 @@ class TTLock {
  */
   static void getAllValidFingerprints(String lockData,
       TTGetAllFingerprintsCallback callback, TTFailedCallback failedCallback) {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_ALL_VALID_FINGERPRINT, lockData, callback,
+    _invoke(TTLockCommands.COMMAND_GET_ALL_VALID_FINGERPRINT, lockData, callback,
         fail: failedCallback);
   }
 
   // static void getPasscodeVerificationParams(String lockData,
   //     TTLockDataCallback callback, TTFailedCallback failedCallback) {
-  //   TTLockChannel.invoke(TTLockCommands.COMMAND_GET_PASSCODE_VERIFICATION_PARAMS, lockData, callback,
+  //   _invoke(TTLockCommands.COMMAND_GET_PASSCODE_VERIFICATION_PARAMS, lockData, callback,
   //       fail: failedCallback);
   // }
 
@@ -467,7 +473,7 @@ class TTLock {
     Map map = Map();
     map[TTResponse.adminPasscode] = adminPasscode;
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_MODIFY_ADMIN_PASSCODE, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_MODIFY_ADMIN_PASSCODE, map, callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -482,7 +488,7 @@ class TTLock {
     Map map = Map();
     map[TTResponse.timestamp] = timestamp;
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_LOCK_TIME, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_SET_LOCK_TIME, map, callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -493,7 +499,7 @@ class TTLock {
  */
   static void getLockTime(String lockData, TTGetLockTimeCallback callback,
       TTFailedCallback failedCallback) {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_LOCK_TIME, lockData, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_GET_LOCK_TIME, lockData, callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -513,7 +519,7 @@ class TTLock {
     Map map = Map();
     map["logType"] = type.index;
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_LOCK_OPERATE_RECORD, map, callback,
+    _invoke(TTLockCommands.COMMAND_GET_LOCK_OPERATE_RECORD, map, callback,
         fail: failedCallback);
   }
 
@@ -527,18 +533,18 @@ class TTLock {
       String lockData,
       TTGetLockElectricQuantityCallback callback,
       TTFailedCallback failedCallback) {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_LOCK_POWER, lockData, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_GET_LOCK_POWER, lockData, callback, fail: failedCallback);
   }
 
   static void getLockSystemInfo(String lockData,
       TTGetLockSystemCallback callback, TTFailedCallback failedCallback) {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_LOCK_SYSTEM_INFO, lockData, callback,
+    _invoke(TTLockCommands.COMMAND_GET_LOCK_SYSTEM_INFO, lockData, callback,
         fail: failedCallback);
   }
 
   static void getLockFeatureValue(String lockData, TTLockDataCallback callback,
       TTFailedCallback failedCallback) {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_LOCK_FRETURE_VALUE, lockData, callback,
+    _invoke(TTLockCommands.COMMAND_GET_LOCK_FRETURE_VALUE, lockData, callback,
         fail: failedCallback);
   }
 
@@ -552,7 +558,7 @@ class TTLock {
       String lockData,
       TTGetLockAutomaticLockingPeriodicTimeCallback callback,
       TTFailedCallback failedCallback) {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_AUTOMATIC_LOCK_PERIODIC_TIME, lockData, callback,
+    _invoke(TTLockCommands.COMMAND_GET_AUTOMATIC_LOCK_PERIODIC_TIME, lockData, callback,
         fail: failedCallback);
   }
 
@@ -568,7 +574,7 @@ class TTLock {
     Map map = Map();
     map[TTResponse.currentTime] = time;
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_AUTOMATIC_LOCK_PERIODIC_TIME, map, callback,
+    _invoke(TTLockCommands.COMMAND_SET_AUTOMATIC_LOCK_PERIODIC_TIME, map, callback,
         fail: failedCallback);
   }
 
@@ -580,7 +586,7 @@ class TTLock {
  */
   static void getLockRemoteUnlockSwitchState(String lockData,
       TTGetSwitchStateCallback callback, TTFailedCallback failedCallback) {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_LOCK_REMOTE_UNLOCK_SWITCH_STATE, lockData, callback,
+    _invoke(TTLockCommands.COMMAND_GET_LOCK_REMOTE_UNLOCK_SWITCH_STATE, lockData, callback,
         fail: failedCallback);
   }
 
@@ -595,7 +601,7 @@ class TTLock {
     Map map = Map();
     map[TTResponse.isOn] = isOn;
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_LOCK_REMOTE_UNLOCK_SWITCH_STATE, map, callback,
+    _invoke(TTLockCommands.COMMAND_SET_LOCK_REMOTE_UNLOCK_SWITCH_STATE, map, callback,
         fail: failedCallback);
   }
 
@@ -604,7 +610,7 @@ class TTLock {
     Map map = Map();
     map[TTResponse.lockData] = lockData;
     map[TTResponse.lockConfig] = config.index;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_LOCK_CONFIG, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_GET_LOCK_CONFIG, map, callback, fail: failedCallback);
   }
 
   static void setLockConfig(TTLockConfig config, bool isOn, String lockData,
@@ -613,7 +619,7 @@ class TTLock {
     map[TTResponse.isOn] = isOn;
     map[TTResponse.lockData] = lockData;
     map[TTResponse.lockConfig] = config.index;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_LOCK_CONFIG, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_SET_LOCK_CONFIG, map, callback, fail: failedCallback);
   }
 
   static void setLockDirection(TTLockDirection direction, String lockData,
@@ -621,12 +627,12 @@ class TTLock {
     Map map = Map();
     map[TTResponse.lockData] = lockData;
     map[TTResponse.direction] = direction.index;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_LOCK_DIRECTION, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_SET_LOCK_DIRECTION, map, callback, fail: failedCallback);
   }
 
   static void getLockDirection(String lockData,
       TTGetLockDirectionCallback callback, TTFailedCallback failedCallback) {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_LOCK_DIRECTION, lockData, callback,
+    _invoke(TTLockCommands.COMMAND_GET_LOCK_DIRECTION, lockData, callback,
         fail: failedCallback);
   }
 
@@ -635,7 +641,7 @@ class TTLock {
     Map map = Map();
     map[TTResponse.lockMac] = lockMac;
     map[TTResponse.resetCode] = resetCode;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_RESET_LOCK_BY_CODE, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_RESET_LOCK_BY_CODE, map, callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -668,7 +674,7 @@ class TTLock {
     } else {
       map[TTResponse.monthly] = monthly;
     }
-    TTLockChannel.invoke(TTLockCommands.COMMAND_ADD_PASSAGE_MODE, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_ADD_PASSAGE_MODE, map, callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -679,7 +685,7 @@ class TTLock {
  */
   static void clearAllPassageModes(String lockData, TTSuccessCallback callback,
       TTFailedCallback failedCallback) {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_CLEAR_ALL_PASSAGE_MODE, lockData, callback,
+    _invoke(TTLockCommands.COMMAND_CLEAR_ALL_PASSAGE_MODE, lockData, callback,
         fail: failedCallback);
   }
 
@@ -688,7 +694,7 @@ class TTLock {
     Map map = Map();
     map["floors"] = floors;
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_ACTIVE_LIFT_FLOORS, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_ACTIVE_LIFT_FLOORS, map, callback, fail: failedCallback);
   }
 
   static void setLiftControlable(String floors, String lockData,
@@ -696,7 +702,7 @@ class TTLock {
     Map map = Map();
     map["floors"] = floors;
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_LIFT_CONTROLABLE_FLOORS, map, callback,
+    _invoke(TTLockCommands.COMMAND_SET_LIFT_CONTROLABLE_FLOORS, map, callback,
         fail: failedCallback);
   }
 
@@ -705,7 +711,7 @@ class TTLock {
     Map map = Map();
     map["liftWorkActiveType"] = type.index;
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_LIFT_WORK_MODE, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_SET_LIFT_WORK_MODE, map, callback, fail: failedCallback);
   }
 
   static void setPowerSaverWorkMode(TTPowerSaverWorkType type, String lockData,
@@ -713,7 +719,7 @@ class TTLock {
     Map map = Map();
     map["powerSaverType"] = type.index;
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_POWSER_SAVER_WORK_MODE, map, callback,
+    _invoke(TTLockCommands.COMMAND_SET_POWSER_SAVER_WORK_MODE, map, callback,
         fail: failedCallback);
   }
 
@@ -722,7 +728,7 @@ class TTLock {
     Map map = Map();
     map[TTResponse.lockMac] = lockMac;
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_POWSER_SAVER_CONTROLABLE, map, callback,
+    _invoke(TTLockCommands.COMMAND_SET_POWSER_SAVER_CONTROLABLE, map, callback,
         fail: failedCallback);
   }
 
@@ -736,7 +742,7 @@ class TTLock {
   //   map[TTResponse.ip] = ip;
   //   map[TTResponse.port] = port;
   //   map[TTResponse.lockData] = lockData;
-  //   TTLockChannel.invoke(TTLockCommands.COMMAND_SET_NB_ADDRESS, map, callback, fail: failedCallback);
+  //   _invoke(TTLockCommands.COMMAND_SET_NB_ADDRESS, map, callback, fail: failedCallback);
   // }
 
   // static void setNbAwakeModes(List<TTNbAwakeMode> modes, String lockData,
@@ -749,12 +755,12 @@ class TTLock {
   //   Map map = Map();
   //   map[TTResponse.nbAwakeModes] = list;
   //   map[TTResponse.lockData] = lockData;
-  //   TTLockChannel.invoke(TTLockCommands.COMMAND_SET_NB_AWAKE_MODES, map, callback, fail: failedCallback);
+  //   _invoke(TTLockCommands.COMMAND_SET_NB_AWAKE_MODES, map, callback, fail: failedCallback);
   // }
 
   // static void getNbAwakeModes(String lockData,
   //     TTGetNbAwakeModesCallback callback, TTFailedCallback failedCallback) {
-  //   TTLockChannel.invoke(TTLockCommands.COMMAND_GET_NB_AWAKE_MODES, lockData, callback,
+  //   _invoke(TTLockCommands.COMMAND_GET_NB_AWAKE_MODES, lockData, callback,
   //       fail: failedCallback);
   // }
 
@@ -771,12 +777,12 @@ class TTLock {
   //   Map map = Map();
   //   map[TTResponse.nbAwakeTimeList] = list;
   //   map[TTResponse.lockData] = lockData;
-  //   TTLockChannel.invoke(TTLockCommands.COMMAND_SET_NB_AWAKE_TIMES, map, callback, fail: failedCallback);
+  //   _invoke(TTLockCommands.COMMAND_SET_NB_AWAKE_TIMES, map, callback, fail: failedCallback);
   // }
 
   // static void getNBAwakeTimes(String lockData,
   //     TTGetNbAwakeTimesCallback callback, TTFailedCallback failedCallback) {
-  //   TTLockChannel.invoke(TTLockCommands.COMMAND_GET_NB_AWAKE_TIMES, lockData, callback,
+  //   _invoke(TTLockCommands.COMMAND_GET_NB_AWAKE_TIMES, lockData, callback,
   //       fail: failedCallback);
   // }
 
@@ -785,12 +791,12 @@ class TTLock {
   //   Map map = Map();
   //   map[TTResponse.isOn] = isOn;
   //   map[TTResponse.lockData] = lockData;
-  //   TTLockChannel.invoke(TTLockCommands.COMMAND_SET_DOOR_SENSOR_SWITCH, map, callback, fail: failedCallback);
+  //   _invoke(TTLockCommands.COMMAND_SET_DOOR_SENSOR_SWITCH, map, callback, fail: failedCallback);
   // }
 
   // static void getDoorSensorLockingSwitchState(String lockData,
   //     TTGetSwitchStateCallback callback, TTFailedCallback failedCallback) {
-  //   TTLockChannel.invoke(TTLockCommands.COMMAND_GET_DOOR_SENSOR_SWITCH, lockData, callback,
+  //   _invoke(TTLockCommands.COMMAND_GET_DOOR_SENSOR_SWITCH, lockData, callback,
   //       fail: failedCallback);
   // }
 
@@ -806,7 +812,7 @@ class TTLock {
     map[TTResponse.buildingNumber] = buildingNumber;
     map[TTResponse.floorNumber] = floorNumber;
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_HOTEL_INFO, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_SET_HOTEL_INFO, map, callback, fail: failedCallback);
   }
 
   static void setHotelCardSector(String sector, String lockData,
@@ -814,12 +820,12 @@ class TTLock {
     Map map = Map();
     map[TTResponse.sector] = sector;
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_HOTEL_CARD_SECTOR, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_SET_HOTEL_CARD_SECTOR, map, callback, fail: failedCallback);
   }
 
   // static void getDoorSensorState(String lockData,
   //     TTGetSwitchStateCallback callback, TTFailedCallback failedCallback) {
-  //   TTLockChannel.invoke(TTLockCommands.COMMAND_GET_DOOR_SENSOR_STATE, lockData, callback,
+  //   _invoke(TTLockCommands.COMMAND_GET_DOOR_SENSOR_STATE, lockData, callback,
   //       fail: failedCallback);
   // }
 
@@ -827,12 +833,12 @@ class TTLock {
       TTFailedCallback failedCallback) {
     Map map = Map();
     map[TTResponse.lockMac] = lockMac;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_LOCK_VERSION, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_GET_LOCK_VERSION, map, callback, fail: failedCallback);
   }
 
   static void scanWifi(String lockData, TTWifiLockScanWifiCallback callback,
       TTFailedCallback failedCallback) {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_SCAN_WIFI, lockData, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_SCAN_WIFI, lockData, callback, fail: failedCallback);
   }
 
   static void configWifi(String wifiName, String wifiPassword, String lockData,
@@ -841,7 +847,7 @@ class TTLock {
     map[TTResponse.wifiName] = wifiName;
     map[TTResponse.wifiPassword] = wifiPassword;
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_CONFIG_WIFI, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_CONFIG_WIFI, map, callback, fail: failedCallback);
   }
 
   static void configServer(String ip, String port, String lockData,
@@ -850,12 +856,12 @@ class TTLock {
     map[TTResponse.ip] = ip;
     map[TTResponse.port] = port;
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_CONFIG_SERVER, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_CONFIG_SERVER, map, callback, fail: failedCallback);
   }
 
   static void getWifiInfo(String lockData,
       TTWifiLockGetWifiInfoCallback callback, TTFailedCallback failedCallback) {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_WIFI_INFO, lockData, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_GET_WIFI_INFO, lockData, callback, fail: failedCallback);
   }
 
   @Deprecated('Use configIpWithParams(TTIpSetting ipSetting, String lockData, ...) instead')
@@ -867,7 +873,7 @@ class TTLock {
   ) {
     map[TTResponse.lockData] = lockData;
     map[TTResponse.ipSettingJsonStr] = convert.jsonEncode(map);
-    TTLockChannel.invoke(TTLockCommands.COMMAND_CONFIG_IP, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_CONFIG_IP, map, callback, fail: failedCallback);
   }
 
   /// Configure lock IP with typed parameters.
@@ -880,7 +886,7 @@ class TTLock {
     final map = Map<String, dynamic>.from(ipSetting.toMap());
     map[TTResponse.lockData] = lockData;
     map[TTResponse.ipSettingJsonStr] = convert.jsonEncode(ipSetting.toMap());
-    TTLockChannel.invoke(TTLockCommands.COMMAND_CONFIG_IP, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_CONFIG_IP, map, callback, fail: failedCallback);
   }
 
   static void configCameraLockWifi(
@@ -892,7 +898,7 @@ class TTLock {
     map[TTResponse.wifiName] = wifiName;
     map[TTResponse.wifiPassword] = wifiPassword;
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_CONFIG_CAMERA_LOCK_WIFI, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_CONFIG_CAMERA_LOCK_WIFI, map, callback, fail: failedCallback);
   }
 
   static void setLockSoundWithSoundVolume(
@@ -903,7 +909,7 @@ class TTLock {
     Map map = Map();
     map["soundVolumeType"] = type.index;
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_LOCK_SOUND_WITH_SOUND_VOLUME, map, callback,
+    _invoke(TTLockCommands.COMMAND_SET_LOCK_SOUND_WITH_SOUND_VOLUME, map, callback,
         fail: failedCallback);
   }
 
@@ -911,7 +917,7 @@ class TTLock {
       String lockData,
       TTGetLockSoundWithSoundVolumeCallback callback,
       TTFailedCallback failedCallback) {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_LOCK_SOUND_WITH_SOUND_VOLUME, lockData, callback,
+    _invoke(TTLockCommands.COMMAND_GET_LOCK_SOUND_WITH_SOUND_VOLUME, lockData, callback,
         fail: failedCallback);
   }
 
@@ -921,21 +927,21 @@ class TTLock {
   //   map[TTResponse.nbServerAddress] = nbServerAddress;
   //   map[TTResponse.nbServerPort] = nbServerPort;
   //   map[TTResponse.lockData] = lockData;
-  //   TTLockChannel.invoke(TTLockCommands.COMMAND_SET_NB_SERVER_INFO, map, callback, fail: failedCallback);
+  //   _invoke(TTLockCommands.COMMAND_SET_NB_SERVER_INFO, map, callback, fail: failedCallback);
   // }
 
   // static void getAdminPasscode(String lockData, TTGetAdminPasscodeCallback callback, TTFailedCallback failedCallback) {
-  //   TTLockChannel.invoke(TTLockCommands.COMMAND_GET_ADMIN_PASSCODE, lockData, callback,
+  //   _invoke(TTLockCommands.COMMAND_GET_ADMIN_PASSCODE, lockData, callback,
   //       fail: failedCallback);
   // }
   //
   // static void getLockSystemInfo(String lockData, TTGetLockSystemInfoCallback callback, TTFailedCallback failedCallback) {
-  //   TTLockChannel.invoke(TTLockCommands.COMMAND_GET_LOCK_SYSTEM_INFO, lockData, callback,
+  //   _invoke(TTLockCommands.COMMAND_GET_LOCK_SYSTEM_INFO, lockData, callback,
   //       fail: failedCallback);
   // }
   //
   // static void getPasscodeVerificationParams(String lockData, TTGetPasscodeVerificationParamsCallback callback, TTFailedCallback failedCallback) {
-  //   TTLockChannel.invoke(TTLockCommands.COMMAND_GET_PASSCODE_VERIFICATION_PARAMS, lockData, callback,
+  //   _invoke(TTLockCommands.COMMAND_GET_PASSCODE_VERIFICATION_PARAMS, lockData, callback,
   //       fail: failedCallback);
   // }
 
@@ -954,7 +960,7 @@ class TTLock {
     map[TTResponse.startDate] = startDate;
     map[TTResponse.endDate] = endDate;
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_ADD_LOCK_REMOTE_KEY, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_ADD_LOCK_REMOTE_KEY, map, callback, fail: failedCallback);
   }
 
   static void deleteRemoteKey(String remoteKeyMac, String lockData,
@@ -962,12 +968,12 @@ class TTLock {
     Map map = new Map();
     map[TTResponse.mac] = remoteKeyMac;
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_DELETE_LOCK_REMOTE_KEY, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_DELETE_LOCK_REMOTE_KEY, map, callback, fail: failedCallback);
   }
 
   static void clearRemoteKey(String lockData, TTSuccessCallback callback,
       TTFailedCallback failedCallback) {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_CLEAR_REMOTE_KEY, lockData, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_CLEAR_REMOTE_KEY, lockData, callback, fail: failedCallback);
   }
 
   static void setRemoteKeyValidDate(
@@ -985,7 +991,7 @@ class TTLock {
     map[TTResponse.startDate] = startDate;
     map[TTResponse.endDate] = endDate;
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_LOCK_REMOTE_KEY_VALID_DATE, map, callback,
+    _invoke(TTLockCommands.COMMAND_SET_LOCK_REMOTE_KEY_VALID_DATE, map, callback,
         fail: failedCallback);
   }
 
@@ -999,7 +1005,7 @@ class TTLock {
     map[TTResponse.remoteAccessory] = remoteAccessory.index;
     map[TTResponse.mac] = remoteAccessoryMac;
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_LOCK_REMOTE_ACCESSORY_ELECTRIC_QUANTITY, map, callback,
+    _invoke(TTLockCommands.COMMAND_GET_LOCK_REMOTE_ACCESSORY_ELECTRIC_QUANTITY, map, callback,
         fail: failedCallback);
   }
 
@@ -1008,12 +1014,12 @@ class TTLock {
     Map map = new Map();
     map[TTResponse.mac] = doorSensorMac;
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_ADD_LOCK_DOOR_SENSORY, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_ADD_LOCK_DOOR_SENSORY, map, callback, fail: failedCallback);
   }
 
   static void deleteDoorSensor(String lockData, TTSuccessCallback callback,
       TTFailedCallback failedCallback) {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_DELETE_LOCK_DOOR_SENSORY, lockData, callback,
+    _invoke(TTLockCommands.COMMAND_DELETE_LOCK_DOOR_SENSORY, lockData, callback,
         fail: failedCallback);
   }
 
@@ -1022,13 +1028,13 @@ class TTLock {
     Map map = new Map();
     map[TTResponse.alertTime] = alertTime;
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_LOCK_DOOR_SENSORY_ALERT_TIME, map, callback,
+    _invoke(TTLockCommands.COMMAND_SET_LOCK_DOOR_SENSORY_ALERT_TIME, map, callback,
         fail: failedCallback);
   }
 
   static void setLockEnterUpgradeMode(String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
-    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_LOCK_ENTER_UPGRADE_MODE, lockData, callback,
+    _invoke(TTLockCommands.COMMAND_SET_LOCK_ENTER_UPGRADE_MODE, lockData, callback,
         fail: failedCallback);
   }
 
@@ -1036,7 +1042,7 @@ class TTLock {
       TTFailedCallback failedCallback) {
     Map map = new Map();
     map[TTResponse.lockMac] = lockMac;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_VERIFY_LOCK, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_VERIFY_LOCK, map, callback, fail: failedCallback);
   }
 
   static void addFace(
@@ -1054,7 +1060,7 @@ class TTLock {
     if (cycleList != null && cycleList.length > 0) {
       map[TTResponse.cycleJsonList] = convert.jsonEncode(cycleList);
     }
-    TTLockChannel.invoke(TTLockCommands.COMMAND_ADD_FACE, map, callback,
+    _invoke(TTLockCommands.COMMAND_ADD_FACE, map, callback,
         progress: progressCallback, fail: failedCallback);
   }
 
@@ -1074,7 +1080,7 @@ class TTLock {
     if (cycleList != null && cycleList.length > 0) {
       map[TTResponse.cycleJsonList] = convert.jsonEncode(cycleList);
     }
-    TTLockChannel.invoke(TTLockCommands.COMMAND_ADD_FACE_DATA, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_ADD_FACE_DATA, map, callback, fail: failedCallback);
   }
 
   static void modifyFace(
@@ -1093,14 +1099,14 @@ class TTLock {
     if (cycleList != null && cycleList.length > 0) {
       map[TTResponse.cycleJsonList] = convert.jsonEncode(cycleList);
     }
-    TTLockChannel.invoke(TTLockCommands.COMMAND_MODIFY_FACE, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_MODIFY_FACE, map, callback, fail: failedCallback);
   }
 
   static void clearFace(String lockData, TTSuccessCallback callback,
       TTFailedCallback failedCallback) {
     Map map = Map();
     map[TTResponse.lockData] = lockData;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_CLEAR_FACE, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_CLEAR_FACE, map, callback, fail: failedCallback);
   }
 
   static void deleteFace(String faceNumber, String lockData,
@@ -1108,7 +1114,7 @@ class TTLock {
     Map map = Map();
     map[TTResponse.lockData] = lockData;
     map[TTResponse.faceNumber] = faceNumber;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_DELETE_FACE, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_DELETE_FACE, map, callback, fail: failedCallback);
   }
   
   static void setSensitivity(String lockData, TTSensitivityValue value, TTSuccessCallback callback,
@@ -1117,7 +1123,7 @@ class TTLock {
     Map map = new Map();
     map[TTResponse.lockData] = lockData;
     map[TTResponse.sensitivityValue] = value.value;
-    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_SENSITIVITY, map, callback, fail: failedCallback);
+    _invoke(TTLockCommands.COMMAND_SET_SENSITIVITY, map, callback, fail: failedCallback);
   }
 
 }

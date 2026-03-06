@@ -500,7 +500,7 @@ class _LockPageState extends State<LockPage> {
 
       case Command.setLockSoundVolumeType:
         TTLock.setLockSoundWithSoundVolume(
-            TTSoundVolumeType.fouthLevel, lockData, () {
+            TTSoundVolumeType.fourthLevel, lockData, () {
           _showSuccessAndDismiss("Success");
         }, (errorCode, errorMsg) {
           _showErrorAndDismiss(errorCode, errorMsg);
