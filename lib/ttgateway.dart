@@ -1,36 +1,28 @@
-import 'package:ttlock_premise_flutter/ttlock.dart';
-import 'package:ttlock_premise_flutter/ttlock_models.dart';
 import 'dart:convert' as convert;
 
+import 'package:ttlock_premise_flutter/src/ttlock_channel.dart';
+import 'package:ttlock_premise_flutter/src/ttgateway_commands.dart';
+import 'package:ttlock_premise_flutter/ttlock.dart';
+import 'package:ttlock_premise_flutter/ttlock_models.dart';
+
 class TTGateway {
-  static const String COMMAND_START_SCAN_GATEWAY = "startScanGateway";
-  static const String COMMAND_STOP_SCAN_GATEWAY = "stopScanGateway";
-  static const String COMMAND_CONNECT_GATEWAY = "connectGateway";
-  static const String COMMAND_DISCONNECT_GATEWAY = "disconnectGateway";
-  static const String COMMAND_GET_SURROUND_WIFI = "getSurroundWifi";
-  static const String COMMAND_INIT_GATEWAY = "initGateway";
-  static const String COMMAND_UPGRADE_GATEWAY = "upgradeGateway";
-
-  static const String COMMAND_CONFIG_IP = "gatewayConfigIp";
-  static const String COMMAND_CONFIG_APN = "gatewayConfigApn";
-
   static void startScan(TTGatewayScanCallback scanCallback) {
-    TTLock.invoke(COMMAND_START_SCAN_GATEWAY, null, scanCallback);
+    TTLockChannel.invoke(TTGatewayCommands.COMMAND_START_SCAN_GATEWAY, null, scanCallback);
   }
 
   static void stopScan() {
-    TTLock.invoke(COMMAND_STOP_SCAN_GATEWAY, null, null);
+    TTLockChannel.invoke(TTGatewayCommands.COMMAND_STOP_SCAN_GATEWAY, null, null);
   }
 
   static void connect(String mac, TTGatewayConnectCallback callback) {
     Map map = Map();
     map["mac"] = mac;
-    TTLock.invoke(COMMAND_CONNECT_GATEWAY, map, callback);
+    TTLockChannel.invoke(TTGatewayCommands.COMMAND_CONNECT_GATEWAY, map, callback);
   }
 
   static void getNearbyWifi(TTGatewayGetAroundWifiCallback callback,
       TTGatewayFailedCallback failedCallback) {
-    TTLock.invoke(COMMAND_GET_SURROUND_WIFI, null, callback,
+    TTLockChannel.invoke(TTGatewayCommands.COMMAND_GET_SURROUND_WIFI, null, callback,
         fail: failedCallback);
   }
 
@@ -48,7 +40,7 @@ class TTGateway {
     }
 
     map[TTResponse.addGatewayJsonStr] = convert.jsonEncode(map);
-    TTLock.invoke(COMMAND_INIT_GATEWAY, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTGatewayCommands.COMMAND_INIT_GATEWAY, map, callback, fail: failedCallback);
   }
 
   /// Initialize gateway with typed parameters.
@@ -59,7 +51,7 @@ class TTGateway {
   ) {
     final map = params.toMap();
     map[TTResponse.addGatewayJsonStr] = convert.jsonEncode(map);
-    TTLock.invoke(COMMAND_INIT_GATEWAY, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTGatewayCommands.COMMAND_INIT_GATEWAY, map, callback, fail: failedCallback);
   }
 
   ///[map] {"type":x, "ipAddress": "xxx", "subnetMask": xxx"", "router": "xxx", "preferredDns": "xxx", "alternateDns": "xxx"}
@@ -71,7 +63,7 @@ class TTGateway {
     TTGatewayFailedCallback failedCallback,
   ) {
     map[TTResponse.ipSettingJsonStr] = convert.jsonEncode(map);
-    TTLock.invoke(COMMAND_CONFIG_IP, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTGatewayCommands.COMMAND_CONFIG_IP, map, callback, fail: failedCallback);
   }
 
   /// Configure gateway IP with typed parameters.
@@ -82,26 +74,26 @@ class TTGateway {
   ) {
     final map = Map<String, dynamic>.from(ipSetting.toMap());
     map[TTResponse.ipSettingJsonStr] = convert.jsonEncode(ipSetting.toMap());
-    TTLock.invoke(COMMAND_CONFIG_IP, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTGatewayCommands.COMMAND_CONFIG_IP, map, callback, fail: failedCallback);
   }
 
   static void configApn(String mac, String apn, TTSuccessCallback callback, TTGatewayFailedCallback failedCallback) {
     Map map = Map();
     map["mac"] = mac;
     map["apn"] = apn;
-    TTLock.invoke(COMMAND_CONFIG_APN, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTGatewayCommands.COMMAND_CONFIG_APN, map, callback, fail: failedCallback);
   }
 
   static void setGatewayEnterUpgradeMode(String mac, TTSuccessCallback callback,
       TTGatewayFailedCallback failedCallback) {
     Map map = Map();
     map["mac"] = mac;
-    TTLock.invoke(COMMAND_UPGRADE_GATEWAY, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTGatewayCommands.COMMAND_UPGRADE_GATEWAY, map, callback, fail: failedCallback);
   }
 
   static void disconnect(String mac, TTSuccessCallback callback) {
     Map map = Map();
     map["mac"] = mac;
-    TTLock.invoke(COMMAND_DISCONNECT_GATEWAY, map, callback);
+    TTLockChannel.invoke(TTGatewayCommands.COMMAND_DISCONNECT_GATEWAY, map, callback);
   }
 }

@@ -1,16 +1,14 @@
+import 'package:ttlock_premise_flutter/src/ttlock_channel.dart';
+import 'package:ttlock_premise_flutter/src/ttremotekey_commands.dart';
 import 'package:ttlock_premise_flutter/ttlock.dart';
 
 class TTRemoteKey {
-  static const String COMMAND_START_SCAN_REMOTE_KEY = "startScanRemoteKey";
-  static const String COMMAND_STOP_SCAN_REMOTE_KEY = "stopScanRemoteKey";
-  static const String COMMAND_INIT_REMOTE_KEY = "initRemoteKey";
-
   static void startScan(TTRemoteAccessoryScanCallback scanCallback) {
-    TTLock.invoke(COMMAND_START_SCAN_REMOTE_KEY, null, scanCallback);
+    TTLockChannel.invoke(TTRemoteKeyCommands.COMMAND_START_SCAN_REMOTE_KEY, null, scanCallback);
   }
 
   static void stopScan() {
-    TTLock.invoke(COMMAND_STOP_SCAN_REMOTE_KEY, null, null);
+    TTLockChannel.invoke(TTRemoteKeyCommands.COMMAND_STOP_SCAN_REMOTE_KEY, null, null);
   }
 
   static void init(
@@ -22,6 +20,6 @@ class TTRemoteKey {
     Map map = Map();
     map[TTResponse.mac] = mac;
     map[TTResponse.lockData] = lockData;
-    TTLock.invoke(COMMAND_INIT_REMOTE_KEY, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTRemoteKeyCommands.COMMAND_INIT_REMOTE_KEY, map, callback, fail: failedCallback);
   }
 }

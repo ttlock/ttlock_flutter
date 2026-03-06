@@ -1,168 +1,27 @@
-import 'package:flutter/services.dart';
-import 'package:ttlock_premise_flutter/ttdoorSensor.dart';
-import 'package:ttlock_premise_flutter/ttremoteKey.dart';
-import 'package:ttlock_premise_flutter/ttremoteKeypad.dart';
 import 'dart:convert' as convert;
-import 'ttgateway.dart';
-import 'ttlock_models.dart';
+
+import 'package:ttlock_premise_flutter/src/ttlock_channel.dart';
+import 'package:ttlock_premise_flutter/src/ttlock_commands.dart';
+import 'package:ttlock_premise_flutter/src/tt_response.dart';
+import 'package:ttlock_premise_flutter/src/ttlock_types.dart';
+import 'package:ttlock_premise_flutter/ttlock_models.dart';
+
+export 'package:ttlock_premise_flutter/src/tt_response.dart';
+export 'package:ttlock_premise_flutter/src/ttlock_types.dart';
 
 class TTLock {
-  static bool isOnPremise = true;
+  static bool get isOnPremise => TTLockChannel.isOnPremise;
+  static set isOnPremise(bool v) => TTLockChannel.isOnPremise = v;
 
-  static MethodChannel _commandChannel =
-      MethodChannel("com.ttlock/command/ttlock");
-  static EventChannel _listenChannel = EventChannel("com.ttlock/listen/ttlock");
-
-  static const String CALLBACK_SUCCESS = "callback_success";
-  static const String CALLBACK_PROGRESS = "callback_progress";
-  static const String CALLBACK_FAIL = "callback_fail";
-  static const String CALLBACK_OTHER_FAIL = "callback_other_fail";
-
-  static const String COMMAND_START_SCAN_LOCK = "startScanLock";
-  static const String COMMAND_STOP_SCAN_LOCK = "stopScanLock";
-  static const String COMMAND_GET_BLUETOOTH_STATE = "getBluetoothState";
-  static const String COMMAND_INIT_LOCK = "initLock";
-  static const String COMMAND_RESET_LOCK = "resetLock";
-
-  static const String COMMAND_CONTROL_LOCK = "controlLock";
-  static const String COMMAND_RESET_EKEY = "resetEkey";
-  static const String COMMAND_CREATE_CUSTOM_PASSCODE = "createCustomPasscode";
-  static const String COMMAND_MODIFY_PASSCODE = "modifyPasscode";
-  static const String COMMAND_DELETE_PASSCODE = "deletePasscode";
-  static const String COMMAND_RESET_PASSCODE = "resetPasscodes";
-  static const String COMMAND_GET_ALL_VALID_PASSCODE = "getAllValidPasscode";
-  static const String COMMAND_MODIFY_ADMIN_PASSCODE = "modifyAdminPasscode";
-  static const String COMMAND_GET_ADMIN_PASSCODE =
-      "getAdminPasscodeWithLockData";
-  static const String COMMAND_SET_ADMIN_ERASE_PASSCODE =
-      "setAdminErasePasscode";
-
-  static const String COMMAND_GET_PASSCODE_VERIFICATION_PARAMS =
-      "getPasscodeVerificationParamsWithLockData";
-  static const String COMMAND_RECOVER_PASSCODE =
-      "recoverPasscodeWithPasswordType";
-
-  static const String COMMAND_ADD_CARD = "addCard";
-  static const String COMMAND_MODIFY_CARD = "modifyIcCard";
-  static const String COMMAND_DELETE_CARD = "deleteIcCard";
-  static const String COMMAND_CLEAR_ALL_CARD = "clearAllIcCard";
-  static const String COMMAND_GET_ALL_VALID_CARD = "getAllValidIcCard";
-  static const String COMMAND_RECOVER_CARD = "recoverCardWithCardType";
-  static const String COMMAND_REPORT_LOSS_CARD = "reportLossCard";
-
-  static const String COMMAND_ADD_FINGERPRINT = "addFingerprint";
-  static const String COMMAND_MODIFY_FINGERPRINT = "modifyFingerprint";
-  static const String COMMAND_DELETE_FINGERPRINT = "deleteFingerprint";
-  static const String COMMAND_CLEAR_ALL_FINGERPRINT = "clearAllFingerprint";
-  static const String COMMAND_GET_ALL_VALID_FINGERPRINT =
-      "getAllValidFingerprint";
-
-  static const String COMMAND_SET_LOCK_TIME = "setLockTime";
-  static const String COMMAND_GET_LOCK_TIME = "getLockTime";
-  static const String COMMAND_GET_LOCK_OPERATE_RECORD = "getLockOperateRecord";
-  static const String COMMAND_GET_LOCK_POWER = "getLockPower";
-  static const String COMMAND_GET_LOCK_SWITCH_STATE = "getLockSwitchState";
-  static const String COMMAND_GET_LOCK_SYSTEM_INFO =
-      "getLockSystemInfoWithLockData";
-  static const String COMMAND_GET_LOCK_FRETURE_VALUE = "getLockFreatureValue";
-
-  static const String COMMAND_GET_AUTOMATIC_LOCK_PERIODIC_TIME =
-      "getLockAutomaticLockingPeriodicTime";
-  static const String COMMAND_SET_AUTOMATIC_LOCK_PERIODIC_TIME =
-      "setLockAutomaticLockingPeriodicTime";
-
-  static const String COMMAND_GET_LOCK_REMOTE_UNLOCK_SWITCH_STATE =
-      "getLockRemoteUnlockSwitchState";
-  static const String COMMAND_SET_LOCK_REMOTE_UNLOCK_SWITCH_STATE =
-      "setLockRemoteUnlockSwitchState";
-
-  static const String COMMAND_GET_LOCK_CONFIG = "getLockConfig";
-  static const String COMMAND_SET_LOCK_CONFIG = "setLockConfig";
-
-  static const String COMMAND_ADD_PASSAGE_MODE = "addPassageMode";
-  static const String COMMAND_CLEAR_ALL_PASSAGE_MODE = "clearAllPassageModes";
-  static const String COMMAND_FUNCTION_SUPPORT = "functionSupport";
-
-  static const String COMMAND_ACTIVE_LIFT_FLOORS = "activateLiftFloors";
-
-  static const String COMMAND_SET_LIFT_CONTROLABLE_FLOORS =
-      "setLiftControlableFloors";
-  static const String COMMAND_SET_LIFT_WORK_MODE = "setLiftWorkMode";
-
-  static const String COMMAND_SET_POWSER_SAVER_WORK_MODE =
-      "setPowerSaverWorkMode";
-  static const String COMMAND_SET_POWSER_SAVER_CONTROLABLE =
-      "setPowerSaverControlable";
-
-  static const String COMMAND_SET_NB_ADDRESS = "setNBServerAddress";
-  static const String COMMAND_SET_NB_AWAKE_MODES = "setNBAwakeModes";
-  static const String COMMAND_GET_NB_AWAKE_MODES = "getNBAwakeModes";
-  static const String COMMAND_SET_NB_AWAKE_TIMES = "setNBAwakeTimes";
-  static const String COMMAND_GET_NB_AWAKE_TIMES = "getNBAwakeTimes";
-
-  static const String COMMAND_SET_DOOR_SENSOR_SWITCH = "setDoorSensorSwitch";
-  static const String COMMAND_GET_DOOR_SENSOR_SWITCH = "getDoorSensorSwitch";
-  static const String COMMAND_GET_DOOR_SENSOR_STATE = "getDoorSensorState";
-
-  static const String COMMAND_SET_HOTEL_CARD_SECTOR = "setHotelCardSector";
-  static const String COMMAND_SET_HOTEL_INFO = "setHotelInfo";
-
-  static const String COMMAND_GET_LOCK_VERSION = "getLockVersion";
-
-  static const String COMMAND_SCAN_WIFI = "scanWifi";
-  static const String COMMAND_CONFIG_WIFI = "configWifi";
-  static const String COMMAND_CONFIG_SERVER = "configServer";
-  static const String COMMAND_GET_WIFI_INFO = "getWifiInfo";
-  static const String COMMAND_CONFIG_IP = "configIp";
-  static const String COMMAND_CONFIG_CAMERA_LOCK_WIFI = "configCameraLockWifi";
-
-  static const String COMMAND_SET_LOCK_SOUND_WITH_SOUND_VOLUME =
-      "setLockSoundWithSoundVolume";
-  static const String COMMAND_GET_LOCK_SOUND_WITH_SOUND_VOLUME =
-      "getLockSoundWithSoundVolume";
-
-  static const String COMMAND_SET_LOCK_ENTER_UPGRADE_MODE =
-      "setLockEnterUpgradeMode";
-
-  static const String COMMAND_ADD_LOCK_REMOTE_KEY = "lockAddRemoteKey";
-  static const String COMMAND_DELETE_LOCK_REMOTE_KEY = "lockDeleteRemoteKey";
-  static const String COMMAND_SET_LOCK_REMOTE_KEY_VALID_DATE =
-      "lockModifyRemoteKeyValidDate";
-  static const String COMMAND_CLEAR_REMOTE_KEY = "clearRemoteKey";
-  static const String COMMAND_GET_LOCK_REMOTE_ACCESSORY_ELECTRIC_QUANTITY =
-      "lockGetRemoteAccessoryElectricQuantity";
-
-  static const String COMMAND_ADD_LOCK_DOOR_SENSORY = "lockAddDoorSensor";
-  static const String COMMAND_DELETE_LOCK_DOOR_SENSORY = "lockDeleteDoorSensor";
-  static const String COMMAND_SET_LOCK_DOOR_SENSORY_ALERT_TIME =
-      "lockSetDoorSensorAlertTime";
-
-  static const String COMMAND_GET_LOCK_DIRECTION = "getLockDirection";
-  static const String COMMAND_SET_LOCK_DIRECTION = "setLockDirection";
-  static const String COMMAND_RESET_LOCK_BY_CODE = "resetLockByCode";
-
-  static const String COMMAND_VERIFY_LOCK = "verifyLock";
-
-  static const String COMMAND_ADD_FACE = "faceAdd";
-  static const String COMMAND_ADD_FACE_DATA = "faceDataAdd";
-  static const String COMMAND_MODIFY_FACE = "faceModify";
-  static const String COMMAND_DELETE_FACE = "faceDelete";
-  static const String COMMAND_CLEAR_FACE = "faceClear";
-
-  static const String COMMAND_SET_SENSITIVITY = "setSensitivity";
-
-  // static const String COMMAND_GET_PASSCODE_VERIFICATION_PARAMS = "getPasscodeVerificationParams";
-
-  static List _commandQueue = [];
-
-  static bool printLog = true;
+  static bool get printLog => TTLockChannel.printLog;
+  static set printLog(bool v) => TTLockChannel.printLog = v;
 
   // ignore: slash_for_doc_comments
 /**
    * Scan the smart lock being broadcast
    */
   static void startScanLock(TTLockScanCallback scanCallback) {
-    invoke(COMMAND_START_SCAN_LOCK, null, scanCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_START_SCAN_LOCK, null, scanCallback);
   }
 
   // ignore: slash_for_doc_comments
@@ -170,7 +29,7 @@ class TTLock {
    * Stop scan the smart lock being broadcast
    */
   static void stopScanLock() {
-    invoke(COMMAND_STOP_SCAN_LOCK, null, null);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_STOP_SCAN_LOCK, null, null);
   }
 
   // ignore: slash_for_doc_comments
@@ -178,7 +37,7 @@ class TTLock {
    * Current Phone/Pad Bluetooth state
    */
   static void getBluetoothState(TTBluetoothStateCallback stateCallback) {
-    invoke(COMMAND_GET_BLUETOOTH_STATE, null, stateCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_BLUETOOTH_STATE, null, stateCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -189,13 +48,13 @@ class TTLock {
   @Deprecated('Use initLockWithParams(TTLockInitParams params, ...) instead')
   static void initLock(
       Map map, TTLockDataCallback callback, TTFailedCallback failedCallback) {
-    invoke(COMMAND_INIT_LOCK, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_INIT_LOCK, map, callback, fail: failedCallback);
   }
 
   /// Initialize the lock with typed parameters.
   static void initLockWithParams(
       TTLockInitParams params, TTLockDataCallback callback, TTFailedCallback failedCallback) {
-    invoke(COMMAND_INIT_LOCK, params.toMap(), callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_INIT_LOCK, params.toMap(), callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -204,7 +63,7 @@ class TTLock {
  */
   static void resetLock(String lockData, TTSuccessCallback callback,
       TTFailedCallback failedCallback) {
-    invoke(COMMAND_RESET_LOCK, lockData, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_RESET_LOCK, lockData, callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -213,7 +72,7 @@ class TTLock {
  */
   static void resetEkey(String lockData, TTLockDataCallback callback,
       TTFailedCallback failedCallback) {
-    invoke(COMMAND_RESET_EKEY, lockData, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_RESET_EKEY, lockData, callback, fail: failedCallback);
   }
 
   // ignore: slash_for_doc_comments
@@ -225,7 +84,7 @@ class TTLock {
     Map map = Map();
     map[TTResponse.lockData] = lockData;
     map[TTResponse.supportFunction] = fuction.value;
-    invoke(COMMAND_FUNCTION_SUPPORT, map, callback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_FUNCTION_SUPPORT, map, callback);
   }
 
 // ignore: slash_for_doc_comments
@@ -237,7 +96,7 @@ class TTLock {
     Map map = Map();
     map[TTResponse.lockData] = lockData;
     map[TTResponse.controlAction] = controlAction.index;
-    invoke(COMMAND_CONTROL_LOCK, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_CONTROL_LOCK, map, callback, fail: failedCallback);
   }
 
   // ignore: slash_for_doc_comments
@@ -263,7 +122,7 @@ class TTLock {
     map[TTResponse.startDate] = startDate;
     map[TTResponse.endDate] = endDate;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_CREATE_CUSTOM_PASSCODE, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_CREATE_CUSTOM_PASSCODE, map, callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -289,7 +148,7 @@ class TTLock {
     map[TTResponse.startDate] = startDate;
     map[TTResponse.endDate] = endDate;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_MODIFY_PASSCODE, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_MODIFY_PASSCODE, map, callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -304,7 +163,7 @@ class TTLock {
     Map map = Map();
     map[TTResponse.passcode] = passcode;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_DELETE_PASSCODE, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_DELETE_PASSCODE, map, callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -313,7 +172,7 @@ class TTLock {
  */
   static void resetPasscode(String lockData, TTLockDataCallback callback,
       TTFailedCallback failedCallback) {
-    invoke(COMMAND_RESET_PASSCODE, lockData, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_RESET_PASSCODE, lockData, callback, fail: failedCallback);
   }
 
   // ignore: slash_for_doc_comments
@@ -324,7 +183,7 @@ class TTLock {
  */
   static void getAdminPasscode(String lockData,
       TTGetAdminPasscodeCallback callback, TTFailedCallback failedCallback) {
-    invoke(COMMAND_GET_ADMIN_PASSCODE, lockData, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_ADMIN_PASSCODE, lockData, callback,
         fail: failedCallback);
   }
 
@@ -333,13 +192,13 @@ class TTLock {
     Map map = new Map();
     map[TTResponse.erasePasscode] = erasePasscode;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_SET_ADMIN_ERASE_PASSCODE, map, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_ADMIN_ERASE_PASSCODE, map, callback,
         fail: failedCallback);
   }
 
   static void getAllValidPasscode(String lockData,
       TTGetAllPasscodeCallback callback, TTFailedCallback failedCallback) {
-    invoke(COMMAND_GET_ALL_VALID_PASSCODE, lockData, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_ALL_VALID_PASSCODE, lockData, callback,
         fail: failedCallback);
   }
 
@@ -361,7 +220,7 @@ class TTLock {
     map[TTResponse.lockData] = lockData;
     map[TTResponse.startDate] = startDate;
     map[TTResponse.endDate] = endDate;
-    invoke(COMMAND_RECOVER_PASSCODE, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_RECOVER_PASSCODE, map, callback, fail: failedCallback);
   }
 
   // ignore: slash_for_doc_comments
@@ -372,7 +231,7 @@ class TTLock {
  */
   static void getLockSwitchState(String lockData,
       TTGetLockStatusCallback callback, TTFailedCallback failedCallback) {
-    invoke(COMMAND_GET_LOCK_SWITCH_STATE, lockData, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_LOCK_SWITCH_STATE, lockData, callback,
         fail: failedCallback);
   }
 
@@ -400,7 +259,7 @@ class TTLock {
     if (cycleList != null && cycleList.length > 0) {
       map[TTResponse.cycleJsonList] = convert.jsonEncode(cycleList);
     }
-    invoke(COMMAND_ADD_CARD, map, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_ADD_CARD, map, callback,
         progress: progressCallback, fail: failedCallback);
   }
 
@@ -430,7 +289,7 @@ class TTLock {
     if (cycleList != null && cycleList.length > 0) {
       map[TTResponse.cycleJsonList] = convert.jsonEncode(cycleList);
     }
-    invoke(COMMAND_MODIFY_CARD, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_MODIFY_CARD, map, callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -445,7 +304,7 @@ class TTLock {
     Map map = Map();
     map[TTResponse.cardNumber] = cardNumber;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_DELETE_CARD, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_DELETE_CARD, map, callback, fail: failedCallback);
   }
 
   // ignore: slash_for_doc_comments
@@ -456,7 +315,7 @@ class TTLock {
  */
   static void getAllValidCards(String lockData, TTGetAllCardsCallback callback,
       TTFailedCallback failedCallback) {
-    invoke(COMMAND_GET_ALL_VALID_CARD, lockData, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_ALL_VALID_CARD, lockData, callback,
         fail: failedCallback);
   }
 
@@ -468,7 +327,7 @@ class TTLock {
  */
   static void clearAllCards(String lockData, TTSuccessCallback callback,
       TTFailedCallback failedCallback) {
-    invoke(COMMAND_CLEAR_ALL_CARD, lockData, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_CLEAR_ALL_CARD, lockData, callback, fail: failedCallback);
   }
 
   static void recoverCard(
@@ -483,7 +342,7 @@ class TTLock {
     map[TTResponse.lockData] = lockData;
     map[TTResponse.startDate] = startDate;
     map[TTResponse.endDate] = endDate;
-    invoke(COMMAND_RECOVER_CARD, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_RECOVER_CARD, map, callback, fail: failedCallback);
   }
 
   // static void reportLossCard(String cardNumber, String lockData,
@@ -491,7 +350,7 @@ class TTLock {
   //   Map map = Map();
   //   map[TTResponse.cardNumber] = cardNumber;
   //   map[TTResponse.lockData] = lockData;
-  //   invoke(COMMAND_REPORT_LOSS_CARD, map, callback, fail: failedCallback);
+  //   TTLockChannel.invoke(TTLockCommands.COMMAND_REPORT_LOSS_CARD, map, callback, fail: failedCallback);
   // }
 
 // ignore: slash_for_doc_comments
@@ -518,7 +377,7 @@ class TTLock {
     if (cycleList != null && cycleList.length > 0) {
       map[TTResponse.cycleJsonList] = convert.jsonEncode(cycleList);
     }
-    invoke(COMMAND_ADD_FINGERPRINT, map, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_ADD_FINGERPRINT, map, callback,
         progress: progressCallback, fail: failedCallback);
   }
 
@@ -548,7 +407,7 @@ class TTLock {
     if (cycleList != null && cycleList.length > 0) {
       map[TTResponse.cycleJsonList] = convert.jsonEncode(cycleList);
     }
-    invoke(COMMAND_MODIFY_FINGERPRINT, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_MODIFY_FINGERPRINT, map, callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -563,7 +422,7 @@ class TTLock {
     Map map = Map();
     map[TTResponse.fingerprintNumber] = fingerprintNumber;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_DELETE_FINGERPRINT, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_DELETE_FINGERPRINT, map, callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -574,7 +433,7 @@ class TTLock {
  */
   static void clearAllFingerprints(String lockData, TTSuccessCallback callback,
       TTFailedCallback failedCallback) {
-    invoke(COMMAND_CLEAR_ALL_FINGERPRINT, lockData, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_CLEAR_ALL_FINGERPRINT, lockData, callback,
         fail: failedCallback);
   }
 
@@ -586,13 +445,13 @@ class TTLock {
  */
   static void getAllValidFingerprints(String lockData,
       TTGetAllFingerprintsCallback callback, TTFailedCallback failedCallback) {
-    invoke(COMMAND_GET_ALL_VALID_FINGERPRINT, lockData, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_ALL_VALID_FINGERPRINT, lockData, callback,
         fail: failedCallback);
   }
 
   // static void getPasscodeVerificationParams(String lockData,
   //     TTLockDataCallback callback, TTFailedCallback failedCallback) {
-  //   invoke(COMMAND_GET_PASSCODE_VERIFICATION_PARAMS, lockData, callback,
+  //   TTLockChannel.invoke(TTLockCommands.COMMAND_GET_PASSCODE_VERIFICATION_PARAMS, lockData, callback,
   //       fail: failedCallback);
   // }
 
@@ -608,7 +467,7 @@ class TTLock {
     Map map = Map();
     map[TTResponse.adminPasscode] = adminPasscode;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_MODIFY_ADMIN_PASSCODE, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_MODIFY_ADMIN_PASSCODE, map, callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -623,7 +482,7 @@ class TTLock {
     Map map = Map();
     map[TTResponse.timestamp] = timestamp;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_SET_LOCK_TIME, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_LOCK_TIME, map, callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -634,7 +493,7 @@ class TTLock {
  */
   static void getLockTime(String lockData, TTGetLockTimeCallback callback,
       TTFailedCallback failedCallback) {
-    invoke(COMMAND_GET_LOCK_TIME, lockData, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_LOCK_TIME, lockData, callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -654,7 +513,7 @@ class TTLock {
     Map map = Map();
     map["logType"] = type.index;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_GET_LOCK_OPERATE_RECORD, map, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_LOCK_OPERATE_RECORD, map, callback,
         fail: failedCallback);
   }
 
@@ -668,18 +527,18 @@ class TTLock {
       String lockData,
       TTGetLockElectricQuantityCallback callback,
       TTFailedCallback failedCallback) {
-    invoke(COMMAND_GET_LOCK_POWER, lockData, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_LOCK_POWER, lockData, callback, fail: failedCallback);
   }
 
   static void getLockSystemInfo(String lockData,
       TTGetLockSystemCallback callback, TTFailedCallback failedCallback) {
-    invoke(COMMAND_GET_LOCK_SYSTEM_INFO, lockData, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_LOCK_SYSTEM_INFO, lockData, callback,
         fail: failedCallback);
   }
 
   static void getLockFeatureValue(String lockData, TTLockDataCallback callback,
       TTFailedCallback failedCallback) {
-    invoke(COMMAND_GET_LOCK_FRETURE_VALUE, lockData, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_LOCK_FRETURE_VALUE, lockData, callback,
         fail: failedCallback);
   }
 
@@ -693,7 +552,7 @@ class TTLock {
       String lockData,
       TTGetLockAutomaticLockingPeriodicTimeCallback callback,
       TTFailedCallback failedCallback) {
-    invoke(COMMAND_GET_AUTOMATIC_LOCK_PERIODIC_TIME, lockData, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_AUTOMATIC_LOCK_PERIODIC_TIME, lockData, callback,
         fail: failedCallback);
   }
 
@@ -709,7 +568,7 @@ class TTLock {
     Map map = Map();
     map[TTResponse.currentTime] = time;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_SET_AUTOMATIC_LOCK_PERIODIC_TIME, map, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_AUTOMATIC_LOCK_PERIODIC_TIME, map, callback,
         fail: failedCallback);
   }
 
@@ -721,7 +580,7 @@ class TTLock {
  */
   static void getLockRemoteUnlockSwitchState(String lockData,
       TTGetSwitchStateCallback callback, TTFailedCallback failedCallback) {
-    invoke(COMMAND_GET_LOCK_REMOTE_UNLOCK_SWITCH_STATE, lockData, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_LOCK_REMOTE_UNLOCK_SWITCH_STATE, lockData, callback,
         fail: failedCallback);
   }
 
@@ -736,7 +595,7 @@ class TTLock {
     Map map = Map();
     map[TTResponse.isOn] = isOn;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_SET_LOCK_REMOTE_UNLOCK_SWITCH_STATE, map, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_LOCK_REMOTE_UNLOCK_SWITCH_STATE, map, callback,
         fail: failedCallback);
   }
 
@@ -745,7 +604,7 @@ class TTLock {
     Map map = Map();
     map[TTResponse.lockData] = lockData;
     map[TTResponse.lockConfig] = config.index;
-    invoke(COMMAND_GET_LOCK_CONFIG, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_LOCK_CONFIG, map, callback, fail: failedCallback);
   }
 
   static void setLockConfig(TTLockConfig config, bool isOn, String lockData,
@@ -754,7 +613,7 @@ class TTLock {
     map[TTResponse.isOn] = isOn;
     map[TTResponse.lockData] = lockData;
     map[TTResponse.lockConfig] = config.index;
-    invoke(COMMAND_SET_LOCK_CONFIG, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_LOCK_CONFIG, map, callback, fail: failedCallback);
   }
 
   static void setLockDirection(TTLockDirection direction, String lockData,
@@ -762,12 +621,12 @@ class TTLock {
     Map map = Map();
     map[TTResponse.lockData] = lockData;
     map[TTResponse.direction] = direction.index;
-    invoke(COMMAND_SET_LOCK_DIRECTION, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_LOCK_DIRECTION, map, callback, fail: failedCallback);
   }
 
   static void getLockDirection(String lockData,
       TTGetLockDirectionCallback callback, TTFailedCallback failedCallback) {
-    invoke(COMMAND_GET_LOCK_DIRECTION, lockData, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_LOCK_DIRECTION, lockData, callback,
         fail: failedCallback);
   }
 
@@ -776,7 +635,7 @@ class TTLock {
     Map map = Map();
     map[TTResponse.lockMac] = lockMac;
     map[TTResponse.resetCode] = resetCode;
-    invoke(COMMAND_RESET_LOCK_BY_CODE, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_RESET_LOCK_BY_CODE, map, callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -809,7 +668,7 @@ class TTLock {
     } else {
       map[TTResponse.monthly] = monthly;
     }
-    invoke(COMMAND_ADD_PASSAGE_MODE, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_ADD_PASSAGE_MODE, map, callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -820,7 +679,7 @@ class TTLock {
  */
   static void clearAllPassageModes(String lockData, TTSuccessCallback callback,
       TTFailedCallback failedCallback) {
-    invoke(COMMAND_CLEAR_ALL_PASSAGE_MODE, lockData, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_CLEAR_ALL_PASSAGE_MODE, lockData, callback,
         fail: failedCallback);
   }
 
@@ -829,7 +688,7 @@ class TTLock {
     Map map = Map();
     map["floors"] = floors;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_ACTIVE_LIFT_FLOORS, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_ACTIVE_LIFT_FLOORS, map, callback, fail: failedCallback);
   }
 
   static void setLiftControlable(String floors, String lockData,
@@ -837,7 +696,7 @@ class TTLock {
     Map map = Map();
     map["floors"] = floors;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_SET_LIFT_CONTROLABLE_FLOORS, map, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_LIFT_CONTROLABLE_FLOORS, map, callback,
         fail: failedCallback);
   }
 
@@ -846,7 +705,7 @@ class TTLock {
     Map map = Map();
     map["liftWorkActiveType"] = type.index;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_SET_LIFT_WORK_MODE, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_LIFT_WORK_MODE, map, callback, fail: failedCallback);
   }
 
   static void setPowerSaverWorkMode(TTPowerSaverWorkType type, String lockData,
@@ -854,7 +713,7 @@ class TTLock {
     Map map = Map();
     map["powerSaverType"] = type.index;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_SET_POWSER_SAVER_WORK_MODE, map, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_POWSER_SAVER_WORK_MODE, map, callback,
         fail: failedCallback);
   }
 
@@ -863,7 +722,7 @@ class TTLock {
     Map map = Map();
     map[TTResponse.lockMac] = lockMac;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_SET_POWSER_SAVER_CONTROLABLE, map, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_POWSER_SAVER_CONTROLABLE, map, callback,
         fail: failedCallback);
   }
 
@@ -877,7 +736,7 @@ class TTLock {
   //   map[TTResponse.ip] = ip;
   //   map[TTResponse.port] = port;
   //   map[TTResponse.lockData] = lockData;
-  //   invoke(COMMAND_SET_NB_ADDRESS, map, callback, fail: failedCallback);
+  //   TTLockChannel.invoke(TTLockCommands.COMMAND_SET_NB_ADDRESS, map, callback, fail: failedCallback);
   // }
 
   // static void setNbAwakeModes(List<TTNbAwakeMode> modes, String lockData,
@@ -890,12 +749,12 @@ class TTLock {
   //   Map map = Map();
   //   map[TTResponse.nbAwakeModes] = list;
   //   map[TTResponse.lockData] = lockData;
-  //   invoke(COMMAND_SET_NB_AWAKE_MODES, map, callback, fail: failedCallback);
+  //   TTLockChannel.invoke(TTLockCommands.COMMAND_SET_NB_AWAKE_MODES, map, callback, fail: failedCallback);
   // }
 
   // static void getNbAwakeModes(String lockData,
   //     TTGetNbAwakeModesCallback callback, TTFailedCallback failedCallback) {
-  //   invoke(COMMAND_GET_NB_AWAKE_MODES, lockData, callback,
+  //   TTLockChannel.invoke(TTLockCommands.COMMAND_GET_NB_AWAKE_MODES, lockData, callback,
   //       fail: failedCallback);
   // }
 
@@ -912,12 +771,12 @@ class TTLock {
   //   Map map = Map();
   //   map[TTResponse.nbAwakeTimeList] = list;
   //   map[TTResponse.lockData] = lockData;
-  //   invoke(COMMAND_SET_NB_AWAKE_TIMES, map, callback, fail: failedCallback);
+  //   TTLockChannel.invoke(TTLockCommands.COMMAND_SET_NB_AWAKE_TIMES, map, callback, fail: failedCallback);
   // }
 
   // static void getNBAwakeTimes(String lockData,
   //     TTGetNbAwakeTimesCallback callback, TTFailedCallback failedCallback) {
-  //   invoke(COMMAND_GET_NB_AWAKE_TIMES, lockData, callback,
+  //   TTLockChannel.invoke(TTLockCommands.COMMAND_GET_NB_AWAKE_TIMES, lockData, callback,
   //       fail: failedCallback);
   // }
 
@@ -926,12 +785,12 @@ class TTLock {
   //   Map map = Map();
   //   map[TTResponse.isOn] = isOn;
   //   map[TTResponse.lockData] = lockData;
-  //   invoke(COMMAND_SET_DOOR_SENSOR_SWITCH, map, callback, fail: failedCallback);
+  //   TTLockChannel.invoke(TTLockCommands.COMMAND_SET_DOOR_SENSOR_SWITCH, map, callback, fail: failedCallback);
   // }
 
   // static void getDoorSensorLockingSwitchState(String lockData,
   //     TTGetSwitchStateCallback callback, TTFailedCallback failedCallback) {
-  //   invoke(COMMAND_GET_DOOR_SENSOR_SWITCH, lockData, callback,
+  //   TTLockChannel.invoke(TTLockCommands.COMMAND_GET_DOOR_SENSOR_SWITCH, lockData, callback,
   //       fail: failedCallback);
   // }
 
@@ -947,7 +806,7 @@ class TTLock {
     map[TTResponse.buildingNumber] = buildingNumber;
     map[TTResponse.floorNumber] = floorNumber;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_SET_HOTEL_INFO, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_HOTEL_INFO, map, callback, fail: failedCallback);
   }
 
   static void setHotelCardSector(String sector, String lockData,
@@ -955,12 +814,12 @@ class TTLock {
     Map map = Map();
     map[TTResponse.sector] = sector;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_SET_HOTEL_CARD_SECTOR, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_HOTEL_CARD_SECTOR, map, callback, fail: failedCallback);
   }
 
   // static void getDoorSensorState(String lockData,
   //     TTGetSwitchStateCallback callback, TTFailedCallback failedCallback) {
-  //   invoke(COMMAND_GET_DOOR_SENSOR_STATE, lockData, callback,
+  //   TTLockChannel.invoke(TTLockCommands.COMMAND_GET_DOOR_SENSOR_STATE, lockData, callback,
   //       fail: failedCallback);
   // }
 
@@ -968,12 +827,12 @@ class TTLock {
       TTFailedCallback failedCallback) {
     Map map = Map();
     map[TTResponse.lockMac] = lockMac;
-    invoke(COMMAND_GET_LOCK_VERSION, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_LOCK_VERSION, map, callback, fail: failedCallback);
   }
 
   static void scanWifi(String lockData, TTWifiLockScanWifiCallback callback,
       TTFailedCallback failedCallback) {
-    invoke(COMMAND_SCAN_WIFI, lockData, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_SCAN_WIFI, lockData, callback, fail: failedCallback);
   }
 
   static void configWifi(String wifiName, String wifiPassword, String lockData,
@@ -982,7 +841,7 @@ class TTLock {
     map[TTResponse.wifiName] = wifiName;
     map[TTResponse.wifiPassword] = wifiPassword;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_CONFIG_WIFI, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_CONFIG_WIFI, map, callback, fail: failedCallback);
   }
 
   static void configServer(String ip, String port, String lockData,
@@ -991,12 +850,12 @@ class TTLock {
     map[TTResponse.ip] = ip;
     map[TTResponse.port] = port;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_CONFIG_SERVER, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_CONFIG_SERVER, map, callback, fail: failedCallback);
   }
 
   static void getWifiInfo(String lockData,
       TTWifiLockGetWifiInfoCallback callback, TTFailedCallback failedCallback) {
-    invoke(COMMAND_GET_WIFI_INFO, lockData, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_WIFI_INFO, lockData, callback, fail: failedCallback);
   }
 
   @Deprecated('Use configIpWithParams(TTIpSetting ipSetting, String lockData, ...) instead')
@@ -1008,7 +867,7 @@ class TTLock {
   ) {
     map[TTResponse.lockData] = lockData;
     map[TTResponse.ipSettingJsonStr] = convert.jsonEncode(map);
-    TTLock.invoke(COMMAND_CONFIG_IP, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_CONFIG_IP, map, callback, fail: failedCallback);
   }
 
   /// Configure lock IP with typed parameters.
@@ -1021,7 +880,7 @@ class TTLock {
     final map = Map<String, dynamic>.from(ipSetting.toMap());
     map[TTResponse.lockData] = lockData;
     map[TTResponse.ipSettingJsonStr] = convert.jsonEncode(ipSetting.toMap());
-    TTLock.invoke(COMMAND_CONFIG_IP, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_CONFIG_IP, map, callback, fail: failedCallback);
   }
 
   static void configCameraLockWifi(
@@ -1033,7 +892,7 @@ class TTLock {
     map[TTResponse.wifiName] = wifiName;
     map[TTResponse.wifiPassword] = wifiPassword;
     map[TTResponse.lockData] = lockData;
-    TTLock.invoke(COMMAND_CONFIG_CAMERA_LOCK_WIFI, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_CONFIG_CAMERA_LOCK_WIFI, map, callback, fail: failedCallback);
   }
 
   static void setLockSoundWithSoundVolume(
@@ -1044,7 +903,7 @@ class TTLock {
     Map map = Map();
     map["soundVolumeType"] = type.index;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_SET_LOCK_SOUND_WITH_SOUND_VOLUME, map, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_LOCK_SOUND_WITH_SOUND_VOLUME, map, callback,
         fail: failedCallback);
   }
 
@@ -1052,7 +911,7 @@ class TTLock {
       String lockData,
       TTGetLockSoundWithSoundVolumeCallback callback,
       TTFailedCallback failedCallback) {
-    invoke(COMMAND_GET_LOCK_SOUND_WITH_SOUND_VOLUME, lockData, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_LOCK_SOUND_WITH_SOUND_VOLUME, lockData, callback,
         fail: failedCallback);
   }
 
@@ -1062,21 +921,21 @@ class TTLock {
   //   map[TTResponse.nbServerAddress] = nbServerAddress;
   //   map[TTResponse.nbServerPort] = nbServerPort;
   //   map[TTResponse.lockData] = lockData;
-  //   invoke(COMMAND_SET_NB_SERVER_INFO, map, callback, fail: failedCallback);
+  //   TTLockChannel.invoke(TTLockCommands.COMMAND_SET_NB_SERVER_INFO, map, callback, fail: failedCallback);
   // }
 
   // static void getAdminPasscode(String lockData, TTGetAdminPasscodeCallback callback, TTFailedCallback failedCallback) {
-  //   invoke(COMMAND_GET_ADMIN_PASSCODE, lockData, callback,
+  //   TTLockChannel.invoke(TTLockCommands.COMMAND_GET_ADMIN_PASSCODE, lockData, callback,
   //       fail: failedCallback);
   // }
   //
   // static void getLockSystemInfo(String lockData, TTGetLockSystemInfoCallback callback, TTFailedCallback failedCallback) {
-  //   invoke(COMMAND_GET_LOCK_SYSTEM_INFO, lockData, callback,
+  //   TTLockChannel.invoke(TTLockCommands.COMMAND_GET_LOCK_SYSTEM_INFO, lockData, callback,
   //       fail: failedCallback);
   // }
   //
   // static void getPasscodeVerificationParams(String lockData, TTGetPasscodeVerificationParamsCallback callback, TTFailedCallback failedCallback) {
-  //   invoke(COMMAND_GET_PASSCODE_VERIFICATION_PARAMS, lockData, callback,
+  //   TTLockChannel.invoke(TTLockCommands.COMMAND_GET_PASSCODE_VERIFICATION_PARAMS, lockData, callback,
   //       fail: failedCallback);
   // }
 
@@ -1095,7 +954,7 @@ class TTLock {
     map[TTResponse.startDate] = startDate;
     map[TTResponse.endDate] = endDate;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_ADD_LOCK_REMOTE_KEY, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_ADD_LOCK_REMOTE_KEY, map, callback, fail: failedCallback);
   }
 
   static void deleteRemoteKey(String remoteKeyMac, String lockData,
@@ -1103,12 +962,12 @@ class TTLock {
     Map map = new Map();
     map[TTResponse.mac] = remoteKeyMac;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_DELETE_LOCK_REMOTE_KEY, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_DELETE_LOCK_REMOTE_KEY, map, callback, fail: failedCallback);
   }
 
   static void clearRemoteKey(String lockData, TTSuccessCallback callback,
       TTFailedCallback failedCallback) {
-    invoke(COMMAND_CLEAR_REMOTE_KEY, lockData, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_CLEAR_REMOTE_KEY, lockData, callback, fail: failedCallback);
   }
 
   static void setRemoteKeyValidDate(
@@ -1126,7 +985,7 @@ class TTLock {
     map[TTResponse.startDate] = startDate;
     map[TTResponse.endDate] = endDate;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_SET_LOCK_REMOTE_KEY_VALID_DATE, map, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_LOCK_REMOTE_KEY_VALID_DATE, map, callback,
         fail: failedCallback);
   }
 
@@ -1140,7 +999,7 @@ class TTLock {
     map[TTResponse.remoteAccessory] = remoteAccessory.index;
     map[TTResponse.mac] = remoteAccessoryMac;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_GET_LOCK_REMOTE_ACCESSORY_ELECTRIC_QUANTITY, map, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_GET_LOCK_REMOTE_ACCESSORY_ELECTRIC_QUANTITY, map, callback,
         fail: failedCallback);
   }
 
@@ -1149,12 +1008,12 @@ class TTLock {
     Map map = new Map();
     map[TTResponse.mac] = doorSensorMac;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_ADD_LOCK_DOOR_SENSORY, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_ADD_LOCK_DOOR_SENSORY, map, callback, fail: failedCallback);
   }
 
   static void deleteDoorSensor(String lockData, TTSuccessCallback callback,
       TTFailedCallback failedCallback) {
-    invoke(COMMAND_DELETE_LOCK_DOOR_SENSORY, lockData, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_DELETE_LOCK_DOOR_SENSORY, lockData, callback,
         fail: failedCallback);
   }
 
@@ -1163,13 +1022,13 @@ class TTLock {
     Map map = new Map();
     map[TTResponse.alertTime] = alertTime;
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_SET_LOCK_DOOR_SENSORY_ALERT_TIME, map, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_LOCK_DOOR_SENSORY_ALERT_TIME, map, callback,
         fail: failedCallback);
   }
 
   static void setLockEnterUpgradeMode(String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
-    invoke(COMMAND_SET_LOCK_ENTER_UPGRADE_MODE, lockData, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_LOCK_ENTER_UPGRADE_MODE, lockData, callback,
         fail: failedCallback);
   }
 
@@ -1177,7 +1036,7 @@ class TTLock {
       TTFailedCallback failedCallback) {
     Map map = new Map();
     map[TTResponse.lockMac] = lockMac;
-    invoke(COMMAND_VERIFY_LOCK, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_VERIFY_LOCK, map, callback, fail: failedCallback);
   }
 
   static void addFace(
@@ -1195,7 +1054,7 @@ class TTLock {
     if (cycleList != null && cycleList.length > 0) {
       map[TTResponse.cycleJsonList] = convert.jsonEncode(cycleList);
     }
-    invoke(COMMAND_ADD_FACE, map, callback,
+    TTLockChannel.invoke(TTLockCommands.COMMAND_ADD_FACE, map, callback,
         progress: progressCallback, fail: failedCallback);
   }
 
@@ -1215,7 +1074,7 @@ class TTLock {
     if (cycleList != null && cycleList.length > 0) {
       map[TTResponse.cycleJsonList] = convert.jsonEncode(cycleList);
     }
-    invoke(COMMAND_ADD_FACE_DATA, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_ADD_FACE_DATA, map, callback, fail: failedCallback);
   }
 
   static void modifyFace(
@@ -1234,14 +1093,14 @@ class TTLock {
     if (cycleList != null && cycleList.length > 0) {
       map[TTResponse.cycleJsonList] = convert.jsonEncode(cycleList);
     }
-    invoke(COMMAND_MODIFY_FACE, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_MODIFY_FACE, map, callback, fail: failedCallback);
   }
 
   static void clearFace(String lockData, TTSuccessCallback callback,
       TTFailedCallback failedCallback) {
     Map map = Map();
     map[TTResponse.lockData] = lockData;
-    invoke(COMMAND_CLEAR_FACE, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_CLEAR_FACE, map, callback, fail: failedCallback);
   }
 
   static void deleteFace(String faceNumber, String lockData,
@@ -1249,7 +1108,7 @@ class TTLock {
     Map map = Map();
     map[TTResponse.lockData] = lockData;
     map[TTResponse.faceNumber] = faceNumber;
-    invoke(COMMAND_DELETE_FACE, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_DELETE_FACE, map, callback, fail: failedCallback);
   }
   
   static void setSensitivity(String lockData, TTSensitivityValue value, TTSuccessCallback callback,
@@ -1258,1181 +1117,7 @@ class TTLock {
     Map map = new Map();
     map[TTResponse.lockData] = lockData;
     map[TTResponse.sensitivityValue] = value.value;
-    invoke(COMMAND_SET_SENSITIVITY, map, callback, fail: failedCallback);
+    TTLockChannel.invoke(TTLockCommands.COMMAND_SET_SENSITIVITY, map, callback, fail: failedCallback);
   }
 
-  static bool isListenEvent = false;
-  static var scanCommandList = [
-    COMMAND_START_SCAN_LOCK,
-    COMMAND_STOP_SCAN_LOCK,
-    TTGateway.COMMAND_START_SCAN_GATEWAY,
-    TTGateway.COMMAND_STOP_SCAN_GATEWAY,
-    TTDoorSensor.COMMAND_START_SCAN_DOOR_SENSOR,
-    TTDoorSensor.COMMAND_STOP_SCAN_DOOR_SENSOR,
-    TTRemoteKey.COMMAND_START_SCAN_REMOTE_KEY,
-    TTRemoteKey.COMMAND_STOP_SCAN_REMOTE_KEY,
-    TTRemoteKeypad.COMMAND_START_SCAN_REMOTE_KEYPAD,
-    TTRemoteKeypad.COMMAND_STOP_SCAN_REMOTE_KEYPAD
-  ];
-
-  static void invoke(String command, Object? parameter, Object? success,
-      {Object? progress, Object? fail,
-        //TODO 多功能键盘会有键盘错误，用这个表示
-        Object? otherFail
-      }) {
-    if (!isListenEvent) {
-      isListenEvent = true;
-      _listenChannel
-          .receiveBroadcastStream("TTLockListen")
-          .listen(_onEvent, onError: _onError);
-    }
-
-    //开始、停止扫描的时候  清空之前所有的扫描回调
-    scanCommandList.forEach((scanCommand) {
-      if (command.compareTo(scanCommand) == 0) {
-        List removeMapList = [];
-        _commandQueue.forEach((map) {
-          String key = map.keys.first;
-          if (key.compareTo(COMMAND_START_SCAN_LOCK) == 0 ||
-              key.compareTo(TTGateway.COMMAND_START_SCAN_GATEWAY) == 0 ||
-              key.compareTo(TTRemoteKey.COMMAND_START_SCAN_REMOTE_KEY) == 0 ||
-              key.compareTo(TTRemoteKeypad.COMMAND_START_SCAN_REMOTE_KEYPAD) ==
-                  0 ||
-              key.compareTo(TTDoorSensor.COMMAND_START_SCAN_DOOR_SENSOR) == 0) {
-            removeMapList.add(map);
-          }
-        });
-        removeMapList.forEach((map) {
-          _commandQueue.remove(map);
-        });
-      }
-    });
-
-    if (command == COMMAND_STOP_SCAN_LOCK ||
-        command == TTGateway.COMMAND_STOP_SCAN_GATEWAY ||
-        command == TTRemoteKey.COMMAND_STOP_SCAN_REMOTE_KEY ||
-        command == TTRemoteKeypad.COMMAND_STOP_SCAN_REMOTE_KEYPAD ||
-        command == TTDoorSensor.COMMAND_STOP_SCAN_DOOR_SENSOR) {
-    } else {
-      Map commandMap = new Map();
-      Map callbackMap = new Map();
-      callbackMap[CALLBACK_SUCCESS] = success;
-      callbackMap[CALLBACK_PROGRESS] = progress;
-      callbackMap[CALLBACK_FAIL] = fail;
-      callbackMap[CALLBACK_OTHER_FAIL] = otherFail;
-      commandMap[command] = callbackMap;
-      _commandQueue.add(commandMap);
-    }
-
-    _commandChannel.invokeMethod(command, parameter);
-
-    // if (printLog) {
-    //   print(
-    //       '----------------------------------------------------------------------------------------------------------');
-    //   print('TTLock command: $command  parameter:$parameter');
-    //   print(
-    //       '----------------------------------------------------------------------------------------------------------');
-    // }
-  }
-
-  static void _successCallback(String command, Map data) {
-    //获取队列里面能匹配到最前一个回调指令
-    dynamic callBack;
-    int index = -1;
-    for (var i = 0; i < _commandQueue.length; i++) {
-      Map map = _commandQueue[i];
-      String key = map.keys.first;
-      if (key.compareTo(command) == 0) {
-        callBack = map[command][CALLBACK_SUCCESS];
-        index = i;
-        break;
-      }
-    }
-    //如果是 网关扫描、锁扫描、网关获取附近wifi 需要特殊处理
-    bool reomveCommand = true;
-    if (index == -1) {
-      reomveCommand = false;
-    } else {
-      if (command == COMMAND_START_SCAN_LOCK ||
-          command == TTGateway.COMMAND_START_SCAN_GATEWAY ||
-          command == TTRemoteKey.COMMAND_START_SCAN_REMOTE_KEY ||
-          command == TTRemoteKeypad.COMMAND_START_SCAN_REMOTE_KEYPAD ||
-          command == TTDoorSensor.COMMAND_START_SCAN_DOOR_SENSOR) {
-        reomveCommand = false;
-      }
-      if (command == COMMAND_SCAN_WIFI && data[TTResponse.finished] == false) {
-        reomveCommand = false;
-      }
-      if (command == TTGateway.COMMAND_GET_SURROUND_WIFI &&
-          data[TTResponse.finished] == false) {
-        reomveCommand = false;
-      }
-    }
-    if (reomveCommand) {
-      _commandQueue.removeAt(index);
-    }
-
-    if (callBack == null) {
-      if (printLog) {
-        print(
-            "********************************************  $command callback null *********************************************");
-      }
-      return;
-    }
-    switch (command) {
-      case COMMAND_GET_BLUETOOTH_STATE:
-        int stateValue = data[TTResponse.state];
-        TTBluetoothState state = TTBluetoothState.values[stateValue];
-        TTBluetoothStateCallback stateCallback = callBack;
-        stateCallback(state);
-        break;
-
-      case COMMAND_START_SCAN_LOCK:
-        TTLockScanCallback scanCallback = callBack;
-        scanCallback(TTLockScanModel(data));
-        break;
-
-      case TTGateway.COMMAND_START_SCAN_GATEWAY:
-        TTGatewayScanCallback scanCallback = callBack;
-        scanCallback(TTGatewayScanModel(data));
-        break;
-
-      case TTRemoteKey.COMMAND_START_SCAN_REMOTE_KEY:
-      case TTRemoteKeypad.COMMAND_START_SCAN_REMOTE_KEYPAD:
-      case TTDoorSensor.COMMAND_START_SCAN_DOOR_SENSOR:
-        TTRemoteAccessoryScanCallback scanCallback = callBack;
-        scanCallback(TTRemoteAccessoryScanModel(data));
-        break;
-
-      case COMMAND_GET_AUTOMATIC_LOCK_PERIODIC_TIME:
-        TTGetLockAutomaticLockingPeriodicTimeCallback
-            getLockAutomaticLockingPeriodicTimeCallback = callBack;
-        getLockAutomaticLockingPeriodicTimeCallback(
-            data[TTResponse.currentTime],
-            data[TTResponse.minTime],
-            data[TTResponse.maxTime]);
-        break;
-
-      case COMMAND_GET_LOCK_REMOTE_UNLOCK_SWITCH_STATE:
-      case COMMAND_GET_LOCK_CONFIG:
-        TTGetSwitchStateCallback switchStateCallback = callBack;
-        switchStateCallback(data[TTResponse.isOn]);
-        break;
-      case COMMAND_GET_LOCK_DIRECTION:
-        TTGetLockDirectionCallback lockDirectionCallback = callBack;
-        int direction = data[TTResponse.direction];
-        lockDirectionCallback(TTLockDirection.values[direction]);
-        break;
-      case COMMAND_GET_LOCK_SYSTEM_INFO:
-      case TTRemoteKey.COMMAND_INIT_REMOTE_KEY:
-      case TTDoorSensor.COMMAND_INIT_DOOR_SENSOR:
-        TTGetLockSystemCallback getLockSystemCallback = callBack;
-        getLockSystemCallback(TTLockSystemModel(data));
-        break;
-
-      case COMMAND_INIT_LOCK:
-      case COMMAND_RESET_EKEY:
-      case COMMAND_RESET_PASSCODE:
-      case COMMAND_SET_LOCK_REMOTE_UNLOCK_SWITCH_STATE:
-      case COMMAND_GET_PASSCODE_VERIFICATION_PARAMS:
-        TTLockDataCallback lockDataCallback = callBack;
-        lockDataCallback(data[TTResponse.lockData]);
-        break;
-
-      case COMMAND_CONTROL_LOCK:
-        TTControlLockCallback controlLockCallback = callBack;
-        controlLockCallback(data[TTResponse.lockTime],
-            data[TTResponse.electricQuantity], data[TTResponse.uniqueId]);
-        break;
-
-      case COMMAND_ACTIVE_LIFT_FLOORS:
-        TTLiftCallback liftCallback = callBack;
-        liftCallback(data[TTResponse.lockTime],
-            data[TTResponse.electricQuantity], data[TTResponse.uniqueId]);
-        break;
-
-      case COMMAND_RESET_PASSCODE:
-      case COMMAND_MODIFY_ADMIN_PASSCODE:
-        if (isOnPremise) {
-          TTLockDataCallback lockDataCallback = callBack;
-          lockDataCallback(data[TTResponse.lockData]);
-        } else {
-          TTSuccessCallback successCallback = callBack;
-          successCallback();
-        }
-        break;
-
-      case COMMAND_GET_ADMIN_PASSCODE:
-        TTGetAdminPasscodeCallback lockDataCallback = callBack;
-        lockDataCallback(data[TTResponse.adminPasscode]);
-        break;
-
-      case COMMAND_ADD_CARD:
-      case TTRemoteKeypad.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD:
-        TTCardNumberCallback addCardCallback = callBack;
-        addCardCallback(data[TTResponse.cardNumber]);
-        break;
-
-      case COMMAND_ADD_FINGERPRINT:
-      case TTRemoteKeypad.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT:
-        TTAddFingerprintCallback addFingerprintCallback = callBack;
-        addFingerprintCallback(data[TTResponse.fingerprintNumber]);
-        break;
-
-      case COMMAND_GET_LOCK_SWITCH_STATE:
-        TTGetLockStatusCallback getLockStatusCallback = callBack;
-        int lockSwitchState = data[TTResponse.lockSwitchState];
-        getLockStatusCallback(TTLockSwitchState.values[lockSwitchState]);
-        break;
-
-      case COMMAND_GET_LOCK_TIME:
-        TTGetLockTimeCallback getLockTimeCallback = callBack;
-        getLockTimeCallback(data[TTResponse.timestamp]);
-        break;
-
-      case COMMAND_GET_LOCK_OPERATE_RECORD:
-        TTGetLockOperateRecordCallback getLockOperateRecordCallback = callBack;
-        getLockOperateRecordCallback(data[TTResponse.records] ?? "");
-        break;
-
-      case COMMAND_GET_LOCK_POWER:
-      case COMMAND_SET_NB_ADDRESS:
-        TTGetLockElectricQuantityCallback getLockElectricQuantityCallback =
-            callBack;
-        getLockElectricQuantityCallback(data[TTResponse.electricQuantity]);
-        break;
-
-      case COMMAND_FUNCTION_SUPPORT:
-        TTFunctionSupportCallback functionSupportCallback = callBack;
-        functionSupportCallback(data[TTResponse.isSupport]);
-        break;
-      case COMMAND_GET_NB_AWAKE_MODES:
-        TTGetNbAwakeModesCallback getNbAwakeModesCallback = callBack;
-        getNbAwakeModesCallback(data[TTResponse.nbAwakeModes]);
-        break;
-      case COMMAND_GET_ALL_VALID_PASSCODE:
-        TTGetAllPasscodeCallback getAllPasscodeCallback = callBack;
-        List passcodeList = [];
-        String? passcodeListString = data[TTResponse.passcodeListString];
-        if (passcodeListString != null) {
-          passcodeList = convert.jsonDecode(passcodeListString);
-        }
-        getAllPasscodeCallback(passcodeList);
-        break;
-      case COMMAND_GET_ALL_VALID_CARD:
-        TTGetAllCardsCallback getAllCardsCallback = callBack;
-
-        List cardList = [];
-        String? cardListString = data[TTResponse.cardListString];
-        if (cardListString != null) {
-          cardList = convert.jsonDecode(cardListString);
-        }
-        getAllCardsCallback(cardList);
-        break;
-      case COMMAND_GET_ALL_VALID_FINGERPRINT:
-        TTGetAllFingerprintsCallback getAllFingerprintsCallback = callBack;
-        List fingerprintList = [];
-        String? fingerprintListString = data[TTResponse.fingerprintListString];
-        if (fingerprintListString != null) {
-          fingerprintList = convert.jsonDecode(fingerprintListString);
-        }
-        getAllFingerprintsCallback(fingerprintList);
-        break;
-      case COMMAND_GET_NB_AWAKE_TIMES:
-        TTGetNbAwakeTimesCallback getNbAwakeTimesCallback = callBack;
-        List<Map> nbAwakeTimeList = data[TTResponse.nbAwakeTimeList];
-        List<TTNbAwakeTimeModel> list = [];
-
-        nbAwakeTimeList.forEach((element) {
-          TTNbAwakeTimeModel model = new TTNbAwakeTimeModel();
-          model.minutes = element[TTResponse.minutes];
-          model.type = TTNbAwakeTimeType.values[element[TTResponse.type]];
-          list.add(model);
-        });
-        getNbAwakeTimesCallback(list);
-        break;
-
-      case COMMAND_GET_ADMIN_PASSCODE:
-        TTGetAdminPasscodeCallback getAdminPasscodeCallback = callBack;
-        getAdminPasscodeCallback(data[TTResponse.adminPasscode]);
-        break;
-      case COMMAND_GET_LOCK_VERSION:
-        TTGetLockVersionCallback getLockVersionCallback = callBack;
-        getLockVersionCallback(data[TTResponse.lockVersion]);
-        break;
-      case COMMAND_SCAN_WIFI:
-        TTWifiLockScanWifiCallback scanWifiCallback = callBack;
-        bool finished = data[TTResponse.finished];
-        List wifiList = data[TTResponse.wifiList];
-        scanWifiCallback(finished, wifiList);
-        break;
-      case COMMAND_GET_WIFI_INFO:
-        TTWifiLockGetWifiInfoCallback getWifiInfoCallback = callBack;
-        getWifiInfoCallback(TTWifiInfoModel(data));
-        break;
-      case COMMAND_CONFIG_CAMERA_LOCK_WIFI:
-        TTCameraLockConfigWifiCallback cameraLockConfigWifiCallback = callBack;
-        String serialNumber = data[TTResponse.videoModuleSerialNumber];
-        String wifiName = data[TTResponse.wifiName];
-        cameraLockConfigWifiCallback(serialNumber,wifiName);
-        break;
-      case COMMAND_GET_LOCK_SOUND_WITH_SOUND_VOLUME:
-        int soundVolumeValue = data[TTResponse.soundVolumeType];
-        TTSoundVolumeType type = TTSoundVolumeType.values[soundVolumeValue];
-
-        TTGetLockSoundWithSoundVolumeCallback getLockSoundCallback = callBack;
-        getLockSoundCallback(type);
-        break;
-
-      case COMMAND_GET_LOCK_FRETURE_VALUE:
-        TTLockDataCallback lockDataCallback = callBack;
-        lockDataCallback(data[TTResponse.lockData]);
-        break;
-
-      // case COMMAND_GET_LOCK_SYSTEM_INFO:
-      //   TTGetLockSystemInfoCallback getLockSystemInfoCallback = callBack;
-      //   getLockSystemInfoCallback(TTLockSystemInfoModel(data));
-      //   break;
-
-      // case COMMAND_GET_PASSCODE_VERIFICATION_PARAMS:
-      //   TTGetPasscodeVerificationParamsCallback getPasscodeVerificationParamsCallback = callBack;
-      //   getPasscodeVerificationParamsCallback(data[TTResponse.lockData]);
-      //   break;
-
-      case TTGateway.COMMAND_CONNECT_GATEWAY:
-        TTGatewayConnectCallback connectCallback = callBack;
-        TTGatewayConnectStatus status =
-            TTGatewayConnectStatus.values[data[TTResponse.status]];
-        connectCallback(status);
-        break;
-
-      case TTGateway.COMMAND_GET_SURROUND_WIFI:
-        TTGatewayGetAroundWifiCallback getAroundWifiCallback = callBack;
-        bool finished = data[TTResponse.finished];
-        List wifiList = data[TTResponse.wifiList];
-        getAroundWifiCallback(finished, wifiList);
-        break;
-
-      case TTGateway.COMMAND_INIT_GATEWAY:
-        TTGatewayInitCallback gatewayInitCallback = callBack;
-        gatewayInitCallback(data);
-        break;
-      case COMMAND_GET_LOCK_REMOTE_ACCESSORY_ELECTRIC_QUANTITY:
-        TTGetLockAccessoryElectricQuantity getLockAccessoryElectricQuantity =
-            callBack;
-        getLockAccessoryElectricQuantity(
-            data[TTResponse.electricQuantity], data[TTResponse.updateDate]);
-        break;
-      case TTRemoteKeypad.COMMAND_INIT_REMOTE_KEYPAD:
-        TTRemoteKeypadInitSuccessCallback remoteKeypadInitSuccessCallback =
-            callBack;
-        remoteKeypadInitSuccessCallback(data[TTResponse.electricQuantity],
-            data[TTResponse.wirelessKeypadFeatureValue]);
-        break;
-      case TTRemoteKeypad.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_GET_STORED_LOCK:
-        TTRemoteKeypadGetStoredLockSuccessCallback getStoredLocks = callBack;
-        getStoredLocks(data["lockMacs"]);
-        break;
-      case TTRemoteKeypad.COMMAND_INIT_MULTIFUNCTIONAL_REMOTE_KEYPAD:
-
-        var systemInfoModelMap = data["systemInfoModel"]??{};
-        TTMultifunctionalRemoteKeypadInitSuccessCallback initSuccessCallback =
-            callBack;
-        initSuccessCallback(
-            data["electricQuantity"],
-            data["wirelessKeypadFeatureValue"],
-            data["slotNumber"],
-            data["slotLimit"],
-            systemInfoModelMap["modelNum"],
-            systemInfoModelMap["hardwareRevision"],
-            systemInfoModelMap["firmwareRevision"],
-        );
-        break;
-      case COMMAND_ADD_FACE:
-      case COMMAND_ADD_FACE_DATA:
-        TTAddFaceSuccessCallback addFaceSuccessCallback = callBack;
-        addFaceSuccessCallback(data[TTResponse.faceNumber]);
-        break;
-      default:
-        TTSuccessCallback successCallback = callBack;
-        successCallback();
-    }
-  }
-
-  static void _progressCallback(String command, Map data) {
-    dynamic callBack;
-    for (var i = 0; i < _commandQueue.length; i++) {
-      Map map = _commandQueue[i];
-      String key = map.keys.first;
-      if (key.compareTo(command) == 0) {
-        callBack = map[command][CALLBACK_PROGRESS];
-        break;
-      }
-    }
-    switch (command) {
-      case COMMAND_ADD_CARD:
-      case TTRemoteKeypad.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD:
-        TTAddCardProgressCallback progressCallback = callBack;
-        progressCallback();
-        break;
-      case COMMAND_ADD_FINGERPRINT:
-      case TTRemoteKeypad.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT:
-        TTAddFingerprintProgressCallback progressCallback = callBack;
-        progressCallback(
-            data[TTResponse.currentCount], data[TTResponse.totalCount]);
-        break;
-      case COMMAND_ADD_FACE:
-        TTAddFaceProgressCallback progressCallback = callBack;
-        progressCallback(TTFaceState.values[data[TTResponse.state]],
-            TTFaceErrorCode.values[data[TTResponse.errorCode]]);
-        break;
-      default:
-    }
-  }
-
-  static void _errorCallback(
-      String command, int errorCode, String errorMessage, Map data) {
-    if (errorCode == TTLockError.lockIsBusy.index) {
-      errorMessage =
-          "The TTLock SDK can only communicate with one lock at a time";
-    }
-    if (errorCode > TTLockError.wrongWifiPassword.index) {
-      errorCode = TTLockError.fail.index;
-    }
-
-
-    dynamic callBack;
-    dynamic otherCallBack;
-    int index = -1;
-    for (var i = 0; i < _commandQueue.length; i++) {
-      Map map = _commandQueue[i];
-      String key = map.keys.first;
-      if (key.compareTo(command) == 0) {
-        callBack = map[command][CALLBACK_FAIL];
-        otherCallBack = map[command][CALLBACK_OTHER_FAIL];
-        index = i;
-        break;
-      }
-    }
-    //多功能键盘添加指纹时返回重复指纹失败时，不移除
-    if (_commandQueue.length > 0 &&
-        !(command == TTRemoteKeypad.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT &&
-            data["errorDevice"] == TTErrorDevice.keyPad.index
-            && errorCode == TTRemoteKeyPadAccessoryError.duplicateFingerprint.index)
-    ) {
-      print("移除方法:$command;;;errorDevice:${data["errorDevice"]};;;;errorCode:${data["errorCode"]}");
-      if (index > -1) {
-        _commandQueue.removeAt(index);
-      }
-    }
-
-
-    if (command == TTGateway.COMMAND_GET_SURROUND_WIFI ||
-        command == TTGateway.COMMAND_INIT_GATEWAY ||
-        command == TTGateway.COMMAND_CONFIG_IP ||
-        command == TTGateway.COMMAND_UPGRADE_GATEWAY) {
-      TTGatewayFailedCallback? failedCallback = callBack;
-      TTGatewayError error = TTGatewayError.values[errorCode];
-      if (failedCallback != null) {
-        failedCallback(error, errorMessage);
-      }
-    } else if (command == TTRemoteKey.COMMAND_INIT_REMOTE_KEY ||
-        command == TTDoorSensor.COMMAND_INIT_DOOR_SENSOR ||
-        command == TTRemoteKeypad.COMMAND_INIT_REMOTE_KEYPAD) {
-      TTRemoteFailedCallback? failedCallback = callBack;
-      TTRemoteAccessoryError error = TTRemoteAccessoryError.values[errorCode];
-      if (failedCallback != null) {
-        failedCallback(error, errorMessage);
-      }
-    } // 多功能键盘失败处理
-    else if ((command ==
-        TTRemoteKeypad.COMMAND_INIT_MULTIFUNCTIONAL_REMOTE_KEYPAD) ||
-        command ==
-            TTRemoteKeypad
-                .COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_DELETE_STORED_LOCK ||
-        command ==
-            TTRemoteKeypad
-                .COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_GET_STORED_LOCK ||
-        command ==
-            TTRemoteKeypad
-                .COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT ||
-        command ==
-            TTRemoteKeypad.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD) {
-
-
-      if(data["errorDevice"] == TTErrorDevice.keyPad.index)
-      {
-        TTRemoteKeypadFailedCallback? failedCallback = otherCallBack;
-        TTRemoteKeyPadAccessoryError error =
-        TTRemoteKeyPadAccessoryError.values[errorCode];
-        if (failedCallback != null) {
-          failedCallback(error, errorMessage);
-        }
-      } else
-      {
-        if(errorCode<0)
-        {
-          errorCode = 0;
-        }
-        callBack?.call(TTLockError.values[errorCode], errorMessage);
-      }
-    } else {
-      TTFailedCallback? failedCallback = callBack;
-      TTLockError error = TTLockError.values[errorCode];
-      if (failedCallback != null) {
-        failedCallback(error, errorMessage);
-      }
-    }
-  }
-
-  // 数据接收
-  static void _onEvent(dynamic value) {
-    if (printLog) {
-      print('TTLock listen: $value');
-    }
-
-    Map map = value;
-    String command = map[TTResponse.command];
-    Map data = map[TTResponse.data] == null ? {} : map[TTResponse.data];
-    int resultState = map[TTResponse.resultState];
-
-    if (resultState == TTLockReuslt.fail.index) {
-      int errorCode = map[TTResponse.errorCode];
-      String errorMessage = map[TTResponse.errorMessage] == null
-          ? ""
-          : map[TTResponse.errorMessage];
-      _errorCallback(command, errorCode, errorMessage, data);
-    } else if (resultState == TTLockReuslt.progress.index) {
-      //中间状态的回调（添加 IC卡、指纹）
-      _progressCallback(command, data);
-    } else {
-      //成功的回调
-      _successCallback(command, data);
-    }
-  }
-
-  // 错误处理
-  static void _onError(Object value) {
-    if (printLog) {
-      print('TTLockPlugin Error: $value');
-    }
-  }
-}
-
-class TTResponse {
-  static const String command = "command";
-  static const String data = "data";
-  static const String resultState = "resultState";
-  static const String errorCode = "errorCode";
-  static const String errorMessage = "errorMessage";
-  static const String state = "state";
-  static const String status = "status";
-  static const String wifiList = "wifiList";
-  static const String finished = "finished";
-
-  static const String lockName = "lockName";
-  static const String lockMac = "lockMac";
-  static const String isInited = "isInited";
-  static const String isAllowUnlock = "isAllowUnlock";
-  static const String isDfuMode = "isDfuMode";
-  static const String electricQuantity = "electricQuantity";
-  static const String lockVersion = "lockVersion";
-  static const String lockSwitchState = "lockSwitchState";
-  static const String rssi = "rssi";
-  static const String oneMeterRssi = "oneMeterRssi";
-  static const String timestamp = "timestamp";
-  static const String specialValue = "specialValue";
-  static const String lockData = "lockData";
-  static const String lockConfig = "lockConfig";
-  static const String scanState = "scanState";
-  static const String passcodeInfo = "passcodeInfo";
-  static const String controlAction = "controlAction";
-  static const String lockTime = "lockTime";
-  static const String uniqueId = "uniqueId";
-  static const String passcode = "passcode";
-  static const String startDate = "startDate";
-  static const String endDate = "endDate";
-  static const String passcodeOrigin = "passcodeOrigin";
-  static const String passcodeNew = "passcodeNew";
-  static const String cardNumber = "cardNumber";
-  static const String fingerprintNumber = "fingerprintNumber";
-  static const String adminPasscode = "adminPasscode";
-  static const String erasePasscode = "erasePasscode";
-  static const String totalCount = "totalCount";
-  static const String currentCount = "currentCount";
-  static const String records = "records";
-  static const String maxTime = "maxTime";
-  static const String cycleJsonList = "cycleJsonList";
-  static const String faceFeatureData = "faceFeatureData";
-  static const String faceNumber = "faceNumber";
-
-  static const String minTime = "minTime";
-  static const String currentTime = "currentTime";
-  static const String isOn = "isOn";
-  static const String passageModeType = "passageModeType";
-  static const String weekly = "weekly";
-  static const String monthly = "monthly";
-
-  static const String direction = "direction";
-
-  static const String isSupport = "isSupport";
-  static const String supportFunction = "supportFunction";
-
-  static const String nbAwakeModes = "nbAwakeModes";
-  static const String nbAwakeTimeList = "nbAwakeTimeList";
-  static const String minutes = "minutes";
-  static const String type = "type";
-  static const String hotelInfo = "hotelInfo";
-  static const String buildingNumber = "buildingNumber";
-  static const String floorNumber = "floorNumber";
-  static const String sector = "sector";
-
-  static const String passcodeListString = "passcodeListString";
-  static const String cardListString = "cardListString";
-  static const String fingerprintListString = "fingerprintListString";
-
-  static const String nbServerAddress = "nbServerAddress";
-  static const String nbServerPort = "nbServerPort";
-
-  static const String modelNum = "modelNum";
-  static const String hardwareRevision = "hardwareRevision";
-  static const String firmwareRevision = "firmwareRevision";
-  static const String nbNodeId = "nbNodeId";
-  static const String nbOperator = "nbOperator";
-  static const String nbCardNumber = "nbCardNumber";
-  static const String nbRssi = "nbRssi";
-
-  static const String addGatewayJsonStr = "addGatewayJsonStr";
-  static const String ip = "ip";
-  static const String port = "port";
-
-  static const String ipSettingJsonStr = "ipSettingJsonStr";
-  static const String wifiName = "wifiName";
-  static const String wifiPassword = "wifiPassword";
-
-  static const String mac = "mac";
-
-  static const String remoteAccessory = "remoteAccessory";
-
-  static const String soundVolumeType = "soundVolumeType";
-
-  static const String updateDate = "updateDate";
-  static const String alertTime = "alertTime";
-  static const String wirelessKeypadFeatureValue = "wirelessKeypadFeatureValue";
-  static const String resetCode = "resetCode";
-
-  static const String sensitivityValue = "sensitivityValue";
-
-  static const String videoModuleSerialNumber = "videoModuleSerialNumber";
-
-}
-
-class TTLockScanModel {
-  String lockName = '';
-  String lockMac = '';
-  bool isInited = true;
-  bool isAllowUnlock = false;
-  // bool isDfuMode;
-  int electricQuantity = -1;
-  String lockVersion = '';
-  TTLockSwitchState lockSwitchState = TTLockSwitchState.unknow;
-  int rssi = -1;
-  int oneMeterRssi = -1;
-  int timestamp = 0;
-
-  TTLockScanModel(Map map) {
-    this.lockName = map[TTResponse.lockName];
-    this.lockMac = map[TTResponse.lockMac];
-    this.isInited = map[TTResponse.isInited];
-    this.isAllowUnlock = map[TTResponse.isAllowUnlock];
-    // this.isDfuMode = map[TTResponse.isDfuMode];
-    this.electricQuantity = map[TTResponse.electricQuantity];
-    this.lockVersion = map[TTResponse.lockVersion];
-    this.lockSwitchState =
-        TTLockSwitchState.values[map[TTResponse.lockSwitchState]];
-    this.rssi = map[TTResponse.rssi];
-    this.oneMeterRssi = map[TTResponse.oneMeterRssi];
-    this.timestamp = map[TTResponse.timestamp];
-  }
-}
-
-class TTCycleModel {
-  // weekDay  1-7,1 means Monday，2 means  Tuesday ,...,7 means Sunday
-  int weekDay = 0;
-  // startTime The time when it becomes valid (minutes from 0 clock)
-  int startTime = 0;
-  // endTime  The time when it is expired (minutes from 0 clock)
-  int endTime = 0;
-
-  /// jsonDecode(jsonStr) 方法中会调用实体类的这个方法。如果实体类中没有这个方法，会报错。
-  Map toJson() {
-    Map map = new Map();
-    map["weekDay"] = this.weekDay;
-    map["startTime"] = this.startTime;
-    map["endTime"] = this.endTime;
-    return map;
-  }
-
-// weekDay  1-7,1 means Monday，2 means  Tuesday ,...,7 means Sunday
-//startTime The time when it becomes valid (minutes from 0 clock)
-//endTime  The time when it is expired (minutes from 0 clock)
-  TTCycleModel(int weekDay, int startTime, int endTime) {
-    this.weekDay = weekDay;
-    this.startTime = startTime;
-    this.endTime = endTime;
-  }
-}
-
-class TTLockSystemModel {
-  String? modelNum;
-  String? hardwareRevision;
-  String? firmwareRevision;
-  int? electricQuantity;
-
-  // NB IOT LOCK
-  String? nbOperator;
-  String? nbNodeId;
-  String? nbCardNumber;
-  String? nbRssi;
-
-  String? lockData;
-
-  // ignore: non_constant_identifier_names
-  TTLockSystemModel(Map map) {
-    this.modelNum = map["modelNum"];
-    this.hardwareRevision = map["hardwareRevision"];
-    this.firmwareRevision = map["firmwareRevision"];
-    this.electricQuantity = map["electricQuantity"];
-
-    this.nbOperator = map["nbOperator"];
-    this.nbNodeId = map["nbNodeId"];
-    this.nbCardNumber = map["nbCardNumber"];
-    this.nbRssi = map["nbRssi"];
-    this.lockData = map["lockData"];
-  }
-}
-
-enum TTBluetoothState {
-  unknow,
-  resetting,
-  unsupported,
-  unAuthorized,
-  turnOff,
-  turnOn
-}
-
-enum TTPasscodeType { once, permanent, period, cycle }
-
-enum TTOperateRecordType { latest, total }
-
-enum TTControlAction { unlock, lock }
-
-enum TTLockSwitchState { lock, unlock, unknow }
-
-enum TTPassageModeType { weekly, monthly }
-
-enum TTLockReuslt { success, progress, fail }
-
-enum TTLockConfig {
-  audio,
-  passcodeVisible,
-  freeze,
-  tamperAlert,
-  resetButton,
-  privacyLock,
-  passageModeAutoUnlock,
-  wifiLockPowerSavingMode,
-  doubleAuth,
-  publicMode,
-  lowBatteryAutoUnlock
-}
-
-enum TTLockDirection { left, right }
-
-enum TTSoundVolumeType {
-  firstLevel,
-  secondLevel,
-  thirdLevel,
-  fouthLevel,
-  fifthLevel,
-  off,
-  on
-}
-
-enum TTSensitivityValue {
-  off(0),
-  low(1),
-  medium(2),
-  high(3);
-  
-  final int value;
-  
-  const TTSensitivityValue(this.value);
-}
-
-enum TTLockError {
-  reseted, //0
-  crcError, //1
-  noPermisstion,
-  wrongAdminCode,
-  noStorageSpace,
-  inSettingMode, //5
-  noAdmin,
-  notInSettingMode,
-  wrongDynamicCode,
-  noPower,
-  resetPasscode, //10
-  unpdatePasscodeIndex,
-  invalidLockFlagPos,
-  ekeyExpired,
-  passcodeLengthInvalid,
-  samePasscodes, //15
-  ekeyInactive,
-  aesKey,
-  fail,
-  passcodeExist,
-  passcodeNotExist, //20
-  lackOfStorageSpaceWhenAddingPasscodes,
-  invalidParaLength,
-  cardNotExist,
-  fingerprintDuplication,
-  fingerprintNotExist, //25
-  invalidCommand,
-  inFreezeMode,
-  invalidClientPara,
-  lockIsLocked,
-  recordNotExist, //30
-
-  notSupportModifyPasscode,
-  bluetoothOff,
-  bluetoothConnectTimeount,
-  bluetoothDisconnection,
-  lockIsBusy, //35
-  invalidLockData,
-  invalidParameter,
-  wrongWifi, //38
-  wrongWifiPassword
-}
-
-enum TTErrorDevice { lock, keyPad, key }
-
-enum TTLiftWorkActivateType { allFloors, specificFloors }
-
-enum TTPowerSaverWorkType { allCards, hotelCard, roomCard }
-
-enum TTNbAwakeMode { keypad, card, fingerprint }
-
-enum TTNbAwakeTimeType { point, interval }
-
-enum TTRemoteAccessory { remoteKey, remoteKeypad, doorSensor }
-
-typedef TTSuccessCallback = void Function();
-typedef TTFailedCallback = void Function(
-    TTLockError errorCode, String errorMsg);
-typedef TTLockScanCallback = void Function(TTLockScanModel scanModel);
-typedef TTBluetoothStateCallback = void Function(TTBluetoothState state);
-typedef TTBluetoothScanStateCallback = void Function(bool isScanning);
-typedef TTLockDataCallback = void Function(String lockData);
-typedef TTControlLockCallback = void Function(
-    int lockTime, int electricQuantity, int uniqueId);
-typedef TTGetAdminPasscodeCallback = void Function(String adminPasscode);
-typedef TTGetLockElectricQuantityCallback = void Function(int electricQuantity);
-typedef TTGetLockOperateRecordCallback = void Function(String records);
-typedef TTGetLockSpecialValueCallback = void Function(int specialValue);
-typedef TTGetLockTimeCallback = void Function(int timestamp);
-typedef TTGetLockSystemCallback = void Function(
-    TTLockSystemModel lockSystemModel);
-
-typedef TTGetLockPasscodeDataCallback = void Function(String passcodeData);
-typedef TTGetLockAutomaticLockingPeriodicTimeCallback = void Function(
-    int currentTime, int minTime, int maxTime);
-typedef TTGetAllPasscodeCallback = void Function(List passcodeList);
-
-typedef TTAddCardProgressCallback = void Function();
-typedef TTCardNumberCallback = void Function(String cardNumber);
-typedef TTGetAllCardsCallback = void Function(List cardList);
-
-typedef TTAddFingerprintProgressCallback = void Function(
-    int currentCount, int totalCount);
-typedef TTAddFingerprintCallback = void Function(String fingerprintNumber);
-typedef TTGetAllFingerprintsCallback = void Function(List fingerprintList);
-typedef TTGetSwitchStateCallback = void Function(bool isOn);
-typedef TTGetLockStatusCallback = void Function(TTLockSwitchState state);
-typedef TTGetLockDirectionCallback = void Function(TTLockDirection direction);
-
-typedef TTGatewayFailedCallback = void Function(
-    TTGatewayError errorCode, String errorMsg);
-typedef TTGatewayScanCallback = void Function(TTGatewayScanModel scanModel);
-typedef TTGatewayConnectCallback = void Function(TTGatewayConnectStatus status);
-typedef TTGatewayDisconnectCallback = void Function();
-typedef TTGatewayGetAroundWifiCallback = void Function(
-    bool finished, List wifiList);
-typedef TTGatewayInitCallback = void Function(Map map);
-typedef TTFunctionSupportCallback = void Function(bool isSupport);
-
-typedef TTLiftCallback = void Function(
-    int lockTime, int electricQuantity, int uniqueId);
-
-typedef TTGetNbAwakeModesCallback = void Function(List<TTNbAwakeMode> list);
-typedef TTGetNbAwakeTimesCallback = void Function(
-    List<TTNbAwakeTimeModel> list);
-
-typedef TTGetLockVersionCallback = void Function(String lockVersion);
-
-typedef TTWifiLockScanWifiCallback = void Function(
-    bool finished, List wifiList);
-
-typedef TTWifiLockGetWifiInfoCallback = void Function(TTWifiInfoModel wifiInfo);
-
-typedef TTCameraLockConfigWifiCallback = void Function(String serialNumber, String wifiName);
-
-typedef TTGetLockSoundWithSoundVolumeCallback = void Function(
-    TTSoundVolumeType ttLocksoundVolumeType);
-// typedef TTGetPasscodeVerificationParamsCallback = void Function(String lockData);
-
-typedef TTRemoteFailedCallback = void Function(
-    TTRemoteAccessoryError errorCode, String errorMsg);
-typedef TTRemoteAccessoryScanCallback = void Function(
-    TTRemoteAccessoryScanModel scanModel);
-
-typedef TTGetLockAccessoryElectricQuantity = void Function(
-    int electricQuantity, int updateDate);
-
-typedef TTRemoteKeypadSuccessCallback = void Function();
-
-typedef TTRemoteKeypadInitSuccessCallback = void Function(
-    int electricQuantity, String wirelessKeypadFeatureValue);
-
-typedef TTMultifunctionalRemoteKeypadInitSuccessCallback = void Function(
-    int electricQuantity,
-    String wirelessKeypadFeatureValue,
-    int slotNumber,
-    int slotLimit,
-    String? modelNum,
-    String? hardwareRevision,
-    String? firmwareRevision);
-
-typedef TTRemoteKeypadGetStoredLockSuccessCallback = void Function(
-    List lockMacs);
-
-typedef TTRemoteKeypadFailedCallback = void Function(
-    TTRemoteKeyPadAccessoryError errorCode, String errorMsg);
-
-
-typedef TTAddFaceProgressCallback = void Function(
-    TTFaceState state, TTFaceErrorCode faceErrorCode);
-
-typedef TTAddFaceSuccessCallback = void Function(String faceNumber);
-
-class TTRemoteAccessoryScanModel {
-  String name = '';
-  String mac = '';
-  int rssi = -1;
-  bool isMultifunctionalKeypad = false;
-  Map advertisementData = {};
-
-  TTRemoteAccessoryScanModel(Map map) {
-    this.name = map["name"];
-    this.mac = map["mac"];
-    this.rssi = map["rssi"];
-    this.isMultifunctionalKeypad = map["isMultifunctionalKeypad"] ?? false;
-    this.advertisementData = map["advertisementData"] ?? {};
-  }
-}
-
-class TTDoorSensorScanModel {
-  String name = '';
-  String mac = '';
-  int rssi = -1;
-
-  TTDoorSensorScanModel(Map map) {
-    this.name = map["name"];
-    this.mac = map["mac"];
-    this.rssi = map["rssi"];
-  }
-}
-
-class TTGatewayScanModel {
-  String gatewayName = '';
-  String gatewayMac = '';
-  int rssi = -1;
-  bool isDfuMode = false;
-  TTGatewayType? type;
-
-  TTGatewayScanModel(Map map) {
-    this.gatewayName = map["gatewayName"];
-    this.gatewayMac = map["gatewayMac"];
-    this.rssi = map["rssi"];
-    this.type = TTGatewayType.values[map["type"]];
-    this.isDfuMode = map["isDfuMode"];
-  }
-}
-
-class TTNbAwakeTimeModel {
-  TTNbAwakeTimeType type = TTNbAwakeTimeType.point;
-  int minutes = 0;
-}
-
-class TTWifiInfoModel {
-  String wifiMac = '';
-  int wifiRssi = -127;
-  // ignore: non_constant_identifier_names
-  TTWifiInfoModel(Map map) {
-    this.wifiMac = map["wifiMac"];
-    this.wifiRssi = map["wifiRssi"];
-  }
-}
-
-enum TTGatewayError {
-  fail,
-  wrongWifi,
-  wrongWifiPassword,
-  wrongCRC,
-  wrongAeskey,
-  notConnect,
-  disconnect,
-  failConfigRouter,
-  failConfigServer,
-  failConfigAccount,
-  noSim,
-  invalidCommand,
-  failConfigIp,
-  failInvalidIp
-}
-
-enum TTGatewayType { g1, g2, g3, g4, g5 }
-
-enum TTIpSettingType { STATIC_IP, DHCP }
-
-enum TTGatewayConnectStatus { timeout, success, faile }
-
-enum TTRemoteAccessoryError { fail, wrongCrc, connectTimeout }
-
-enum TTRemoteKeyPadAccessoryError {
-  fail,
-  wrongCrc,
-  connectTimeout,
-  factoryDate,
-  duplicateFingerprint,
-  lackOfStorageSpace
-}
-
-enum TTLockFuction {
-  passcode(0, androidName: 'PASSCODE', iosName: 'TTLockFeatureValuePasscode'),
-  icCard(1, androidName: 'IC', iosName: 'TTLockFeatureValueICCard'),
-  fingerprint(2, androidName: 'FINGER_PRINT', iosName: 'TTLockFeatureValueFingerprint'),
-  wristband(3, androidName: 'WRIST_BAND', iosName: 'TTLockFeatureValueWristband'),
-  autoLock(4, androidName: 'AUTO_LOCK', iosName: 'TTLockFeatureValueAutoLock'),
-  deletePasscode(5, androidName: 'PASSCODE_WITH_DELETE_FUNCTION', iosName: 'TTLockFeatureValueDeletePasscode'),
-  managePasscode(7, androidName: 'MODIFY_PASSCODE_FUNCTION', iosName: 'TTLockFeatureValueManagePasscode'),
-  locking(8, androidName: 'MANUAL_LOCK', iosName: 'TTLockFeatureValueLocking'),
-  passcodeVisible(9, androidName: 'PASSWORD_DISPLAY_OR_HIDE', iosName: 'TTLockFeatureValuePasscodeVisible'),
-  gatewayUnlock(10, androidName: 'GATEWAY_UNLOCK', iosName: 'TTLockFeatureValueGatewayUnlock'),
-  lockFreeze(11, androidName: 'FREEZE_LOCK', iosName: 'TTLockFeatureValueLockFreeze'),
-  cyclePassword(12, androidName: 'CYCLIC_PASSWORD', iosName: 'TTLockFeatureValueCyclePassword'),
-  unlockSwicth(14, androidName: 'CONFIG_GATEWAY_UNLOCK', iosName: 'TTLockFeatureValueRemoteUnlockSwicth'),
-  audioSwitch(15, androidName: 'AUDIO_MANAGEMENT', iosName: 'TTLockFeatureValueAudioSwitch'),
-  nbIoT(16, androidName: 'NB_LOCK', iosName: 'TTLockFeatureValueNBIoT'),
-  getAdminPasscode(18, androidName: 'GET_ADMIN_CODE', iosName: 'TTLockFeatureValueGetAdminPasscode'),
-  hotelCard(19, androidName: 'HOTEL_LOCK', iosName: 'TTLockFeatureValueHotelCard'),
-  noClock(20, androidName: 'LOCK_NO_CLOCK_CHIP', iosName: 'TTLockFeatureValueNoClock'),
-  noBroadcastInNormal(21, androidName: 'SUPPORT_CLOSE_BLUETOOTH_ADVERTISING', iosName: 'TTLockFeatureValueNoBroadcastInNormal'),
-  passageMode(22, androidName: 'PASSAGE_MODE', iosName: 'TTLockFeatureValuePassageMode'),
-  turnOffAutoLock(23, androidName: 'PASSAGE_MODE_AND_AUTO_LOCK_AND_CAN_CLOSE', iosName: 'TTLockFeatureValueTurnOffAutoLock'),
-  wirelessKeypad(24, androidName: 'WIRELESS_KEYBOARD', iosName: 'TTLockFeatureValueWirelessKeypad'),
-  light(25, androidName: 'LAMP', iosName: 'TTLockFeatureValueLight'),
-  hotelCardBlacklist(26, androidName: null, iosName: 'TTLockFeatureValueHotelCardBlacklist'),
-  identityCard(27, androidName: null, iosName: 'TTLockFeatureValueIdentityCard'),
-  tamperAlert(28, androidName: 'TAMPER_ALERT', iosName: 'TTLockFeatureValueTamperAlert'),
-  resetButton(29, androidName: 'RESET_BUTTON', iosName: 'TTLockFeatureValueResetButton'),
-  privacyLock(30, androidName: 'PRIVACY_LOCK', iosName: 'TTLockFeatureValuePrivacyLock'),
-  deadLock(32, androidName: 'DEAD_LOCK', iosName: 'TTLockFeatureValueDeadLock'),
-  cyclicCardOrFingerprint(34, androidName: 'CYCLIC_IC_OR_FINGER_PRINT', iosName: 'TTLockFeatureValueCyclicCardOrFingerprint'),
-  fingerVein(37, androidName: 'FINGER_VEIN', iosName: 'TTLockFeatureValueFingerVein'),
-  ble5G(38, androidName: 'TELINK_CHIP', iosName: 'TTLockFeatureValueBle5G'),
-  nbAwake(39, androidName: 'NB_ACTIVITE_CONFIGURATION', iosName: 'TTLockFeatureValueNBAwake'),
-  recoverCyclePasscode(40, androidName: 'CYCLIC_PASSCODE_CAN_RECOVERY', iosName: 'TTLockFeatureValueRecoverCyclePasscode'),
-  remoteKey(41, androidName: 'REMOTE', iosName: 'TTLockFeatureValueWirelessKeyFob'),
-  getAccessoryElectricQuantity(42, androidName: 'ACCESSORY_BATTERY', iosName: 'TTLockFeatureValueGetAccessoryElectricQuantity'),
-  soundVolumeAndLanguageSetting(43, androidName: 'SOUND_VOLUME_AND_LANGUAGE_SETTING', iosName: 'TTLockFeatureValueSoundVolume'),
-  qrCode(44, androidName: 'QR_CODE', iosName: 'TTLockFeatureValueQRCode'),
-  doorSensorState(45, androidName: 'DOOR_SENSOR', iosName: 'TTLockFeatureValueSensorState'),
-  passageModeAutoUnlockSetting(46, androidName: 'PASSAGE_MODE_AUTO_UNLOCK_SETTING', iosName: 'TTLockFeatureValuePassageModeAutoUnlock'),
-  doorSensor(50, androidName: 'WIRELESS_DOOR_SENSOR', iosName: 'TTLockFeatureValueDoorSensor'),
-  doorSensorAlert(51, androidName: 'DOOR_OPEN_ALARM', iosName: 'TTLockFeatureValueDoorSensorAlert'),
-  sensitivity(52, androidName: 'SENSITIVITY', iosName: 'TTLockFeatureValueSensitivity'),
-  face(53, androidName: 'FACE_3D', iosName: 'TTLockFeatureValueFace'),
-  cpuCard(55, androidName: 'CPU_CARD', iosName: 'TTLockFeatureValueCpuCard'),
-  wifiLock(56, androidName: 'WIFI_LOCK', iosName: 'TTLockFeatureValueWifiLock'),
-  wifiLockStaticIP(58, androidName: 'WIFI_LOCK_SUPPORT_STATIC_IP', iosName: 'TTLockFeatureValueWifiLockStaticIP'),
-  passcodeKeyNumber(60, androidName: 'INCOMPLETE_PASSCODE', iosName: 'TTLockFeatureValuePasscodeKeyNumber'),
-  standAloneActivation(62, androidName: null, iosName: 'TTLockFeatureValueStandAloneActivation'),
-  doubleAuth(63, androidName: 'SUPPORT_DOUBLE_CHECK', iosName: 'TTLockFeatureValueDoubleAuth'),
-  authorizedUnlock(64, androidName: 'APP_AUTH_UNLOCK', iosName: 'TTLockFeatureValueAuthorizedUnlock'),
-  gatewayAuthorizedUnlock(65, androidName: 'GATEWAY_AUTH_UNLOCK', iosName: 'TTLockFeatureValueGatewayAuthorizedUnlock'),
-  noEkeyUnlock(66, androidName: 'DO_NOT_SUPPORT_APP_AND_GATEWAY_UNLOCK', iosName: 'TTLockFeatureValueNoEkeyUnlock'),
-  zhiAnPhotoFace(69, androidName: 'ZHI_AN_FACE_DELIVERY', iosName: 'TTLockFeatureValueZhiAnPhotoFace'),
-  palmVein(70, androidName: 'PALM_VEIN', iosName: 'TTLockFeatureValuePalmVein'),
-  wifiArea(71, androidName: null, iosName: 'TTLockFeatureValueWifiArea'),
-  xiaoCaoCamera(75, androidName: 'SUPPORT_GRASS', iosName: 'TTLockFeatureValueXiaoCaoCamera'),
-  resetLockByCode(76, androidName: 'RESET_LOCK_BY_CODE', iosName: 'TTLockFeatureValueResetLockByCode'),
-  thirdPartyBluetoothDevice(77, androidName: 'SUPPORT_THIRD_PARTY_BLUETOOTH_DEVICE', iosName: null),
-  autoSetAngle(78, androidName: 'AUTO_SET_ANGLE', iosName: 'TTLockFeatureValueAutoSetAngle'),
-  manualSetAngle(79, androidName: 'MANUAL_SET_ANGLE', iosName: 'TTLockFeatureValueManualSetAngle'),
-  controlLatchBolt(80, androidName: 'CONTROL_LATCH_BOLT', iosName: 'TTLockFeatureValueControlLatchBolt'),
-  autoSetUnlockDirection(81, androidName: 'AUTO_SET_UNLOCK_DIRECTION', iosName: 'TTLockFeatureValueAutoSetUnlockDirection'),
-  icCardSecuritySetting(82, androidName: 'SUPPORT_IC_CARD_SECURITY_SETTING', iosName: null),
-  wifiPowerSavingTime(83, androidName: 'SUPPORT_WIFI_SLEEP_MODE_TIMES_SETTING', iosName: 'TTLockFeatureValueWifiPowerSavingTime'),
-  multiFunctionKeypad(84, androidName: 'SUPPORT_MULTI_FUNCTION_KEYPAD', iosName: 'TTLockFeatureValueMultifunctionalKeypad'),
-  doNotSupportTurnOffLatchBolt(85, androidName: 'DO_NOT_SUPPORT_TURN_OFF_LATCH_BOLT', iosName: null),
-  publicMode(86, androidName: 'SUPPORT_PUBLIC_MODE_SETTING', iosName: 'TTLockFeatureValuePublicMode'),
-  lowBatteryAutoUnlock(87, androidName: 'SUPPORT_LOW_BATTERY_UNLOCK_SETTING', iosName: 'TTLockFeatureValueLowBatteryAutoUnlock'),
-  motorDriveTime(88, androidName: 'SUPPORT_MOTOR_DRIVE_TIME_SETTING', iosName: 'TTLockFeatureValueMotorDriveTime'),
-  modifyFeatureValue(89, androidName: 'SUPPORT_MODIFY_FEATURE_VALUE', iosName: 'TTLockFeatureValueModifyFeatureValue'),
-  modifyLockNamePrefix(90, androidName: 'SUPPORT_MODIFY_LOCK_NAME_PREFIX', iosName: 'TTLockFeatureValueModifyLockNamePrefix'),
-  authCode(92, androidName: 'SUPPORT_AUTH_CODE', iosName: 'TTLockFeatureValueAuthCode'),
-  unauthorizedAttemptAlarm(93, androidName: 'UNAUTHORIZED_ATTEMPT_ALARM', iosName: null),
-  powerSaverSupportWifi(96, androidName: 'POWER_SAVER_SUPPORT_WIFI', iosName: 'TTLockFeatureValuePowerSaverSupportWifi'),
-  bluetoothAdvertisingSetting(97, androidName: 'SUPPORT_BLUETOOTH_ADVERTISING_SETTING', iosName: null),
-  workingMode(98, androidName: 'SUPPORT_WORKING_TIMES', iosName: 'TTLockFeatureValueWorkingMode'),
-  supplierCode(99, androidName: 'SUPPORT_SUPPLIER_CODE', iosName: null),
-  catOne(100, androidName: 'SUPPORT_CAT_ONE', iosName: null),
-  forcedOpeningDoorAlarm(102, androidName: 'SUPPORT_FORCED_OPENING_DOOR_ALARM', iosName: null),
-  zhiAnFaceFeatureSecondGeneration(103, androidName: 'ZHI_AN_FACE_FEATURE_SECOND_GENERATION', iosName: null),
-  supportDeadLocking(106, androidName: 'SUPPORT_DEAD_LOCKING', iosName: null),
-  workingTime(107, androidName: null, iosName: 'TTLockFeatureValueWorkingTime'),
-  customQRCode(108, androidName: 'SUPPORT_CUSTOM_QR_CODE', iosName: 'TTLockFeatureValueCustomQRCode'),
-  securityM1Card(109, androidName: 'SUPPORT_SAFE_M1_CARD', iosName: 'TTLockFeatureValueSecurityM1Card'),
-  yiShengPhotoFace(110, androidName: null, iosName: 'TTLockFeatureValueYiShengPhotoFace');
-
-  final int value;
-  final String? androidName;
-  final String? iosName;
-  const TTLockFuction(this.value, {this.androidName, this.iosName});
-}
-
-enum TTFaceState { canStartAdd, error }
-
-enum TTFaceErrorCode {
-  normal,
-  noFaceDetected,
-  tooCloseToTheTop,
-  tooCloseToTheBottom,
-  tooCloseToTheLeft,
-  tooCloseToTheRight,
-  tooFarAway,
-  tooClose,
-  eyebrowsCovered,
-  eyesCovered,
-  faceCovered,
-  faceDirection,
-  eyeOpeningDetected,
-  eyesClosedStatus,
-  failedToDetectEye,
-  needTurnHeadToLeft,
-  needTurnHeadToRight,
-  needRaiseHead,
-  needLowerHead,
-  needTiltHeadToLeft,
-  needTiltHeadToRight,
 }
