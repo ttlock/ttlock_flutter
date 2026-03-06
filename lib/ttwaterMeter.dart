@@ -327,7 +327,7 @@ class TTWaterDeviceInfoModel {
     this.catOneOperator = map[TTResponse.catOneOperator]??'';
     this.catOneNodeId = map[TTResponse.catOneNodeId]??'';
     this.catOneCardNumber = map[TTResponse.catOneCardNumber]??'';
-    this.catOneRssi = map[TTResponse.catOneRssi]??'';
+    this.catOneRssi = (map[TTResponse.catOneRssi] ?? '').toString(); 
     this.catOneImsi = map[TTResponse.catOneImsi]??'';
   }
 }
