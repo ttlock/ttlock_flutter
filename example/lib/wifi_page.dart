@@ -1,8 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:ttlock_flutter_example/gateway_page.dart';
-import 'package:ttlock_premise_flutter/ttgateway.dart';
 import 'package:bmprogresshud/progresshud.dart';
 import 'package:ttlock_premise_flutter/ttlock.dart';
+
+import 'gateway_page.dart';
 
 class WifiPage extends StatefulWidget {
   WifiPage({required this.mac}) : super();
@@ -13,26 +15,34 @@ class WifiPage extends StatefulWidget {
 
 class _WifiPageState extends State<WifiPage> {
   List _wifiList = [];
-  // BuildContext _context;
+  StreamSubscription? _wifiSub;
 
-  _WifiPageState() {
+  @override
+  void initState() {
     super.initState();
     _getNearbyWifi();
   }
 
+  @override
+  void dispose() {
+    _wifiSub?.cancel();
+    super.dispose();
+  }
+
   void _getNearbyWifi() {
-    // ProgressHud.of(_context).showLoading();
-    TTGateway.getNearbyWifi((finished, wifiList) {
-      // ProgressHud.of(_context).dismiss();
-      setState(() {
-        _wifiList = wifiList;
-      });
-    }, (errorCode, errorMsg) {});
+    _wifiSub = TTLock.gateway.getNearbyWifi().listen(
+      (wifiList) {
+        setState(() {
+          _wifiList = wifiList;
+        });
+      },
+      onError: (e) => print('WiFi scan error: $e'),
+    );
   }
 
   void _pushGatewayPage(String wifi) {
     Navigator.push(context,
-        new MaterialPageRoute(builder: (BuildContext context) {
+        MaterialPageRoute(builder: (BuildContext context) {
       return GatewayPage(type: TTGatewayType.g2, wifi: wifi);
     }));
   }
@@ -40,13 +50,10 @@ class _WifiPageState extends State<WifiPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Select Wifi'),
-        ),
+        appBar: AppBar(title: Text('Select Wifi')),
         body: Material(child: ProgressHud(
           child: Container(
             child: Builder(builder: (context) {
-              // _context = context;
               return getList();
             }),
           ),
@@ -56,7 +63,7 @@ class _WifiPageState extends State<WifiPage> {
   Widget getList() {
     return ListView.builder(
         itemCount: _wifiList.length,
-        padding: new EdgeInsets.all(5.0),
+        padding: EdgeInsets.all(5.0),
         itemExtent: 50.0,
         itemBuilder: (context, index) {
           Map wifiMap = _wifiList[index];
@@ -65,7 +72,6 @@ class _WifiPageState extends State<WifiPage> {
             title: Text(wifiMap['wifi']),
             subtitle: Text('rssi:$rssi'),
             onTap: () {
-              Map wifiMap = _wifiList[index];
               String wifi = wifiMap['wifi'];
               _pushGatewayPage(wifi);
             },

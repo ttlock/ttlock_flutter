@@ -1,50 +1,112 @@
-// Enums for TTLock / gateway / accessory. No dependency on TTResponse or models.
-
 enum TTBluetoothState {
-  unknow,
-  resetting,
-  unsupported,
-  unAuthorized,
-  turnOff,
-  turnOn
+  unknow(0),
+  resetting(1),
+  unsupported(2),
+  unAuthorized(3),
+  turnOff(4),
+  turnOn(5);
+
+  final int value;
+  const TTBluetoothState(this.value);
+  static TTBluetoothState fromValue(int v) =>
+      TTBluetoothState.values.firstWhere((e) => e.value == v);
 }
 
-enum TTPasscodeType { once, permanent, period, cycle }
+enum TTPasscodeType {
+  once(0),
+  permanent(1),
+  period(2),
+  cycle(3);
 
-enum TTOperateRecordType { latest, total }
+  final int value;
+  const TTPasscodeType(this.value);
+  static TTPasscodeType fromValue(int v) =>
+      TTPasscodeType.values.firstWhere((e) => e.value == v);
+}
 
-enum TTControlAction { unlock, lock }
+enum TTOperateRecordType {
+  latest(0),
+  total(1);
 
-enum TTLockSwitchState { lock, unlock, unknow }
+  final int value;
+  const TTOperateRecordType(this.value);
+  static TTOperateRecordType fromValue(int v) =>
+      TTOperateRecordType.values.firstWhere((e) => e.value == v);
+}
 
-enum TTPassageModeType { weekly, monthly }
+enum TTControlAction {
+  unlock(0),
+  lock(1);
 
-enum TTLockReuslt { success, progress, fail }
+  final int value;
+  const TTControlAction(this.value);
+  static TTControlAction fromValue(int v) =>
+      TTControlAction.values.firstWhere((e) => e.value == v);
+}
+
+enum TTLockSwitchState {
+  lock(0),
+  unlock(1),
+  unknow(2);
+
+  final int value;
+  const TTLockSwitchState(this.value);
+  static TTLockSwitchState fromValue(int v) =>
+      TTLockSwitchState.values.firstWhere((e) => e.value == v);
+}
+
+enum TTPassageModeType {
+  weekly(0),
+  monthly(1);
+
+  final int value;
+  const TTPassageModeType(this.value);
+  static TTPassageModeType fromValue(int v) =>
+      TTPassageModeType.values.firstWhere((e) => e.value == v);
+}
 
 enum TTLockConfig {
-  audio,
-  passcodeVisible,
-  freeze,
-  tamperAlert,
-  resetButton,
-  privacyLock,
-  passageModeAutoUnlock,
-  wifiLockPowerSavingMode,
-  doubleAuth,
-  publicMode,
-  lowBatteryAutoUnlock
+  audio(0),
+  passcodeVisible(1),
+  freeze(2),
+  tamperAlert(3),
+  resetButton(4),
+  privacyLock(5),
+  passageModeAutoUnlock(6),
+  wifiLockPowerSavingMode(7),
+  doubleAuth(8),
+  publicMode(9),
+  lowBatteryAutoUnlock(10);
+
+  final int value;
+  const TTLockConfig(this.value);
+  static TTLockConfig fromValue(int v) =>
+      TTLockConfig.values.firstWhere((e) => e.value == v);
 }
 
-enum TTLockDirection { left, right }
+enum TTLockDirection {
+  left(0),
+  right(1);
+
+  final int value;
+  const TTLockDirection(this.value);
+  static TTLockDirection fromValue(int v) =>
+      TTLockDirection.values.firstWhere((e) => e.value == v);
+}
 
 enum TTSoundVolumeType {
-  firstLevel,
-  secondLevel,
-  thirdLevel,
-  fourthLevel,
-  fifthLevel,
-  off,
-  on
+  firstLevel(0),
+  secondLevel(1),
+  thirdLevel(2),
+  fourthLevel(3),
+  fifthLevel(4),
+  off(5),
+  on(6);
+
+  final int value;
+  const TTSoundVolumeType(this.value);
+  static TTSoundVolumeType fromValue(int v) =>
+      TTSoundVolumeType.values.firstWhere((e) => e.value == v);
 }
 
 enum TTSensitivityValue {
@@ -54,127 +116,244 @@ enum TTSensitivityValue {
   high(3);
 
   final int value;
-
   const TTSensitivityValue(this.value);
+  static TTSensitivityValue fromValue(int v) =>
+      TTSensitivityValue.values.firstWhere((e) => e.value == v);
 }
 
 enum TTLockError {
-  reseted,
-  crcError,
-  noPermisstion,
-  wrongAdminCode,
-  noStorageSpace,
-  inSettingMode,
-  noAdmin,
-  notInSettingMode,
-  wrongDynamicCode,
-  noPower,
-  resetPasscode,
-  unpdatePasscodeIndex,
-  invalidLockFlagPos,
-  ekeyExpired,
-  passcodeLengthInvalid,
-  samePasscodes,
-  ekeyInactive,
-  aesKey,
-  fail,
-  passcodeExist,
-  passcodeNotExist,
-  lackOfStorageSpaceWhenAddingPasscodes,
-  invalidParaLength,
-  cardNotExist,
-  fingerprintDuplication,
-  fingerprintNotExist,
-  invalidCommand,
-  inFreezeMode,
-  invalidClientPara,
-  lockIsLocked,
-  recordNotExist,
-  notSupportModifyPasscode,
-  bluetoothOff,
-  bluetoothConnectTimeount,
-  bluetoothDisconnection,
-  lockIsBusy,
-  invalidLockData,
-  invalidParameter,
-  wrongWifi,
-  wrongWifiPassword
+  reseted(0),
+  crcError(1),
+  noPermisstion(2),
+  wrongAdminCode(3),
+  noStorageSpace(4),
+  inSettingMode(5),
+  noAdmin(6),
+  notInSettingMode(7),
+  wrongDynamicCode(8),
+  noPower(9),
+  resetPasscode(10),
+  unpdatePasscodeIndex(11),
+  invalidLockFlagPos(12),
+  ekeyExpired(13),
+  passcodeLengthInvalid(14),
+  samePasscodes(15),
+  ekeyInactive(16),
+  aesKey(17),
+  fail(18),
+  passcodeExist(19),
+  passcodeNotExist(20),
+  lackOfStorageSpaceWhenAddingPasscodes(21),
+  invalidParaLength(22),
+  cardNotExist(23),
+  fingerprintDuplication(24),
+  fingerprintNotExist(25),
+  invalidCommand(26),
+  inFreezeMode(27),
+  invalidClientPara(28),
+  lockIsLocked(29),
+  recordNotExist(30),
+  notSupportModifyPasscode(31),
+  bluetoothOff(32),
+  bluetoothConnectTimeount(33),
+  bluetoothDisconnection(34),
+  lockIsBusy(35),
+  invalidLockData(36),
+  invalidParameter(37),
+  wrongWifi(38),
+  wrongWifiPassword(39);
+
+  final int value;
+  const TTLockError(this.value);
+  static TTLockError fromValue(int v) =>
+      TTLockError.values.firstWhere((e) => e.value == v);
 }
 
-enum TTErrorDevice { lock, keyPad, key }
+enum TTErrorDevice {
+  lock(0),
+  keyPad(1),
+  key(2);
 
-enum TTLiftWorkActivateType { allFloors, specificFloors }
+  final int value;
+  const TTErrorDevice(this.value);
+  static TTErrorDevice fromValue(int v) =>
+      TTErrorDevice.values.firstWhere((e) => e.value == v);
+}
 
-enum TTPowerSaverWorkType { allCards, hotelCard, roomCard }
+enum TTLiftWorkActivateType {
+  allFloors(0),
+  specificFloors(1);
 
-enum TTNbAwakeMode { keypad, card, fingerprint }
+  final int value;
+  const TTLiftWorkActivateType(this.value);
+  static TTLiftWorkActivateType fromValue(int v) =>
+      TTLiftWorkActivateType.values.firstWhere((e) => e.value == v);
+}
 
-enum TTNbAwakeTimeType { point, interval }
+enum TTPowerSaverWorkType {
+  allCards(0),
+  hotelCard(1),
+  roomCard(2);
 
-enum TTRemoteAccessory { remoteKey, remoteKeypad, doorSensor }
+  final int value;
+  const TTPowerSaverWorkType(this.value);
+  static TTPowerSaverWorkType fromValue(int v) =>
+      TTPowerSaverWorkType.values.firstWhere((e) => e.value == v);
+}
+
+enum TTNbAwakeMode {
+  keypad(0),
+  card(1),
+  fingerprint(2);
+
+  final int value;
+  const TTNbAwakeMode(this.value);
+  static TTNbAwakeMode fromValue(int v) =>
+      TTNbAwakeMode.values.firstWhere((e) => e.value == v);
+}
+
+enum TTNbAwakeTimeType {
+  point(0),
+  interval(1);
+
+  final int value;
+  const TTNbAwakeTimeType(this.value);
+  static TTNbAwakeTimeType fromValue(int v) =>
+      TTNbAwakeTimeType.values.firstWhere((e) => e.value == v);
+}
+
+enum TTRemoteAccessory {
+  remoteKey(0),
+  remoteKeypad(1),
+  doorSensor(2);
+
+  final int value;
+  const TTRemoteAccessory(this.value);
+  static TTRemoteAccessory fromValue(int v) =>
+      TTRemoteAccessory.values.firstWhere((e) => e.value == v);
+}
 
 enum TTGatewayError {
-  fail,
-  wrongWifi,
-  wrongWifiPassword,
-  wrongCRC,
-  wrongAeskey,
-  notConnect,
-  disconnect,
-  failConfigRouter,
-  failConfigServer,
-  failConfigAccount,
-  noSim,
-  invalidCommand,
-  failConfigIp,
-  failInvalidIp
+  fail(0),
+  wrongWifi(1),
+  wrongWifiPassword(2),
+  wrongCRC(3),
+  wrongAeskey(4),
+  notConnect(5),
+  disconnect(6),
+  failConfigRouter(7),
+  failConfigServer(8),
+  failConfigAccount(9),
+  noSim(10),
+  invalidCommand(11),
+  failConfigIp(12),
+  failInvalidIp(13);
+
+  final int value;
+  const TTGatewayError(this.value);
+  static TTGatewayError fromValue(int v) =>
+      TTGatewayError.values.firstWhere((e) => e.value == v);
 }
 
-enum TTGatewayType { g1, g2, g3, g4, g5 }
+enum TTGatewayType {
+  g1(0),
+  g2(1),
+  g3(2),
+  g4(3),
+  g5(4);
 
-enum TTIpSettingType { STATIC_IP, DHCP }
+  final int value;
+  const TTGatewayType(this.value);
+  static TTGatewayType fromValue(int v) =>
+      TTGatewayType.values.firstWhere((e) => e.value == v);
+}
 
-enum TTGatewayConnectStatus { timeout, success, faile }
+enum TTIpSettingType {
+  staticIp(0),
+  dhcp(1);
 
-enum TTRemoteAccessoryError { fail, wrongCrc, connectTimeout }
+  final int value;
+  const TTIpSettingType(this.value);
+  static TTIpSettingType fromValue(int v) =>
+      TTIpSettingType.values.firstWhere((e) => e.value == v);
+}
+
+enum TTGatewayConnectStatus {
+  timeout(0),
+  success(1),
+  faile(2);
+
+  final int value;
+  const TTGatewayConnectStatus(this.value);
+  static TTGatewayConnectStatus fromValue(int v) =>
+      TTGatewayConnectStatus.values.firstWhere((e) => e.value == v);
+}
+
+enum TTRemoteAccessoryError {
+  fail(0),
+  wrongCrc(1),
+  connectTimeout(2);
+
+  final int value;
+  const TTRemoteAccessoryError(this.value);
+  static TTRemoteAccessoryError fromValue(int v) =>
+      TTRemoteAccessoryError.values.firstWhere((e) => e.value == v);
+}
 
 enum TTRemoteKeyPadAccessoryError {
-  fail,
-  wrongCrc,
-  connectTimeout,
-  factoryDate,
-  duplicateFingerprint,
-  lackOfStorageSpace
+  fail(0),
+  wrongCrc(1),
+  connectTimeout(2),
+  factoryDate(3),
+  duplicateFingerprint(4),
+  lackOfStorageSpace(5);
+
+  final int value;
+  const TTRemoteKeyPadAccessoryError(this.value);
+  static TTRemoteKeyPadAccessoryError fromValue(int v) =>
+      TTRemoteKeyPadAccessoryError.values.firstWhere((e) => e.value == v);
 }
 
-enum TTFaceState { canStartAdd, error }
+enum TTFaceState {
+  canStartAdd(0),
+  error(1);
+
+  final int value;
+  const TTFaceState(this.value);
+  static TTFaceState fromValue(int v) =>
+      TTFaceState.values.firstWhere((e) => e.value == v);
+}
 
 enum TTFaceErrorCode {
-  normal,
-  noFaceDetected,
-  tooCloseToTheTop,
-  tooCloseToTheBottom,
-  tooCloseToTheLeft,
-  tooCloseToTheRight,
-  tooFarAway,
-  tooClose,
-  eyebrowsCovered,
-  eyesCovered,
-  faceCovered,
-  faceDirection,
-  eyeOpeningDetected,
-  eyesClosedStatus,
-  failedToDetectEye,
-  needTurnHeadToLeft,
-  needTurnHeadToRight,
-  needRaiseHead,
-  needLowerHead,
-  needTiltHeadToLeft,
-  needTiltHeadToRight,
+  normal(0),
+  noFaceDetected(1),
+  tooCloseToTheTop(2),
+  tooCloseToTheBottom(3),
+  tooCloseToTheLeft(4),
+  tooCloseToTheRight(5),
+  tooFarAway(6),
+  tooClose(7),
+  eyebrowsCovered(8),
+  eyesCovered(9),
+  faceCovered(10),
+  faceDirection(11),
+  eyeOpeningDetected(12),
+  eyesClosedStatus(13),
+  failedToDetectEye(14),
+  needTurnHeadToLeft(15),
+  needTurnHeadToRight(16),
+  needRaiseHead(17),
+  needLowerHead(18),
+  needTiltHeadToLeft(19),
+  needTiltHeadToRight(20);
+
+  final int value;
+  const TTFaceErrorCode(this.value);
+  static TTFaceErrorCode fromValue(int v) =>
+      TTFaceErrorCode.values.firstWhere((e) => e.value == v);
 }
 
-// --- TTLockFuction (enum with constructor) ---
-enum TTLockFuction {
+enum TTLockFunction {
   passcode(0, androidName: 'PASSCODE', iosName: 'TTLockFeatureValuePasscode'),
   icCard(1, androidName: 'IC', iosName: 'TTLockFeatureValueICCard'),
   fingerprint(2, androidName: 'FINGER_PRINT', iosName: 'TTLockFeatureValueFingerprint'),
@@ -187,7 +366,7 @@ enum TTLockFuction {
   gatewayUnlock(10, androidName: 'GATEWAY_UNLOCK', iosName: 'TTLockFeatureValueGatewayUnlock'),
   lockFreeze(11, androidName: 'FREEZE_LOCK', iosName: 'TTLockFeatureValueLockFreeze'),
   cyclePassword(12, androidName: 'CYCLIC_PASSWORD', iosName: 'TTLockFeatureValueCyclePassword'),
-  unlockSwicth(14, androidName: 'CONFIG_GATEWAY_UNLOCK', iosName: 'TTLockFeatureValueRemoteUnlockSwicth'),
+  unlockSwitch(14, androidName: 'CONFIG_GATEWAY_UNLOCK', iosName: 'TTLockFeatureValueRemoteUnlockSwicth'),
   audioSwitch(15, androidName: 'AUDIO_MANAGEMENT', iosName: 'TTLockFeatureValueAudioSwitch'),
   nbIoT(16, androidName: 'NB_LOCK', iosName: 'TTLockFeatureValueNBIoT'),
   getAdminPasscode(18, androidName: 'GET_ADMIN_CODE', iosName: 'TTLockFeatureValueGetAdminPasscode'),
@@ -265,5 +444,7 @@ enum TTLockFuction {
   final int value;
   final String? androidName;
   final String? iosName;
-  const TTLockFuction(this.value, {this.androidName, this.iosName});
+  const TTLockFunction(this.value, {this.androidName, this.iosName});
+  static TTLockFunction fromValue(int v) =>
+      TTLockFunction.values.firstWhere((e) => e.value == v);
 }

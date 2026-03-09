@@ -6,13 +6,14 @@ description: Demonstrates how to use the ttlock_flutter plugin.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
 
   bmprogresshud: ^0.0.8
+  permission_handler: ^11.0.0
   
   ttlock_premise_flutter:
     # When depending on this package from a real application you should use:

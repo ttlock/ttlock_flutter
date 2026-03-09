@@ -12,5 +12,6 @@ public class MainActivity extends FlutterActivity {
         if (ttlockflutterpluginPlugin != null) {
             ttlockflutterpluginPlugin.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }

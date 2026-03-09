@@ -1,97 +1,46 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:ttlock_premise_flutter/ttlock.dart';
-import 'package:ttlock_premise_flutter/ttlock_models.dart';
 import 'package:bmprogresshud/progresshud.dart';
 
 import 'key_pad/scan_key_pad_page.dart';
 
 class LockPage extends StatefulWidget {
-  LockPage(
-      {Key? key,
-      required this.title,
-      required this.lockData,
-      required this.lockMac})
-      : super(key: key);
+  LockPage({
+    Key? key,
+    required this.title,
+    required this.lockData,
+    required this.lockMac,
+  }) : super(key: key);
   final String title;
   final String lockData;
   final String lockMac;
   @override
-  _LockPageState createState() => _LockPageState(lockData, lockMac);
+  _LockPageState createState() => _LockPageState();
 }
 
 enum Command {
-  resetLock,
-  unlock,
-  resetEkey,
-  modifyAdminPasscode,
-  getLockTime,
-  setLockTime,
-  getLockPower,
-  getLockOperateRecord,
-  getLockSwitchState,
-  customPasscode,
-  modifyPasscode,
-  deletePasscode,
-  resetPasscode,
-  getAllValidPasscode,
-  addCard,
-  modifyCard,
-  deleteCard,
-  clearCard,
-  getAllValidCard,
-  addFingerprint,
-  modifyFingerprint,
-  deleteFingerprint,
-  clearFingerprint,
-  getAllValidFingerprint,
-
-  getLockAutomaticLockingPeriodicTime,
-  setLockAutomaticLockingPeriodicTime,
-  getLockRemoteUnlockSwitchState,
-  setLockRemoteUnlockSwitchState,
-  getLockAudioSwitchState,
-  setLockAudioSwitchState,
-  getLockSoundVolumeType,
-  setLockSoundVolumeType,
-  addPassageMode,
-  clearAllPassageModes,
-
-  activateLiftFloors,
-  setLiftControlableFloors,
-  setLiftWorkMode,
-
-  setPowerSaverWorkMode,
-  setPowerSaverControlableLock,
-
-  // setDoorSensorSwitch,
-  // getDoorSensorSwitch,
-  // getDoorSensorState,
-
-  setHotelCardSector,
-  setHotelData,
-
-  setLockDirectionLeft,
-  getLockDirection,
-
-  getLockSystemInfo,
-
-  // setNBServerInfo,
-  // getAdminPasscode,
-
-  // getPasscodeVerificationParams,
-  // recoveryCard,
-  // getLockVersion,
-  // scanWifi,
-  // configWifi,
-  // configServer,
-  // getWifiInfo,
-  configIp,
-  keypad,
-  setSensitivity
+  resetLock, unlock, resetEkey, modifyAdminPasscode,
+  getLockTime, setLockTime, getLockPower, getLockOperateRecord,
+  getLockSwitchState, customPasscode, modifyPasscode, deletePasscode,
+  resetPasscode, getAllValidPasscode,
+  addCard, modifyCard, deleteCard, clearCard, getAllValidCard,
+  addFingerprint, modifyFingerprint, deleteFingerprint, clearFingerprint, getAllValidFingerprint,
+  getLockAutomaticLockingPeriodicTime, setLockAutomaticLockingPeriodicTime,
+  getLockRemoteUnlockSwitchState, setLockRemoteUnlockSwitchState,
+  getLockAudioSwitchState, setLockAudioSwitchState,
+  getLockSoundVolumeType, setLockSoundVolumeType,
+  addPassageMode, clearAllPassageModes,
+  activateLiftFloors, setLiftControlableFloors, setLiftWorkMode,
+  setPowerSaverWorkMode, setPowerSaverControlableLock,
+  setHotelCardSector, setHotelData,
+  setLockDirectionLeft, getLockDirection,
+  getLockSystemInfo, configIp, keypad, setSensitivity,
 }
 
 class _LockPageState extends State<LockPage> {
-  List<Map<String, Command>> _commandList = [
+  final List<Map<String, Command>> _commandList = [
     {"Reset Lock": Command.resetLock},
     {"Unlock": Command.unlock},
     {"Get Power": Command.getLockPower},
@@ -115,667 +64,364 @@ class _LockPageState extends State<LockPage> {
     {"Modify Fingerprint": Command.modifyFingerprint},
     {"Get All Fingerprints": Command.getAllValidFingerprint},
     {"Delete Fingerprint": Command.deleteFingerprint},
-    {"Cleaer All Fingerprints": Command.clearFingerprint},
-    {
-      "Get Lock Automatic Locking Periodic Time":
-          Command.getLockAutomaticLockingPeriodicTime
-    },
-    {
-      "Set Lock Automatic Locking Periodic Time":
-          Command.setLockAutomaticLockingPeriodicTime
-    },
-    {
-      "Get Lock Remote Unlock Switch State":
-          Command.getLockRemoteUnlockSwitchState
-    },
-    {
-      "Set Lock Remote Unlock Switch State":
-          Command.setLockRemoteUnlockSwitchState
-    },
-    {"Get Lock Audio Switch State": Command.getLockAudioSwitchState},
-    {"Set Lock Audio Switch State": Command.setLockAudioSwitchState},
-    {"Get Lock Unlock Direction": Command.getLockDirection},
-    {"Set Lock Unlock Direction Left": Command.setLockDirectionLeft},
-    {"Get Lock Sound Volume Type": Command.getLockSoundVolumeType},
-    {"Set Lock Sound Volume Type": Command.setLockSoundVolumeType},
+    {"Clear All Fingerprints": Command.clearFingerprint},
+    {"Get Auto Lock Time": Command.getLockAutomaticLockingPeriodicTime},
+    {"Set Auto Lock Time": Command.setLockAutomaticLockingPeriodicTime},
+    {"Get Remote Unlock Switch": Command.getLockRemoteUnlockSwitchState},
+    {"Set Remote Unlock Switch": Command.setLockRemoteUnlockSwitchState},
+    {"Get Audio Switch": Command.getLockAudioSwitchState},
+    {"Set Audio Switch": Command.setLockAudioSwitchState},
+    {"Get Lock Direction": Command.getLockDirection},
+    {"Set Lock Direction Left": Command.setLockDirectionLeft},
+    {"Get Sound Volume": Command.getLockSoundVolumeType},
+    {"Set Sound Volume": Command.setLockSoundVolumeType},
     {"Add Passage Mode": Command.addPassageMode},
-    {"Clear All Passage Mode": Command.clearAllPassageModes},
+    {"Clear All Passage Modes": Command.clearAllPassageModes},
     {"Activate Lift Floors": Command.activateLiftFloors},
     {"Set Lift Controlable Floors": Command.setLiftControlableFloors},
     {"Set Lift Work Mode": Command.setLiftWorkMode},
     {"Set Power Saver Work Mode": Command.setPowerSaverWorkMode},
     {"Set Power Saver Controlable": Command.setPowerSaverControlableLock},
-    // {"Set Door Sensor Switch": Command.setDoorSensorSwitch},
-    // {"Get Door Sensor Switch": Command.getDoorSensorSwitch},
-    // {"Get Door Sensor State": Command.getDoorSensorState},
     {"Set Hotel Card Sector": Command.setHotelCardSector},
     {"Set Hotel Data": Command.setHotelData},
     {"Get Lock System Info": Command.getLockSystemInfo},
-    // {"Set Nb Server Info": Command.setNBServerInfo},
-    // {"Get Admin Passcode": Command.getAdminPasscode},
-    // {"Get Passcode Verification Param": Command.getPasscodeVerificationParams},
-    // {"Recovery Card Data": Command.recoveryCard},
-    // {"Get LockVersion": Command.getLockVersion},
-    // {"Wifi lock scan nearby wifi": Command.scanWifi},
-    // {"Wifi lock config wifi": Command.configWifi},
-    // {"Wifi lock config server": Command.configServer},
-    // {"Wifi lock get wifi info": Command.getWifiInfo},
-    {"Wifi lock config ip": Command.configIp},
+    {"Config IP (DHCP)": Command.configIp},
     {"Keypad": Command.keypad},
-    {"setSensitivity":Command.setSensitivity}
+    {"Set Sensitivity": Command.setSensitivity},
   ];
 
-  String note =
-      'Note: You need to reset the lock befor pop current page,otherwise the lock will can\'t be initialized again';
+  String note = 'Note: Reset the lock before leaving, otherwise it cannot be initialized again';
 
-  String lockData = '';
-  String lockMac = '';
+  late String lockData;
   String? addCardNumber;
   String? addFingerprintNumber;
   BuildContext? _context;
+  StreamSubscription? _progressSub;
 
-  _LockPageState(String lockData, String lockMac) {
+  @override
+  void initState() {
     super.initState();
-    this.lockData = lockData;
-    this.lockMac = lockMac;
-  }
-
-  void _showLoading(String text) {
-    ProgressHud.of(_context!).showLoading(text: text);
-  }
-
-  void _showSuccessAndDismiss(String text) {
-    ProgressHud.of(_context!).showSuccessAndDismiss(text: text);
-  }
-
-  void _showErrorAndDismiss(TTLockError errorCode, String errorMsg) {
-    ProgressHud.of(_context!).showErrorAndDismiss(
-        text: 'errorCode:$errorCode errorMessage:$errorMsg');
+    lockData = widget.lockData;
   }
 
   @override
   void dispose() {
-    //You need to reset lock, otherwise the lock will can't be initialized again
-    TTLock.resetLock(lockData, () {}, (errorCode, errorMsg) {});
+    _progressSub?.cancel();
+    TTLock.lock.resetLock(lockData).catchError((_) {});
     super.dispose();
   }
+
+  void _showLoading(String text) => ProgressHud.of(_context!).showLoading(text: text);
+  void _showSuccess(String text) => ProgressHud.of(_context!).showSuccessAndDismiss(text: text);
+  void _showError(String text) => ProgressHud.of(_context!).showErrorAndDismiss(text: text);
+
+  final _lock = TTLock.lock;
 
   void _click(Command command, BuildContext context) async {
     _showLoading('');
     int startDate = DateTime.now().millisecondsSinceEpoch;
     int endDate = startDate + 3600 * 24 * 30 * 1000;
 
-    switch (command) {
-      case Command.resetLock:
-        TTLock.resetLock(lockData, () {
-          print("Reset lock success");
+    try {
+      switch (command) {
+        case Command.resetLock:
+          await _lock.resetLock(lockData);
           Navigator.popAndPushNamed(context, '/');
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.unlock:
-        //Note: the lockData is not contain userId and valid date.
-        //If you want to get lockData contain userId and valid date please get lockData from api https://open.ttlock.com/doc/api/v3/key/list
-        TTLock.controlLock(lockData, TTControlAction.unlock,
-            (lockTime, electricQuantity, uniqueId) {
-          _showSuccessAndDismiss(
-              "Unlock Success lockTime:$lockTime electricQuantity:$electricQuantity uniqueId:$uniqueId");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.getLockPower:
-        TTLock.getLockPower(lockData, (electricQuantity) {
-          _showSuccessAndDismiss("The power: $electricQuantity ");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.getLockTime:
-        TTLock.getLockTime(lockData, (lockTimestamp) {
-          _showSuccessAndDismiss("Time: $lockTimestamp ");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.setLockTime:
-        int timestamp = DateTime.now().millisecondsSinceEpoch;
-        TTLock.setLockTime(timestamp, lockData, () {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-
-      case Command.getLockOperateRecord:
-        TTLock.getLockOperateRecord(TTOperateRecordType.latest, lockData,
-            (operateRecord) {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-
-      case Command.resetEkey:
-        TTLock.resetEkey(lockData, (lockData) {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-
-      // case Command.modifyAdminPasscode:
-      //   TTLock.modifyAdminPasscode('1234', lockData, () {
-      //     _showSuccessAndDismiss("Success");
-      //   }, (errorCode, errorMsg) {
-      //     _showErrorAndDismiss(errorCode, errorMsg);
-      //   });
-      //   break;
-
-      case Command.getLockSwitchState:
-        TTLock.getLockSwitchState(lockData, (state) {
-          _showSuccessAndDismiss(state.toString());
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.customPasscode:
-        TTLock.supportFunction(TTLockFuction.managePasscode, lockData,
-            (isSupport) {
-          // not support
-          if (!isSupport) {
-            _showErrorAndDismiss(
-                TTLockError.fail, "not support custom passcode");
-            return;
-          }
-
-          TTLock.createCustomPasscode("6666", startDate, endDate, lockData, () {
-            _showSuccessAndDismiss("Success");
-          }, (errorCode, errorMsg) {
-            _showErrorAndDismiss(errorCode, errorMsg);
-          });
-        });
-
-        break;
-
-      case Command.modifyPasscode:
-        TTLock.supportFunction(TTLockFuction.managePasscode, lockData,
-            (isSupport) {
-          // not support
-          if (!isSupport) {
-            _showErrorAndDismiss(
-                TTLockError.fail, "Not support modify passcode");
-            return;
-          }
-          TTLock.modifyPasscode("6666", "7777", startDate, endDate, lockData,
-              () {
-            _showSuccessAndDismiss("Success");
-          }, (errorCode, errorMsg) {
-            _showErrorAndDismiss(errorCode, errorMsg);
-          });
-        });
-
-        break;
-      case Command.deletePasscode:
-        TTLock.supportFunction(TTLockFuction.managePasscode, lockData,
-            (isSupport) {
-          if (isSupport) {
-            TTLock.deletePasscode("7777", lockData, () {
-              _showSuccessAndDismiss("Success");
-            }, (errorCode, errorMsg) {
-              _showErrorAndDismiss(errorCode, errorMsg);
-            });
-          } else {
-            _showErrorAndDismiss(
-                TTLockError.fail, 'Not support delete passcode');
-          }
-        });
-        break;
-
-      case Command.resetPasscode:
-        TTLock.resetPasscode(lockData, (lockData) {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.addCard:
-        TTLock.addCard(null, startDate, endDate, lockData, () {
-          _showLoading('Waiting for add card ...');
-        }, (cardNumber) {
-          addCardNumber = cardNumber;
-          _showSuccessAndDismiss("cardNumber: $cardNumber");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-
-      case Command.modifyCard:
-        if (addCardNumber == null) {
-          _showErrorAndDismiss(
-              TTLockError.cardNotExist, 'please add an ic card first');
           return;
-        }
-        TTLock.modifyCardValidityPeriod(
-            addCardNumber!, null, startDate, endDate, lockData, () {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.deleteCard:
-        if (addCardNumber == null) {
-          _showErrorAndDismiss(
-              TTLockError.cardNotExist, 'please add an ic card first');
-          return;
-        }
-        TTLock.deleteCard(addCardNumber!, lockData, () {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
 
-      case Command.clearCard:
-        TTLock.clearAllCards(lockData, () {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
+        case Command.unlock:
+          final r = await _lock.controlLock(lockData, TTControlAction.unlock);
+          _showSuccess("Unlock Success lockTime:${r.lockTime} battery:${r.electricQuantity} uniqueId:${r.uniqueId}");
+          break;
 
-      case Command.addFingerprint:
-        TTLock.addFingerprint(null, startDate, endDate, lockData,
-            (currentCount, totalCount) {
-          _showLoading("currentCount:$currentCount  totalCount:$totalCount");
-        }, (fingerprintNumber) {
-          this.addFingerprintNumber = fingerprintNumber;
-          _showSuccessAndDismiss("fingerprintNumber: $fingerprintNumber");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
+        case Command.getLockPower:
+          final power = await _lock.getLockPower(lockData);
+          _showSuccess("Power: $power");
+          break;
 
-      case Command.modifyFingerprint:
-        if (addFingerprintNumber == null) {
-          _showErrorAndDismiss(
-              TTLockError.fingerprintNotExist, 'please add fingerprint first');
-          return;
-        }
-        TTLock.modifyFingerprintValidityPeriod(
-            addFingerprintNumber!, null, startDate, endDate, lockData, () {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.deleteFingerprint:
-        if (addFingerprintNumber == null) {
-          _showErrorAndDismiss(
-              TTLockError.fingerprintNotExist, 'please add fingerprint first');
-          return;
-        }
-        TTLock.deleteFingerprint(addFingerprintNumber!, lockData, () {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
+        case Command.getLockTime:
+          final t = await _lock.getLockTime(lockData);
+          _showSuccess("Time: $t");
+          break;
 
-      case Command.clearFingerprint:
-        TTLock.clearAllFingerprints(lockData, () {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
+        case Command.setLockTime:
+          await _lock.setLockTime(timestamp: DateTime.now().millisecondsSinceEpoch, lockData: lockData);
+          _showSuccess("Success");
+          break;
 
-      case Command.getLockAutomaticLockingPeriodicTime:
-        TTLock.getLockAutomaticLockingPeriodicTime(lockData,
-            (currentTime, minTime, maxTime) {
-          _showSuccessAndDismiss(
-              "currentTime:$currentTime minTime:$minTime maxTime:$maxTime");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
+        case Command.getLockOperateRecord:
+          final record = await _lock.getLockOperateRecord(type: TTOperateRecordType.latest, lockData: lockData);
+          _showSuccess("Record: $record");
+          break;
 
-      case Command.setLockAutomaticLockingPeriodicTime:
-        TTLock.setLockAutomaticLockingPeriodicTime(8, lockData, () {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
+        case Command.resetEkey:
+          await _lock.resetEkey(lockData);
+          _showSuccess("Success");
+          break;
 
-      case Command.getLockRemoteUnlockSwitchState:
-        TTLock.getLockRemoteUnlockSwitchState(lockData, (isOn) {
-          _showSuccessAndDismiss("SwitchOn: $isOn");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
+        case Command.modifyAdminPasscode:
+          await _lock.modifyAdminPasscode(adminPasscode: '1234', lockData: lockData);
+          _showSuccess("Success");
+          break;
 
-      case Command.setLockRemoteUnlockSwitchState:
-        TTLock.setLockRemoteUnlockSwitchState(true, lockData, (lockData) {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
+        case Command.getLockSwitchState:
+          final state = await _lock.getLockSwitchState(lockData);
+          _showSuccess(state.toString());
+          break;
 
-      case Command.getLockAudioSwitchState:
-        TTLock.getLockConfig(TTLockConfig.audio, lockData, (isOn) {
-          _showSuccessAndDismiss("SwitchOn: $isOn");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
+        case Command.customPasscode:
+          final support = await _lock.supportFunction(TTLockFunction.managePasscode, lockData);
+          if (!support) { _showError("Not supported"); return; }
+          await _lock.createCustomPasscode(passcode: "6666", startDate: startDate, endDate: endDate, lockData: lockData);
+          _showSuccess("Success");
+          break;
 
-      case Command.setLockAudioSwitchState:
-        TTLock.setLockConfig(TTLockConfig.audio, true, lockData, () {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
+        case Command.modifyPasscode:
+          final support = await _lock.supportFunction(TTLockFunction.managePasscode, lockData);
+          if (!support) { _showError("Not supported"); return; }
+          await _lock.modifyPasscode(passcodeOrigin: "6666", passcodeNew: "7777", startDate: startDate, endDate: endDate, lockData: lockData);
+          _showSuccess("Success");
+          break;
 
-      case Command.getLockDirection:
-        TTLock.getLockDirection(lockData, (direction) {
-          _showSuccessAndDismiss("direction: $direction");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
+        case Command.deletePasscode:
+          final support = await _lock.supportFunction(TTLockFunction.managePasscode, lockData);
+          if (!support) { _showError("Not supported"); return; }
+          await _lock.deletePasscode(passcode: "7777", lockData: lockData);
+          _showSuccess("Success");
+          break;
 
-      case Command.setLockDirectionLeft:
-        TTLock.setLockDirection(TTLockDirection.left, lockData, () {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
+        case Command.resetPasscode:
+          await _lock.resetPasscode(lockData);
+          _showSuccess("Success");
+          break;
 
-        break;
+        case Command.getAllValidPasscode:
+          final list = await _lock.getAllValidPasscodes(lockData);
+          _showSuccess(list.toString());
+          break;
 
-      case Command.setLockSoundVolumeType:
-        TTLock.setLockSoundWithSoundVolume(
-            TTSoundVolumeType.fourthLevel, lockData, () {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-
-      case Command.getLockSoundVolumeType:
-        TTLock.getLockSoundWithSoundVolume(lockData, (ttLocksoundVolumeType) {
-          _showSuccessAndDismiss("sound volume type: $ttLocksoundVolumeType");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-
-      case Command.addPassageMode:
-        int startTime = 8 * 60; //8:00 am
-        int endTime = 17 * 60; //17:00 pm
-        List<int> weekly = [1, 2]; // [Monday，Tuesday]
-
-        TTLock.addPassageMode(TTPassageModeType.weekly, weekly, null, startTime,
-            endTime, lockData, () {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.clearAllPassageModes:
-        TTLock.clearAllPassageModes(lockData, () {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.activateLiftFloors:
-        TTLock.activateLift("1,2,3", lockData,
-            (lockTime, electricQuantity, uniqueId) {
-          _showSuccessAndDismiss(
-              "Active lift florrs success lockTime:$lockTime electricQuantity:$electricQuantity uniqueId:$uniqueId");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.setLiftControlableFloors:
-        TTLock.setLiftControlable("3", lockData, () {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.setLiftWorkMode:
-        TTLock.setLiftWorkMode(TTLiftWorkActivateType.allFloors, lockData, () {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.setPowerSaverWorkMode:
-        TTLock.setPowerSaverWorkMode(TTPowerSaverWorkType.allCards, lockData,
-            () {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.setPowerSaverControlableLock:
-        TTLock.setPowerSaverControlableLock(this.lockMac, lockData, () {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      // case Command.setDoorSensorSwitch:
-      //   TTLock.setDoorSensorLockingSwitchState(true, lockData, () {
-      //     _showSuccessAndDismiss("Success");
-      //   }, (errorCode, errorMsg) {
-      //     _showErrorAndDismiss(errorCode, errorMsg);
-      //   });
-      //   break;
-      // case Command.getDoorSensorSwitch:
-      //   TTLock.getDoorSensorLockingSwitchState(lockData, (isOn) {
-      //     _showSuccessAndDismiss(isOn.toString());
-      //   }, (errorCode, errorMsg) {
-      //     _showErrorAndDismiss(errorCode, errorMsg);
-      //   });
-      //   break;
-      // case Command.getDoorSensorState:
-      //   TTLock.getDoorSensorState(lockData, (isOn) {
-      //     _showSuccessAndDismiss(isOn.toString());
-      //   }, (errorCode, errorMsg) {
-      //     _showErrorAndDismiss(errorCode, errorMsg);
-      //   });
-      //   break;
-      case Command.setHotelCardSector:
-        TTLock.setHotelCardSector("1,4", lockData, () {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.setHotelData:
-        String hotelData = "";
-        int building = 0;
-        int floor = 0;
-        TTLock.setHotel(hotelData, building, floor, lockData, () {
-          _showSuccessAndDismiss("Success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.getAllValidPasscode:
-        TTLock.getAllValidPasscode(lockData, (passcodeList) {
-          _showSuccessAndDismiss(passcodeList.toString());
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.getAllValidCard:
-        TTLock.getAllValidCards(lockData, (cardList) {
-          _showSuccessAndDismiss(cardList.toString());
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.getAllValidFingerprint:
-        TTLock.getAllValidFingerprints(lockData, (fingerprintList) {
-          _showSuccessAndDismiss(fingerprintList.toString());
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.getLockSystemInfo:
-        TTLock.getLockSystemInfo(lockData, (lockSystemInfoModel) {
-          _showSuccessAndDismiss(lockSystemInfoModel.modelNum!);
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      // case Command.setNBServerInfo:
-      //   String port = "5683";
-      //   String ip = "117.60.157.137";
-      //   TTLock.setLockNbAddress(ip, port, lockData, (electricQuantity) {
-      //     _showSuccessAndDismiss("electricQuantity: $electricQuantity");
-      //   }, (errorCode, errorMsg) {
-      //     _showErrorAndDismiss(errorCode, errorMsg);
-      //   });
-      //   break;
-      // case Command.getAdminPasscode:
-      //   TTLock.getAdminPasscode(lockData, (adminPasscode) {
-      //     _showSuccessAndDismiss("AdminPasscode: $adminPasscode");
-      //   }, (errorCode, errorMsg) {
-      //     _showErrorAndDismiss(errorCode, errorMsg);
-      //   });
-      //   break;
-      // case Command.getPasscodeVerificationParams:
-      //   TTLock.getPasscodeVerificationParams(lockData, (lockData) {
-      //     _showSuccessAndDismiss("Get Passcode Verification Params success");
-      //   }, (errorCode, errorMsg) {
-      //     _showErrorAndDismiss(errorCode, errorMsg);
-      //   });
-      //   break;
-      // case Command.recoveryCard:
-      //   String cardNumber = "123458970";
-      //   int startDate = DateTime.now().millisecondsSinceEpoch;
-      //   int endDate =
-      //       DateTime.now().millisecondsSinceEpoch + 24 * 60 * 60 * 1000;
-      //   TTLock.recoverCard(cardNumber, startDate, endDate, lockData, () {
-      //     _showSuccessAndDismiss("success:$cardNumber");
-      //   }, (errorCode, errorMsg) {
-      //     _showErrorAndDismiss(errorCode, errorMsg);
-      //   });
-      //   break;
-      // case Command.getLockVersion:
-      //   TTLock.getLockVersion(lockMac, (lockVersion) {
-      //     _showSuccessAndDismiss("Get LockVersion success:$lockVersion");
-      //   }, (errorCode, errorMsg) {
-      //     _showErrorAndDismiss(errorCode, errorMsg);
-      //   });
-      //   break;
-      // case Command.scanWifi:
-      //   TTLock.scanWifi(lockData, (finished, wifiList) {
-      //     _showSuccessAndDismiss("scan wifi");
-      //   }, (errorCode, errorMsg) {
-      //     _showErrorAndDismiss(errorCode, errorMsg);
-      //   });
-      //   break;
-      // case Command.configWifi:
-      //   TTLock.configWifi("sciener", "sciener.com", lockData, () {
-      //     _showSuccessAndDismiss("Config wifi success");
-      //   }, (errorCode, errorMsg) {
-      //     _showErrorAndDismiss(errorCode, errorMsg);
-      //   });
-      //   break;
-      // case Command.configServer:
-      //   TTLock.configServer("wifilock.ttlock.com", "4999", lockData, () {
-      //     _showSuccessAndDismiss("Config server success");
-      //   }, (errorCode, errorMsg) {
-      //     _showErrorAndDismiss(errorCode, errorMsg);
-      //   });
-      //   break;
-      // case Command.getWifiInfo:
-      //   TTLock.getWifiInfo(lockData, (wifiInfo) {
-      //     _showSuccessAndDismiss(wifiInfo.toString());
-      //   }, (errorCode, errorMsg) {
-      //     _showErrorAndDismiss(errorCode, errorMsg);
-      //   });
-      //   break;
-      case Command.configIp:
-        final ipSetting = TTIpSetting(type: TTIpSettingType.DHCP.index);
-        // For static IP: TTIpSetting(type: TTIpSettingType.STATIC_IP.index, ipAddress: "192.168.1.100", subnetMask: "255.255.255.0", router: "192.168.1.1", ...)
-        TTLock.configIpWithParams(ipSetting, lockData, () {
-          _showSuccessAndDismiss("config ip success");
-        }, (errorCode, errorMsg) {
-          _showErrorAndDismiss(errorCode, errorMsg);
-        });
-        break;
-      case Command.keypad:
-        _showSuccessAndDismiss("keypad success");
-        Navigator.push(context,
-            new MaterialPageRoute(builder: (BuildContext context) {
-              return ScanKeyPadPage(
-                lockData: lockData,
-                lockMac: widget.lockMac,
-              );
-            }));
-        break;
-      case Command.setSensitivity:
-        TTLock.supportFunction(TTLockFuction.sensitivity, lockData, (bool support){
-          if(support)
-            {
-              TTLock.setSensitivity(lockData, TTSensitivityValue.off, () {
-                _showSuccessAndDismiss("setSensitivity success");
-              }, (errorCode, errorMsg) {
-                _showErrorAndDismiss(errorCode, errorMsg);
-              });
-            }else
-              {
-                _showErrorAndDismiss(TTLockError.fail, 'unSupport');
+        case Command.addCard:
+          _progressSub?.cancel();
+          _progressSub = _lock.addCard(startDate: startDate, endDate: endDate, lockData: lockData).listen(
+            (event) {
+              if (event is AddCardProgress) {
+                _showLoading('Waiting for card...');
+              } else if (event is AddCardComplete) {
+                addCardNumber = event.cardNumber;
+                _showSuccess("cardNumber: ${event.cardNumber}");
               }
-        });
-        break;
-      default:
-    }
-  }
-
-  Widget getListView() {
-    return ListView.separated(
-        separatorBuilder: (BuildContext context, int index) {
-          return Divider(height: 2, color: Colors.green);
-        },
-        itemCount: _commandList.length,
-        itemBuilder: (context, index) {
-          Map<String, Command> map = _commandList[index];
-          String title = '${map.keys.first}';
-          String subtitle = index == 0 ? note : '';
-          return ListTile(
-            title: Text(title),
-            subtitle: Text(subtitle),
-            onTap: () {
-              _click(map.values.first, context);
             },
+            onError: (e) => _showError(e.toString()),
           );
-        });
+          return;
+
+        case Command.modifyCard:
+          if (addCardNumber == null) { _showError("Please add a card first"); return; }
+          await _lock.modifyCardValidityPeriod(cardNumber: addCardNumber!, startDate: startDate, endDate: endDate, lockData: lockData);
+          _showSuccess("Success");
+          break;
+
+        case Command.deleteCard:
+          if (addCardNumber == null) { _showError("Please add a card first"); return; }
+          await _lock.deleteCard(cardNumber: addCardNumber!, lockData: lockData);
+          _showSuccess("Success");
+          break;
+
+        case Command.clearCard:
+          await _lock.clearAllCards(lockData);
+          _showSuccess("Success");
+          break;
+
+        case Command.getAllValidCard:
+          final list = await _lock.getAllValidCards(lockData);
+          _showSuccess(list.toString());
+          break;
+
+        case Command.addFingerprint:
+          _progressSub?.cancel();
+          _progressSub = _lock.addFingerprint(startDate: startDate, endDate: endDate, lockData: lockData).listen(
+            (event) {
+              if (event is AddFingerprintProgress) {
+                _showLoading("${event.currentCount} / ${event.totalCount}");
+              } else if (event is AddFingerprintComplete) {
+                addFingerprintNumber = event.fingerprintNumber;
+                _showSuccess("fingerprintNumber: ${event.fingerprintNumber}");
+              }
+            },
+            onError: (e) => _showError(e.toString()),
+          );
+          return;
+
+        case Command.modifyFingerprint:
+          if (addFingerprintNumber == null) { _showError("Please add fingerprint first"); return; }
+          await _lock.modifyFingerprintValidityPeriod(fingerprintNumber: addFingerprintNumber!, startDate: startDate, endDate: endDate, lockData: lockData);
+          _showSuccess("Success");
+          break;
+
+        case Command.deleteFingerprint:
+          if (addFingerprintNumber == null) { _showError("Please add fingerprint first"); return; }
+          await _lock.deleteFingerprint(fingerprintNumber: addFingerprintNumber!, lockData: lockData);
+          _showSuccess("Success");
+          break;
+
+        case Command.clearFingerprint:
+          await _lock.clearAllFingerprints(lockData);
+          _showSuccess("Success");
+          break;
+
+        case Command.getAllValidFingerprint:
+          final list = await _lock.getAllValidFingerprints(lockData);
+          _showSuccess(list.toString());
+          break;
+
+        case Command.getLockAutomaticLockingPeriodicTime:
+          final t = await _lock.getAutoLockingPeriodicTime(lockData);
+          _showSuccess("current:${t.currentTime} min:${t.minTime} max:${t.maxTime}");
+          break;
+
+        case Command.setLockAutomaticLockingPeriodicTime:
+          await _lock.setAutoLockingPeriodicTime(seconds: 8, lockData: lockData);
+          _showSuccess("Success");
+          break;
+
+        case Command.getLockRemoteUnlockSwitchState:
+          final isOn = await _lock.getRemoteUnlockSwitchState(lockData);
+          _showSuccess("SwitchOn: $isOn");
+          break;
+
+        case Command.setLockRemoteUnlockSwitchState:
+          await _lock.setRemoteUnlockSwitchState(isOn: true, lockData: lockData);
+          _showSuccess("Success");
+          break;
+
+        case Command.getLockAudioSwitchState:
+          final isOn = await _lock.getLockConfig(config: TTLockConfig.audio, lockData: lockData);
+          _showSuccess("SwitchOn: $isOn");
+          break;
+
+        case Command.setLockAudioSwitchState:
+          await _lock.setLockConfig(config: TTLockConfig.audio, isOn: true, lockData: lockData);
+          _showSuccess("Success");
+          break;
+
+        case Command.getLockDirection:
+          final dir = await _lock.getLockDirection(lockData);
+          _showSuccess("direction: $dir");
+          break;
+
+        case Command.setLockDirectionLeft:
+          await _lock.setLockDirection(direction: TTLockDirection.left, lockData: lockData);
+          _showSuccess("Success");
+          break;
+
+        case Command.getLockSoundVolumeType:
+          final vol = await _lock.getSoundVolume(lockData);
+          _showSuccess("volume: $vol");
+          break;
+
+        case Command.setLockSoundVolumeType:
+          await _lock.setSoundVolume(type: TTSoundVolumeType.fourthLevel, lockData: lockData);
+          _showSuccess("Success");
+          break;
+
+        case Command.addPassageMode:
+          await _lock.addPassageMode(type: TTPassageModeType.weekly, weekly: [1, 2], startTime: 8 * 60, endTime: 17 * 60, lockData: lockData);
+          _showSuccess("Success");
+          break;
+
+        case Command.clearAllPassageModes:
+          await _lock.clearAllPassageModes(lockData);
+          _showSuccess("Success");
+          break;
+
+        case Command.activateLiftFloors:
+          final r = await _lock.activateLift(floors: "1,2,3", lockData: lockData);
+          _showSuccess("Lift activated lockTime:${r.lockTime} battery:${r.electricQuantity}");
+          break;
+
+        case Command.setLiftControlableFloors:
+          await _lock.setLiftControlable(floors: "3", lockData: lockData);
+          _showSuccess("Success");
+          break;
+
+        case Command.setLiftWorkMode:
+          await _lock.setLiftWorkMode(type: TTLiftWorkActivateType.allFloors, lockData: lockData);
+          _showSuccess("Success");
+          break;
+
+        case Command.setPowerSaverWorkMode:
+          await _lock.setPowerSaverWorkMode(type: TTPowerSaverWorkType.allCards, lockData: lockData);
+          _showSuccess("Success");
+          break;
+
+        case Command.setPowerSaverControlableLock:
+          await _lock.setPowerSaverControlableLock(lockMac: widget.lockMac, lockData: lockData);
+          _showSuccess("Success");
+          break;
+
+        case Command.setHotelCardSector:
+          await _lock.setHotelCardSector(sector: "1,4", lockData: lockData);
+          _showSuccess("Success");
+          break;
+
+        case Command.setHotelData:
+          await _lock.setHotel(hotelInfo: "", buildingNumber: 0, floorNumber: 0, lockData: lockData);
+          _showSuccess("Success");
+          break;
+
+        case Command.getLockSystemInfo:
+          final info = await _lock.getLockSystemInfo(lockData);
+          _showSuccess("model: ${info.modelNum}");
+          break;
+
+        case Command.configIp:
+          final ipSetting = TTIpSetting(type: TTIpSettingType.dhcp.value);
+          await _lock.configIp(ipSetting: ipSetting, lockData: lockData);
+          _showSuccess("Config IP success");
+          break;
+
+        case Command.keypad:
+          _showSuccess("keypad");
+          Navigator.push(context, MaterialPageRoute(builder: (_) {
+            return ScanKeyPadPage(lockData: lockData, lockMac: widget.lockMac);
+          }));
+          break;
+
+        case Command.setSensitivity:
+          final support = await _lock.supportFunction(TTLockFunction.sensitivity, lockData);
+          if (!support) { _showError("Not supported"); return; }
+          await _lock.setSensitivity(value: TTSensitivityValue.off, lockData: lockData);
+          _showSuccess("Success");
+          break;
+      }
+    } on TTLockException catch (e) {
+      _showError('${e.error}: ${e.message}');
+    } on TTGatewayException catch (e) {
+      _showError('${e.error}: ${e.message}');
+    } catch (e) {
+      _showError(e.toString());
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Lock'),
-        ),
+        appBar: AppBar(title: Text('Lock')),
         body: Material(child: ProgressHud(
           child: Container(
             child: Builder(builder: (context) {
               _context = context;
-              return getListView();
+              return ListView.separated(
+                  separatorBuilder: (_, __) => Divider(height: 2, color: Colors.green),
+                  itemCount: _commandList.length,
+                  itemBuilder: (context, index) {
+                    final map = _commandList[index];
+                    return ListTile(
+                      title: Text(map.keys.first),
+                      subtitle: Text(index == 0 ? note : ''),
+                      onTap: () => _click(map.values.first, context),
+                    );
+                  });
             }),
           ),
         )));

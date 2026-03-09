@@ -5,7 +5,7 @@ author: ttlock-developers-email-list@googlegroups.com
 homepage: https://github.com/ttlock/ttlock_flutter.git
 
 environment:
-  sdk: ">=2.17.0 <4.0.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:

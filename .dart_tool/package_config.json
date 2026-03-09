@@ -155,10 +155,10 @@
       "name": "ttlock_premise_flutter",
       "rootUri": "../",
       "packageUri": "lib/",
-      "languageVersion": "2.17"
+      "languageVersion": "3.0"
     }
   ],
-  "generated": "2026-03-06T05:00:40.699295Z",
+  "generated": "2026-03-09T00:47:52.423011Z",
   "generator": "pub",
   "generatorVersion": "3.6.2",
   "flutterRoot": "file:///Users/chuyi/fvm/versions/3.27.4",

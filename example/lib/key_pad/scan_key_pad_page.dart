@@ -1,12 +1,13 @@
+import 'dart:async';
+
 import 'package:bmprogresshud/progresshud.dart';
 import 'package:flutter/material.dart';
 import 'package:ttlock_premise_flutter/ttlock.dart';
-import 'package:ttlock_premise_flutter/ttremoteKeypad.dart';
 
 class ScanKeyPadPage extends StatefulWidget {
   final String lockData;
   final String lockMac;
-  const ScanKeyPadPage({Key? key, required this.lockData, required this.lockMac}):super(key: key);
+  const ScanKeyPadPage({Key? key, required this.lockData, required this.lockMac}) : super(key: key);
 
   @override
   State<ScanKeyPadPage> createState() => _ScanKeyPadPageState();
@@ -14,198 +15,142 @@ class ScanKeyPadPage extends StatefulWidget {
 
 class _ScanKeyPadPageState extends State<ScanKeyPadPage> {
   TTRemoteAccessoryScanModel? model;
-
   bool isInit = false;
   bool isMultifunctionalKeypad = false;
-  late BuildContext context;
+  late BuildContext _ctx;
+  StreamSubscription? _scanSub;
+  StreamSubscription? _progressSub;
+
+  final _accessory = TTLock.accessory;
+
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      scanKeyPad();
-    });
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _startScan());
   }
 
   @override
   void dispose() {
-    TTRemoteKeypad.stopScan();
+    _scanSub?.cancel();
+    _progressSub?.cancel();
+    _accessory.stopScanRemoteKeypad();
     super.dispose();
   }
+
+  void _startScan() {
+    _scanSub = _accessory.startScanRemoteKeypad().listen((scanModel) {
+      if (mounted) setState(() => model = scanModel);
+    });
+  }
+
+  void _showLoading(String text) => ProgressHud.of(_ctx).showLoading(text: text);
+  void _showSuccess(String text) => ProgressHud.of(_ctx).showSuccessAndDismiss(text: text);
+  void _showError(String text) => ProgressHud.of(_ctx).showErrorAndDismiss(text: text);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Scan KeyPad'),
-      ),
+      appBar: AppBar(title: const Text('Scan KeyPad')),
       body: ProgressHud(
-        child: Container(
-          child: Builder(builder: (context) {
-            this.context = context;
-            return Column(
-              children: [
-                ListTile(
-                  title: Text(model?.name??''),
-                  subtitle: Text('Click to Init'),
-                  onTap: () {
-                    if(model == null)
-                    {
-                      return;
-                    }
-                    TTRemoteKeypad.stopScan();
-                    _showLoading('waiting init keypad');
-                    isMultifunctionalKeypad = model?.isMultifunctionalKeypad??false;
-                    if(!isInit)
-                    {
-
-                      if(isMultifunctionalKeypad)
-                      {
-                        TTRemoteKeypad.multifunctionalInit(
-                            model!.mac,
-                            widget.lockData, (
-                            int electricQuantity,
-                            String wirelessKeypadFeatureValue,
-                            int slotNumber,
-                            int slotLimit,
-                            String? modelNum,
-                            String? hardwareRevision,
-                            String? firmwareRevision
-                            ){
-                          if(mounted)
-                            {
-                              setState(() {
-                                isInit = true;
-                              });
-                            }
-                          _showSuccessAndDismiss('init keypad success');
-                        },(TTLockError errorCode, String errorMsg){
-                          _showErrorAndDismiss(errorMsg);
-                        },(TTRemoteKeyPadAccessoryError errorCode, String errorMsg){
-                          _showErrorAndDismiss(errorMsg);
-                        });
-                      }else
-                      {
-                        TTRemoteKeypad.init(model!.mac, widget.lockMac, (
-                            int electricQuantity, String wirelessKeypadFeatureValue){
-
-                        }, (TTRemoteAccessoryError errorCode, String errorMsg){
-
-                        });
-                      }
-                    }
-                  },
-                ),
-                getContent()
-              ],
-            );
-          }),
-        ),
+        child: Builder(builder: (ctx) {
+          _ctx = ctx;
+          return Column(
+            children: [
+              ListTile(
+                title: Text(model?.name ?? ''),
+                subtitle: Text('Click to Init'),
+                onTap: _onInitTap,
+              ),
+              if (isInit && isMultifunctionalKeypad) _buildActions(),
+            ],
+          );
+        }),
       ),
     );
   }
 
-  Widget getContent()
-  {
-    if(!isInit)
-      {
-        return SizedBox();
+  void _onInitTap() async {
+    if (model == null) return;
+    _accessory.stopScanRemoteKeypad();
+    _showLoading('Initializing keypad...');
+    isMultifunctionalKeypad = model?.isMultifunctionalKeypad ?? false;
+
+    if (isInit) return;
+
+    try {
+      if (isMultifunctionalKeypad) {
+        await _accessory.initMultifunctionalKeypad(mac: model!.mac, lockData: widget.lockData);
+        if (mounted) setState(() => isInit = true);
+        _showSuccess('Init keypad success');
+      } else {
+        await _accessory.initRemoteKeypad(mac: model!.mac, lockMac: widget.lockMac);
+        if (mounted) setState(() => isInit = true);
+        _showSuccess('Init keypad success');
       }
-    if(!isMultifunctionalKeypad)
-    {
-      return SizedBox();
+    } catch (e) {
+      _showError(e.toString());
     }
+  }
+
+  Widget _buildActions() {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         ListTile(
           title: Text('Delete stored lock'),
-          subtitle: Text('Click to delete stored lock'),
-          onTap: () {
-            if(model == null)
-            {
-              return;
-            }
-            _showLoading('waiting deleteStoredLock');
-
-            TTRemoteKeypad.deleteStoredLock(model!.mac,1, (){
-              _showSuccessAndDismiss("deleteStoredLock success");
+          onTap: () async {
+            if (model == null) return;
+            _showLoading('Deleting...');
+            try {
+              await _accessory.deleteStoredLock(mac: model!.mac, slotNumber: 1);
+              _showSuccess("Delete success");
               Navigator.pop(context);
-            },(TTRemoteKeyPadAccessoryError errorCode, String errorMsg){
-              _showErrorAndDismiss(errorMsg);
-            });
+            } catch (e) {
+              _showError(e.toString());
+            }
           },
         ),
-
         ListTile(
           title: Text('Add fingerprint'),
-          subtitle: Text('Click Add fingerprint'),
           onTap: () {
-            if(model == null)
-            {
-              return;
-            }
-            _showLoading('waiting Add fingerprint');
-
-            TTRemoteKeypad.addFingerprint(model!.mac,null,0,0, widget.lockData, (
-                int currentCount, int totalCount){
-               print("多功能键盘添加指纹currentCount：$currentCount;;;totalCount:$totalCount");
-            },(String fingerprintNumber){
-              _showSuccessAndDismiss("addFingerprint success");
-            },(
-                TTLockError errorCode, String errorMsg){
-              _showErrorAndDismiss(errorMsg);
-            },(TTRemoteKeyPadAccessoryError errorCode, String errorMsg){
-              _showErrorAndDismiss(errorMsg);
-            });
+            if (model == null) return;
+            _showLoading('Adding fingerprint...');
+            _progressSub?.cancel();
+            _progressSub = _accessory.addKeypadFingerprint(
+              mac: model!.mac, startDate: 0, endDate: 0, lockData: widget.lockData,
+            ).listen(
+              (event) {
+                if (event is AddFingerprintProgress) {
+                  _showLoading("${event.currentCount} / ${event.totalCount}");
+                } else if (event is AddFingerprintComplete) {
+                  _showSuccess("Fingerprint added: ${event.fingerprintNumber}");
+                }
+              },
+              onError: (e) => _showError(e.toString()),
+            );
           },
         ),
-
         ListTile(
           title: Text('Add Card'),
-          subtitle: Text('Click to Add Card'),
           onTap: () {
-            if(model == null)
-            {
-              return;
-            }
-            _showLoading('waiting Add Card');
-
-            TTRemoteKeypad.addCard(null,0,0, widget.lockData, (){
-              print("多功能键盘添加卡：请刷卡");
-            },(String cardNumber){
-              _showSuccessAndDismiss("addCard success");
-            },(
-                TTLockError errorCode, String errorMsg){
-              _showErrorAndDismiss(errorMsg);
-            });
+            if (model == null) return;
+            _showLoading('Adding card...');
+            _progressSub?.cancel();
+            _progressSub = _accessory.addKeypadCard(
+              startDate: 0, endDate: 0, lockData: widget.lockData,
+            ).listen(
+              (event) {
+                if (event is AddCardProgress) {
+                  _showLoading("Waiting for card...");
+                } else if (event is AddCardComplete) {
+                  _showSuccess("Card added: ${event.cardNumber}");
+                }
+              },
+              onError: (e) => _showError(e.toString()),
+            );
           },
         ),
       ],
     );
-  }
-
-
-  void scanKeyPad() {
-    TTRemoteKeypad.startScan((TTRemoteAccessoryScanModel scanModel){
-      if(mounted)
-        {
-          setState(() {
-            model = scanModel;
-          });
-        }
-
-    });
-  }
-
-  void _showLoading(String text) {
-    ProgressHud.of(context).showLoading(text: text);
-  }
-
-  void _showSuccessAndDismiss(String text) {
-    ProgressHud.of(context).showSuccessAndDismiss(text: text);
-  }
-
-  void _showErrorAndDismiss(String errorMsg) {
-    ProgressHud.of(context).showErrorAndDismiss(
-        text: 'errorMessage:$errorMsg');
   }
 }
