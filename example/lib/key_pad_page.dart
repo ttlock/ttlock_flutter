@@ -81,18 +81,21 @@ class _KeyPadState extends State<KeyPadPage> {
       case Command.addFingerprint:
         TTRemoteKeypad.addFingerprint(mac,
             null,
-            1746673751000,
-            1746760151000,
+            DateTime.now().millisecondsSinceEpoch,
+            DateTime.now().millisecondsSinceEpoch + 1000 * 60 * 60 * 24 * 30,
             lockData,
                 (int currentCount, int totalCount){
                print("addFingerprint;;;currentCount:$currentCount;;;;totalCount:$totalCount");
+               _showLoading('adding: $currentCount/$totalCount');
             }, (String fingerprintNumber) {
               print("addFingerprint fingerprintNumber:$fingerprintNumber");
+              _showSuccessAndDismiss("addFingerprint success");
             }, (errorCode, errorMsg) {
               print("addFingerprint;;;errorCode:$errorCode;;;;errorMsg:$errorMsg");
-
+              _showSuccessAndDismiss( errorMsg);
             }, (TTRemoteKeyPadAccessoryError errorCode, String errorMsg){
-              print("addFingerprint;;;errorCode:$errorCode;;;;errorMsg:$errorMsg");
+              _showErrorAndDismiss(errorCode, errorMsg);
+              print("addFingerprint RemoteKeyPadAccessoryError;;;errorCode:$errorCode;;;;errorMsg:$errorMsg");
             });
         break;
       case Command.addCard:

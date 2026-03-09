@@ -1754,6 +1754,7 @@ class TTLock {
         failedCallback(error, errorMessage);
       }
     }
+    
     //普通键盘和遥控钥匙失败处理
     else if (command == TTRemoteKey.COMMAND_INIT_REMOTE_KEY ||
         command == TTDoorSensor.COMMAND_INIT_DOOR_SENSOR ||
@@ -1774,21 +1775,31 @@ class TTLock {
       if (failedCallback != null) {
         failedCallback(error, errorMessage);
       }
+    } 
+    
+    else if (command ==
+            TTRemoteKeypad
+                .COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_DELETE_STORED_LOCK ||
+        command ==
+            TTRemoteKeypad
+                .COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_GET_STORED_LOCK) {
+      TTRemoteKeypadFailedCallback? failedCallback = callBack;
+      TTRemoteKeyPadAccessoryError error =
+          TTRemoteKeyPadAccessoryError.values[errorCode];
+      if (failedCallback != null) {
+        failedCallback(error, errorMessage);
+      }
     }
+
     // 多功能键盘失败处理
     else if ((command ==
             TTRemoteKeypad.COMMAND_INIT_MULTIFUNCTIONAL_REMOTE_KEYPAD) ||
         command ==
             TTRemoteKeypad
-                .COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_DELETE_STORED_LOCK ||
-        command ==
-            TTRemoteKeypad
-                .COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_GET_STORED_LOCK ||
-        command ==
-            TTRemoteKeypad
                 .COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_FINGERPRINT ||
         command ==
             TTRemoteKeypad.COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_ADD_CARD) {
+      print('errorCallback: $command, $errorCode, $errorMessage, $data');
       if (data["errorDevice"] == TTErrorDevice.keyPad.index) {
         TTRemoteKeypadFailedCallback? failedCallback = otherCallBack;
         TTRemoteKeyPadAccessoryError error =

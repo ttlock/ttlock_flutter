@@ -138,13 +138,14 @@ class _ScanPageState extends State<ScanPage> {
     var lockData = LockConfig.lockData;
     print("多功能键盘lockData:$lockData");
     print("多功能键盘：$lockMac");
+    _showLoading();
+
     if (scanModel.isMultifunctionalKeypad) {
       assert(lockMac.isNotEmpty);
       assert(lockData.isNotEmpty);
       TTRemoteKeypad.multifunctionalInit(mac, lockData, (int electricQuantity,
-              String wirelessKeypadFeatureValue,
-              int slotNumber,
-              int slotLimit) {
+          String wirelessKeypadFeatureValue, int slotNumber, int slotLimit) {
+        _dismissLoading();
         Navigator.push(context,
             new MaterialPageRoute(builder: (BuildContext context) {
           return KeyPadPage(
@@ -154,12 +155,16 @@ class _ScanPageState extends State<ScanPage> {
             lockMac: lockMac,
           );
         }));
-      }, (TTLockError errorCode, String errorMsg) {},
-          (TTRemoteKeyPadAccessoryError errorCode, String errorMsg) {});
+      }, (TTLockError errorCode, String errorMsg) {
+        _dismissLoading();
+      }, (TTRemoteKeyPadAccessoryError errorCode, String errorMsg) {
+        _dismissLoading();
+      });
     } else {
       assert(lockMac.isNotEmpty);
       TTRemoteKeypad.init(mac, lockMac,
           (int electricQuantity, String wirelessKeypadFeatureValue) {
+        _dismissLoading();
         Navigator.push(context,
             new MaterialPageRoute(builder: (BuildContext context) {
           return KeyPadPage(
@@ -169,7 +174,9 @@ class _ScanPageState extends State<ScanPage> {
             lockMac: lockMac,
           );
         }));
-      }, (TTRemoteAccessoryError errorCode, String errorMsg) {});
+      }, (TTRemoteAccessoryError errorCode, String errorMsg) {
+        _dismissLoading();
+      });
     }
   }
 

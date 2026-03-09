@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:bmprogresshud/progresshud.dart';
 import 'package:ttlock_flutter/ttelectricMeter.dart';
+import 'package:ttlock_flutter/ttremoteKeypad.dart';
 import 'package:ttlock_flutter/ttwaterMeter.dart';
 import 'scan_page.dart';
 import 'config.dart';
@@ -58,6 +59,14 @@ class _HomePageState extends State<HomePage> {
     //     'VgC8yDPW/jr6V31nNAcCEkFLNA6o27cQ6OZDjF4iNbKbSz1kU5LcoMh0I4xgbZNZ';
     TTWaterMeter.configServer(waterMeterServerParamMode);
     _startScan(ScanType.waterMeter);
+  }
+
+  void _showLoading() {
+    ProgressHud.of(_context!)!.showLoading(text: '');
+  }
+
+  void _dismissLoading() {
+    ProgressHud.of(_context!)!.dismiss();
   }
 
   void _startKeyPadPage() {
