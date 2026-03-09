@@ -7,7 +7,6 @@ import android.bluetooth.BluetoothDevice;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
-import android.src.main.java.com.ttlock.ttlock_flutter.model.SoundVolumeConverter;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -167,6 +166,7 @@ import com.ttlock.ttlock_flutter.model.GatewayErrorConverter;
 import com.ttlock.ttlock_flutter.model.GatewayModel;
 import com.ttlock.ttlock_flutter.model.LiftWorkModeConverter;
 import com.ttlock.ttlock_flutter.model.PowerSaverWorkModeConverter;
+import com.ttlock.ttlock_flutter.model.SoundVolumeConverter;
 import com.ttlock.ttlock_flutter.model.TTBluetoothState;
 import com.ttlock.ttlock_flutter.model.TTGatewayScanModel;
 import com.ttlock.ttlock_flutter.model.TTKeyPadScanModel;
@@ -2424,9 +2424,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
             @Override
             public void onGetLockSoundSuccess(boolean enable, SoundVolume soundVolume) {
                 if (enable) {
-                    ttlockModel.soundVolumeType = android.src.main.java.com.ttlock.ttlock_flutter.model.SoundVolumeConverter.native2Flutter(soundVolume);
+                    ttlockModel.soundVolumeType = SoundVolumeConverter.native2Flutter(soundVolume);
                 } else {
-                    ttlockModel.soundVolumeType = android.src.main.java.com.ttlock.ttlock_flutter.model.SoundVolumeConverter.off.ordinal();
+                    ttlockModel.soundVolumeType = SoundVolumeConverter.off.ordinal();
                 }
                 apiSuccess(ttlockModel);
             }

@@ -1,0 +1,10 @@
+{
+  "module": {
+    "name": "ttlock_premise_flutter",
+    "type": "har",
+    "deviceTypes": [
+      "default",
+      "tablet"
+    ]
+  }
+}

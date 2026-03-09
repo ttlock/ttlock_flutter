@@ -32,5 +32,7 @@ flutter:
         pluginClass: TtlockFlutterPlugin
       ios:
         pluginClass: TtlockFlutterPlugin
+      ohos:
+        pluginClass: TtlockFlutterPlugin
 
 #发布 更新插件  https://blog.csdn.net/m0_37714581/article/details/100162272

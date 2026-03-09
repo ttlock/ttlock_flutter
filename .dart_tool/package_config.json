@@ -45,13 +45,13 @@
     },
     {
       "name": "flutter",
-      "rootUri": "file:///Users/chuyi/fvm/versions/3.27.4/packages/flutter",
+      "rootUri": "file:///Users/chuyi/fvm/versions/3.27.5-ohos-1.0.4/packages/flutter",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
     {
       "name": "flutter_test",
-      "rootUri": "file:///Users/chuyi/fvm/versions/3.27.4/packages/flutter_test",
+      "rootUri": "file:///Users/chuyi/fvm/versions/3.27.5-ohos-1.0.4/packages/flutter_test",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
@@ -99,7 +99,7 @@
     },
     {
       "name": "sky_engine",
-      "rootUri": "file:///Users/chuyi/fvm/versions/3.27.4/bin/cache/pkg/sky_engine",
+      "rootUri": "file:///Users/chuyi/fvm/versions/3.27.5-ohos-1.0.4/bin/cache/pkg/sky_engine",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
@@ -158,10 +158,10 @@
       "languageVersion": "3.0"
     }
   ],
-  "generated": "2026-03-09T00:47:52.423011Z",
+  "generated": "2026-03-09T06:02:28.835409Z",
   "generator": "pub",
   "generatorVersion": "3.6.2",
-  "flutterRoot": "file:///Users/chuyi/fvm/versions/3.27.4",
-  "flutterVersion": "3.27.4",
+  "flutterRoot": "file:///Users/chuyi/fvm/versions/3.27.5-ohos-1.0.4",
+  "flutterVersion": "3.27.5-ohos-1.0.4",
   "pubCache": "file:///Users/chuyi/.pub-cache"
 }
