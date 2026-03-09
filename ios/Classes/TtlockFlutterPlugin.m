@@ -1221,7 +1221,8 @@ typedef NS_ENUM(NSInteger, ErrorDevice) {
             successData.cardNumber = cardNumber;
             [weakSelf successCallbackCommand:command data:successData];
         } lockFailure:^(TTError errorCode, NSString *errorMsg) {
-            [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];
+            NSDictionary *errorData = @{@"errorDevice": @(ErrorDeviceLock)};
+            [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg data:errorData];
         }];
     }
     
