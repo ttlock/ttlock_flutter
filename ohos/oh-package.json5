@@ -1,9 +1,11 @@
 {
   "name": "ttlock_premise_flutter",
   "version": "1.0.0",
-  "description": "Please describe the basic information.",
+  "description": "TTLock Flutter plugin for OpenHarmony.",
   "main": "index.ets",
   "author": "",
   "license": "Apache-2.0",
-  "dependencies": {}
+  "dependencies": {
+    "@sciener/ttlock": "1.0.4"
+  }
 }

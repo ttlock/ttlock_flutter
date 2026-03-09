@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:bmprogresshud/progresshud.dart';
+import 'package:ttlock_flutter_example/permission_helper.dart';
 import 'scan_page.dart';
 import 'config.dart';
 
@@ -25,7 +26,11 @@ class _HomePageState extends State<HomePage> {
     _startScan(ScanType.lock);
   }
 
-  void _startScan(ScanType scanType) {
+  void _startScan(ScanType scanType) async{
+    bool r = await requestScanPermissions();
+    if(!r){
+      ProgressHud.of(_context!).showAndDismiss(ProgressHudType.error, "Please agree permissions");
+    }
     Navigator.push(context,
         new MaterialPageRoute(builder: (BuildContext context) {
       return ScanPage(

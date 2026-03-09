@@ -5,6 +5,18 @@
     "deviceTypes": [
       "default",
       "tablet"
+    ],
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.ACCESS_BLUETOOTH",
+        "reason": "$string:bluetooth_reson",
+        "usedScene": {}
+      },
+      {
+        "name": "ohos.permission.PERSISTENT_BLUETOOTH_PEERS_MAC",
+        "reason": "$string:bluetooth_reson",
+        "usedScene": {}
+      }
     ]
   }
 }

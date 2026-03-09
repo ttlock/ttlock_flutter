@@ -34,7 +34,28 @@
       }
     ],
     "requestPermissions": [
-      {"name" :  "ohos.permission.INTERNET"},
+      {"name": "ohos.permission.INTERNET"},
+      {
+        "name": "ohos.permission.ACCESS_BLUETOOTH",
+        "reason": "$string:permission_bluetooth_reason",
+        "usedScene": {
+          "when": "inuse"
+        }
+      },
+      {
+        "name": "ohos.permission.APPROXIMATELY_LOCATION",
+        "reason": "$string:permission_location_reason",
+        "usedScene": {
+          "when": "inuse"
+        }
+      },
+      {
+        "name": "ohos.permission.LOCATION",
+        "reason": "$string:permission_location_reason",
+        "usedScene": {
+          "when": "inuse"
+        }
+      }
     ]
   }
 }

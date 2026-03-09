@@ -11,6 +11,14 @@
     {
       "name": "EntryAbility_label",
       "value": "ttlock_premise_flutter_example"
+    },
+    {
+      "name": "permission_bluetooth_reason",
+      "value": "For scanning and connecting to Bluetooth lock devices"
+    },
+    {
+      "name": "permission_location_reason",
+      "value": "Location is required for Bluetooth device scanning"
     }
   ]
 }

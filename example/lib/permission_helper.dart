@@ -4,7 +4,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 /// 扫描门锁/网关所需的蓝牙和定位权限
 Future<bool> requestScanPermissions() async {
-  final permissions = Platform.isAndroid
+  final permissions = Platform.isAndroid || Platform.isOhos
       ? [
           Permission.bluetoothConnect,
           Permission.bluetoothScan,

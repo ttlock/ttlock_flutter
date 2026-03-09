@@ -11,6 +11,14 @@
     {
       "name": "EntryAbility_label",
       "value": "ttlock_premise_flutter_example"
+    },
+    {
+      "name": "permission_bluetooth_reason",
+      "value": "用于扫描与连接蓝牙门锁设备"
+    },
+    {
+      "name": "permission_location_reason",
+      "value": "扫描蓝牙设备需要位置权限"
     }
   ]
 }

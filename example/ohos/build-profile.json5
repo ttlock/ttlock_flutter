@@ -1,13 +1,31 @@
-
 {
   "app": {
-    "signingConfigs": [],
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "/Users/chuyi/.ohos/config/default_ohos_SsR9128z38ibd1DjfmxF0ay4awrmbFx0L-x_P2Savgs=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001AAB28BAA3BDB2721F7601CF33244C61DC37640BE9B4E22D06E26728A895D0BAAEE830A272F6FE",
+          "profile": "/Users/chuyi/.ohos/config/default_ohos_SsR9128z38ibd1DjfmxF0ay4awrmbFx0L-x_P2Savgs=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "/Users/chuyi/.ohos/config/default_ohos_SsR9128z38ibd1DjfmxF0ay4awrmbFx0L-x_P2Savgs=.p12",
+          "storePassword": "0000001A81203049B3825E33C20B6ADD11DAD1CF82B649BE8E3F71923FB9FECFBEF7A0501DDF2557216A"
+        }
+      }
+    ],
     "products": [
       {
         "name": "default",
         "signingConfig": "default",
-        "compatibleSdkVersion": "5.0.0(12)",
+        "compatibleSdkVersion": "5.1.0(18)",
         "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "useNormalizedOHMUrl": true
+          }
+        }
       }
     ],
     "buildModeSet": [
