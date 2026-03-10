@@ -27,6 +27,7 @@ class TTCommands {
   static const getAllValidPasscode = 'getAllValidPasscode';
   static const modifyAdminPasscode = 'modifyAdminPasscode';
   static const getAdminPasscode = 'getAdminPasscodeWithLockData';
+  static const getPasscodeVerificationParams = 'getPasscodeVerificationParamsWithLockData';
   static const setAdminErasePasscode = 'setAdminErasePasscode';
   static const recoverPasscode = 'recoverPasscodeWithPasswordType';
 
@@ -37,6 +38,7 @@ class TTCommands {
   static const clearAllCards = 'clearAllIcCard';
   static const getAllValidCards = 'getAllValidIcCard';
   static const recoverCard = 'recoverCardWithCardType';
+  static const reportLossCard = 'reportLossCard';
 
   // --- Lock: Fingerprint ---
   static const addFingerprint = 'addFingerprint';
@@ -55,6 +57,7 @@ class TTCommands {
   // --- Lock: Time ---
   static const setLockTime = 'setLockTime';
   static const getLockTime = 'getLockTime';
+  static const setLockWorkingTime = 'setLockWorkingTime';
 
   // --- Lock: Records / Power / System ---
   static const getLockOperateRecord = 'getLockOperateRecord';
@@ -98,6 +101,13 @@ class TTCommands {
   // --- Lock: Version ---
   static const getLockVersion = 'getLockVersion';
 
+  // --- Lock: NB ---
+  static const setNBServerAddress = 'setNBServerAddress';
+  static const setNBAwakeModes = 'setNBAwakeModes';
+  static const getNBAwakeModes = 'getNBAwakeModes';
+  static const setNBAwakeTimes = 'setNBAwakeTimes';
+  static const getNBAwakeTimes = 'getNBAwakeTimes';
+
   // --- Lock: WiFi ---
   static const scanWifi = 'scanWifi';
   static const configWifi = 'configWifi';
@@ -120,6 +130,9 @@ class TTCommands {
   static const addDoorSensor = 'lockAddDoorSensor';
   static const deleteDoorSensor = 'lockDeleteDoorSensor';
   static const setDoorSensorAlertTime = 'lockSetDoorSensorAlertTime';
+  static const setDoorSensorSwitch = 'setDoorSensorSwitch';
+  static const getDoorSensorSwitch = 'getDoorSensorSwitch';
+  static const getDoorSensorState = 'getDoorSensorState';
 
   // --- Lock: Upgrade ---
   static const setLockEnterUpgradeMode = 'setLockEnterUpgradeMode';

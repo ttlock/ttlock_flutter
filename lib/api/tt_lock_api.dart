@@ -147,6 +147,11 @@ abstract class TTLockApi {
   /// Throws [TTLockException] on failure.
   Future<String> modifyAdminPasscode({required String adminPasscode, required String lockData});
 
+  /// Returns passcode verification params (lockData) for the given [lockData].
+  ///
+  /// Throws [TTLockException] on failure.
+  Future<String> getPasscodeVerificationParams(String lockData);
+
   // ---------------------------------------------------------------------------
   // Card
   // ---------------------------------------------------------------------------
@@ -197,6 +202,11 @@ abstract class TTLockApi {
     required int endDate,
     required String lockData,
   });
+
+  /// Reports the card [cardNumber] as lost so it is invalidated on the lock.
+  ///
+  /// Throws [TTLockException] on failure.
+  Future<void> reportLossCard({required String cardNumber, required String lockData});
 
   // ---------------------------------------------------------------------------
   // Fingerprint
@@ -300,6 +310,15 @@ abstract class TTLockApi {
   ///
   /// Throws [TTLockException] on failure.
   Future<int> getLockTime(String lockData);
+
+  /// Sets the lock working time window ([startDate]–[endDate], minutes from midnight).
+  ///
+  /// Throws [TTLockException] on failure.
+  Future<void> setLockWorkingTime({
+    required int startDate,
+    required int endDate,
+    required String lockData,
+  });
 
   // ---------------------------------------------------------------------------
   // Records / Power / System
@@ -463,6 +482,21 @@ abstract class TTLockApi {
   /// Throws [TTLockException] on failure.
   Future<String> getLockVersion(String lockMac);
 
+  /// Sets the NB-IoT server address for the lock; returns current battery level.
+  ///
+  /// Throws [TTLockException] on failure.
+  Future<int> setNBServerAddress({
+    required String ip,
+    required String port,
+    required String lockData,
+  });
+
+  // Not implemented in classic (commented there); platform command available.
+  // Future<void> setNBAwakeModes({required List<int> modes, required String lockData});
+  // Future<List<int>> getNBAwakeModes(String lockData);
+  // Future<void> setNBAwakeTimes({required List<Map<String, dynamic>> times, required String lockData});
+  // Future<List<Map<String, dynamic>>> getNBAwakeTimes(String lockData);
+
   // ---------------------------------------------------------------------------
   // WiFi Lock
   // ---------------------------------------------------------------------------
@@ -579,6 +613,11 @@ abstract class TTLockApi {
   ///
   /// Throws [TTLockException] on failure.
   Future<void> setDoorSensorAlertTime({required int alertTime, required String lockData});
+
+  // Not implemented in classic (commented there); platform command available.
+  // Future<void> setDoorSensorSwitch({required bool isOn, required String lockData});
+  // Future<bool> getDoorSensorSwitchState(String lockData);
+  // Future<bool> getDoorSensorState(String lockData);
 
   // ---------------------------------------------------------------------------
   // Upgrade

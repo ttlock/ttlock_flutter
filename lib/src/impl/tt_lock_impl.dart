@@ -196,6 +196,12 @@ class TTLockImpl implements TTLockApi {
     return data['lockData'] as String;
   }
 
+  @override
+  Future<String> getPasscodeVerificationParams(String lockData) async {
+    final data = await _platform.invoke(TTCommands.getPasscodeVerificationParams, lockData);
+    return data['lockData'] as String? ?? '';
+  }
+
   // ---------------------------------------------------------------------------
   // Card
   // ---------------------------------------------------------------------------
@@ -270,6 +276,14 @@ class TTLockImpl implements TTLockApi {
       'cardNumber': cardNumber,
       'startDate': startDate,
       'endDate': endDate,
+      'lockData': lockData,
+    });
+  }
+
+  @override
+  Future<void> reportLossCard({required String cardNumber, required String lockData}) async {
+    await _platform.invoke(TTCommands.reportLossCard, {
+      'cardNumber': cardNumber,
       'lockData': lockData,
     });
   }
@@ -439,6 +453,19 @@ class TTLockImpl implements TTLockApi {
   Future<int> getLockTime(String lockData) async {
     final data = await _platform.invoke(TTCommands.getLockTime, lockData);
     return data['timestamp'] as int;
+  }
+
+  @override
+  Future<void> setLockWorkingTime({
+    required int startDate,
+    required int endDate,
+    required String lockData,
+  }) async {
+    await _platform.invoke(TTCommands.setLockWorkingTime, {
+      'startDate': startDate,
+      'endDate': endDate,
+      'lockData': lockData,
+    });
   }
 
   // ---------------------------------------------------------------------------
@@ -671,6 +698,40 @@ class TTLockImpl implements TTLockApi {
     return data['lockVersion'] as String;
   }
 
+  @override
+  Future<int> setNBServerAddress({
+    required String ip,
+    required String port,
+    required String lockData,
+  }) async {
+    final data = await _platform.invoke(TTCommands.setNBServerAddress, {
+      'ip': ip,
+      'port': port,
+      'lockData': lockData,
+    });
+    return data['electricQuantity'] as int;
+  }
+
+  // Not implemented in classic (commented there); platform command available.
+  // @override
+  // Future<void> setNBAwakeModes({required List<int> modes, required String lockData}) async {
+  //   await _platform.invoke(TTCommands.setNBAwakeModes, {'nbAwakeModes': modes, 'lockData': lockData});
+  // }
+  // @override
+  // Future<List<int>> getNBAwakeModes(String lockData) async {
+  //   final data = await _platform.invoke(TTCommands.getNBAwakeModes, lockData);
+  //   return (data['nbAwakeModes'] as List<dynamic>).cast<int>();
+  // }
+  // @override
+  // Future<void> setNBAwakeTimes({required List<Map<String, dynamic>> times, required String lockData}) async {
+  //   await _platform.invoke(TTCommands.setNBAwakeTimes, {'nbAwakeTimeList': times, 'lockData': lockData});
+  // }
+  // @override
+  // Future<List<Map<String, dynamic>>> getNBAwakeTimes(String lockData) async {
+  //   final data = await _platform.invoke(TTCommands.getNBAwakeTimes, lockData);
+  //   return (data['nbAwakeTimeList'] as List<dynamic>).cast<Map<String, dynamic>>();
+  // }
+
   // ---------------------------------------------------------------------------
   // WiFi Lock
   // ---------------------------------------------------------------------------
@@ -833,6 +894,22 @@ class TTLockImpl implements TTLockApi {
       'lockData': lockData,
     });
   }
+
+  // Not implemented in classic (commented there); platform command available.
+  // @override
+  // Future<void> setDoorSensorSwitch({required bool isOn, required String lockData}) async {
+  //   await _platform.invoke(TTCommands.setDoorSensorSwitch, {'isOn': isOn, 'lockData': lockData});
+  // }
+  // @override
+  // Future<bool> getDoorSensorSwitchState(String lockData) async {
+  //   final data = await _platform.invoke(TTCommands.getDoorSensorSwitch, lockData);
+  //   return data['isOn'] as bool;
+  // }
+  // @override
+  // Future<bool> getDoorSensorState(String lockData) async {
+  //   final data = await _platform.invoke(TTCommands.getDoorSensorState, lockData);
+  //   return data['isOn'] as bool;
+  // }
 
   // ---------------------------------------------------------------------------
   // Upgrade

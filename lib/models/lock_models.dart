@@ -177,6 +177,19 @@ class TTLockInitParams {
     if (floorNumber != null) map['floorNumber'] = floorNumber;
     return map;
   }
+
+  /// Creates params from a map (e.g. from classic API initLock(Map, ...)).
+  static TTLockInitParams fromMap(Map map) {
+    return TTLockInitParams(
+      lockMac: map['lockMac'] as String,
+      lockVersion: map['lockVersion'] as String,
+      isInited: map['isInited'] as bool,
+      clientPara: map['clientPara'] as String?,
+      hotelInfo: map['hotelInfo'] as String?,
+      buildingNumber: map['buildingNumber'] as int?,
+      floorNumber: map['floorNumber'] as int?,
+    );
+  }
 }
 
 class TTIpSetting {

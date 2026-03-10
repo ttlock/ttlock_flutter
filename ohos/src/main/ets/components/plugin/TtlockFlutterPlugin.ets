@@ -1086,11 +1086,10 @@ export default class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHan
     const endDate = (call.argument("endDate") as number) ?? 0;
     const cyclicConfig = this.parseCyclicConfig(call);
     TTLock.addFingerprint(lockData, startDate, endDate, cyclicConfig, {
-      success: (model: IAddFingerprintProgressModel | Record<string, Object>) => {
-        const m = model as Record<string, Object>;
-        const totalCount = m['totalCount'] as number | undefined;
-        const currentCount = m['currentCount'] as number | undefined;
-        const fingerprintNumber = m['fingerprintNumber'] ?? m['fingerprintNum'];
+      success: (model) => {
+        const totalCount = model.totalCount;
+        const currentCount = model.currentCount;
+        const fingerprintNumber = model.fingerprintNumber;
         if (totalCount != null && currentCount != null && fingerprintNumber == null) {
           this.callbackCommand(TTCommands.addFingerprint, RESULT_STATE_PROGRESS, { 'currentCount': currentCount, 'totalCount': totalCount }, -1, '');
         } else {
