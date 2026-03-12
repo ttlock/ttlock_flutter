@@ -236,19 +236,19 @@ class TTElectricMeterScanModel {
   TTMeterPayMode payMode = TTMeterPayMode.postpaid;
   int scanTime = 0;
 
-  TTElectricMeterScanModel(Map map) {
+   TTElectricMeterScanModel(Map map) {
     this.name = map[TTResponse.name];
     this.mac = map[TTResponse.mac];
     this.isInited = map[TTResponse.isInited];
-    this.totalKwh = map[TTResponse.totalKwh];
-    this.remainderKwh = map[TTResponse.remainderKwh];
-    this.voltage = map[TTResponse.voltage];
-    this.electricCurrent = map[TTResponse.electricCurrent];
-    this.rssi = map[TTResponse.rssi];
-    this.onOff = map[TTResponse.onOff];
+    this.totalKwh = map[TTResponse.totalKwh] ?? '';
+    this.remainderKwh = map[TTResponse.remainderKwh] ?? '';
+    this.voltage = map[TTResponse.voltage] ?? '';
+    this.electricCurrent = map[TTResponse.electricCurrent] ?? '';
+    this.rssi = map[TTResponse.rssi] ?? -1;
+    this.onOff = map[TTResponse.onOff] ?? true;
     this.payMode = map[TTResponse.payMode] == 0
         ? TTMeterPayMode.postpaid
         : TTMeterPayMode.prepaid;
-    this.scanTime = map[TTResponse.scanTime];
+    this.scanTime = map[TTResponse.scanTime] ?? 0;
   }
 }
