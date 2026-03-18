@@ -474,12 +474,12 @@ class TTLock {
   @Deprecated('Use TTLock.lock.modifyAdminPasscode(adminPasscode: ..., lockData: ...) instead.')
   static void modifyAdminPasscode(String adminPasscode, String lockData,
       TTLockDataCallback callback, TTFailedCallback failedCallback) {
-    _runLock(
+    _runLock<String?>(
       new_ttlock.TTLock.lock.modifyAdminPasscode(
         adminPasscode: adminPasscode,
         lockData: lockData,
       ),
-      callback,
+      (lockData) => callback(lockData ?? ''),
       failedCallback,
     );
   }
