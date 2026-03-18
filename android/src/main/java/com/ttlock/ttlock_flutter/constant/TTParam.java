@@ -14,6 +14,10 @@ public class TTParam {
 //    public static final String SPECIAL_VALUE = "specialValue";
     public static final String KEYPAD_FEATURE_VALUE = "wirelessKeypadFeatureValue";
 
+    public static final String featureValue = "featureValue";
+
+    public static final String waterMeterId = "waterMeterId";
+
     public static final String MODEL_NUM = "modelNum";
     public static final String HARD_WARE_REVISION = "hardwareRevision";
     public static final String FIRMWARE_REVISION = "firmwareRevision";
@@ -45,7 +49,7 @@ public class TTParam {
     public static final String electricQuantity = "electricQuantity";
     public static final String waterValveFailure = "waterValveFailure";
 
-
+    public static final String executeResponse = "executeResponse";
 
     public static final String slotNumber = "slotNumber";
     public static final String startDate = "startDate";
@@ -53,4 +57,8 @@ public class TTParam {
     public static final String cycleJsonList = "cycleJsonList";
     public static final String fingerprintNumber = "fingerprintNumber";
 
+    /** 独立门磁：门磁数据 / 初始化结果等 */
+    public static final String doorSensorData = "doorSensorData";
+    public static final String wifiMac = "wifiMac";
+    public static final String supportFunction = "supportFunction";
 }

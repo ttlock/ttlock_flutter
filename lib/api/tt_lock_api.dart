@@ -145,7 +145,7 @@ abstract class TTLockApi {
   /// Modifies the admin passcode and returns updated [lockData] (on-premise mode).
   ///
   /// Throws [TTLockException] on failure.
-  Future<String> modifyAdminPasscode({required String adminPasscode, required String lockData});
+  Future<String?> modifyAdminPasscode({required String adminPasscode, required String lockData});
 
   /// Returns passcode verification params (lockData) for the given [lockData].
   ///

@@ -113,6 +113,7 @@ class TTRemoteAccessoryScanModel {
   final String name;
   final String mac;
   final int rssi;
+  final int? scanTime;
   final bool isMultifunctionalKeypad;
   final Map<String, dynamic> advertisementData;
 
@@ -120,6 +121,7 @@ class TTRemoteAccessoryScanModel {
     required this.name,
     required this.mac,
     required this.rssi,
+    this.scanTime,
     this.isMultifunctionalKeypad = false,
     this.advertisementData = const {},
   });
@@ -129,6 +131,7 @@ class TTRemoteAccessoryScanModel {
       name: map['name'] as String,
       mac: map['mac'] as String,
       rssi: map['rssi'] as int,
+      scanTime: map['scanTime'] as int?,
       isMultifunctionalKeypad: (map['isMultifunctionalKeypad'] as bool?) ?? false,
       advertisementData: (map['advertisementData'] as Map?)?.cast<String, dynamic>() ?? {},
     );
@@ -138,6 +141,7 @@ class TTRemoteAccessoryScanModel {
     String? name,
     String? mac,
     int? rssi,
+    int? scanTime,
     bool? isMultifunctionalKeypad,
     Map<String, dynamic>? advertisementData,
   }) {
@@ -145,6 +149,7 @@ class TTRemoteAccessoryScanModel {
       name: name ?? this.name,
       mac: mac ?? this.mac,
       rssi: rssi ?? this.rssi,
+      scanTime: scanTime ?? this.scanTime,
       isMultifunctionalKeypad:
           isMultifunctionalKeypad ?? this.isMultifunctionalKeypad,
       advertisementData: advertisementData ?? this.advertisementData,

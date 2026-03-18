@@ -1,7 +1,9 @@
 import 'package:ttlock_premise_flutter/models/accessory_models.dart';
 import 'package:ttlock_premise_flutter/models/events.dart';
 import 'package:ttlock_premise_flutter/models/lock_models.dart';
+import 'package:ttlock_premise_flutter/models/meter_models.dart';
 import 'package:ttlock_premise_flutter/models/scan_models.dart';
+import 'package:ttlock_premise_flutter/models/standalone_door_sensor_models.dart';
 
 /// Abstract interface for accessory operations (remote key, keypad, door sensor).
 ///
@@ -105,4 +107,94 @@ abstract class TTAccessoryApi {
   ///
   /// Returns [TTLockSystemModel]. Throws [TTAccessoryException] on failure.
   Future<TTLockSystemModel> initDoorSensor({required String mac, required String lockData});
+
+  // ---------------------------------------------------------------------------
+  // Standalone Door Sensor
+  // ---------------------------------------------------------------------------
+
+  /// Starts scanning for standalone door sensors; returns a stream of [TTStandaloneDoorSensorScanModel].
+  Stream<TTStandaloneDoorSensorScanModel> standaloneDoorSensorStartScan();
+
+  /// Stops scanning for standalone door sensors.
+  Future<void> standaloneDoorSensorStopScan();
+
+  /// Initializes the standalone door sensor [mac] with [info] map.
+  Future<TTStandaloneDoorSensorInfo> standaloneDoorSensorInit({
+    required String mac,
+    required Map<String, dynamic> info,
+  });
+
+  /// Reads feature value from standalone door sensor [mac].
+  Future<String> standaloneDoorSensorReadFeatureValue(String mac);
+
+  /// Checks whether the standalone door sensor supports a specific function.
+  Future<bool> standaloneDoorSensorIsSupportFunction({
+    required String featureValue,
+    required int function,
+  });
+
+  // ---------------------------------------------------------------------------
+  // Water Meter
+  // ---------------------------------------------------------------------------
+
+  Future<void> waterMeterConfigServer({
+    required String url,
+    required String clientId,
+    required String accessToken,
+  });
+
+  Stream<TTMeterScanModel> waterMeterStartScan();
+  Future<void> waterMeterStopScan();
+
+  Future<void> waterMeterConnect(String mac);
+  Future<void> waterMeterDisconnect(String mac);
+
+  Future<TTWaterMeterInitResult> waterMeterInit(Map<String, dynamic> params);
+  Future<void> waterMeterDelete(String waterMeterId);
+
+  Future<void> waterMeterSetPowerOnOff({required String waterMeterId, required bool isOn});
+  Future<void> waterMeterSetRemainderM3({required String waterMeterId, required num remainderM3});
+  Future<void> waterMeterClearRemainderM3({required String waterMeterId});
+  Future<Map<String, dynamic>> waterMeterReadData({required String waterMeterId});
+  Future<void> waterMeterSetPayMode({required String waterMeterId, required int payMode});
+  Future<void> waterMeterCharge({required String waterMeterId, required num amount});
+  Future<void> waterMeterSetTotalUsage({required String waterMeterId, required num totalM3});
+
+  Future<String> waterMeterGetFeatureValue(String waterMeterId);
+  Future<Map<String, dynamic>> waterMeterGetDeviceInfo(String waterMeterId);
+  Future<bool> waterMeterIsSupportFunction({required String featureValue, required int function});
+
+  Future<void> waterMeterConfigApn({required String apn});
+  Future<void> waterMeterConfigMeterServer({required String ip, required String port});
+  Future<void> waterMeterReset(String waterMeterId);
+
+  // ---------------------------------------------------------------------------
+  // Electric Meter
+  // ---------------------------------------------------------------------------
+
+  Future<void> electricMeterConfigServer({
+    required String url,
+    required String clientId,
+    required String accessToken,
+  });
+
+  Stream<TTMeterScanModel> electricMeterStartScan();
+  Future<void> electricMeterStopScan();
+
+  Future<void> electricMeterConnect(String mac);
+  Future<void> electricMeterDisconnect(String mac);
+
+  Future<TTElectricMeterInitResult> electricMeterInit(Map<String, dynamic> params);
+  Future<void> electricMeterDelete(String electricMeterId);
+
+  Future<void> electricMeterSetPowerOnOff({required String electricMeterId, required bool isOn});
+  Future<void> electricMeterSetRemainderKwh({required String electricMeterId, required num remainderKwh});
+  Future<void> electricMeterClearRemainderKwh({required String electricMeterId});
+  Future<Map<String, dynamic>> electricMeterReadData({required String electricMeterId});
+  Future<void> electricMeterSetPayMode({required String electricMeterId, required int payMode});
+  Future<void> electricMeterCharge({required String electricMeterId, required num amount});
+  Future<void> electricMeterSetMaxPower({required String electricMeterId, required num maxPower});
+
+  Future<String> electricMeterGetFeatureValue(String electricMeterId);
+  Future<bool> electricMeterIsSupportFunction({required String featureValue, required int function});
 }

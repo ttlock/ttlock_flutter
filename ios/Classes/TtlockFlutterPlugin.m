@@ -126,6 +126,9 @@ ErrorDeviceKey
             data.lockTime = @(lockTime);
             data.electricQuantity = @(electricQuantity);
             data.uniqueId = @(uniqueId);
+            if (lockModel.lockData.length > 0) {
+                data.lockData = lockModel.lockData;
+            }
             [weakSelf successCallbackCommand:command data:data];
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];
@@ -283,7 +286,12 @@ ErrorDeviceKey
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];
         }];
-        
+    }else if ([command isEqualToString:command_set_lock_working_time]) {
+        [TTLock setLockWorkingTimeWithStartDate:lockModel.startDate.longLongValue endDate:lockModel.endDate.longLongValue lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];
+        }];
     }else if ([command isEqualToString:command_get_lock_operate_record]) {
         int logType = lockModel.logType.intValue;
         TTOperateLogType type = logType == 0 ? TTOperateLogTypeLatest :TTOperateLogTypeAll;
@@ -530,6 +538,18 @@ ErrorDeviceKey
                 [weakSelf errorCallbackCommand:command code:connectStatus == TTGatewayConnectTimeout ? TTGatewayTimeout :TTGatewayFail msg:nil];
             }
        }];
+    }else if ([command isEqualToString:command_gateway_get_network_mac]) {
+        NSMutableDictionary *paramDict = @{}.mutableCopy;
+        paramDict[@"networkMac"] = [TTGateway getNetworkMac];
+        [weakSelf successCallbackCommand:command data:paramDict];
+    }else if ([command isEqualToString:command_gateway_config_apn]) {
+        [TTGateway configApn:lockModel.apn block:^(TTGatewayStatus status) {
+            if (status == TTGatewaySuccess) {
+                [weakSelf successCallbackCommand:command data:nil];
+            }else{
+                [weakSelf errorCallbackCommand:command code:status msg:nil];
+            }
+        }];
     }else if ([command isEqualToString:command_function_support]) {
         NSInteger value = lockModel.supportFunction.integerValue;
         TTLockFeatureValue featureValue;
@@ -687,34 +707,26 @@ ErrorDeviceKey
             [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];
         }];
     }
-//   else if ([command isEqualToString:command_get_passcode_verification_param]) {
-//        [TTLock getPasscodeVerificationParamsWithLockData:lockModel.lockData success:^(NSString *lockData) {
-//            TtlockModel *data = [TtlockModel new];
-//            data.lockData = lockData;
-//            [weakSelf successCallbackCommand:command data:data];
-//        } failure:^(TTError errorCode, NSString *errorMsg) {
-//            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
-//        }];
-//    }else if ([command isEqualToString:command_set_nb_server_address]) {
-//    
-//        [TTLock setNBServerAddress:lockModel.ip
-//                        portNumber:lockModel.port
-//                          lockData:lockModel.lockData
-//                           success:^(NSInteger electricQuantity) {
-//            TtlockModel *data = [TtlockModel new];
-//            data.electricQuantity = @(electricQuantity);
-//            [weakSelf successCallbackCommand:command data:data];
-//        } failure:^(TTError errorCode, NSString *errorMsg) {
-//            [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
-//        }];
-//    }else if ([command isEqualToString:command_set_v2_lock_admin_erase_passcode]) {
-//     [TTLock setAdminErasePasscode:lockModel.erasePasscode lockData:lockModel.lockData success:^{
-//         [weakSelf successCallbackCommand:command data:nil];
-//     } failure:^(TTError errorCode, NSString *errorMsg) {
-//         [weakSelf errorCallbackCommand:command code:errorCode details:errorMsg];
-//     }];
-//     }
-else if ([command isEqualToString:command_recover_card]) {
+    }else if ([command isEqualToString:command_get_passcode_verification_param]) {
+        [TTLock getPasscodeVerificationParamsWithLockData:lockModel.lockData success:^(NSString *lockData) {
+            TtlockModel *data = [TtlockModel new];
+            data.lockData = lockData;
+            [weakSelf successCallbackCommand:command data:data];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];
+        }];
+    }else if ([command isEqualToString:command_set_nb_server_address]) {
+        [TTLock setNBServerAddress:lockModel.ip
+                        portNumber:lockModel.port
+                          lockData:lockModel.lockData
+                           success:^(NSInteger electricQuantity) {
+            TtlockModel *data = [TtlockModel new];
+            data.electricQuantity = @(electricQuantity);
+            [weakSelf successCallbackCommand:command data:data];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];
+        }];
+    }else if ([command isEqualToString:command_recover_card]) {
         NSArray *cycleConfigArray = (NSArray *)[self dictFromJsonStr:lockModel.cycleJsonList];
                 cycleConfigArray = cycleConfigArray.count > 0 ? cycleConfigArray : nil;
                 [TTLock recoverICCardWithCyclicConfig:cycleConfigArray cardNumber:lockModel.cardNumber
@@ -1113,6 +1125,329 @@ else if ([command isEqualToString:command_recover_card]) {
             [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];
         }];
     }
+    
+#pragma mark - 独立门磁 / 水表 / 电表（参考云版真实调用）
+    else if ([command isEqualToString:@"standaloneDoorSensorStartScan"]) {
+        [TTStandaloneDoorSensor startScanWithSuccess:^(TTStandaloneDoorSensorScanModel * _Nonnull model) {
+            NSMutableDictionary *dict = @{}.mutableCopy;
+            dict[@"name"] = model.name;
+            dict[@"rssi"] = @(model.RSSI);
+            dict[@"mac"] = model.mac;
+            dict[@"scanTime"] = @(model.scanTime);
+            [weakSelf successCallbackCommand:command data:dict];
+        } failure:^(TTStandaloneDoorSensorError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"standaloneDoorSensorStopScan"]) {
+        [TTStandaloneDoorSensor stopScan];
+    }
+    else if ([command isEqualToString:@"standaloneDoorSensorInit"]) {
+        NSMutableDictionary *infoDict = [self dictFromJsonStr:lockModel.standaloneInfoStr];
+        [TTStandaloneDoorSensor initWithInfo:infoDict mac:lockModel.mac success:^(TTStandaloneDoorSensorInitModel * _Nonnull initModel) {
+            NSMutableDictionary *dict = [weakSelf dicFromObject:initModel];
+            [weakSelf successCallbackCommand:command data:dict];
+        } failure:^(TTStandaloneDoorSensorError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"standaloneDoorGetFeatureValue"]) {
+        [TTStandaloneDoorSensor getFeatureValueWithMac:lockModel.mac success:^(NSString * _Nonnull featureValue) {
+            NSMutableDictionary * dict = @{}.mutableCopy;
+            dict[@"featureValue"] = featureValue;
+            [weakSelf successCallbackCommand:command data:dict];
+        } failure:^(TTStandaloneDoorSensorError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"standaloneDoorIsSupportFunction"]) {
+        bool isSupport = [TTStandaloneDoorSensor supportFunction:lockModel.standaloneDoorFeature.intValue featureValue:lockModel.featureValue];
+        TtlockModel *data = [TtlockModel new];
+        data.isSupport = @(isSupport);
+        [weakSelf successCallbackCommand:command data:data];
+    }
+    
+    // 电表
+    else if ([command isEqualToString:@"electricMeterConfigServer"]) {
+        [TTElectricMeter setClientParamWithUrl:lockModel.url clientId:lockModel.clientId accessToken:lockModel.accessToken];
+        [weakSelf successCallbackCommand:command data:nil];
+    }
+    else if ([command isEqualToString:@"electricMeterStartScan"]) {
+        [TTElectricMeter startScanWithSuccess:^(TTElectricMeterModel * _Nonnull model) {
+            NSMutableDictionary *dict = @{}.mutableCopy;
+            dict[@"name"] = model.name;
+            dict[@"rssi"] = @(model.RSSI);
+            dict[@"mac"] = model.mac;
+            dict[@"isInited"] = [NSNumber numberWithBool:model.isInited];
+            dict[@"onOff"] = [NSNumber numberWithBool:model.onOff];
+            dict[@"payMode"] = @(model.payMode);
+            dict[@"totalKwh"] = model.totalKwh;
+            dict[@"scanTime"] = @(model.scanTime);
+            dict[@"remainderKwh"] = model.remainderKwh;
+            dict[@"voltage"] = model.voltage;
+            dict[@"electricCurrent"] = model.electricCurrent;
+            [weakSelf successCallbackCommand:command data:dict];
+        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"electricMeterStopScan"]) {
+        [TTElectricMeter stopScan];
+    }
+    else if ([command isEqualToString:@"electricMeterConnect"]) {
+        [TTElectricMeter connectWithMac:lockModel.mac success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"electricMeterDisconnect"]) {
+        [TTElectricMeter cancelConnectWithMac:lockModel.mac];
+    }
+    else if ([command isEqualToString:@"electricMeterInit"]) {
+        NSDictionary *dict = (NSDictionary *)arguments;
+        [TTElectricMeter addElectricMeterWithInfo:dict success:^(TTElectricMeterAddResult *result){
+            NSMutableDictionary *ret = @{}.mutableCopy;
+            ret[@"electricMeterId"] = @(result.electricMeterId);
+            [weakSelf successCallbackCommand:command data:ret];
+        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"electricMeterDelete"]) {
+        [TTElectricMeter deleteWithMac:lockModel.mac success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"electricMeterSetPowerOnOff"]) {
+        [TTElectricMeter setPowerOnOffWithMac:lockModel.mac powerOn:lockModel.isOn.boolValue success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"electricMeterSetRemainderKwh"]) {
+        [TTElectricMeter setRemainingElectricityWithMac:lockModel.mac remainderKwh:lockModel.remainderKwh success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"electricMeterClearRemainderKwh"]) {
+        [TTElectricMeter clearRemainingElectricityWithMac:lockModel.mac success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"electricMeterReadData"]) {
+        [TTElectricMeter readDataWithMac:lockModel.mac success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"electricMeterSetPayMode"]) {
+        [TTElectricMeter setPayModeWithMac:lockModel.mac payMode:lockModel.payMode.intValue price:lockModel.price success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"electricMeterCharge"]) {
+        [TTElectricMeter rechargeWithMac:lockModel.mac rechargeAmount:lockModel.chargeAmount rechargeKwh:lockModel.chargeKwh success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"electricMeterSetMaxPower"]) {
+        [TTElectricMeter setMaxPowerWithMac:lockModel.mac maxPower:lockModel.maxPower.intValue success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"electricMeterGetFeatureValue"]) {
+        [TTElectricMeter getFeatureValueWithMac:lockModel.mac success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"electricMeterIsSupportFunction"]) {
+        bool isSupport = [TTElectricMeter supportFunction:lockModel.supportFunction.intValue featureValue:lockModel.featureValue];
+        TtlockModel *data = [TtlockModel new];
+        data.isSupport = @(isSupport);
+        [weakSelf successCallbackCommand:command data:data];
+    }
+    
+    // 水表
+    else if ([command isEqualToString:@"waterMeterConfigServer"]) {
+        [TTWaterMeter setClientParamWithUrl:lockModel.url clientId:lockModel.clientId accessToken:lockModel.accessToken];
+        [weakSelf successCallbackCommand:command data:nil];
+    }
+    else if ([command isEqualToString:@"waterMeterStartScan"]) {
+        [TTWaterMeter startScanWithSuccess:^(TTWaterMeterModel * _Nonnull model) {
+            NSMutableDictionary *dict = @{}.mutableCopy;
+            dict[@"name"] = model.name;
+            dict[@"mac"] = model.mac;
+            dict[@"rssi"] = @(model.RSSI);
+            dict[@"scanTime"] = @(model.scanTime);
+            dict[@"onOff"] = [NSNumber numberWithBool:model.onOff];
+            dict[@"isInited"] = [NSNumber numberWithBool:model.isInited];
+            dict[@"payMode"] = @(model.payMode);
+            dict[@"totalM3"] = model.totalM3;
+            dict[@"remainderM3"] = model.remainderM3;
+            dict[@"magneticInterference"] = @(model.magneticInterference);
+            dict[@"waterValveFailure"] = @(model.waterValveFailure);
+            dict[@"electricQuantity"] = @(model.electricQuantity);
+            dict[@"executeResponse"] = model.executeResponse;
+            [weakSelf successCallbackCommand:command data:dict];
+        } failure:^(TTWaterMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"waterMeterStopScan"]) {
+        [TTWaterMeter stopScan];
+    }
+    else if ([command isEqualToString:@"waterMeterConnect"]) {
+        [TTWaterMeter connectWithMac:lockModel.mac success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTWaterMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"waterMeterDisconnect"]) {
+        [TTWaterMeter cancelConnectWithMac:lockModel.mac];
+    }
+    else if ([command isEqualToString:@"waterMeterInit"]) {
+        NSDictionary *dict = (NSDictionary *)arguments;
+        [TTWaterMeter addWaterMeterWithInfo:dict success:^(TTWaterMeterAddResult *result){
+            NSMutableDictionary *ret = @{}.mutableCopy;
+            ret[@"featureValue"] = result.featureValue;
+            ret[@"waterMeterId"] = @(result.waterMeterId);
+            [weakSelf successCallbackCommand:command data:ret];
+        } failure:^(TTWaterMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"waterMeterDelete"]) {
+        [TTWaterMeter deleteWithMac:lockModel.mac success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTWaterMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"waterMeterSetPowerOnOff"]) {
+        [TTWaterMeter setWaterOnOffWithMac:lockModel.mac onOff:lockModel.isOn.boolValue ? 1 : 0 success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTWaterMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"waterMeterSetRemainderM3"]) {
+        [TTWaterMeter setRemainingWaterWithMac:lockModel.mac remainderM3:lockModel.remainderM3 success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTWaterMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"waterMeterClearRemainderM3"]) {
+        [TTWaterMeter clearRemainingWaterWithMac:lockModel.mac success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTWaterMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"waterMeterReadData"]) {
+        [TTWaterMeter readDataWithMac:lockModel.mac success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTWaterMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"waterMeterSetPayMode"]) {
+        [TTWaterMeter setPayModeWithMac:lockModel.mac payMode:lockModel.payMode.intValue price:lockModel.price success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTWaterMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"waterMeterCharge"]) {
+        [TTWaterMeter rechargeWithMac:lockModel.mac rechargeAmount:lockModel.chargeAmount rechargeM3:lockModel.m3 success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTWaterMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"waterMeterSetTotalUsage"]) {
+        [TTWaterMeter setTotalUsageWithMac:lockModel.mac totalM3:lockModel.totalM3 success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTWaterMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"waterMeterGetFeatureValue"]) {
+        [TTWaterMeter getFeatureValueWithMac:lockModel.mac success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTWaterMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"waterMeterIsSupportFunction"]) {
+        bool isSupport = [TTWaterMeter supportFunction:lockModel.WaterMeterFeature.intValue featureValue:lockModel.featureValue];
+        TtlockModel *data = [TtlockModel new];
+        data.isSupport = @(isSupport);
+        [weakSelf successCallbackCommand:command data:data];
+    }
+    else if ([command isEqualToString:@"waterMeterGetDeviceInfo"]) {
+        [TTWaterMeter getDeviceInfoWithMac:lockModel.mac success:^(TTWaterDeviceInfoModel * _Nonnull model) {
+            NSMutableDictionary *dict = @{}.mutableCopy;
+            dict[@"modelNum"] = model.modelNum;
+            dict[@"hardwareRevision"] = model.hardwareRevision;
+            dict[@"firmwareRevision"] = model.firmwareRevision;
+            dict[@"catOneOperator"] = model.catOneOperator;
+            dict[@"catOneNodeId"] = model.catOneNodeId;
+            dict[@"catOneCardNumber"] = model.catOneCardNumber;
+            dict[@"catOneRssi"] = model.catOneRssi;
+            dict[@"catOneImsi"] = model.catOneImsi;
+            [weakSelf successCallbackCommand:command data:dict];
+        } failure:^(TTWaterMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"waterMeterConfigApn"]) {
+        [TTWaterMeter configApnWithMac:lockModel.mac apn:lockModel.apn success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTWaterMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"waterMeterConfigMeterServer"]) {
+        [TTWaterMeter configServerWithMac:lockModel.mac serverAddress:lockModel.ip portNumber:lockModel.port success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTWaterMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:@"waterMeterReset"]) {
+        [TTWaterMeter resetWithMac:lockModel.mac success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTWaterMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
+        }];
+    }
+    else if ([command hasPrefix:@"standaloneDoorSensor"] || [command hasPrefix:@"waterMeter"] || [command hasPrefix:@"electricMeter"]) {
+        [weakSelf accessoryNotSupported:command];
+    }
+}
+
+#pragma mark - Phase4: 独立门磁 / 水表 / 电表（当前 SDK 未支持时统一回传错误）
+- (void)accessoryNotSupported:(NSString *)command {
+    [self errorCallbackCommand:command code:0 msg:@"Accessory API not supported by current SDK"];
 }
 
 
@@ -1174,7 +1509,9 @@ else if ([command isEqualToString:command_recover_card]) {
                                     command_config_gateway_ip,
                                     command_disconnect_gateway,
                                     command_init_gateway,
-                                    command_upgrade_gateway
+                                    command_upgrade_gateway,
+                                    command_gateway_config_apn,
+                                    command_gateway_get_network_mac
     ];
     
     bool isGatewayStatus = false;
@@ -1250,6 +1587,18 @@ else if ([command isEqualToString:command_recover_card]) {
     return isRemoteKeyCommand;
 }
 
+- (Boolean) isStandaloneDoorSensorCommand:(NSString *)command{
+    return [command containsString:@"standaloneDoorSensor"];
+}
+
+- (Boolean) isElectricMeterCommand:(NSString *)command{
+    return [command containsString:@"electricMeter"];
+}
+
+- (Boolean) isWaterMeterCommand:(NSString *)command{
+    return [command containsString:@"waterMeter"];
+}
+
 - (void)callbackCommand:(NSString *)command resultState:(ResultState)resultState data:(NSObject *)data errorCode:(NSNumber *)code msg:(NSString *)msg {
     
    
@@ -1262,6 +1611,12 @@ else if ([command isEqualToString:command_recover_card]) {
         errorCode = @([self getTTRemoteKeypadErrorCode:[code intValue]]);
     }else if([self isDoorSensorCommand:command]){
         errorCode = @([self getTTDoorSensoryErrorCode:[code intValue]]);
+    }else if([self isStandaloneDoorSensorCommand:command]){
+        errorCode = @([self getTTStandaloneDoorSensoryErrorCode:[code intValue]]);
+    }else if([self isElectricMeterCommand:command]){
+        errorCode = @([self getTTElectricErrorCode:[code intValue]]);
+    }else if([self isWaterMeterCommand:command]){
+        errorCode = @([self getTTWaterErrorCode:[code intValue]]);
     }else{
         errorCode = [self getTTLockErrorCode:code];
     }
@@ -1366,6 +1721,59 @@ else if ([command isEqualToString:command_recover_card]) {
     ];
     
     NSInteger errorCode = TTGatewayFail;
+    for (int i = 0; i < codeArray.count; i++) {
+        if([codeArray[i] intValue] == status){
+            errorCode = i;
+        }
+    }
+    return errorCode;
+}
+
+- (NSInteger)getTTStandaloneDoorSensoryErrorCode:(TTStandaloneDoorSensorError) status{
+    NSArray *codeArray =@[@(TTStandaloneDoorSensorBluetoothPowerOff),
+                          @(TTStandaloneDoorSensorConnectTimeout),
+                          @(TTStandaloneDoorSensorDisconnect),
+                          @(TTDoorSensorErrorFail),
+                          @(TTDoorSensorErrorWrongCRC),
+                          @(TTStandaloneDoorSensorWrongSSID),
+                          @(TTStandaloneDoorSensorWrongWifiPassword)
+    ];
+    
+    NSInteger errorCode = [codeArray indexOfObject:@(TTDoorSensorErrorFail)];
+    for (int i = 0; i < codeArray.count; i++) {
+        if([codeArray[i] intValue] == status){
+            errorCode = i;
+        }
+    }
+    return errorCode;
+}
+
+- (NSInteger)getTTElectricErrorCode:(TTElectricMeterError) status{
+    NSArray *codeArray =@[@(TTElectricMeterBluetoothPowerOff),
+                          @(TTElectricMeterConnectTimeout),
+                          @(TTElectricMeterDisconnect),
+                          @(TTElectricMeterNetError),
+                          @(TTElectricMeterRequestServerError),
+                          @(TTElectricMeterExistedInServer)
+    ];
+    NSInteger errorCode = [codeArray indexOfObject:@(TTElectricMeterConnectTimeout)];
+    for (int i = 0; i < codeArray.count; i++) {
+        if([codeArray[i] intValue] == status){
+            errorCode = i;
+        }
+    }
+    return errorCode;
+}
+
+- (NSInteger)getTTWaterErrorCode:(TTWaterMeterError) status{
+    NSArray *codeArray =@[@(TTWaterMeterBluetoothPowerOff),
+                          @(TTWaterMeterConnectTimeout),
+                          @(TTWaterMeterDisconnect),
+                          @(TTWaterMeterNetError),
+                          @(TTWaterMeterRequestServerError),
+                          @(TTWaterMeterExistedInServer)
+    ];
+    NSInteger errorCode = [codeArray indexOfObject:@(TTWaterMeterConnectTimeout)];
     for (int i = 0; i < codeArray.count; i++) {
         if([codeArray[i] intValue] == status){
             errorCode = i;

@@ -188,12 +188,12 @@ class TTLockImpl implements TTLockApi {
   }
 
   @override
-  Future<String> modifyAdminPasscode({required String adminPasscode, required String lockData}) async {
+  Future<String?> modifyAdminPasscode({required String adminPasscode, required String lockData}) async {
     final data = await _platform.invoke(TTCommands.modifyAdminPasscode, {
       'adminPasscode': adminPasscode,
       'lockData': lockData,
     });
-    return data['lockData'] as String;
+    return data['lockData'] as String?;
   }
 
   @override

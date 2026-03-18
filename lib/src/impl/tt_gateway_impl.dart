@@ -60,6 +60,12 @@ class TTGatewayImpl implements TTGatewayApi {
   }
 
   @override
+  Future<String?> getNetworkMac() async {
+    final data = await _platform.invoke(TTCommands.getNetworkMac);
+    return data['networkMac'] as String?;
+  }
+
+  @override
   Future<void> enterUpgradeMode(String mac) async {
     await _platform.invoke(TTCommands.upgradeGateway, {'mac': mac});
   }

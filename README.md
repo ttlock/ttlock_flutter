@@ -1,12 +1,15 @@
-# TTLock Flutter Plugin (On-Premise)
+# TTLock Flutter Plugin
 
-基于 Future/Stream 的 TTLock 智能锁、网关及配件 Flutter 插件，适用于本地/on-premise SDK 场景。
+基于 **Future/Stream** 的 TTLock 智能锁、网关及配件 Flutter 插件，目标是用**同一套 Dart API**同时支持：
+
+- **On-Premise（离线版）**：iOS 依赖 `TTLockOnPremise`；Android 依赖 `TTLockOnPremise.aar`
+- **Cloud（在线版）**：iOS 依赖 `TTLock`；Android 依赖 `ttlock-release.aar`（或你的在线版 aar）
 
 ## 功能概览
 
 - **锁 (Lock)**：扫描、初始化、开关锁、密码/卡/指纹/人脸、时间与记录、WiFi 配置、自动上锁、电梯/酒店等扩展功能。
 - **网关 (Gateway)**：扫描、连接、初始化、配置 IP/APN、进入升级模式。
-- **配件 (Accessory)**：遥控器、键盘、门磁的扫描与初始化等。
+- **配件 (Accessory)**：遥控器、键盘、门磁、**独立门磁**、**水表**、**电表**（均从 `TTLock.accessory` 进入）。
 
 ## 环境要求
 
@@ -27,7 +30,8 @@ dependencies:
 ### iOS
 
 1. 在 Xcode 中打开工程，进入 `Project` → `Info` → `Custom iOS Target Properties`。
-2. 添加键 `Privacy - Bluetooth Peripheral Usage Description`，值填写蓝牙使用说明（如 "用于连接智能锁"）。
+2. 添加键 `Privacy - Bluetooth Peripheral Usage Description`，值填写蓝牙使用说明（如“用于连接智能锁/网关/配件”）。
+3. **切换 SDK（On-Premise vs Cloud）**：通过修改 `ios/ttlock_premise_flutter.podspec` 的依赖完成切换（见 `docs/IOS_SDK_SWITCH.md`）。
 
 ### Android
 
@@ -74,6 +78,15 @@ buildTypes {
 }
 ```
 
+**配件（独立门磁 / 水表 / 电表）依赖说明：**
+
+- 如果你的 `TTLockOnPremise.aar` **已包含** `standalonedoorsensor / watermeter / electricmeter` 对应 API，则无需额外处理。
+- 如果不包含：将在线版 `ttlock-release.aar` 放入 `android/libs`，并在 `android/build.gradle` 中加入：
+
+```groovy
+implementation(name: 'ttlock-release', ext: 'aar')
+```
+
 ## 快速开始
 
 引入包并开启调试日志（可选）：
@@ -82,6 +95,14 @@ buildTypes {
 import 'package:ttlock_premise_flutter/ttlock.dart';
 
 TTLock.printLog = true;
+```
+
+运行示例工程（推荐用 fvm）：
+
+```bash
+cd example
+fvm flutter pub get
+fvm flutter run
 ```
 
 ### 扫描锁并初始化
@@ -242,6 +263,13 @@ try {
 | **门磁** | `startScanDoorSensor()` | 扫描门磁 | `Stream<TTRemoteAccessoryScanModel>` |
 | | `stopScanDoorSensor()` | 停止扫描 | `Future<void>` |
 | | `initDoorSensor(mac, lockData)` | 初始化门磁 | `Future<TTLockSystemModel>` |
+| **独立门磁** | `startScanStandaloneDoorSensor()` | 扫描独立门磁 | `Stream<TTStandaloneDoorSensorScanModel>` |
+| | `stopScanStandaloneDoorSensor()` | 停止扫描 | `Future<void>` |
+| | `initStandaloneDoorSensor(mac, standaloneInfoStr?)` | 初始化独立门磁 | `Future<TTStandaloneDoorSensorInitResult>` |
+| | `getStandaloneDoorSensorFeatureValue(mac)` | 获取 featureValue | `Future<String>` |
+| | `isStandaloneDoorSensorSupportFunction(featureValue, supportFunction)` | 是否支持功能 | `Future<bool>` |
+| **水表** | `waterMeter*` | 水表能力集合（scan/connect/init/charge/config 等） | `Future/Stream` |
+| **电表** | `electricMeter*` | 电表能力集合（scan/connect/init/charge/config 等） | `Future/Stream` |
 
 ---
 
@@ -295,6 +323,17 @@ if (supported) {
 ## 示例工程
 
 仓库中 `example/` 为完整示例，包含锁/网关扫描、锁控制、网关初始化等，可直接运行参考。
+
+## 迁移与兼容层（Phase5）
+
+- **新代码**：建议统一使用 `TTLock.lock / TTLock.gateway / TTLock.accessory`（Future/Stream）。
+- **旧式 callback 兼容层**：仍保留 `ttlock_classic.dart`、`ttgateway.dart`、`ttdoorSensor.dart`、`ttremotekey.dart`、`ttremoteKeypad.dart`，并标注 `@Deprecated`，内部转调新 API。
+- **可选别名**：若你需要与旧工程 import 路径保持一致，可使用：
+  - `lib/ttstandalonedoorsensor.dart`
+  - `lib/ttwaterMeter.dart`
+  - `lib/ttelectricMeter.dart`
+
+更详细迁移说明见 `docs/MIGRATION_GUIDE.md`。
 
 ## 联系方式
 

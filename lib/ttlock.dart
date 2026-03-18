@@ -31,6 +31,8 @@ export 'package:ttlock_premise_flutter/models/lock_models.dart';
 export 'package:ttlock_premise_flutter/models/gateway_models.dart';
 export 'package:ttlock_premise_flutter/models/accessory_models.dart';
 export 'package:ttlock_premise_flutter/models/events.dart';
+export 'package:ttlock_premise_flutter/models/meter_models.dart';
+export 'package:ttlock_premise_flutter/models/standalone_door_sensor_models.dart';
 
 // Errors
 export 'package:ttlock_premise_flutter/errors/tt_exception.dart';

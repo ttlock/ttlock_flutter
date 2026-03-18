@@ -49,6 +49,11 @@ abstract class TTGatewayApi {
   /// Throws [TTGatewayException] on failure.
   Future<void> configApn({required String mac, required String apn});
 
+  /// Returns the network MAC for the current gateway environment (SDK-dependent).
+  ///
+  /// Throws [TTGatewayException] on failure.
+  Future<String?> getNetworkMac();
+
   /// Puts the gateway identified by [mac] into upgrade (DFU) mode.
   ///
   /// Throws [TTGatewayException] on failure.

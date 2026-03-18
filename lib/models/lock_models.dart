@@ -4,11 +4,13 @@ class ControlLockResult {
   final int lockTime;
   final int electricQuantity;
   final int uniqueId;
+  final String? lockData;
 
   const ControlLockResult({
     required this.lockTime,
     required this.electricQuantity,
     required this.uniqueId,
+    this.lockData,
   });
 
   factory ControlLockResult.fromMap(Map<String, dynamic> map) {
@@ -16,6 +18,7 @@ class ControlLockResult {
       lockTime: map['lockTime'] as int,
       electricQuantity: map['electricQuantity'] as int,
       uniqueId: map['uniqueId'] as int,
+      lockData: map['lockData'] as String?,
     );
   }
 
@@ -23,11 +26,13 @@ class ControlLockResult {
     int? lockTime,
     int? electricQuantity,
     int? uniqueId,
+    String? lockData,
   }) {
     return ControlLockResult(
       lockTime: lockTime ?? this.lockTime,
       electricQuantity: electricQuantity ?? this.electricQuantity,
       uniqueId: uniqueId ?? this.uniqueId,
+      lockData: lockData ?? this.lockData,
     );
   }
 }

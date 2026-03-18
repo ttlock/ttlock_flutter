@@ -24,6 +24,38 @@
 @property (nonatomic, strong) NSNumber * remoteAccessory;
 @property (nonatomic, strong) NSString * resetCode;
 @property (nonatomic, strong) NSNumber * sensitivityValue;
+// --- Accessory / Meter / Standalone door sensor params ---
+@property (nonatomic, strong) NSString *url;
+@property (nonatomic, strong) NSString *clientId;
+@property (nonatomic, strong) NSString *accessToken;
+
+@property (nonatomic, strong) NSNumber *payMode;
+@property (nonatomic, strong) NSNumber *price;
+
+// electric meter
+@property (nonatomic, strong) NSString *totalKwh;
+@property (nonatomic, strong) NSString *remainderKwh;
+@property (nonatomic, strong) NSString *voltage;
+@property (nonatomic, strong) NSString *electricCurrent;
+@property (nonatomic, strong) NSNumber *chargeKwh;
+@property (nonatomic, strong) NSNumber *chargeAmount;
+@property (nonatomic, strong) NSNumber *maxPower;
+
+// water meter
+@property (nonatomic, strong) NSString *totalM3;
+@property (nonatomic, strong) NSString *remainderM3;
+@property (nonatomic, strong) NSNumber *magneticInterference;
+@property (nonatomic, strong) NSNumber *waterValveFailure;
+@property (nonatomic, strong) NSString *executeResponse;
+@property (nonatomic, strong) NSNumber *m3;
+@property (nonatomic, strong) NSNumber *WaterMeterFeature;
+
+// standalone door sensor
+@property (nonatomic, strong) NSString *standaloneInfoStr;
+@property (nonatomic, strong) NSNumber *standaloneDoorFeature;
+
+// shared feature value / support checks
+@property (nonatomic, strong) NSNumber *featureValue;
 
 // 0、null - 读取最近的操作记录,  1-读取锁内存中的全部操作记录
 @property (nonatomic, strong) NSNumber *logType;
@@ -44,6 +76,7 @@
 //@property (nonatomic, strong) NSString *ttlockUid;
 @property (nonatomic, strong) NSString *ip;
 @property (nonatomic, strong) NSString *port;
+@property (nonatomic, strong) NSString *apn;
 //@property (nonatomic, strong) NSString *gatewayName;
 @property (nonatomic, strong) NSNumber *supportFunction;
 @property (nonatomic, strong) NSNumber *isSupport;

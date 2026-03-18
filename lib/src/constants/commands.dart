@@ -147,6 +147,7 @@ class TTCommands {
   static const upgradeGateway = 'upgradeGateway';
   static const gatewayConfigIp = 'gatewayConfigIp';
   static const gatewayConfigApn = 'gatewayConfigApn';
+  static const getNetworkMac = 'getNetworkMac';
 
   // --- Remote Key ---
   static const startScanRemoteKey = 'startScanRemoteKey';
@@ -168,6 +169,53 @@ class TTCommands {
   static const stopScanDoorSensor = 'doorSensorStopScan';
   static const initDoorSensor = 'doorSensorInit';
 
+  // --- Standalone Door Sensor ---
+  static const startScanStandaloneDoorSensor = 'standaloneDoorSensorStartScan';
+  static const stopScanStandaloneDoorSensor = 'standaloneDoorSensorStopScan';
+  static const initStandaloneDoorSensor = 'standaloneDoorSensorInit';
+  static const standaloneDoorGetFeatureValue = 'standaloneDoorGetFeatureValue';
+  static const standaloneDoorIsSupportFunction = 'standaloneDoorIsSupportFunction';
+
+  // --- Water Meter ---
+  static const waterMeterConfigServer = 'waterMeterConfigServer';
+  static const startScanWaterMeter = 'waterMeterStartScan';
+  static const stopScanWaterMeter = 'waterMeterStopScan';
+  static const waterMeterConnect = 'waterMeterConnect';
+  static const waterMeterDisconnect = 'waterMeterDisconnect';
+  static const waterMeterInit = 'waterMeterInit';
+  static const waterMeterDelete = 'waterMeterDelete';
+  static const waterMeterSetPowerOnOff = 'waterMeterSetPowerOnOff';
+  static const waterMeterSetRemainderM3 = 'waterMeterSetRemainderM3';
+  static const waterMeterClearRemainderM3 = 'waterMeterClearRemainderM3';
+  static const waterMeterReadData = 'waterMeterReadData';
+  static const waterMeterSetPayMode = 'waterMeterSetPayMode';
+  static const waterMeterCharge = 'waterMeterCharge';
+  static const waterMeterSetTotalUsage = 'waterMeterSetTotalUsage';
+  static const waterMeterGetFeatureValue = 'waterMeterGetFeatureValue';
+  static const waterMeterGetDeviceInfo = 'waterMeterGetDeviceInfo';
+  static const waterMeterIsSupportFunction = 'waterMeterIsSupportFunction';
+  static const waterMeterConfigApn = 'waterMeterConfigApn';
+  static const waterMeterConfigMeterServer = 'waterMeterConfigMeterServer';
+  static const waterMeterReset = 'waterMeterReset';
+
+  // --- Electric Meter ---
+  static const electricMeterConfigServer = 'electricMeterConfigServer';
+  static const startScanElectricMeter = 'electricMeterStartScan';
+  static const stopScanElectricMeter = 'electricMeterStopScan';
+  static const electricMeterConnect = 'electricMeterConnect';
+  static const electricMeterDisconnect = 'electricMeterDisconnect';
+  static const electricMeterInit = 'electricMeterInit';
+  static const electricMeterDelete = 'electricMeterDelete';
+  static const electricMeterSetPowerOnOff = 'electricMeterSetPowerOnOff';
+  static const electricMeterSetRemainderKwh = 'electricMeterSetRemainderKwh';
+  static const electricMeterClearRemainderKwh = 'electricMeterClearRemainderKwh';
+  static const electricMeterReadData = 'electricMeterReadData';
+  static const electricMeterSetPayMode = 'electricMeterSetPayMode';
+  static const electricMeterCharge = 'electricMeterCharge';
+  static const electricMeterSetMaxPower = 'electricMeterSetMaxPower';
+  static const electricMeterGetFeatureValue = 'electricMeterGetFeatureValue';
+  static const electricMeterIsSupportFunction = 'electricMeterIsSupportFunction';
+
   // --- Command sets ---
   static const scanStartCommands = {
     startScanLock,
@@ -175,6 +223,9 @@ class TTCommands {
     startScanRemoteKey,
     startScanRemoteKeypad,
     startScanDoorSensor,
+    startScanStandaloneDoorSensor,
+    startScanWaterMeter,
+    startScanElectricMeter,
   };
 
   static const scanStopToStartMap = {
@@ -183,6 +234,9 @@ class TTCommands {
     stopScanRemoteKey: startScanRemoteKey,
     stopScanRemoteKeypad: startScanRemoteKeypad,
     stopScanDoorSensor: startScanDoorSensor,
+    stopScanStandaloneDoorSensor: startScanStandaloneDoorSensor,
+    stopScanWaterMeter: startScanWaterMeter,
+    stopScanElectricMeter: startScanElectricMeter,
   };
 
   static const streamCommands = {
@@ -191,6 +245,9 @@ class TTCommands {
     startScanRemoteKey,
     startScanRemoteKeypad,
     startScanDoorSensor,
+    startScanStandaloneDoorSensor,
+    startScanWaterMeter,
+    startScanElectricMeter,
     scanWifi,
     getSurroundWifi,
   };
@@ -209,6 +266,7 @@ class TTCommands {
     gatewayConfigIp,
     upgradeGateway,
     gatewayConfigApn,
+    getNetworkMac,
   };
 
   static const remoteErrorCommands = {

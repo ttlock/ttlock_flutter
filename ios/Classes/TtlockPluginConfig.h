@@ -82,6 +82,7 @@
 #define command_function_support @"functionSupport"
 
 #define command_set_lock_enter_upgrade_mode @"setLockEnterUpgradeMode"
+#define command_set_lock_working_time @"setLockWorkingTime"
 
 #define command_verify_lock @"verifyLock"
 
@@ -97,6 +98,8 @@
 #define command_init_gateway @"initGateway"
 #define command_config_gateway_ip @"gatewayConfigIp"
 #define command_upgrade_gateway @"upgradeGateway"
+#define command_gateway_config_apn @"gatewayConfigApn"
+#define command_gateway_get_network_mac @"getNetworkMac"
 
 
 #pragma mark - 梯控

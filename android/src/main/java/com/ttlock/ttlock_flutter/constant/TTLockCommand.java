@@ -152,4 +152,6 @@ public class TTLockCommand {
 
     public static final String COMMAND_SET_SENSITIVITY = "setSensitivity";
 
+    public static final String COMMAND_SET_LOCK_WORKING_TIME = "setLockWorkingTime";
+
 }
