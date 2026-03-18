@@ -783,17 +783,7 @@ export default class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHan
     TTLock.lockScanNearbyWifi(lockData, {
       success: (info) => {
         const wifiList = info?.wifiList ?? [];
-        const arr: Record<string, Object>[] = [];
-        for (let i = 0; i < wifiList.length; i++) {
-          const item = wifiList[i] as Map<string, Object>;
-          const o: Record<string, Object> = {};
-          const w = item.get('wifi');
-          const r = item.get('rssi');
-          if (w != null) o['wifi'] = w;
-          if (r != null) o['rssi'] = r;
-          arr.push(o);
-        }
-        this.callbackCommand(TTCommands.scanWifi, RESULT_STATE_SUCCESS, { 'list': arr as Object[], 'isFinished': info?.isFinished ?? true }, -1, '');
+        this.callbackCommand(TTCommands.scanWifi, RESULT_STATE_SUCCESS, { 'list': wifiList, 'isFinished': info?.isFinished ?? true }, -1, '');
       },
       failure: (e: SNError) => this.sendResult(TTCommands.scanWifi, false, null, e),
     });
