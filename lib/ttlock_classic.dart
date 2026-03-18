@@ -897,9 +897,34 @@ class TTLock {
   static void scanWifi(String lockData, TTWifiLockScanWifiCallback callback,
       TTFailedCallback failedCallback) {
     _scanWifiSub?.cancel();
+    final List allWifiList = [];
+    final Set<String> seen = <String>{};
+
+    String wifiKey(dynamic item) {
+      if (item is Map) {
+        final dynamic mapKey = item['wifiMac'] ??
+            item['bssid'] ??
+            item['BSSID'] ??
+            item['mac'] ??
+            item['ssid'] ??
+            item['wifiName'] ??
+            item['name'];
+        if (mapKey != null) return mapKey.toString();
+      }
+      return item?.toString() ?? '';
+    }
+
     _scanWifiSub = new_ttlock.TTLock.lock.scanWifi(lockData).listen(
-      (wifiList) => callback(false, wifiList),
-      onDone: () => callback(true, []),
+      (wifiList) {
+        for (final item in wifiList) {
+          final key = wifiKey(item);
+          if (seen.add(key)) {
+            allWifiList.add(item);
+          }
+        }
+        callback(false, allWifiList);
+      },
+      onDone: () => callback(true, allWifiList),
       onError: (e) {
         if (e is TTLockException) {
           failedCallback(e.error, e.message);

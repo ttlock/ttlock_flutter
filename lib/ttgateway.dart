@@ -63,9 +63,34 @@ class TTGateway {
     TTGatewayGetAroundWifiCallback callback,
     TTGatewayFailedCallback failedCallback,
   ) {
+    final List allWifiList = [];
+    final Set<String> seen = <String>{};
+
+    String wifiKey(dynamic item) {
+      if (item is Map) {
+        final dynamic mapKey = item['wifiMac'] ??
+            item['bssid'] ??
+            item['BSSID'] ??
+            item['mac'] ??
+            item['ssid'] ??
+            item['wifiName'] ??
+            item['name'];
+        if (mapKey != null) return mapKey.toString();
+      }
+      return item?.toString() ?? '';
+    }
+
     new_ttlock.TTLock.gateway.getNearbyWifi().listen(
-      (wifiList) => callback(false, wifiList),
-      onDone: () => callback(true, []),
+      (wifiList) {
+        for (final item in wifiList) {
+          final key = wifiKey(item);
+          if (seen.add(key)) {
+            allWifiList.add(item);
+          }
+        }
+        callback(false, allWifiList);
+      },
+      onDone: () => callback(true, allWifiList),
       onError: (e, _) {
         if (e is TTGatewayException) {
           final err = e.error.value < TTGatewayError.values.length
