@@ -39,6 +39,32 @@ class TTLockScanModel {
       timestamp: map['timestamp'] as int,
     );
   }
+
+  TTLockScanModel copyWith({
+    String? lockName,
+    String? lockMac,
+    bool? isInited,
+    bool? isAllowUnlock,
+    int? electricQuantity,
+    String? lockVersion,
+    TTLockSwitchState? lockSwitchState,
+    int? rssi,
+    int? oneMeterRssi,
+    int? timestamp,
+  }) {
+    return TTLockScanModel(
+      lockName: lockName ?? this.lockName,
+      lockMac: lockMac ?? this.lockMac,
+      isInited: isInited ?? this.isInited,
+      isAllowUnlock: isAllowUnlock ?? this.isAllowUnlock,
+      electricQuantity: electricQuantity ?? this.electricQuantity,
+      lockVersion: lockVersion ?? this.lockVersion,
+      lockSwitchState: lockSwitchState ?? this.lockSwitchState,
+      rssi: rssi ?? this.rssi,
+      oneMeterRssi: oneMeterRssi ?? this.oneMeterRssi,
+      timestamp: timestamp ?? this.timestamp,
+    );
+  }
 }
 
 class TTGatewayScanModel {
@@ -65,6 +91,22 @@ class TTGatewayScanModel {
       type: TTGatewayType.fromValue(map['type'] as int),
     );
   }
+
+  TTGatewayScanModel copyWith({
+    String? gatewayName,
+    String? gatewayMac,
+    int? rssi,
+    bool? isDfuMode,
+    TTGatewayType? type,
+  }) {
+    return TTGatewayScanModel(
+      gatewayName: gatewayName ?? this.gatewayName,
+      gatewayMac: gatewayMac ?? this.gatewayMac,
+      rssi: rssi ?? this.rssi,
+      isDfuMode: isDfuMode ?? this.isDfuMode,
+      type: type ?? this.type,
+    );
+  }
 }
 
 class TTRemoteAccessoryScanModel {
@@ -89,6 +131,23 @@ class TTRemoteAccessoryScanModel {
       rssi: map['rssi'] as int,
       isMultifunctionalKeypad: (map['isMultifunctionalKeypad'] as bool?) ?? false,
       advertisementData: (map['advertisementData'] as Map?)?.cast<String, dynamic>() ?? {},
+    );
+  }
+
+  TTRemoteAccessoryScanModel copyWith({
+    String? name,
+    String? mac,
+    int? rssi,
+    bool? isMultifunctionalKeypad,
+    Map<String, dynamic>? advertisementData,
+  }) {
+    return TTRemoteAccessoryScanModel(
+      name: name ?? this.name,
+      mac: mac ?? this.mac,
+      rssi: rssi ?? this.rssi,
+      isMultifunctionalKeypad:
+          isMultifunctionalKeypad ?? this.isMultifunctionalKeypad,
+      advertisementData: advertisementData ?? this.advertisementData,
     );
   }
 }

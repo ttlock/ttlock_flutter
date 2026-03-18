@@ -13,6 +13,17 @@ class RemoteKeypadInitResult {
       wirelessKeypadFeatureValue: map['wirelessKeypadFeatureValue'] as String,
     );
   }
+
+  RemoteKeypadInitResult copyWith({
+    int? electricQuantity,
+    String? wirelessKeypadFeatureValue,
+  }) {
+    return RemoteKeypadInitResult(
+      electricQuantity: electricQuantity ?? this.electricQuantity,
+      wirelessKeypadFeatureValue:
+          wirelessKeypadFeatureValue ?? this.wirelessKeypadFeatureValue,
+    );
+  }
 }
 
 class MultifunctionalKeypadInitResult {
@@ -44,6 +55,27 @@ class MultifunctionalKeypadInitResult {
       modelNum: sysInfo['modelNum'] as String?,
       hardwareRevision: sysInfo['hardwareRevision'] as String?,
       firmwareRevision: sysInfo['firmwareRevision'] as String?,
+    );
+  }
+
+  MultifunctionalKeypadInitResult copyWith({
+    int? electricQuantity,
+    String? wirelessKeypadFeatureValue,
+    int? slotNumber,
+    int? slotLimit,
+    String? modelNum,
+    String? hardwareRevision,
+    String? firmwareRevision,
+  }) {
+    return MultifunctionalKeypadInitResult(
+      electricQuantity: electricQuantity ?? this.electricQuantity,
+      wirelessKeypadFeatureValue:
+          wirelessKeypadFeatureValue ?? this.wirelessKeypadFeatureValue,
+      slotNumber: slotNumber ?? this.slotNumber,
+      slotLimit: slotLimit ?? this.slotLimit,
+      modelNum: modelNum ?? this.modelNum,
+      hardwareRevision: hardwareRevision ?? this.hardwareRevision,
+      firmwareRevision: firmwareRevision ?? this.firmwareRevision,
     );
   }
 }

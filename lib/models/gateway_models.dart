@@ -42,4 +42,31 @@ class TTGatewayInitParams {
   }
 
   String toJsonStr() => convert.jsonEncode(toMap());
+
+  TTGatewayInitParams copyWith({
+    int? type,
+    int? ttlockUid,
+    String? gatewayName,
+    String? ttlockLoginPassword,
+    String? wifi,
+    String? wifiPassword,
+    String? serverIp,
+    String? serverPort,
+    int? companyId,
+    int? branchId,
+  }) {
+    return TTGatewayInitParams(
+      type: type ?? this.type,
+      ttlockUid: ttlockUid ?? this.ttlockUid,
+      gatewayName: gatewayName ?? this.gatewayName,
+      ttlockLoginPassword:
+          ttlockLoginPassword ?? this.ttlockLoginPassword,
+      wifi: wifi ?? this.wifi,
+      wifiPassword: wifiPassword ?? this.wifiPassword,
+      serverIp: serverIp ?? this.serverIp,
+      serverPort: serverPort ?? this.serverPort,
+      companyId: companyId ?? this.companyId,
+      branchId: branchId ?? this.branchId,
+    );
+  }
 }

@@ -18,6 +18,18 @@ class ControlLockResult {
       uniqueId: map['uniqueId'] as int,
     );
   }
+
+  ControlLockResult copyWith({
+    int? lockTime,
+    int? electricQuantity,
+    int? uniqueId,
+  }) {
+    return ControlLockResult(
+      lockTime: lockTime ?? this.lockTime,
+      electricQuantity: electricQuantity ?? this.electricQuantity,
+      uniqueId: uniqueId ?? this.uniqueId,
+    );
+  }
 }
 
 class AutoLockingTime {
@@ -38,6 +50,18 @@ class AutoLockingTime {
       maxTime: map['maxTime'] as int,
     );
   }
+
+  AutoLockingTime copyWith({
+    int? currentTime,
+    int? minTime,
+    int? maxTime,
+  }) {
+    return AutoLockingTime(
+      currentTime: currentTime ?? this.currentTime,
+      minTime: minTime ?? this.minTime,
+      maxTime: maxTime ?? this.maxTime,
+    );
+  }
 }
 
 class AccessoryElectricQuantityResult {
@@ -53,6 +77,16 @@ class AccessoryElectricQuantityResult {
     return AccessoryElectricQuantityResult(
       electricQuantity: map['electricQuantity'] as int,
       updateDate: map['updateDate'] as int,
+    );
+  }
+
+  AccessoryElectricQuantityResult copyWith({
+    int? electricQuantity,
+    int? updateDate,
+  }) {
+    return AccessoryElectricQuantityResult(
+      electricQuantity: electricQuantity ?? this.electricQuantity,
+      updateDate: updateDate ?? this.updateDate,
     );
   }
 }
@@ -93,6 +127,30 @@ class TTLockSystemModel {
       lockData: map['lockData'] as String?,
     );
   }
+
+  TTLockSystemModel copyWith({
+    String? modelNum,
+    String? hardwareRevision,
+    String? firmwareRevision,
+    int? electricQuantity,
+    String? nbOperator,
+    String? nbNodeId,
+    String? nbCardNumber,
+    String? nbRssi,
+    String? lockData,
+  }) {
+    return TTLockSystemModel(
+      modelNum: modelNum ?? this.modelNum,
+      hardwareRevision: hardwareRevision ?? this.hardwareRevision,
+      firmwareRevision: firmwareRevision ?? this.firmwareRevision,
+      electricQuantity: electricQuantity ?? this.electricQuantity,
+      nbOperator: nbOperator ?? this.nbOperator,
+      nbNodeId: nbNodeId ?? this.nbNodeId,
+      nbCardNumber: nbCardNumber ?? this.nbCardNumber,
+      nbRssi: nbRssi ?? this.nbRssi,
+      lockData: lockData ?? this.lockData,
+    );
+  }
 }
 
 class TTCycleModel {
@@ -116,6 +174,18 @@ class TTCycleModel {
     if (list == null || list.isEmpty) return '';
     return convert.jsonEncode(list.map((e) => e.toJson()).toList());
   }
+
+  TTCycleModel copyWith({
+    int? weekDay,
+    int? startTime,
+    int? endTime,
+  }) {
+    return TTCycleModel(
+      weekDay: weekDay ?? this.weekDay,
+      startTime: startTime ?? this.startTime,
+      endTime: endTime ?? this.endTime,
+    );
+  }
 }
 
 class TTWifiInfoModel {
@@ -130,6 +200,16 @@ class TTWifiInfoModel {
       wifiRssi: map['wifiRssi'] as int,
     );
   }
+
+  TTWifiInfoModel copyWith({
+    String? wifiMac,
+    int? wifiRssi,
+  }) {
+    return TTWifiInfoModel(
+      wifiMac: wifiMac ?? this.wifiMac,
+      wifiRssi: wifiRssi ?? this.wifiRssi,
+    );
+  }
 }
 
 class CameraLockWifiResult {
@@ -142,6 +222,16 @@ class CameraLockWifiResult {
     return CameraLockWifiResult(
       serialNumber: map['videoModuleSerialNumber'] as String,
       wifiName: map['wifiName'] as String,
+    );
+  }
+
+  CameraLockWifiResult copyWith({
+    String? serialNumber,
+    String? wifiName,
+  }) {
+    return CameraLockWifiResult(
+      serialNumber: serialNumber ?? this.serialNumber,
+      wifiName: wifiName ?? this.wifiName,
     );
   }
 }
@@ -190,6 +280,26 @@ class TTLockInitParams {
       floorNumber: map['floorNumber'] as int?,
     );
   }
+
+  TTLockInitParams copyWith({
+    String? lockMac,
+    String? lockVersion,
+    bool? isInited,
+    String? clientPara,
+    String? hotelInfo,
+    int? buildingNumber,
+    int? floorNumber,
+  }) {
+    return TTLockInitParams(
+      lockMac: lockMac ?? this.lockMac,
+      lockVersion: lockVersion ?? this.lockVersion,
+      isInited: isInited ?? this.isInited,
+      clientPara: clientPara ?? this.clientPara,
+      hotelInfo: hotelInfo ?? this.hotelInfo,
+      buildingNumber: buildingNumber ?? this.buildingNumber,
+      floorNumber: floorNumber ?? this.floorNumber,
+    );
+  }
 }
 
 class TTIpSetting {
@@ -217,5 +327,23 @@ class TTIpSetting {
     if (preferredDns != null) map['preferredDns'] = preferredDns;
     if (alternateDns != null) map['alternateDns'] = alternateDns;
     return map;
+  }
+
+  TTIpSetting copyWith({
+    int? type,
+    String? ipAddress,
+    String? subnetMask,
+    String? router,
+    String? preferredDns,
+    String? alternateDns,
+  }) {
+    return TTIpSetting(
+      type: type ?? this.type,
+      ipAddress: ipAddress ?? this.ipAddress,
+      subnetMask: subnetMask ?? this.subnetMask,
+      router: router ?? this.router,
+      preferredDns: preferredDns ?? this.preferredDns,
+      alternateDns: alternateDns ?? this.alternateDns,
+    );
   }
 }
