@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../ttlock_flutter_premise"
+		},
+		{
+			"path": "../ttlock_flutter"
+		},
+		{
+			"path": "../shared_preferences"
+		}
+	],
+	"settings": {}
+}

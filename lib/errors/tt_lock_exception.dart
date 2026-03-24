@@ -1,13 +1,13 @@
-import 'package:ttlock_premise_flutter/errors/tt_exception.dart';
-import 'package:ttlock_premise_flutter/models/enums.dart';
+import 'package:ttlock_premise_flutter/pigeon/messages.g.dart';
 
-/// Exception thrown by lock operations.
-class TTLockException extends TTException {
-  final TTLockError error;
+import 'tt_exception.dart';
 
-  TTLockException({required this.error, String message = ''})
-      : super(code: error.value, message: message);
+/// 对应 [TTLockError] 的操作失败。
+final class TTLockException extends TTException {
+  TTLockException(this.code, [super.message]);
+
+  final TTLockError code;
 
   @override
-  String toString() => 'TTLockException($error, $message)';
+  String toString() => message ?? 'TTLockException($code)';
 }

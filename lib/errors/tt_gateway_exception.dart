@@ -1,13 +1,13 @@
-import 'package:ttlock_premise_flutter/errors/tt_exception.dart';
-import 'package:ttlock_premise_flutter/models/enums.dart';
+import 'package:ttlock_premise_flutter/pigeon/messages.g.dart';
 
-/// Exception thrown by gateway operations.
-class TTGatewayException extends TTException {
-  final TTGatewayError error;
+import 'tt_exception.dart';
 
-  TTGatewayException({required this.error, String message = ''})
-      : super(code: error.value, message: message);
+/// 对应 [TTGatewayError] 的操作失败。
+final class TTGatewayException extends TTException {
+  TTGatewayException(this.code, [super.message]);
+
+  final TTGatewayError code;
 
   @override
-  String toString() => 'TTGatewayException($error, $message)';
+  String toString() => message ?? 'TTGatewayException($code)';
 }

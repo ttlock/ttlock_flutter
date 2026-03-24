@@ -15,16 +15,7 @@ class TTDoorSensor {
   /// Legacy: scan for door sensors via callback. Prefer [new_ttlock.TTLock.accessory.startScanDoorSensor].
   @Deprecated('Use TTLock.accessory.startScanDoorSensor() and listen to the stream instead.')
   static void startScan(TTRemoteAccessoryScanCallback scanCallback) {
-    new_ttlock.TTLock.accessory.startScanDoorSensor().listen((model) {
-      final legacyMap = {
-        'name': model.name,
-        'mac': model.mac,
-        'rssi': model.rssi,
-        'isMultifunctionalKeypad': model.isMultifunctionalKeypad,
-        'advertisementData': model.advertisementData,
-      };
-      scanCallback(TTRemoteAccessoryScanModel.fromMap(Map<String, dynamic>.from(legacyMap)));
-    });
+    new_ttlock.TTLock.accessory.startScanDoorSensor().listen(scanCallback);
   }
 
   /// Legacy: stop door sensor scan. Prefer [new_ttlock.TTLock.accessory.stopScanDoorSensor].
@@ -43,20 +34,7 @@ class TTDoorSensor {
   ) {
     new_ttlock.TTLock.accessory
         .initDoorSensor(mac: mac, lockData: lockData)
-        .then((model) {
-      final legacyMap = {
-        'modelNum': model.modelNum,
-        'hardwareRevision': model.hardwareRevision,
-        'firmwareRevision': model.firmwareRevision,
-        'electricQuantity': model.electricQuantity,
-        'nbOperator': model.nbOperator,
-        'nbNodeId': model.nbNodeId,
-        'nbCardNumber': model.nbCardNumber,
-        'nbRssi': model.nbRssi,
-        'lockData': model.lockData,
-      };
-      callback(TTLockSystemModel.fromMap(Map<String, dynamic>.from(legacyMap)));
-    }).catchError((e, _) {
+        .then(callback).catchError((e, _) {
       if (e is TTAccessoryException) {
         final error = e.code >= 0 && e.code < TTRemoteAccessoryError.values.length
             ? TTRemoteAccessoryError.values[e.code]

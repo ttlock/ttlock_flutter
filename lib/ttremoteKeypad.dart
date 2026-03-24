@@ -1,8 +1,7 @@
+import 'package:ttlock_premise_flutter/pigeon/messages.g.dart';
 import 'package:ttlock_premise_flutter/ttlock.dart' as new_ttlock;
 import 'package:ttlock_premise_flutter/ttlock_classic.dart';
 import 'package:ttlock_premise_flutter/errors/tt_accessory_exception.dart';
-import 'package:ttlock_premise_flutter/models/lock_models.dart' as models;
-import 'package:ttlock_premise_flutter/models/events.dart';
 
 /// Legacy remote keypad API. Prefer [new_ttlock.TTLock.accessory] instead.
 @Deprecated('Use TTLock.accessory for remote keypad operations instead.')
@@ -26,16 +25,7 @@ class TTRemoteKeypad {
 
   @Deprecated('Use TTLock.accessory.startScanRemoteKeypad() and listen to the stream instead.')
   static void startScan(TTRemoteAccessoryScanCallback scanCallback) {
-    new_ttlock.TTLock.accessory.startScanRemoteKeypad().listen((model) {
-      final legacyMap = {
-        'name': model.name,
-        'mac': model.mac,
-        'rssi': model.rssi,
-        'isMultifunctionalKeypad': model.isMultifunctionalKeypad,
-        'advertisementData': model.advertisementData,
-      };
-      scanCallback(TTRemoteAccessoryScanModel.fromMap(Map<String, dynamic>.from(legacyMap)));
-    });
+    new_ttlock.TTLock.accessory.startScanRemoteKeypad().listen(scanCallback);
   }
 
   @Deprecated('Use TTLock.accessory.stopScanRemoteKeypad() instead.')
@@ -153,26 +143,20 @@ class TTRemoteKeypad {
     TTFailedCallback lockFailedCallback,
     TTRemoteKeypadFailedCallback keyPadFailedCallback,
   ) {
-    List<models.TTCycleModel>? newCycleList;
-    if (cycleList != null && cycleList.isNotEmpty) {
-      newCycleList = cycleList
-          .map((c) => models.TTCycleModel(weekDay: c.weekDay, startTime: c.startTime, endTime: c.endTime))
-          .toList();
-    }
     new_ttlock.TTLock.accessory
         .addKeypadFingerprint(
           mac: mac,
-          cycleList: newCycleList,
+          cycleList: cycleList,
           startDate: startDate,
           endDate: endDate,
           lockData: lockData,
         )
         .listen(
           (event) {
-            if (event is AddFingerprintProgress) {
-              progressCallback(event.currentCount, event.totalCount);
-            } else if (event is AddFingerprintComplete) {
-              callback(event.fingerprintNumber);
+            if (event.isProgress) {
+              progressCallback(event.currentCount!, event.totalCount!);
+            } else {
+              callback(event.fingerprintNumber!);
             }
           },
           onError: (e) {
@@ -202,25 +186,19 @@ class TTRemoteKeypad {
     TTCardNumberCallback callback,
     TTFailedCallback failedCallback,
   ) {
-    List<models.TTCycleModel>? newCycleList;
-    if (cycleList != null && cycleList.isNotEmpty) {
-      newCycleList = cycleList
-          .map((c) => models.TTCycleModel(weekDay: c.weekDay, startTime: c.startTime, endTime: c.endTime))
-          .toList();
-    }
     new_ttlock.TTLock.accessory
         .addKeypadCard(
-          cycleList: newCycleList,
+          cycleList: cycleList,
           startDate: startDate,
           endDate: endDate,
           lockData: lockData,
         )
         .listen(
           (event) {
-            if (event is AddCardProgress) {
+            if (event.isProgress) {
               progressCallback();
-            } else if (event is AddCardComplete) {
-              callback(event.cardNumber);
+            } else {
+              callback(event.cardNumber!);
             }
           },
           onError: (e) {

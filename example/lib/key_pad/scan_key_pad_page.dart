@@ -21,7 +21,7 @@ class _ScanKeyPadPageState extends State<ScanKeyPadPage> {
   StreamSubscription? _scanSub;
   StreamSubscription? _progressSub;
 
-  final _accessory = TTLock.accessory;
+  final _keypad = TTLock.remoteKeypad;
 
   @override
   void initState() {
@@ -33,12 +33,11 @@ class _ScanKeyPadPageState extends State<ScanKeyPadPage> {
   void dispose() {
     _scanSub?.cancel();
     _progressSub?.cancel();
-    _accessory.stopScanRemoteKeypad();
     super.dispose();
   }
 
   void _startScan() {
-    _scanSub = _accessory.startScanRemoteKeypad().listen((scanModel) {
+    _scanSub = _keypad.accessoryStartScanRemoteKeypad().listen((scanModel) {
       if (mounted) setState(() => model = scanModel);
     });
   }
@@ -71,7 +70,7 @@ class _ScanKeyPadPageState extends State<ScanKeyPadPage> {
 
   void _onInitTap() async {
     if (model == null) return;
-    _accessory.stopScanRemoteKeypad();
+    _scanSub?.cancel();
     _showLoading('Initializing keypad...');
     isMultifunctionalKeypad = model?.isMultifunctionalKeypad ?? false;
 
@@ -79,14 +78,20 @@ class _ScanKeyPadPageState extends State<ScanKeyPadPage> {
 
     try {
       if (isMultifunctionalKeypad) {
-        await _accessory.initMultifunctionalKeypad(mac: model!.mac, lockData: widget.lockData);
+        await _keypad.initMultifunctionalKeypad(model!.mac, widget.lockData);
         if (mounted) setState(() => isInit = true);
         _showSuccess('Init keypad success');
       } else {
-        await _accessory.initRemoteKeypad(mac: model!.mac, lockMac: widget.lockMac);
+        await _keypad.initRemoteKeypad(model!.mac, widget.lockMac);
         if (mounted) setState(() => isInit = true);
         _showSuccess('Init keypad success');
       }
+    } on TTLockException catch (e) {
+      _showError('${e.code}: ${e.message}');
+    } on TTMultifunctionalKeypadException catch (e) {
+      _showError('${e.code}: ${e.message}');
+    } on TTRemoteAccessoryException catch (e) {
+      _showError('${e.code}: ${e.message}');
     } catch (e) {
       _showError(e.toString());
     }
@@ -102,9 +107,13 @@ class _ScanKeyPadPageState extends State<ScanKeyPadPage> {
             if (model == null) return;
             _showLoading('Deleting...');
             try {
-              await _accessory.deleteStoredLock(mac: model!.mac, slotNumber: 1);
+              await _keypad.deleteStoredLock(model!.mac, 1);
               _showSuccess("Delete success");
               Navigator.pop(context);
+            } on TTLockException catch (e) {
+              _showError('${e.code}: ${e.message}');
+            } on TTMultifunctionalKeypadException catch (e) {
+              _showError('${e.code}: ${e.message}');
             } catch (e) {
               _showError(e.toString());
             }
@@ -116,13 +125,11 @@ class _ScanKeyPadPageState extends State<ScanKeyPadPage> {
             if (model == null) return;
             _showLoading('Adding fingerprint...');
             _progressSub?.cancel();
-            _progressSub = _accessory.addKeypadFingerprint(
-              mac: model!.mac, startDate: 0, endDate: 0, lockData: widget.lockData,
-            ).listen(
+            _progressSub = _keypad.accessoryAddKeypadFingerprint(model!.mac).listen(
               (event) {
-                if (event is AddFingerprintProgress) {
+                if (event.isProgress) {
                   _showLoading("${event.currentCount} / ${event.totalCount}");
-                } else if (event is AddFingerprintComplete) {
+                } else {
                   _showSuccess("Fingerprint added: ${event.fingerprintNumber}");
                 }
               },
@@ -136,13 +143,11 @@ class _ScanKeyPadPageState extends State<ScanKeyPadPage> {
             if (model == null) return;
             _showLoading('Adding card...');
             _progressSub?.cancel();
-            _progressSub = _accessory.addKeypadCard(
-              startDate: 0, endDate: 0, lockData: widget.lockData,
-            ).listen(
+            _progressSub = _keypad.accessoryAddKeypadCard(model!.mac).listen(
               (event) {
-                if (event is AddCardProgress) {
+                if (event.isProgress) {
                   _showLoading("Waiting for card...");
-                } else if (event is AddCardComplete) {
+                } else {
                   _showSuccess("Card added: ${event.cardNumber}");
                 }
               },

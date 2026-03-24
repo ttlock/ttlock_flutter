@@ -1,4 +1,7 @@
 buildscript {
+    ext {
+        kotlin_version = '2.3.20'
+    }
     repositories {
         mavenCentral()
         maven{url'https://maven.aliyun.com/repository/jcenter'}
@@ -8,6 +11,7 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:8.6.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 

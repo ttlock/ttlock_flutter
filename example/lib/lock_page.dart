@@ -7,12 +7,12 @@ import 'package:bmprogresshud/progresshud.dart';
 import 'key_pad/scan_key_pad_page.dart';
 
 class LockPage extends StatefulWidget {
-  LockPage({
-    Key? key,
+  const LockPage({
+    super.key,
     required this.title,
     required this.lockData,
     required this.lockMac,
-  }) : super(key: key);
+  });
   final String title;
   final String lockData;
   final String lockMac;
@@ -21,8 +21,8 @@ class LockPage extends StatefulWidget {
 }
 
 enum Command {
-  resetLock, unlock, resetEkey, modifyAdminPasscode,
-  getLockTime, setLockTime, getLockPower, getLockOperateRecord,
+  resetLock, unlock, getLockPower, resetEkey, modifyAdminPasscode,
+  getLockTime, setLockTime, getLockOperateRecord,
   getLockSwitchState, customPasscode, modifyPasscode, deletePasscode,
   resetPasscode, getAllValidPasscode,
   addCard, modifyCard, deleteCard, clearCard, getAllValidCard,
@@ -126,7 +126,7 @@ class _LockPageState extends State<LockPage> {
       switch (command) {
         case Command.resetLock:
           await _lock.resetLock(lockData);
-          Navigator.popAndPushNamed(context, '/');
+          Navigator.of(context).popUntil((route) => route.isFirst);
           return;
 
         case Command.unlock:
@@ -145,12 +145,12 @@ class _LockPageState extends State<LockPage> {
           break;
 
         case Command.setLockTime:
-          await _lock.setLockTime(timestamp: DateTime.now().millisecondsSinceEpoch, lockData: lockData);
+          await _lock.setLockTime(DateTime.now().millisecondsSinceEpoch, lockData);
           _showSuccess("Success");
           break;
 
         case Command.getLockOperateRecord:
-          final record = await _lock.getLockOperateRecord(type: TTOperateRecordType.latest, lockData: lockData);
+          final record = await _lock.getLockOperateRecord(TTOperateRecordType.latest, lockData);
           _showSuccess("Record: $record");
           break;
 
@@ -160,7 +160,7 @@ class _LockPageState extends State<LockPage> {
           break;
 
         case Command.modifyAdminPasscode:
-          await _lock.modifyAdminPasscode(adminPasscode: '1234', lockData: lockData);
+          await _lock.modifyAdminPasscode('1234', lockData);
           _showSuccess("Success");
           break;
 
@@ -172,21 +172,21 @@ class _LockPageState extends State<LockPage> {
         case Command.customPasscode:
           final support = await _lock.supportFunction(TTLockFunction.managePasscode, lockData);
           if (!support) { _showError("Not supported"); return; }
-          await _lock.createCustomPasscode(passcode: "6666", startDate: startDate, endDate: endDate, lockData: lockData);
+          await _lock.createCustomPasscode("6666", startDate, endDate, lockData);
           _showSuccess("Success");
           break;
 
         case Command.modifyPasscode:
           final support = await _lock.supportFunction(TTLockFunction.managePasscode, lockData);
           if (!support) { _showError("Not supported"); return; }
-          await _lock.modifyPasscode(passcodeOrigin: "6666", passcodeNew: "7777", startDate: startDate, endDate: endDate, lockData: lockData);
+          await _lock.modifyPasscode("6666", "7777", startDate, endDate, lockData);
           _showSuccess("Success");
           break;
 
         case Command.deletePasscode:
           final support = await _lock.supportFunction(TTLockFunction.managePasscode, lockData);
           if (!support) { _showError("Not supported"); return; }
-          await _lock.deletePasscode(passcode: "7777", lockData: lockData);
+          await _lock.deletePasscode("7777", lockData);
           _showSuccess("Success");
           break;
 
@@ -202,11 +202,11 @@ class _LockPageState extends State<LockPage> {
 
         case Command.addCard:
           _progressSub?.cancel();
-          _progressSub = _lock.addCard(startDate: startDate, endDate: endDate, lockData: lockData).listen(
+          _progressSub = _lock.lockAddCard(lockData).listen(
             (event) {
-              if (event is AddCardProgress) {
+              if (event.isProgress) {
                 _showLoading('Waiting for card...');
-              } else if (event is AddCardComplete) {
+              } else {
                 addCardNumber = event.cardNumber;
                 _showSuccess("cardNumber: ${event.cardNumber}");
               }
@@ -217,13 +217,13 @@ class _LockPageState extends State<LockPage> {
 
         case Command.modifyCard:
           if (addCardNumber == null) { _showError("Please add a card first"); return; }
-          await _lock.modifyCardValidityPeriod(cardNumber: addCardNumber!, startDate: startDate, endDate: endDate, lockData: lockData);
+          await _lock.modifyCardValidityPeriod(addCardNumber!, null, startDate, endDate, lockData);
           _showSuccess("Success");
           break;
 
         case Command.deleteCard:
           if (addCardNumber == null) { _showError("Please add a card first"); return; }
-          await _lock.deleteCard(cardNumber: addCardNumber!, lockData: lockData);
+          await _lock.deleteCard(addCardNumber!, lockData);
           _showSuccess("Success");
           break;
 
@@ -239,11 +239,11 @@ class _LockPageState extends State<LockPage> {
 
         case Command.addFingerprint:
           _progressSub?.cancel();
-          _progressSub = _lock.addFingerprint(startDate: startDate, endDate: endDate, lockData: lockData).listen(
+          _progressSub = _lock.lockAddFingerprint(lockData).listen(
             (event) {
-              if (event is AddFingerprintProgress) {
+              if (event.isProgress) {
                 _showLoading("${event.currentCount} / ${event.totalCount}");
-              } else if (event is AddFingerprintComplete) {
+              } else {
                 addFingerprintNumber = event.fingerprintNumber;
                 _showSuccess("fingerprintNumber: ${event.fingerprintNumber}");
               }
@@ -254,13 +254,13 @@ class _LockPageState extends State<LockPage> {
 
         case Command.modifyFingerprint:
           if (addFingerprintNumber == null) { _showError("Please add fingerprint first"); return; }
-          await _lock.modifyFingerprintValidityPeriod(fingerprintNumber: addFingerprintNumber!, startDate: startDate, endDate: endDate, lockData: lockData);
+          await _lock.modifyFingerprintValidityPeriod(addFingerprintNumber!, null, startDate, endDate, lockData);
           _showSuccess("Success");
           break;
 
         case Command.deleteFingerprint:
           if (addFingerprintNumber == null) { _showError("Please add fingerprint first"); return; }
-          await _lock.deleteFingerprint(fingerprintNumber: addFingerprintNumber!, lockData: lockData);
+          await _lock.deleteFingerprint(addFingerprintNumber!, lockData);
           _showSuccess("Success");
           break;
 
@@ -280,7 +280,7 @@ class _LockPageState extends State<LockPage> {
           break;
 
         case Command.setLockAutomaticLockingPeriodicTime:
-          await _lock.setAutoLockingPeriodicTime(seconds: 8, lockData: lockData);
+          await _lock.setAutoLockingPeriodicTime(8, lockData);
           _showSuccess("Success");
           break;
 
@@ -290,17 +290,17 @@ class _LockPageState extends State<LockPage> {
           break;
 
         case Command.setLockRemoteUnlockSwitchState:
-          await _lock.setRemoteUnlockSwitchState(isOn: true, lockData: lockData);
+          await _lock.setRemoteUnlockSwitchState(true, lockData);
           _showSuccess("Success");
           break;
 
         case Command.getLockAudioSwitchState:
-          final isOn = await _lock.getLockConfig(config: TTLockConfig.audio, lockData: lockData);
+          final isOn = await _lock.getLockConfig(TTLockConfig.audio, lockData);
           _showSuccess("SwitchOn: $isOn");
           break;
 
         case Command.setLockAudioSwitchState:
-          await _lock.setLockConfig(config: TTLockConfig.audio, isOn: true, lockData: lockData);
+          await _lock.setLockConfig(TTLockConfig.audio, true, lockData);
           _showSuccess("Success");
           break;
 
@@ -310,7 +310,7 @@ class _LockPageState extends State<LockPage> {
           break;
 
         case Command.setLockDirectionLeft:
-          await _lock.setLockDirection(direction: TTLockDirection.left, lockData: lockData);
+          await _lock.setLockDirection(TTLockDirection.left, lockData);
           _showSuccess("Success");
           break;
 
@@ -320,12 +320,12 @@ class _LockPageState extends State<LockPage> {
           break;
 
         case Command.setLockSoundVolumeType:
-          await _lock.setSoundVolume(type: TTSoundVolumeType.fourthLevel, lockData: lockData);
+          await _lock.setSoundVolume(TTSoundVolumeType.fourthLevel, lockData);
           _showSuccess("Success");
           break;
 
         case Command.addPassageMode:
-          await _lock.addPassageMode(type: TTPassageModeType.weekly, weekly: [1, 2], startTime: 8 * 60, endTime: 17 * 60, lockData: lockData);
+          await _lock.addPassageMode(TTPassageModeType.weekly, [1, 2], null, 8 * 60, 17 * 60, lockData);
           _showSuccess("Success");
           break;
 
@@ -335,37 +335,37 @@ class _LockPageState extends State<LockPage> {
           break;
 
         case Command.activateLiftFloors:
-          final r = await _lock.activateLift(floors: "1,2,3", lockData: lockData);
+          final r = await _lock.activateLift("1,2,3", lockData);
           _showSuccess("Lift activated lockTime:${r.lockTime} battery:${r.electricQuantity}");
           break;
 
         case Command.setLiftControlableFloors:
-          await _lock.setLiftControlable(floors: "3", lockData: lockData);
+          await _lock.setLiftControlable("3", lockData);
           _showSuccess("Success");
           break;
 
         case Command.setLiftWorkMode:
-          await _lock.setLiftWorkMode(type: TTLiftWorkActivateType.allFloors, lockData: lockData);
+          await _lock.setLiftWorkMode(TTLiftWorkActivateType.allFloors, lockData);
           _showSuccess("Success");
           break;
 
         case Command.setPowerSaverWorkMode:
-          await _lock.setPowerSaverWorkMode(type: TTPowerSaverWorkType.allCards, lockData: lockData);
+          await _lock.setPowerSaverWorkMode(TTPowerSaverWorkType.allCards, lockData);
           _showSuccess("Success");
           break;
 
         case Command.setPowerSaverControlableLock:
-          await _lock.setPowerSaverControlableLock(lockMac: widget.lockMac, lockData: lockData);
+          await _lock.setPowerSaverControlableLock(widget.lockMac, lockData);
           _showSuccess("Success");
           break;
 
         case Command.setHotelCardSector:
-          await _lock.setHotelCardSector(sector: "1,4", lockData: lockData);
+          await _lock.setHotelCardSector("1,4", lockData);
           _showSuccess("Success");
           break;
 
         case Command.setHotelData:
-          await _lock.setHotel(hotelInfo: "", buildingNumber: 0, floorNumber: 0, lockData: lockData);
+          await _lock.setHotel("", 0, 0, lockData);
           _showSuccess("Success");
           break;
 
@@ -375,8 +375,8 @@ class _LockPageState extends State<LockPage> {
           break;
 
         case Command.configIp:
-          final ipSetting = TTIpSetting(type: TTIpSettingType.dhcp.value);
-          await _lock.configIp(ipSetting: ipSetting, lockData: lockData);
+          final ipSetting = TTIpSetting(type: TTIpSettingType.dhcp.index);
+          await _lock.configIp(ipSetting, lockData);
           _showSuccess("Config IP success");
           break;
 
@@ -390,14 +390,14 @@ class _LockPageState extends State<LockPage> {
         case Command.setSensitivity:
           final support = await _lock.supportFunction(TTLockFunction.sensitivity, lockData);
           if (!support) { _showError("Not supported"); return; }
-          await _lock.setSensitivity(value: TTSensitivityValue.off, lockData: lockData);
+          await _lock.setSensitivity(TTSensitivityValue.off, lockData);
           _showSuccess("Success");
           break;
       }
     } on TTLockException catch (e) {
-      _showError('${e.error}: ${e.message}');
+      _showError('${e.code}: ${e.message}');
     } on TTGatewayException catch (e) {
-      _showError('${e.error}: ${e.message}');
+      _showError('${e.code}: ${e.message}');
     } catch (e) {
       _showError(e.toString());
     }

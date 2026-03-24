@@ -1,14 +1,11 @@
-import 'package:ttlock_premise_flutter/models/scan_models.dart';
-import 'package:ttlock_premise_flutter/models/lock_models.dart';
-import 'package:ttlock_premise_flutter/models/enums.dart';
-import 'package:ttlock_premise_flutter/models/events.dart';
+import 'dart:convert';
+
+import 'package:ttlock_premise_flutter/pigeon/messages.g.dart';
 import 'package:ttlock_premise_flutter/ttlock.dart' as new_ttlock;
 import 'package:ttlock_premise_flutter/errors/tt_lock_exception.dart';
 
 // 供仅 import ttlock_classic 的调用方使用
-export 'package:ttlock_premise_flutter/models/scan_models.dart';
-export 'package:ttlock_premise_flutter/models/lock_models.dart';
-export 'package:ttlock_premise_flutter/models/enums.dart';
+export 'package:ttlock_premise_flutter/pigeon/messages.g.dart';
 
 @Deprecated('Use TTLock from package:ttlock_premise_flutter/ttlock.dart and TTLock.lock / TTLock.gateway / TTLock.accessory instead.')
 class TTLock {
@@ -50,11 +47,10 @@ class TTLock {
   }
 
   /// Stop scan the smart lock being broadcast
-  @Deprecated('Use TTLock.lock.stopScanLock() instead.')
+  @Deprecated('Cancel the subscription returned by TTLock.lock.lockScanLock().')
   static void stopScanLock() {
     _scanLockSub?.cancel();
     _scanLockSub = null;
-    new_ttlock.TTLock.lock.stopScanLock().catchError((_) {});
   }
 
   /// Current Phone/Pad Bluetooth state
@@ -63,12 +59,50 @@ class TTLock {
     _runLock(new_ttlock.TTLock.lock.getBluetoothState(), stateCallback, null);
   }
 
-  /// Initialize the lock. map {"lockMac": string, "lockVersion": string, "isInited": bool}
+  /// Initialize the lock. `lockVersion` 可为 [TTLockVersion]、字段 Map，或与原生一致的 JSON 字符串。
   @Deprecated('Use TTLock.lock.initLock(TTLockInitParams) instead.')
   static void initLock(
       Map map, TTLockDataCallback callback, TTFailedCallback failedCallback) {
-    final params = TTLockInitParams.fromMap(Map<String, dynamic>.from(map));
+    final m = Map<String, dynamic>.from(map);
+    final params = TTLockInitParams(
+      lockMac: m['lockMac'] as String,
+      lockVersion: _lockVersionFromLegacyValue(m['lockVersion']),
+      isInited: m['isInited'] as bool,
+      clientPara: m['clientPara'] as String?,
+      hotelInfo: m['hotelInfo'] as String?,
+      buildingNumber: m['buildingNumber'] as int?,
+      floorNumber: m['floorNumber'] as int?,
+    );
     _runLock(new_ttlock.TTLock.lock.initLock(params), callback, failedCallback);
+  }
+
+  static TTLockVersion _lockVersionFromLegacyValue(Object? value) {
+    if (value is TTLockVersion) return value;
+    if (value is Map) {
+      final map = Map<String, dynamic>.from(value);
+      return TTLockVersion(
+        protocolType: map['protocolType']! as int,
+        protocolVersion: map['protocolVersion']! as int,
+        scene: map['scene']! as int,
+        groupId: map['groupId']! as int,
+        orgId: map['orgId']! as int,
+      );
+    }
+    if (value is String) {
+      final map = jsonDecode(value) as Map<String, dynamic>;
+      return TTLockVersion(
+        protocolType: map['protocolType']! as int,
+        protocolVersion: map['protocolVersion']! as int,
+        scene: map['scene']! as int,
+        groupId: map['groupId']! as int,
+        orgId: map['orgId']! as int,
+      );
+    }
+    throw ArgumentError.value(
+      value,
+      'lockVersion',
+      'Expected TTLockVersion, Map, or JSON string',
+    );
   }
 
   /// Reset the lock
@@ -251,10 +285,10 @@ class TTLock {
         )
         .listen(
           (e) {
-            if (e is AddCardProgress) {
+            if (e.isProgress) {
               progressCallback();
-            } else if (e is AddCardComplete) {
-              callback(e.cardNumber);
+            } else {
+              callback(e.cardNumber!);
             }
           },
           onError: (err) {
@@ -387,10 +421,10 @@ class TTLock {
         )
         .listen(
           (e) {
-            if (e is AddFingerprintProgress) {
-              progressCallback(e.currentCount, e.totalCount);
-            } else if (e is AddFingerprintComplete) {
-              callback(e.fingerprintNumber);
+            if (e.isProgress) {
+              progressCallback(e.currentCount!, e.totalCount!);
+            } else {
+              callback(e.fingerprintNumber!);
             }
           },
           onError: (err) {
@@ -901,6 +935,14 @@ class TTLock {
     final Set<String> seen = <String>{};
 
     String wifiKey(dynamic item) {
+      if (item is TTWifiScanEntry) {
+        final mapKey = item.wifiMac ??
+            item.bssid ??
+            item.ssid ??
+            item.wifiName ??
+            item.name;
+        if (mapKey != null) return mapKey.toString();
+      }
       if (item is Map) {
         final dynamic mapKey = item['wifiMac'] ??
             item['bssid'] ??
@@ -985,7 +1027,7 @@ class TTLock {
     final router = map['router'] as String?;
     final subnetMask = map['subnetMask'] as String?;
     final ipSetting = TTIpSetting(
-      type: type ?? TTIpSettingType.dhcp.value,
+      type: type ?? TTIpSettingType.dhcp.index,
       ipAddress: ip,
       subnetMask: subnetMask,
       router: router,
@@ -1173,13 +1215,12 @@ class TTLock {
     );
   }
 
-  @Deprecated('Use TTLock.lock.setLockEnterUpgradeMode(lockData) instead.')
+  @Deprecated('Removed from TTLockApi; no replacement in this plugin.')
   static void setLockEnterUpgradeMode(String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
-    _runLockVoid(
-      new_ttlock.TTLock.lock.setLockEnterUpgradeMode(lockData),
-      callback,
-      failedCallback,
+    failedCallback?.call(
+      TTLockError.fail,
+      'setLockEnterUpgradeMode is no longer supported',
     );
   }
 
@@ -1211,10 +1252,10 @@ class TTLock {
         )
         .listen(
           (e) {
-            if (e is AddFaceProgress) {
-              progressCallback(e.state, e.errorCode);
-            } else if (e is AddFaceComplete) {
-              callback(e.faceNumber);
+            if (e.isProgress) {
+              progressCallback(e.state!, e.errorCode!);
+            } else {
+              callback(e.faceNumber!);
             }
           },
           onError: (err) {
@@ -1297,7 +1338,9 @@ class TTLock {
   @Deprecated('Use TTLock.lock.setSensitivity(value: TTSensitivityValue, lockData: ...) instead.')
   static void setSensitivity(String lockData, int value, TTSuccessCallback callback,
       TTFailedCallback failedCallback) {
-    final sensitivity = TTSensitivityValue.fromValue(value);
+    final sensitivity = (value >= 0 && value < TTSensitivityValue.values.length)
+        ? TTSensitivityValue.values[value]
+        : TTSensitivityValue.medium;
     _runLockVoid(
       new_ttlock.TTLock.lock.setSensitivity(
         value: sensitivity,

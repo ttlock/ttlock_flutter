@@ -10,7 +10,7 @@ import 'package:bmprogresshud/progresshud.dart';
 enum ScanType { lock, gateway }
 
 class ScanPage extends StatefulWidget {
-  const ScanPage({Key? key, required this.scanType}) : super(key: key);
+  const ScanPage({super.key, required this.scanType});
   final ScanType scanType;
 
   @override
@@ -41,11 +41,7 @@ class _ScanPageState extends State<ScanPage> {
   void dispose() {
     _lockSub?.cancel();
     _gatewaySub?.cancel();
-    if (scanType == ScanType.lock) {
-      TTLock.lock.stopScanLock();
-    } else {
-      TTLock.gateway.stopScan();
-    }
+    // 网关扫描由 EventChannel 管理，取消订阅后原生 onCancel 会 stopScanGateway
     super.dispose();
   }
 
@@ -111,7 +107,7 @@ class _ScanPageState extends State<ScanPage> {
   void _startScanLock() {
     _lockList = [];
     _lockSub?.cancel();
-    _lockSub = TTLock.lock.startScanLock().listen((scanModel) {
+    _lockSub = TTLock.lock.lockScanLock().listen((scanModel) {
       if (!mounted) return;
       final idx = _lockList.indexWhere((m) => m.lockMac == scanModel.lockMac);
       if (idx < 0) {
@@ -131,7 +127,7 @@ class _ScanPageState extends State<ScanPage> {
   void _startScanGateway() {
     _gatewayList = [];
     _gatewaySub?.cancel();
-    _gatewaySub = TTLock.gateway.startScan().listen((scanModel) {
+    _gatewaySub = TTLock.gateway.gatewayStartScan().listen((scanModel) {
       if (!mounted) return;
       final contain = _gatewayList.any((m) => m.gatewayMac == scanModel.gatewayMac);
       if (!contain) {
@@ -182,7 +178,6 @@ class _ScanPageState extends State<ScanPage> {
                   ),
                   onTap: () {
                     if (!scanModel.isInited) {
-                      TTLock.lock.stopScanLock();
                       _initLock(scanModel);
                     }
                   },
@@ -193,7 +188,6 @@ class _ScanPageState extends State<ScanPage> {
                   title: Text('Gateway：${scanModel.gatewayName}'),
                   subtitle: const Text('click to connect the gateway'),
                   onTap: () {
-                    TTLock.gateway.stopScan();
                     _connectGateway(scanModel.gatewayMac, scanModel.type);
                   },
                 );

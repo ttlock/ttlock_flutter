@@ -30,7 +30,7 @@ class _WifiPageState extends State<WifiPage> {
   }
 
   void _getNearbyWifi() {
-    _wifiSub = TTLock.gateway.getNearbyWifi().listen(
+    _wifiSub = TTLock.gateway.gatewayGetNearbyWifi(gatewayMac: widget.mac).listen(
       (wifiList) {
         setState(() {
           _wifiList = wifiList;

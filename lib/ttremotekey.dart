@@ -15,16 +15,7 @@ class TTRemoteKey {
   /// Legacy: scan for remote keys via callback. Prefer [new_ttlock.TTLock.accessory.startScanRemoteKey].
   @Deprecated('Use TTLock.accessory.startScanRemoteKey() and listen to the stream instead.')
   static void startScan(TTRemoteAccessoryScanCallback scanCallback) {
-    new_ttlock.TTLock.accessory.startScanRemoteKey().listen((model) {
-      final legacyMap = {
-        'name': model.name,
-        'mac': model.mac,
-        'rssi': model.rssi,
-        'isMultifunctionalKeypad': model.isMultifunctionalKeypad,
-        'advertisementData': model.advertisementData,
-      };
-      scanCallback(TTRemoteAccessoryScanModel.fromMap(Map<String, dynamic>.from(legacyMap)));
-    });
+    new_ttlock.TTLock.accessory.startScanRemoteKey().listen(scanCallback);
   }
 
   /// Legacy: stop remote key scan. Prefer [new_ttlock.TTLock.accessory.stopScanRemoteKey].
@@ -43,20 +34,7 @@ class TTRemoteKey {
   ) {
     new_ttlock.TTLock.accessory
         .initRemoteKey(mac: mac, lockData: lockData)
-        .then((model) {
-      final legacyMap = {
-        'modelNum': model.modelNum,
-        'hardwareRevision': model.hardwareRevision,
-        'firmwareRevision': model.firmwareRevision,
-        'electricQuantity': model.electricQuantity,
-        'nbOperator': model.nbOperator,
-        'nbNodeId': model.nbNodeId,
-        'nbCardNumber': model.nbCardNumber,
-        'nbRssi': model.nbRssi,
-        'lockData': model.lockData,
-      };
-      callback(TTLockSystemModel.fromMap(Map<String, dynamic>.from(legacyMap)));
-    }).catchError((e, _) {
+        .then(callback).catchError((e, _) {
       if (e is TTAccessoryException) {
         final error = e.code >= 0 && e.code < TTRemoteAccessoryError.values.length
             ? TTRemoteAccessoryError.values[e.code]

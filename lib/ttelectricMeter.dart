@@ -1,7 +1,7 @@
 import 'package:ttlock_premise_flutter/ttlock.dart' as new_ttlock;
 import 'package:ttlock_premise_flutter/ttlock_classic.dart';
 import 'package:ttlock_premise_flutter/errors/tt_accessory_exception.dart';
-import 'package:ttlock_premise_flutter/models/meter_models.dart';
+import 'package:ttlock_premise_flutter/pigeon/messages.g.dart';
 
 @Deprecated('Use Stream<TTElectricMeterScanModel> from TTLock.accessory.startScanElectricMeter().')
 typedef TTElectricMeterScanCallback = void Function(TTMeterScanModel scanModel);

@@ -123,7 +123,7 @@ try {
   final lockData = await TTLock.lock.initLock(params);
   // 使用 lockData 进行后续操作
 } on TTLockException catch (e) {
-  print('失败: ${e.error} ${e.message}');
+  print('失败: ${e.code} ${e.message}');
 }
 ```
 
@@ -168,8 +168,7 @@ try {
 
 | 分类 | 接口 | 说明 | 返回 |
 |------|------|------|------|
-| **扫描与蓝牙** | `startScanLock()` | 扫描附近锁 | `Stream<TTLockScanModel>` |
-| | `stopScanLock()` | 停止扫描 | `Future<void>` |
+| **扫描与蓝牙** | `lockScanLock()` | 扫描附近锁 | `Stream<TTLockScanModel>` |
 | | `getBluetoothState()` | 当前蓝牙状态 | `Future<TTBluetoothState>` |
 | **初始化与重置** | `initLock(params)` | 初始化（添加）锁，返回 lockData | `Future<String>` |
 | | `resetLock(lockData)` | 恢复出厂 | `Future<void>` |
@@ -225,7 +224,6 @@ try {
 | | `setRemoteKeyValidDate(...)` | 遥控器有效期 | `Future<void>` |
 | | `getRemoteAccessoryElectricQuantity(...)` | 配件电量 | `Future<AccessoryElectricQuantityResult>` |
 | | `addDoorSensor(...)` / `deleteDoorSensor(...)` / `setDoorSensorAlertTime(...)` | 门磁 | `Future<void>` |
-| **升级** | `setLockEnterUpgradeMode(lockData)` | 进入升级模式 | `Future<void>` |
 
 ---
 

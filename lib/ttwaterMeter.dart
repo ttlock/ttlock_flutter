@@ -1,7 +1,7 @@
 import 'package:ttlock_premise_flutter/ttlock.dart' as new_ttlock;
 import 'package:ttlock_premise_flutter/ttlock_classic.dart';
 import 'package:ttlock_premise_flutter/errors/tt_accessory_exception.dart';
-import 'package:ttlock_premise_flutter/models/meter_models.dart';
+import 'package:ttlock_premise_flutter/pigeon/messages.g.dart';
 
 @Deprecated('Use Stream<TTWaterMeterScanModel> from TTLock.accessory.startScanWaterMeter().')
 typedef TTWaterMeterScanCallback = void Function(TTMeterScanModel scanModel);
@@ -9,8 +9,8 @@ typedef TTWaterMeterScanCallback = void Function(TTMeterScanModel scanModel);
 @Deprecated('Use Future<TTWaterMeterInitResult> from TTLock.accessory.waterMeterInit(...).')
 typedef TTWaterMeterInitCallback = void Function(TTWaterMeterInitResult initResult);
 
-@Deprecated('Use Future<Map<String, dynamic>> from TTLock.accessory.waterMeterGetDeviceInfo(waterMeterId).')
-typedef TTWaterDeviceInfoCallback = void Function(Map<String, dynamic> deviceInfo);
+@Deprecated('Use Future<Map<String, Object?>> from TTLock.accessory.waterMeterGetDeviceInfo(waterMeterId).')
+typedef TTWaterDeviceInfoCallback = void Function(Map<String, Object?> deviceInfo);
 
 /// Legacy water meter API. Prefer [new_ttlock.TTLock.accessory] instead.
 @Deprecated('Use TTLock.accessory.*waterMeter* APIs instead.')

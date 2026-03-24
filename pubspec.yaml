@@ -15,6 +15,11 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  pigeon:
+    git:
+      url: "https://gitcode.com/openharmony-sig/flutter_packages.git"
+      path: "packages/pigeon"
+      ref: "br_pigeon-v25.3.2_ohos"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

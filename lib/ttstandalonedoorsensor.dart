@@ -1,7 +1,7 @@
 import 'package:ttlock_premise_flutter/ttlock.dart' as new_ttlock;
 import 'package:ttlock_premise_flutter/ttlock_classic.dart';
 import 'package:ttlock_premise_flutter/errors/tt_accessory_exception.dart';
-import 'package:ttlock_premise_flutter/models/standalone_door_sensor_models.dart';
+import 'package:ttlock_premise_flutter/pigeon/messages.g.dart';
 import 'dart:convert';
 
 @Deprecated('Use Stream<TTStandaloneDoorSensorScanModel> from TTLock.accessory.startScanStandaloneDoorSensor().')
@@ -57,7 +57,7 @@ class TTStandaloneDoorSensor {
     }
 
     new_ttlock.TTLock.accessory
-        .standaloneDoorSensorInit(mac: mac, info: Map<String, dynamic>.from(info))
+        .standaloneDoorSensorInit(mac: mac, info: Map<String, Object?>.from(info))
         .then(callback)
         .catchError((e, _) {
       if (e is TTAccessoryException) {

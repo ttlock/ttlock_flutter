@@ -28,7 +28,7 @@ class _GatewayPageState extends State<GatewayPage> {
     }
 
     final params = TTGatewayInitParams(
-      type: widget.type.value,
+      type: widget.type.index,
       ttlockUid: Config.uid,
       gatewayName: Config.gatewayName,
       wifi: widget.wifi,
@@ -43,8 +43,9 @@ class _GatewayPageState extends State<GatewayPage> {
       print(result);
       _showAndDismiss(ProgressHudType.success, 'Init Gateway Success');
     } on TTGatewayException catch (e) {
-      _showAndDismiss(ProgressHudType.error, '${e.error}: ${e.message}');
-      if (e.error == TTGatewayError.notConnect || e.error == TTGatewayError.disconnect) {
+      _showAndDismiss(ProgressHudType.error, '${e.code}: ${e.message}');
+      if (e.code == TTGatewayError.unConnected ||
+          e.code == TTGatewayError.communicationDisconnected) {
         print("Please repower and connect the gateway again");
       }
     } catch (e) {
