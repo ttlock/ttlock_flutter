@@ -7,7 +7,7 @@ import 'package:ttlock_premise_flutter/ttlock.dart';
 import 'gateway_page.dart';
 
 class WifiPage extends StatefulWidget {
-  WifiPage({required this.mac}) : super();
+  const WifiPage({required this.mac}) : super();
   final String mac;
   @override
   _WifiPageState createState() => _WifiPageState();
@@ -33,7 +33,7 @@ class _WifiPageState extends State<WifiPage> {
     _wifiSub = TTLock.gateway.gatewayGetNearbyWifi(gatewayMac: widget.mac).listen(
       (wifiList) {
         setState(() {
-          _wifiList = wifiList;
+          _wifiList = wifiList.wifiList;
         });
       },
       onError: (e) => print('WiFi scan error: $e'),
@@ -52,11 +52,9 @@ class _WifiPageState extends State<WifiPage> {
     return Scaffold(
         appBar: AppBar(title: Text('Select Wifi')),
         body: Material(child: ProgressHud(
-          child: Container(
-            child: Builder(builder: (context) {
-              return getList();
-            }),
-          ),
+          child: Builder(builder: (context) {
+            return getList();
+          }),
         )));
   }
 

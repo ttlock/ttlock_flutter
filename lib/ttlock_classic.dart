@@ -30,7 +30,7 @@ class TTLock {
   }
 
   static StreamSubscription<TTLockScanModel>? _scanLockSub;
-  static StreamSubscription<List<dynamic>>? _scanWifiSub;
+  static StreamSubscription<TTWifiScanResult>? _scanWifiSub;
 
   /// Scan the smart lock being broadcast
   @Deprecated('Use TTLock.lock.startScanLock() and listen to the stream instead.')
@@ -902,7 +902,7 @@ class TTLock {
 
     _scanWifiSub = new_ttlock.TTLock.lock.lockScanWifi(lockData).listen(
       (wifiList) {
-        for (final item in wifiList) {
+        for (final item in wifiList.wifiList) {
           final key = wifiKey(item);
           if (seen.add(key)) {
             allWifiList.add(item);
@@ -910,13 +910,19 @@ class TTLock {
         }
         callback(false, allWifiList);
       },
-      onDone: () => callback(true, allWifiList),
+      onDone: () {
+        callback(true, allWifiList);
+        _scanWifiSub?.cancel();
+        _scanWifiSub = null;
+      },
       onError: (e) {
         if (e is TTLockException) {
           failedCallback(e.code, e.message ?? '');
         } else {
           failedCallback(TTLockError.fail, e?.toString() ?? 'Unknown error');
         }
+        _scanWifiSub?.cancel();
+        _scanWifiSub = null;
       },
     );
   }

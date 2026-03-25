@@ -23,7 +23,7 @@ import 'package:pigeon/pigeon.dart';
       package: 'com.ttlock.ttlock_flutter',
       // copyrightHeader: <String>['pigeons/copyright.txt'],
     ),
-    swiftOut: 'ios/Classes/messages.swift',
+    swiftOut: 'ios/Classes/Messages.swift',
     swiftOptions: SwiftOptions(
       // copyrightHeader: <String>['pigeons/copyright.txt'],
     ),
@@ -348,6 +348,14 @@ class TTElectricMeterInitResult {
   TTElectricMeterInitResult({
     required this.electricMeterId,
     this.featureValue,
+  });
+}
+
+class TTWifiScanResult {
+  List<TTWifiScanEntry> wifiList;
+
+  TTWifiScanResult({
+    required this.wifiList
   });
 }
 
@@ -1143,7 +1151,7 @@ abstract class TTAccessoryHostApi {
 abstract class TTEventChannelApi {
   TTLockScanModel lockScanLock();
 
-  List<TTWifiScanEntry> lockScanWifi();
+  TTWifiScanResult lockScanWifi();
 
   AddCardEvent lockAddCard();
 
@@ -1153,7 +1161,7 @@ abstract class TTEventChannelApi {
 
   TTGatewayScanModel gatewayStartScan();
 
-  List<TTWifiScanEntry> gatewayGetNearbyWifi();
+  TTWifiScanResult gatewayGetNearbyWifi();
 
   TTRemoteAccessoryScanModel accessoryStartScanRemoteKey();
 

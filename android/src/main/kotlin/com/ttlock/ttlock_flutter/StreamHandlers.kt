@@ -123,7 +123,7 @@ class ScanLockWifiImpl : LockScanWifiStreamHandler {
                         name = ssid
                     )
                 } ?: emptyList()
-                sink.success(list)
+                sink.success(TTWifiScanResult(wifiList = list))
             }
 
             override fun onFail(lockError: LockError?) {
@@ -393,7 +393,7 @@ class ScanGatewayWiFiImpl : GatewayGetNearbyWifiStreamHandler {
                         name = ssid
                     )
                 } ?: emptyList()
-                sink.success(list)
+                sink.success(TTWifiScanResult(wifiList = list))
             }
 
             override fun onScanWiFiByGatewaySuccess() {

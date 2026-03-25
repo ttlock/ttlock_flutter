@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:ttlock_premise_flutter/pigeon/messages.g.dart' as pigeon;
+import 'package:ttlock_premise_flutter/pigeon/messages.g.dart';
 
 import 'pigeon_errors.dart';
 
@@ -20,7 +21,7 @@ class TTLockApi {
   Stream<pigeon.TTLockScanModel> lockScanLock() => pigeon.lockScanLock();
 
   /// 订阅前会先调用 [setEventLockData]；[lockData] 不能为空字符串。
-  Stream<List<dynamic>> lockScanWifi(String lockData) {
+  Stream<TTWifiScanResult> lockScanWifi(String lockData) {
     if (lockData.isEmpty) {
       throw ArgumentError.value(lockData, 'lockData', 'must not be empty');
     }

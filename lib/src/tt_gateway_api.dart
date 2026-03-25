@@ -23,7 +23,7 @@ class TTGatewayApi {
   Stream<pigeon.TTGatewayScanModel> gatewayStartScan() => pigeon.gatewayStartScan();
 
   /// 订阅前会先调用 [setEventGatewayMac]；[gatewayMac] 不能为空字符串。
-  Stream<List<dynamic>> gatewayGetNearbyWifi({required String gatewayMac}) {
+  Stream<pigeon.TTWifiScanResult> gatewayGetNearbyWifi({required String gatewayMac}) {
     if (gatewayMac.isEmpty) {
       throw ArgumentError.value(gatewayMac, 'gatewayMac', 'must not be empty');
     }

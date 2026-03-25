@@ -1366,6 +1366,34 @@ data class TTElectricMeterInitResult (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
+data class TTWifiScanResult (
+  val wifiList: List<TTWifiScanEntry>
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): TTWifiScanResult {
+      val wifiList = pigeonVar_list[0] as List<TTWifiScanEntry>
+      return TTWifiScanResult(wifiList)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      wifiList,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other !is TTWifiScanResult) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    return MessagesPigeonUtils.deepEquals(toList(), other.toList())  }
+
+  override fun hashCode(): Int = toList().hashCode()
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
 data class TTWifiScanEntry (
   val wifiMac: String? = null,
   val wifiRssi: Long? = null,
@@ -1864,35 +1892,40 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
       }
       175.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          TTWifiScanEntry.fromList(it)
+          TTWifiScanResult.fromList(it)
         }
       }
       176.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          RemoteKeypadInitResult.fromList(it)
+          TTWifiScanEntry.fromList(it)
         }
       }
       177.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MultifunctionalKeypadInitResult.fromList(it)
+          RemoteKeypadInitResult.fromList(it)
         }
       }
       178.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          WaterMeterDeviceInfo.fromList(it)
+          MultifunctionalKeypadInitResult.fromList(it)
         }
       }
       179.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          AddCardEvent.fromList(it)
+          WaterMeterDeviceInfo.fromList(it)
         }
       }
       180.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          AddFingerprintEvent.fromList(it)
+          AddCardEvent.fromList(it)
         }
       }
       181.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          AddFingerprintEvent.fromList(it)
+        }
+      }
+      182.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           AddFaceEvent.fromList(it)
         }
@@ -2086,32 +2119,36 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
         stream.write(174)
         writeValue(stream, value.toList())
       }
-      is TTWifiScanEntry -> {
+      is TTWifiScanResult -> {
         stream.write(175)
         writeValue(stream, value.toList())
       }
-      is RemoteKeypadInitResult -> {
+      is TTWifiScanEntry -> {
         stream.write(176)
         writeValue(stream, value.toList())
       }
-      is MultifunctionalKeypadInitResult -> {
+      is RemoteKeypadInitResult -> {
         stream.write(177)
         writeValue(stream, value.toList())
       }
-      is WaterMeterDeviceInfo -> {
+      is MultifunctionalKeypadInitResult -> {
         stream.write(178)
         writeValue(stream, value.toList())
       }
-      is AddCardEvent -> {
+      is WaterMeterDeviceInfo -> {
         stream.write(179)
         writeValue(stream, value.toList())
       }
-      is AddFingerprintEvent -> {
+      is AddCardEvent -> {
         stream.write(180)
         writeValue(stream, value.toList())
       }
-      is AddFaceEvent -> {
+      is AddFingerprintEvent -> {
         stream.write(181)
+        writeValue(stream, value.toList())
+      }
+      is AddFaceEvent -> {
+        stream.write(182)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -4879,14 +4916,14 @@ abstract class LockScanLockStreamHandler : MessagesPigeonEventChannelWrapper<TTL
   }
 }
       
-abstract class LockScanWifiStreamHandler : MessagesPigeonEventChannelWrapper<List<TTWifiScanEntry>> {
+abstract class LockScanWifiStreamHandler : MessagesPigeonEventChannelWrapper<TTWifiScanResult> {
   companion object {
     fun register(messenger: BinaryMessenger, streamHandler: LockScanWifiStreamHandler, instanceName: String = "") {
       var channelName: String = "dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.lockScanWifi"
       if (instanceName.isNotEmpty()) {
         channelName += ".$instanceName"
       }
-      val internalStreamHandler = MessagesPigeonStreamHandler<List<TTWifiScanEntry>>(streamHandler)
+      val internalStreamHandler = MessagesPigeonStreamHandler<TTWifiScanResult>(streamHandler)
       EventChannel(messenger, channelName, MessagesPigeonMethodCodec).setStreamHandler(internalStreamHandler)
     }
   }
@@ -4944,14 +4981,14 @@ abstract class GatewayStartScanStreamHandler : MessagesPigeonEventChannelWrapper
   }
 }
       
-abstract class GatewayGetNearbyWifiStreamHandler : MessagesPigeonEventChannelWrapper<List<TTWifiScanEntry>> {
+abstract class GatewayGetNearbyWifiStreamHandler : MessagesPigeonEventChannelWrapper<TTWifiScanResult> {
   companion object {
     fun register(messenger: BinaryMessenger, streamHandler: GatewayGetNearbyWifiStreamHandler, instanceName: String = "") {
       var channelName: String = "dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.gatewayGetNearbyWifi"
       if (instanceName.isNotEmpty()) {
         channelName += ".$instanceName"
       }
-      val internalStreamHandler = MessagesPigeonStreamHandler<List<TTWifiScanEntry>>(streamHandler)
+      val internalStreamHandler = MessagesPigeonStreamHandler<TTWifiScanResult>(streamHandler)
       EventChannel(messenger, channelName, MessagesPigeonMethodCodec).setStreamHandler(internalStreamHandler)
     }
   }

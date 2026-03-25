@@ -1573,6 +1573,47 @@ class TTElectricMeterInitResult {
 ;
 }
 
+class TTWifiScanResult {
+  TTWifiScanResult({
+    required this.wifiList,
+  });
+
+  List<TTWifiScanEntry> wifiList;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      wifiList,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static TTWifiScanResult decode(Object result) {
+    result as List<Object?>;
+    return TTWifiScanResult(
+      wifiList: (result[0] as List<Object?>?)!.cast<TTWifiScanEntry>(),
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! TTWifiScanResult || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(encode(), other.encode());
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => Object.hashAll(_toList())
+;
+}
+
 class TTWifiScanEntry {
   TTWifiScanEntry({
     this.wifiMac,
@@ -2121,26 +2162,29 @@ class _PigeonCodec extends StandardMessageCodec {
     }    else if (value is TTElectricMeterInitResult) {
       buffer.putUint8(174);
       writeValue(buffer, value.encode());
-    }    else if (value is TTWifiScanEntry) {
+    }    else if (value is TTWifiScanResult) {
       buffer.putUint8(175);
       writeValue(buffer, value.encode());
-    }    else if (value is RemoteKeypadInitResult) {
+    }    else if (value is TTWifiScanEntry) {
       buffer.putUint8(176);
       writeValue(buffer, value.encode());
-    }    else if (value is MultifunctionalKeypadInitResult) {
+    }    else if (value is RemoteKeypadInitResult) {
       buffer.putUint8(177);
       writeValue(buffer, value.encode());
-    }    else if (value is WaterMeterDeviceInfo) {
+    }    else if (value is MultifunctionalKeypadInitResult) {
       buffer.putUint8(178);
       writeValue(buffer, value.encode());
-    }    else if (value is AddCardEvent) {
+    }    else if (value is WaterMeterDeviceInfo) {
       buffer.putUint8(179);
       writeValue(buffer, value.encode());
-    }    else if (value is AddFingerprintEvent) {
+    }    else if (value is AddCardEvent) {
       buffer.putUint8(180);
       writeValue(buffer, value.encode());
-    }    else if (value is AddFaceEvent) {
+    }    else if (value is AddFingerprintEvent) {
       buffer.putUint8(181);
+      writeValue(buffer, value.encode());
+    }    else if (value is AddFaceEvent) {
+      buffer.putUint8(182);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -2269,18 +2313,20 @@ class _PigeonCodec extends StandardMessageCodec {
       case 174: 
         return TTElectricMeterInitResult.decode(readValue(buffer)!);
       case 175: 
-        return TTWifiScanEntry.decode(readValue(buffer)!);
+        return TTWifiScanResult.decode(readValue(buffer)!);
       case 176: 
-        return RemoteKeypadInitResult.decode(readValue(buffer)!);
+        return TTWifiScanEntry.decode(readValue(buffer)!);
       case 177: 
-        return MultifunctionalKeypadInitResult.decode(readValue(buffer)!);
+        return RemoteKeypadInitResult.decode(readValue(buffer)!);
       case 178: 
-        return WaterMeterDeviceInfo.decode(readValue(buffer)!);
+        return MultifunctionalKeypadInitResult.decode(readValue(buffer)!);
       case 179: 
-        return AddCardEvent.decode(readValue(buffer)!);
+        return WaterMeterDeviceInfo.decode(readValue(buffer)!);
       case 180: 
-        return AddFingerprintEvent.decode(readValue(buffer)!);
+        return AddCardEvent.decode(readValue(buffer)!);
       case 181: 
+        return AddFingerprintEvent.decode(readValue(buffer)!);
+      case 182: 
         return AddFaceEvent.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -5489,14 +5535,14 @@ Stream<TTLockScanModel> lockScanLock( {String instanceName = ''}) {
   });
 }
     
-Stream<List> lockScanWifi( {String instanceName = ''}) {
+Stream<TTWifiScanResult> lockScanWifi( {String instanceName = ''}) {
   if (instanceName.isNotEmpty) {
     instanceName = '.$instanceName';
   }
   final EventChannel lockScanWifiChannel =
       EventChannel('dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.lockScanWifi$instanceName', pigeonMethodCodec);
   return lockScanWifiChannel.receiveBroadcastStream().map((dynamic event) {
-    return event as List;
+    return event as TTWifiScanResult;
   });
 }
     
@@ -5544,14 +5590,14 @@ Stream<TTGatewayScanModel> gatewayStartScan( {String instanceName = ''}) {
   });
 }
     
-Stream<List> gatewayGetNearbyWifi( {String instanceName = ''}) {
+Stream<TTWifiScanResult> gatewayGetNearbyWifi( {String instanceName = ''}) {
   if (instanceName.isNotEmpty) {
     instanceName = '.$instanceName';
   }
   final EventChannel gatewayGetNearbyWifiChannel =
       EventChannel('dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.gatewayGetNearbyWifi$instanceName', pigeonMethodCodec);
   return gatewayGetNearbyWifiChannel.receiveBroadcastStream().map((dynamic event) {
-    return event as List;
+    return event as TTWifiScanResult;
   });
 }
     

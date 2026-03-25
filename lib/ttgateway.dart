@@ -27,7 +27,8 @@ class TTGateway {
   static const String COMMAND_CONFIG_APN = 'gatewayConfigApn';
 
   static StreamSubscription<TTGatewayScanModel>? _scanSub;
-  
+
+  static StreamSubscription<TTWifiScanResult>? _scanWifiSub;
   @Deprecated('Use TTLock.gateway.gatewayStartScan() and listen to the stream instead.')
   static void startScan(TTGatewayScanCallback scanCallback) {
     _scanSub?.cancel();
@@ -81,7 +82,7 @@ class TTGateway {
 
     new_ttlock.TTLock.gateway.gatewayGetNearbyWifi(gatewayMac: gatewayMac).listen(
       (wifiList) {
-        for (final item in wifiList) {
+        for (final item in wifiList.wifiList) {
           final key = wifiKey(item);
           if (seen.add(key)) {
             allWifiList.add(item);
@@ -89,13 +90,19 @@ class TTGateway {
         }
         callback(false, allWifiList);
       },
-      onDone: () => callback(true, allWifiList),
+      onDone: () {
+        callback(true, allWifiList);
+        _scanWifiSub?.cancel();
+        _scanWifiSub = null;
+      },
       onError: (e, _) {
         if (e is TTGatewayException) {
           failedCallback(e.code, e.message ?? '');
         } else {
           failedCallback(TTGatewayError.failed, e.toString());
         }
+        _scanWifiSub?.cancel();
+        _scanWifiSub = null;
       },
     );
   }

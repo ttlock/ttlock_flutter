@@ -2505,6 +2505,38 @@ export class TTElectricMeterInitResult {
 }
 
 /* Generated class from Pigeon that represents data sent in messages.*/
+export class TTWifiScanResult {
+  private wifiList?: Array<TTWifiScanEntry>;
+
+  public setWifiList(wifiList:Array<TTWifiScanEntry>):void {
+    this.wifiList = wifiList;
+  }
+
+  getWifiList(): Array<TTWifiScanEntry> | undefined{
+    return this.wifiList;
+  }
+
+  constructor(wifiList?: Array<TTWifiScanEntry>) {
+    this.wifiList = wifiList;
+  }
+
+  toList(): Object[] {
+    let arr: Object[] = new Array();
+    if(this.wifiList !==undefined){
+      arr.push(this.wifiList);
+    }
+    return arr;
+  }
+
+  static fromList(arr: Object[]): TTWifiScanResult {
+    let pigeonResult: TTWifiScanResult = new TTWifiScanResult();
+    let wifiList: Object = arr[0];
+    pigeonResult.setWifiList(wifiList as Array<TTWifiScanEntry>);
+    return pigeonResult;
+  }
+}
+
+/* Generated class from Pigeon that represents data sent in messages.*/
 export class TTWifiScanEntry {
   private wifiMac?: string;
 
@@ -3257,18 +3289,20 @@ export class PigeonCodec extends StandardMessageCodec {
       case this.getByte(174):
         return TTElectricMeterInitResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(175):
-        return TTWifiScanEntry.fromList(super.readValue(buffer) as Object[]);
+        return TTWifiScanResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(176):
-        return RemoteKeypadInitResult.fromList(super.readValue(buffer) as Object[]);
+        return TTWifiScanEntry.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(177):
-        return MultifunctionalKeypadInitResult.fromList(super.readValue(buffer) as Object[]);
+        return RemoteKeypadInitResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(178):
-        return WaterMeterDeviceInfo.fromList(super.readValue(buffer) as Object[]);
+        return MultifunctionalKeypadInitResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(179):
-        return AddCardEvent.fromList(super.readValue(buffer) as Object[]);
+        return WaterMeterDeviceInfo.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(180):
-        return AddFingerprintEvent.fromList(super.readValue(buffer) as Object[]);
+        return AddCardEvent.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(181):
+        return AddFingerprintEvent.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(182):
         return AddFaceEvent.fromList(super.readValue(buffer) as Object[]);
       default:
         return super.readValueOfType(type, buffer);
@@ -3414,26 +3448,29 @@ export class PigeonCodec extends StandardMessageCodec {
     } else if (value instanceof TTElectricMeterInitResult) {
       stream.writeUint8(this.getByte(174));
       this.writeValue(stream, (value as TTElectricMeterInitResult).toList());
-    } else if (value instanceof TTWifiScanEntry) {
+    } else if (value instanceof TTWifiScanResult) {
       stream.writeUint8(this.getByte(175));
+      this.writeValue(stream, (value as TTWifiScanResult).toList());
+    } else if (value instanceof TTWifiScanEntry) {
+      stream.writeUint8(this.getByte(176));
       this.writeValue(stream, (value as TTWifiScanEntry).toList());
     } else if (value instanceof RemoteKeypadInitResult) {
-      stream.writeUint8(this.getByte(176));
+      stream.writeUint8(this.getByte(177));
       this.writeValue(stream, (value as RemoteKeypadInitResult).toList());
     } else if (value instanceof MultifunctionalKeypadInitResult) {
-      stream.writeUint8(this.getByte(177));
+      stream.writeUint8(this.getByte(178));
       this.writeValue(stream, (value as MultifunctionalKeypadInitResult).toList());
     } else if (value instanceof WaterMeterDeviceInfo) {
-      stream.writeUint8(this.getByte(178));
+      stream.writeUint8(this.getByte(179));
       this.writeValue(stream, (value as WaterMeterDeviceInfo).toList());
     } else if (value instanceof AddCardEvent) {
-      stream.writeUint8(this.getByte(179));
+      stream.writeUint8(this.getByte(180));
       this.writeValue(stream, (value as AddCardEvent).toList());
     } else if (value instanceof AddFingerprintEvent) {
-      stream.writeUint8(this.getByte(180));
+      stream.writeUint8(this.getByte(181));
       this.writeValue(stream, (value as AddFingerprintEvent).toList());
     } else if (value instanceof AddFaceEvent) {
-      stream.writeUint8(this.getByte(181));
+      stream.writeUint8(this.getByte(182));
       this.writeValue(stream, (value as AddFaceEvent).toList());
     } else {
       super.writeValue(stream, value);
