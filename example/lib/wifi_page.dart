@@ -7,13 +7,14 @@ import 'package:ttlock_premise_flutter/ttlock.dart';
 import 'gateway_page.dart';
 
 class WifiPage extends StatefulWidget {
-  const WifiPage({required this.mac}) : super();
+  const WifiPage({super.key, required this.mac});
   final String mac;
+
   @override
-  _WifiPageState createState() => _WifiPageState();
+  WifiPageState createState() => WifiPageState();
 }
 
-class _WifiPageState extends State<WifiPage> {
+class WifiPageState extends State<WifiPage> {
   List _wifiList = [];
   StreamSubscription? _wifiSub;
 

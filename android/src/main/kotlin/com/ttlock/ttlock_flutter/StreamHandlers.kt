@@ -372,7 +372,7 @@ class ScanGatewayWiFiImpl : GatewayGetNearbyWifiStreamHandler {
 
     override fun onListen(
         p0: Any?,
-        sink: PigeonEventSink<List<TTWifiScanEntry>>
+        sink: PigeonEventSink<TTWifiScanResult>
     ) {
         super.onListen(p0, sink)
         val mac = GatewayApi.latestGatewayMac

@@ -8,9 +8,6 @@
 		},
 		{
 			"path": "../ttlock_flutter"
-		},
-		{
-			"path": "../shared_preferences"
 		}
 	],
 	"settings": {}

@@ -257,7 +257,7 @@ final class GatewayStartScanStreamHandlerImpl: GatewayStartScanStreamHandler {
 }
 
 final class GatewayGetNearbyWifiStreamHandlerImpl: GatewayGetNearbyWifiStreamHandler {
-  override func onListen(withArguments arguments: Any?, sink: PigeonEventSink<[TTWifiScanEntry]>) {
+  override func onListen(withArguments arguments: Any?, sink: PigeonEventSink<TTWifiScanResult>) {
     guard let mac = streamContext.gatewayMac, !mac.isEmpty else {
       sink.error(
         code: "NO_GATEWAY",
