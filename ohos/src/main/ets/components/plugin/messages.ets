@@ -371,13 +371,18 @@ export enum TTGatewayError {
   TIME_OUT,
   NO_SIM_CARD,
   NO_CABLE,
+  WRONG_CRC,
+  WRONG_AES_KEY,
   FAILED_CONFIGURE_ROUTER,
   FAILED_CONFIGURE_SERVER,
   FAILED_CONFIGURE_ACCOUNT,
   COMMUNICATION_DISCONNECTED,
   UN_CONNECTED,
   CONNECT_TIMEOUT,
-  DATA_FORMAT_ERROR
+  DATA_FORMAT_ERROR,
+  FAILED_CONFIG_ACCOUNT,
+  FAILED_CONFIG_IP,
+  INVALID_IP
 }
 
 /* Generated enum Companion class from Pigeon that represents data sent 
@@ -394,6 +399,7 @@ export enum TTRemoteAccessoryError {
   SUCCESS,
   FAILED,
   NO_RESPONSE,
+  WRONG_CRC,
   REQUEST_FAILED,
   CONNECT_FAILED,
   DEVICE_IS_BUSY,
@@ -414,6 +420,8 @@ export enum TTMultifunctionalKeypadError {
   SUCCESS,
   FAILED,
   DUPLICATE_FINGERPRINT,
+  NO_STORAGE_SPACE,
+  WRONG_CRC,
   NO_RESPONSE,
   KEYPAD_CONNECT_FAILED,
   DATA_FORMAT_ERROR
@@ -432,9 +440,7 @@ export class TTMultifunctionalKeypadErrorEnum {
 export enum TTRemoteAccessory {
   REMOTE_KEY,
   REMOTE_KEYPAD,
-  DOOR_SENSOR,
-  WATER_METER,
-  ELECTRIC_METER
+  DOOR_SENSOR
 }
 
 /* Generated enum Companion class from Pigeon that represents data sent 
@@ -3560,7 +3566,7 @@ export abstract class TTLockHostApi {
 
   abstract setHotelCardSector(sector: string , lockData: string , result: Result<void>): void;
 
-  abstract getLockVersion(lockMac: string , result: Result<string>): void;
+  abstract getLockVersion(lockMac: string , result: Result<TTLockVersion>): void;
 
   abstract setNBServerAddress(ip: string , port: string , lockData: string , result: Result<number>): void;
 
@@ -3588,7 +3594,7 @@ export abstract class TTLockHostApi {
 
   abstract clearRemoteKey(lockData: string , result: Result<void>): void;
 
-  abstract getRemoteAccessoryElectricQuantity(accessory: number , mac: string , lockData: string , result: Result<AccessoryElectricQuantityResult>): void;
+  abstract getRemoteAccessoryElectricQuantity(accessory: TTRemoteAccessory , mac: string , lockData: string , result: Result<AccessoryElectricQuantityResult>): void;
 
   abstract addDoorSensor(doorSensorMac: string , lockData: string , result: Result<void>): void;
 
@@ -5212,8 +5218,8 @@ export abstract class TTLockHostApi {
         channel.setMessageHandler({
             onMessage(message: Object ,reply: Reply<Object> ) {
               let args: Array<Object> = message as Array<Object>;
-              class ResultImp implements Result<string>{
-                    success(result: string): void {
+              class ResultImp implements Result<TTLockVersion>{
+                    success(result: TTLockVersion): void {
                       let res: Array<Object> = [];
                       res.push(result);
                       reply.reply(res);
@@ -5224,7 +5230,7 @@ export abstract class TTLockHostApi {
                       reply.reply(wrappedError);
                     }
               }
-              let resultCallback: Result<string> = new ResultImp();
+              let resultCallback: Result<TTLockVersion> = new ResultImp();
 
               api!.getLockVersion(args[0] as string, resultCallback);
             } });
@@ -5618,7 +5624,7 @@ export abstract class TTLockHostApi {
               }
               let resultCallback: Result<AccessoryElectricQuantityResult> = new ResultImp();
 
-              api!.getRemoteAccessoryElectricQuantity(args[0] as number, args[1] as string, args[2] as string, resultCallback);
+              api!.getRemoteAccessoryElectricQuantity(args[0] as TTRemoteAccessory, args[1] as string, args[2] as string, resultCallback);
             } });
       } else {
         channel.setMessageHandler(null);
@@ -5955,7 +5961,7 @@ export abstract class TTAccessoryHostApi {
 
   abstract initMultifunctionalKeypad(mac: string , lockData: string , result: Result<MultifunctionalKeypadInitResult>): void;
 
-  abstract getStoredLocks(mac: string ): Array<string>;
+  abstract getStoredLocks(mac: string , result: Result<Array<string>>): void;
 
   abstract deleteStoredLock(mac: string , slotNumber: number , result: Result<void>): void;
 
@@ -6151,16 +6157,21 @@ export abstract class TTAccessoryHostApi {
         channel.setMessageHandler({
             onMessage(message: Object ,reply: Reply<Object> ) {
               let args: Array<Object> = message as Array<Object>;
-              let res: Array<Object> = [];
-              try {
-                let output: Array<string> = api!.getStoredLocks(args[0] as string);
-                res.push(output);
+              class ResultImp implements Result<Array<string>>{
+                    success(result: Array<string>): void {
+                      let res: Array<Object> = [];
+                      res.push(result);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
               }
- catch (error) {
-                let wrappedError: Array<Object> = wrapError(error);
-                res = wrappedError;
-              }
-              reply.reply(res);
+              let resultCallback: Result<Array<string>> = new ResultImp();
+
+              api!.getStoredLocks(args[0] as string, resultCallback);
             } });
       } else {
         channel.setMessageHandler(null);

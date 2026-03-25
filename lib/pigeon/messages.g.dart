@@ -197,6 +197,8 @@ enum TTGatewayError {
   timeOut,
   noSimCard,
   noCable,
+  wrongCRC,
+  wrongAesKey,
   failedConfigureRouter,
   failedConfigureServer,
   failedConfigureAccount,
@@ -204,12 +206,16 @@ enum TTGatewayError {
   unConnected,
   connectTimeout,
   dataFormatError,
+  failedConfigAccount,
+  failedConfigIp,
+  invalidIp,
 }
 
 enum TTRemoteAccessoryError {
   success,
   failed,
   noResponse,
+  wrongCRC,
   requestFailed,
   connectFailed,
   deviceIsBusy,
@@ -220,6 +226,8 @@ enum TTMultifunctionalKeypadError {
   success,
   failed,
   duplicateFingerprint,
+  noStorageSpace,
+  wrongCRC,
   noResponse,
   keypadConnectFailed,
   dataFormatError,
@@ -229,8 +237,6 @@ enum TTRemoteAccessory {
   remoteKey,
   remoteKeypad,
   doorSensor,
-  waterMeter,
-  electricMeter,
 }
 
 enum TTIpSettingType {
@@ -3752,7 +3758,7 @@ class TTLockHostApi {
     }
   }
 
-  Future<String> getLockVersion(String lockMac) async {
+  Future<TTLockVersion> getLockVersion(String lockMac) async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.getLockVersion$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
@@ -3776,7 +3782,7 @@ class TTLockHostApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (pigeonVar_replyList[0] as String?)!;
+      return (pigeonVar_replyList[0] as TTLockVersion?)!;
     }
   }
 
@@ -4099,7 +4105,7 @@ class TTLockHostApi {
     }
   }
 
-  Future<AccessoryElectricQuantityResult> getRemoteAccessoryElectricQuantity(int accessory, String mac, String lockData) async {
+  Future<AccessoryElectricQuantityResult> getRemoteAccessoryElectricQuantity(TTRemoteAccessory accessory, String mac, String lockData) async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.getRemoteAccessoryElectricQuantity$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,

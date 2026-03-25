@@ -20,6 +20,7 @@ A new flutter plugin project.
 #   s.vendored_frameworks = "Frameworks/**/*.framework"
   s.dependency 'TTLockOnPremise', '2.2.0'
   s.static_framework = true
+  s.swift_version = '5.0'
 
 
   # Flutter.framework does not contain a i386 slice. Only x86_64 simulators are supported.

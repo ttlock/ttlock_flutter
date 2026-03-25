@@ -627,6 +627,8 @@ enum TTGatewayError {
     timeOut,
     noSimCard,
     noCable,
+    wrongCRC,
+    wrongAesKey,
     failedConfigureRouter,
     failedConfigureServer,
     failedConfigureAccount,
@@ -634,12 +636,16 @@ enum TTGatewayError {
     unConnected,
     connectTimeout,
     dataFormatError,
+    failedConfigAccount,
+    failedConfigIp,
+    invalidIp
 }
 
 enum TTRemoteAccessoryError {
     success,
     failed,
     noResponse,
+    wrongCRC,
     requestFailed,
     connectFailed,
     deviceIsBusy,
@@ -650,6 +656,8 @@ enum TTMultifunctionalKeypadError {
     success,
     failed,
     duplicateFingerprint,
+    noStorageSpace,
+    wrongCRC,
     noResponse,
     keypadConnectFailed,
     dataFormatError,
@@ -660,8 +668,6 @@ enum TTRemoteAccessory {
   remoteKey,
   remoteKeypad,
   doorSensor,
-  waterMeter,
-  electricMeter,
 }
 
 enum TTIpSettingType {
@@ -967,7 +973,7 @@ abstract class TTLockHostApi {
   void setHotelCardSector(String sector, String lockData);
 
   @async
-  String getLockVersion(String lockMac);
+  TTLockVersion getLockVersion(String lockMac);
   @async
   int setNBServerAddress(String ip, String port, String lockData);
 
@@ -1008,7 +1014,7 @@ abstract class TTLockHostApi {
 
   @async
   AccessoryElectricQuantityResult getRemoteAccessoryElectricQuantity(
-    int accessory,
+    TTRemoteAccessory accessory,
     String mac,
     String lockData,
   );
@@ -1052,6 +1058,7 @@ abstract class TTAccessoryHostApi {
   RemoteKeypadInitResult initRemoteKeypad(String mac, String lockMac);
   @async
   MultifunctionalKeypadInitResult initMultifunctionalKeypad(String mac, String lockData);
+  @async
   List<String> getStoredLocks(String mac);
   @async
   void deleteStoredLock(String mac, int slotNumber);

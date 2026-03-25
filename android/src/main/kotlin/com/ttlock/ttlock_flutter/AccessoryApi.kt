@@ -206,8 +206,8 @@ class AccessoryApi : TTAccessoryHostApi {
         )
     }
 
-    override fun getStoredLocks(mac: String): List<String> {
-        return emptyList()
+    override fun getStoredLocks(mac: String, callback: (Result<List<String>>) -> Unit) {
+        callback(Result.failure(FlutterError("NOT_IMPLEMENTED", "getStoredLocks is not implemented", null)))
     }
 
     override fun deleteStoredLock(

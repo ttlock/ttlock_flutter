@@ -341,13 +341,18 @@ enum class TTGatewayError(val raw: Int) {
   TIME_OUT(5),
   NO_SIM_CARD(6),
   NO_CABLE(7),
-  FAILED_CONFIGURE_ROUTER(8),
-  FAILED_CONFIGURE_SERVER(9),
-  FAILED_CONFIGURE_ACCOUNT(10),
-  COMMUNICATION_DISCONNECTED(11),
-  UN_CONNECTED(12),
-  CONNECT_TIMEOUT(13),
-  DATA_FORMAT_ERROR(14);
+  WRONG_CRC(8),
+  WRONG_AES_KEY(9),
+  FAILED_CONFIGURE_ROUTER(10),
+  FAILED_CONFIGURE_SERVER(11),
+  FAILED_CONFIGURE_ACCOUNT(12),
+  COMMUNICATION_DISCONNECTED(13),
+  UN_CONNECTED(14),
+  CONNECT_TIMEOUT(15),
+  DATA_FORMAT_ERROR(16),
+  FAILED_CONFIG_ACCOUNT(17),
+  FAILED_CONFIG_IP(18),
+  INVALID_IP(19);
 
   companion object {
     fun ofRaw(raw: Int): TTGatewayError? {
@@ -360,10 +365,11 @@ enum class TTRemoteAccessoryError(val raw: Int) {
   SUCCESS(0),
   FAILED(1),
   NO_RESPONSE(2),
-  REQUEST_FAILED(3),
-  CONNECT_FAILED(4),
-  DEVICE_IS_BUSY(5),
-  DATA_FORMAT_ERROR(6);
+  WRONG_CRC(3),
+  REQUEST_FAILED(4),
+  CONNECT_FAILED(5),
+  DEVICE_IS_BUSY(6),
+  DATA_FORMAT_ERROR(7);
 
   companion object {
     fun ofRaw(raw: Int): TTRemoteAccessoryError? {
@@ -376,9 +382,11 @@ enum class TTMultifunctionalKeypadError(val raw: Int) {
   SUCCESS(0),
   FAILED(1),
   DUPLICATE_FINGERPRINT(2),
-  NO_RESPONSE(3),
-  KEYPAD_CONNECT_FAILED(4),
-  DATA_FORMAT_ERROR(5);
+  NO_STORAGE_SPACE(3),
+  WRONG_CRC(4),
+  NO_RESPONSE(5),
+  KEYPAD_CONNECT_FAILED(6),
+  DATA_FORMAT_ERROR(7);
 
   companion object {
     fun ofRaw(raw: Int): TTMultifunctionalKeypadError? {
@@ -390,9 +398,7 @@ enum class TTMultifunctionalKeypadError(val raw: Int) {
 enum class TTRemoteAccessory(val raw: Int) {
   REMOTE_KEY(0),
   REMOTE_KEYPAD(1),
-  DOOR_SENSOR(2),
-  WATER_METER(3),
-  ELECTRIC_METER(4);
+  DOOR_SENSOR(2);
 
   companion object {
     fun ofRaw(raw: Int): TTRemoteAccessory? {
@@ -2177,7 +2183,7 @@ interface TTLockHostApi {
   fun setPowerSaverControlableLock(lockMac: String, lockData: String, callback: (Result<Unit>) -> Unit)
   fun setHotel(hotelInfo: String, buildingNumber: Long, floorNumber: Long, lockData: String, callback: (Result<Unit>) -> Unit)
   fun setHotelCardSector(sector: String, lockData: String, callback: (Result<Unit>) -> Unit)
-  fun getLockVersion(lockMac: String, callback: (Result<String>) -> Unit)
+  fun getLockVersion(lockMac: String, callback: (Result<TTLockVersion>) -> Unit)
   fun setNBServerAddress(ip: String, port: String, lockData: String, callback: (Result<Long>) -> Unit)
   fun configWifi(wifiName: String, wifiPassword: String, lockData: String, callback: (Result<Unit>) -> Unit)
   fun configServer(ip: String, port: String, lockData: String, callback: (Result<Unit>) -> Unit)
@@ -2191,7 +2197,7 @@ interface TTLockHostApi {
   fun addRemoteKey(remoteKeyMac: String, cycleList: List<TTCycleModel>?, startDate: Long, endDate: Long, lockData: String, callback: (Result<Unit>) -> Unit)
   fun deleteRemoteKey(remoteKeyMac: String, lockData: String, callback: (Result<Unit>) -> Unit)
   fun clearRemoteKey(lockData: String, callback: (Result<Unit>) -> Unit)
-  fun getRemoteAccessoryElectricQuantity(accessory: Long, mac: String, lockData: String, callback: (Result<AccessoryElectricQuantityResult>) -> Unit)
+  fun getRemoteAccessoryElectricQuantity(accessory: TTRemoteAccessory, mac: String, lockData: String, callback: (Result<AccessoryElectricQuantityResult>) -> Unit)
   fun addDoorSensor(doorSensorMac: String, lockData: String, callback: (Result<Unit>) -> Unit)
   fun deleteDoorSensor(lockData: String, callback: (Result<Unit>) -> Unit)
   fun setDoorSensorAlertTime(alertTime: Long, lockData: String, callback: (Result<Unit>) -> Unit)
@@ -3394,7 +3400,7 @@ interface TTLockHostApi {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val lockMacArg = args[0] as String
-            api.getLockVersion(lockMacArg) { result: Result<String> ->
+            api.getLockVersion(lockMacArg) { result: Result<TTLockVersion> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(MessagesPigeonUtils.wrapError(error))
@@ -3684,7 +3690,7 @@ interface TTLockHostApi {
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val accessoryArg = args[0] as Long
+            val accessoryArg = args[0] as TTRemoteAccessory
             val macArg = args[1] as String
             val lockDataArg = args[2] as String
             api.getRemoteAccessoryElectricQuantity(accessoryArg, macArg, lockDataArg) { result: Result<AccessoryElectricQuantityResult> ->
@@ -3946,7 +3952,7 @@ interface TTAccessoryHostApi {
   fun initRemoteKey(mac: String, lockData: String, callback: (Result<TTLockSystemModel>) -> Unit)
   fun initRemoteKeypad(mac: String, lockMac: String, callback: (Result<RemoteKeypadInitResult>) -> Unit)
   fun initMultifunctionalKeypad(mac: String, lockData: String, callback: (Result<MultifunctionalKeypadInitResult>) -> Unit)
-  fun getStoredLocks(mac: String): List<String>
+  fun getStoredLocks(mac: String, callback: (Result<List<String>>) -> Unit)
   fun deleteStoredLock(mac: String, slotNumber: Long, callback: (Result<Unit>) -> Unit)
   fun initDoorSensor(mac: String, lockData: String, callback: (Result<TTLockSystemModel>) -> Unit)
   fun standaloneDoorSensorInit(mac: String, info: Map<String, Any?>, callback: (Result<TTStandaloneDoorSensorInfo>) -> Unit)
@@ -4082,12 +4088,15 @@ interface TTAccessoryHostApi {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val macArg = args[0] as String
-            val wrapped: List<Any?> = try {
-              listOf(api.getStoredLocks(macArg))
-            } catch (exception: Throwable) {
-              MessagesPigeonUtils.wrapError(exception)
+            api.getStoredLocks(macArg) { result: Result<List<String>> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(MessagesPigeonUtils.wrapResult(data))
+              }
             }
-            reply.reply(wrapped)
           }
         } else {
           channel.setMessageHandler(null)

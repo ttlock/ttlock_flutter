@@ -22,8 +22,7 @@ export 'package:ttlock_premise_flutter/src/tt_lock_api.dart';
 export 'package:ttlock_premise_flutter/src/tt_remote_key_api.dart';
 export 'package:ttlock_premise_flutter/src/tt_remote_keypad_api.dart';
 export 'package:ttlock_premise_flutter/src/tt_water_meter_api.dart';
-
-export 'package:ttlock_premise_flutter/pigeon/messages.g.dart';
+export 'package:ttlock_premise_flutter/pigeon/messages.g.dart' hide TTLockHostApi, TTAccessoryHostApi, TTGatewayHostApi;
 
 export 'package:ttlock_premise_flutter/errors/errors.dart';
 

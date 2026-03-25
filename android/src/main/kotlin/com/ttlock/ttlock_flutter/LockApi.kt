@@ -111,11 +111,7 @@ class LockApi: TTLockHostApi {
                 }
 
                 override fun onFail(lockError: LockError) {
-                    callback.invoke(Result.failure(FlutterError(
-                        lockError.errorCode ?: "",
-                        lockError.errorMsg,
-                        lockError.description
-                    )))
+                    callback.invoke(Result.failure(lockErrorToFlutterError(lockError)))
                 }
             })
 
@@ -1087,10 +1083,17 @@ class LockApi: TTLockHostApi {
         })
     }
 
-    override fun getLockVersion(lockMac: String, callback: (Result<String>) -> Unit) {
+    override fun getLockVersion(lockMac: String, callback: (Result<TTLockVersion>) -> Unit) {
         TTLockClient.getDefault().getLockVersion(lockMac, object : GetLockVersionCallback {
             override fun onGetLockVersionSuccess(lockVersion: String) {
-                callback.invoke(Result.success(lockVersion))
+                val lockVersionModel = gson.fromJson(lockVersion, LockVersion::class.java)
+                callback.invoke(Result.success(TTLockVersion(
+                    protocolType = lockVersionModel.protocolType.toLong(),
+                    protocolVersion = lockVersionModel.protocolVersion.toLong(),
+                    scene = lockVersionModel.scene.toLong(),
+                    groupId = lockVersionModel.groupId.toLong(),
+                    orgId = lockVersionModel.orgId.toLong()
+                )))
             }
 
             override fun onFail(lockError: LockError) {
@@ -1342,18 +1345,13 @@ class LockApi: TTLockHostApi {
     }
 
     override fun getRemoteAccessoryElectricQuantity(
-        accessory: Long,
+        accessory: TTRemoteAccessory,
         mac: String,
         lockData: String,
         callback: (Result<AccessoryElectricQuantityResult>) -> Unit
     ) {
         val accessoryInfo = AccessoryInfo()
-        val accessoryType = when (accessory) {
-            0L -> AccessoryType.REMOTE
-            1L -> AccessoryType.WIRELESS_KEYPAD
-            2L -> AccessoryType.DOOR_SENSOR
-            else -> AccessoryType.REMOTE
-        }
+        val accessoryType = accessaryTypeConvert(accessory)
         accessoryInfo.accessoryType = accessoryType
         accessoryInfo.accessoryMac = mac
 

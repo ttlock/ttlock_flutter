@@ -343,7 +343,7 @@ class TTLockApi {
   Future<void> setHotelCardSector(String sector, String lockData) =>
       runLockApi(() => _host.setHotelCardSector(sector, lockData));
 
-  Future<String> getLockVersion(String lockMac) =>
+  Future<pigeon.TTLockVersion> getLockVersion(String lockMac) =>
       runLockApi(() => _host.getLockVersion(lockMac));
 
   Future<int> setNBServerAddress(String ip, String port, String lockData) =>
@@ -416,7 +416,7 @@ class TTLockApi {
       runLockApi(() => _host.clearRemoteKey(lockData));
 
   Future<pigeon.AccessoryElectricQuantityResult> getRemoteAccessoryElectricQuantity(
-    int accessory,
+    pigeon.TTRemoteAccessory accessory,
     String mac,
     String lockData,
   ) =>

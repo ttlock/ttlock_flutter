@@ -1,5 +1,7 @@
 PODS:
   - Flutter (1.0.0)
+  - permission_handler_apple (9.3.0):
+    - Flutter
   - ttlock_premise_flutter (0.0.1):
     - Flutter
     - TTLockOnPremise (= 2.2.0)
@@ -7,6 +9,7 @@ PODS:
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
+  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - ttlock_premise_flutter (from `.symlinks/plugins/ttlock_premise_flutter/ios`)
 
 SPEC REPOS:
@@ -16,12 +19,15 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
+  permission_handler_apple:
+    :path: ".symlinks/plugins/permission_handler_apple/ios"
   ttlock_premise_flutter:
     :path: ".symlinks/plugins/ttlock_premise_flutter/ios"
 
 SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  ttlock_premise_flutter: f26a99835de17cb22bcd0469c0ffc68709f7eae9
+  permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
+  ttlock_premise_flutter: 7c38c4e5ddf56d69a2c7a551c67e97988ec997e0
   TTLockOnPremise: 818fb233b9f09bec94a8b9dc47f6bf5194a9b09b
 
 PODFILE CHECKSUM: cf0c950f7e9a456b4e325f5b8fc0f98906a3705a

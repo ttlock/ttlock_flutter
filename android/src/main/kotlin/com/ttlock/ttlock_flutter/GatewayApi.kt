@@ -117,7 +117,7 @@ class GatewayApi : TTGatewayHostApi {
                 callback(Result.success(Unit))
             }
 
-            override fun onFail(error: com.ttlock.bl.sdk.gateway.model.GatewayError) {
+            override fun onFail(error: GatewayError) {
                 callback(Result.failure(gatewayErrorToFlutterError(error)))
             }
         })

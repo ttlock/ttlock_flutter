@@ -7,6 +7,7 @@ import com.ttlock.bl.sdk.constant.KeyboardPwdType
 import com.ttlock.bl.sdk.constant.LockDataSwitchValue
 import com.ttlock.bl.sdk.constant.LockStatus
 import com.ttlock.bl.sdk.electricmeter.model.ElectricMeterError
+import com.ttlock.bl.sdk.entity.AccessoryType
 import com.ttlock.bl.sdk.entity.LockError
 import com.ttlock.bl.sdk.entity.OperateLogType
 import com.ttlock.bl.sdk.entity.PassageModeType
@@ -202,6 +203,14 @@ fun operateLogTypeConvert(type: TTOperateRecordType): OperateLogType {
     return when(type) {
         TTOperateRecordType.LATEST -> OperateLogType.NEW
         TTOperateRecordType.TOTAL -> OperateLogType.ALL
+    }
+}
+
+fun accessaryTypeConvert(type: TTRemoteAccessory): AccessoryType{
+    return  when (type) {
+        TTRemoteAccessory.REMOTE_KEY -> AccessoryType.REMOTE
+        TTRemoteAccessory.REMOTE_KEYPAD -> AccessoryType.WIRELESS_KEYPAD
+        TTRemoteAccessory.DOOR_SENSOR -> AccessoryType.DOOR_SENSOR
     }
 }
 

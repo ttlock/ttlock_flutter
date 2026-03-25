@@ -295,40 +295,46 @@ enum TTGatewayError: Int {
   case timeOut = 5
   case noSimCard = 6
   case noCable = 7
-  case failedConfigureRouter = 8
-  case failedConfigureServer = 9
-  case failedConfigureAccount = 10
-  case communicationDisconnected = 11
-  case unConnected = 12
-  case connectTimeout = 13
-  case dataFormatError = 14
+  case wrongCRC = 8
+  case wrongAesKey = 9
+  case failedConfigureRouter = 10
+  case failedConfigureServer = 11
+  case failedConfigureAccount = 12
+  case communicationDisconnected = 13
+  case unConnected = 14
+  case connectTimeout = 15
+  case dataFormatError = 16
+  case failedConfigAccount = 17
+  case failedConfigIp = 18
+  case invalidIp = 19
 }
 
 enum TTRemoteAccessoryError: Int {
   case success = 0
   case failed = 1
   case noResponse = 2
-  case requestFailed = 3
-  case connectFailed = 4
-  case deviceIsBusy = 5
-  case dataFormatError = 6
+  case wrongCRC = 3
+  case requestFailed = 4
+  case connectFailed = 5
+  case deviceIsBusy = 6
+  case dataFormatError = 7
 }
 
 enum TTMultifunctionalKeypadError: Int {
   case success = 0
   case failed = 1
   case duplicateFingerprint = 2
-  case noResponse = 3
-  case keypadConnectFailed = 4
-  case dataFormatError = 5
+  case noStorageSpace = 3
+  case wrongCRC = 4
+  case noResponse = 5
+  case keypadConnectFailed = 6
+  case dataFormatError = 7
 }
 
 enum TTRemoteAccessory: Int {
   case remoteKey = 0
   case remoteKeypad = 1
   case doorSensor = 2
-  case waterMeter = 3
-  case electricMeter = 4
 }
 
 enum TTIpSettingType: Int {
@@ -2000,7 +2006,7 @@ protocol TTLockHostApi {
   func setPowerSaverControlableLock(lockMac: String, lockData: String, completion: @escaping (Result<Void, Error>) -> Void)
   func setHotel(hotelInfo: String, buildingNumber: Int64, floorNumber: Int64, lockData: String, completion: @escaping (Result<Void, Error>) -> Void)
   func setHotelCardSector(sector: String, lockData: String, completion: @escaping (Result<Void, Error>) -> Void)
-  func getLockVersion(lockMac: String, completion: @escaping (Result<String, Error>) -> Void)
+  func getLockVersion(lockMac: String, completion: @escaping (Result<TTLockVersion, Error>) -> Void)
   func setNBServerAddress(ip: String, port: String, lockData: String, completion: @escaping (Result<Int64, Error>) -> Void)
   func configWifi(wifiName: String, wifiPassword: String, lockData: String, completion: @escaping (Result<Void, Error>) -> Void)
   func configServer(ip: String, port: String, lockData: String, completion: @escaping (Result<Void, Error>) -> Void)
@@ -2014,7 +2020,7 @@ protocol TTLockHostApi {
   func addRemoteKey(remoteKeyMac: String, cycleList: [TTCycleModel]?, startDate: Int64, endDate: Int64, lockData: String, completion: @escaping (Result<Void, Error>) -> Void)
   func deleteRemoteKey(remoteKeyMac: String, lockData: String, completion: @escaping (Result<Void, Error>) -> Void)
   func clearRemoteKey(lockData: String, completion: @escaping (Result<Void, Error>) -> Void)
-  func getRemoteAccessoryElectricQuantity(accessory: Int64, mac: String, lockData: String, completion: @escaping (Result<AccessoryElectricQuantityResult, Error>) -> Void)
+  func getRemoteAccessoryElectricQuantity(accessory: TTRemoteAccessory, mac: String, lockData: String, completion: @escaping (Result<AccessoryElectricQuantityResult, Error>) -> Void)
   func addDoorSensor(doorSensorMac: String, lockData: String, completion: @escaping (Result<Void, Error>) -> Void)
   func deleteDoorSensor(lockData: String, completion: @escaping (Result<Void, Error>) -> Void)
   func setDoorSensorAlertTime(alertTime: Int64, lockData: String, completion: @escaping (Result<Void, Error>) -> Void)
@@ -3331,7 +3337,7 @@ class TTLockHostApiSetup {
     if let api = api {
       getRemoteAccessoryElectricQuantityChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
-        let accessoryArg = args[0] as! Int64
+        let accessoryArg = args[0] as! TTRemoteAccessory
         let macArg = args[1] as! String
         let lockDataArg = args[2] as! String
         api.getRemoteAccessoryElectricQuantity(accessory: accessoryArg, mac: macArg, lockData: lockDataArg) { result in
@@ -3407,7 +3413,7 @@ protocol TTGatewayHostApi {
   func setEventGatewayMac(mac: String) throws
   func connect(mac: String, completion: @escaping (Result<TTGatewayConnectStatus, Error>) -> Void)
   func disconnect(mac: String) throws
-  func init(params: TTGatewayInitParams, completion: @escaping (Result<GatewayDeviceInfo, Error>) -> Void)
+  func `init`(params: TTGatewayInitParams, completion: @escaping (Result<GatewayDeviceInfo, Error>) -> Void)
   func configIp(mac: String, ipSetting: TTIpSetting, completion: @escaping (Result<Void, Error>) -> Void)
   func configApn(mac: String, apn: String, completion: @escaping (Result<Void, Error>) -> Void)
   func getNetworkMac(completion: @escaping (Result<String?, Error>) -> Void)
@@ -3473,7 +3479,7 @@ class TTGatewayHostApiSetup {
       initChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let paramsArg = args[0] as! TTGatewayInitParams
-        api.init(params: paramsArg) { result in
+        api.`init`(params: paramsArg) { result in
           switch result {
           case .success(let res):
             reply(wrapResult(res))
@@ -3560,7 +3566,7 @@ protocol TTAccessoryHostApi {
   func initRemoteKey(mac: String, lockData: String, completion: @escaping (Result<TTLockSystemModel, Error>) -> Void)
   func initRemoteKeypad(mac: String, lockMac: String, completion: @escaping (Result<RemoteKeypadInitResult, Error>) -> Void)
   func initMultifunctionalKeypad(mac: String, lockData: String, completion: @escaping (Result<MultifunctionalKeypadInitResult, Error>) -> Void)
-  func getStoredLocks(mac: String) throws -> [String]
+  func getStoredLocks(mac: String, completion: @escaping (Result<[String], Error>) -> Void)
   func deleteStoredLock(mac: String, slotNumber: Int64, completion: @escaping (Result<Void, Error>) -> Void)
   func initDoorSensor(mac: String, lockData: String, completion: @escaping (Result<TTLockSystemModel, Error>) -> Void)
   func standaloneDoorSensorInit(mac: String, info: [String: Any?], completion: @escaping (Result<TTStandaloneDoorSensorInfo, Error>) -> Void)
@@ -3682,11 +3688,13 @@ class TTAccessoryHostApiSetup {
       getStoredLocksChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let macArg = args[0] as! String
-        do {
-          let result = try api.getStoredLocks(mac: macArg)
-          reply(wrapResult(result))
-        } catch {
-          reply(wrapError(error))
+        api.getStoredLocks(mac: macArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
         }
       }
     } else {
