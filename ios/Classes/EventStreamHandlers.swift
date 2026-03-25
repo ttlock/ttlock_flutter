@@ -90,7 +90,7 @@ final class LockScanLockStreamHandlerImpl: LockScanLockStreamHandler {
 }
 
 final class LockScanWifiStreamHandlerImpl: LockScanWifiStreamHandler {
-  override func onListen(withArguments arguments: Any?, sink: PigeonEventSink<[TTWifiScanEntry]>) {
+  override func onListen(withArguments arguments: Any?, sink: PigeonEventSink<TTWifiScanResult>) {
     guard let lockData = streamContext.lockData, !lockData.isEmpty else {
       sink.error(
         code: "NO_LOCK_DATA",

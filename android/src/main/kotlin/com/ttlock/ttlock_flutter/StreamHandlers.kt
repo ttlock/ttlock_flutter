@@ -98,7 +98,7 @@ class ScanLockWifiImpl : LockScanWifiStreamHandler {
 
     override fun onListen(
         p0: Any?,
-        sink: PigeonEventSink<List<TTWifiScanEntry>>
+        sink: PigeonEventSink<TTWifiScanResult>
     ) {
         super.onListen(p0, sink)
         val lockData = LockStreamParams.lockData
