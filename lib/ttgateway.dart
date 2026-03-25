@@ -1,4 +1,5 @@
-import 'package:ttlock_premise_flutter/pigeon/messages.g.dart';
+import 'dart:async';
+
 import 'package:ttlock_premise_flutter/ttlock.dart' as new_ttlock;
 import 'package:ttlock_premise_flutter/ttlock_classic.dart';
 import 'package:ttlock_premise_flutter/errors/tt_gateway_exception.dart';
@@ -25,25 +26,31 @@ class TTGateway {
   @Deprecated('Replaced by Pigeon TTGatewayHostApi channel names')
   static const String COMMAND_CONFIG_APN = 'gatewayConfigApn';
 
-  @Deprecated('Use TTLock.gateway.startScan() and listen to the stream instead.')
+  static StreamSubscription<TTGatewayScanModel>? _scanSub;
+  
+  @Deprecated('Use TTLock.gateway.gatewayStartScan() and listen to the stream instead.')
   static void startScan(TTGatewayScanCallback scanCallback) {
-    new_ttlock.TTLock.gateway.startScan().listen(scanCallback);
+    _scanSub?.cancel();
+    _scanSub = new_ttlock.TTLock.gateway.gatewayStartScan().listen(scanCallback);
   }
 
-  @Deprecated('Use TTLock.gateway.stopScan() instead.')
+  @Deprecated('Cancel the subscription from gatewayStartScan().')
   static void stopScan() {
-    new_ttlock.TTLock.gateway.stopScan();
+    _scanSub?.cancel();
+    _scanSub = null;
   }
 
   @Deprecated('Use TTLock.gateway.connect(mac) instead.')
   static void connect(String mac, TTGatewayConnectCallback callback) {
     new_ttlock.TTLock.gateway.connect(mac).then(callback).catchError((_, __) {
-      callback(TTGatewayConnectStatus.faile);
+      callback(TTGatewayConnectStatus.failed);
     });
   }
 
-  @Deprecated('Use TTLock.gateway.getNearbyWifi() and listen to the stream instead.')
+  /// [gatewayMac] 当前已连接网关 MAC，用于 [TTGatewayApi.gatewayGetNearbyWifi]。
+  @Deprecated('Use TTLock.gateway.gatewayGetNearbyWifi(gatewayMac: ...) and listen to the stream instead.')
   static void getNearbyWifi(
+    String gatewayMac,
     TTGatewayGetAroundWifiCallback callback,
     TTGatewayFailedCallback failedCallback,
   ) {
@@ -72,7 +79,7 @@ class TTGateway {
       return item?.toString() ?? '';
     }
 
-    new_ttlock.TTLock.gateway.getNearbyWifi().listen(
+    new_ttlock.TTLock.gateway.gatewayGetNearbyWifi(gatewayMac: gatewayMac).listen(
       (wifiList) {
         for (final item in wifiList) {
           final key = wifiKey(item);
@@ -85,13 +92,20 @@ class TTGateway {
       onDone: () => callback(true, allWifiList),
       onError: (e, _) {
         if (e is TTGatewayException) {
-          failedCallback(e.error, e.message);
+          failedCallback(e.code, e.message ?? '');
         } else {
-          failedCallback(TTGatewayError.fail, e.toString());
+          failedCallback(TTGatewayError.failed, e.toString());
         }
       },
     );
   }
+
+  static Map _gatewayDeviceInfoToMap(GatewayDeviceInfo m) => <String, Object?>{
+        'modelNum': m.modelNum,
+        'hardwareRevision': m.hardwareRevision,
+        'firmwareRevision': m.firmwareRevision,
+        'networkMac': m.networkMac,
+      };
 
   @Deprecated('Use TTLock.gateway.init(TTGatewayInitParams(...)) instead.')
   static void init(
@@ -117,17 +131,17 @@ class TTGateway {
       companyId: map['companyId'] as int?,
       branchId: map['branchId'] as int?,
     );
-    new_ttlock.TTLock.gateway.init(params).then((m) => callback(m)).catchError((e, _) {
+    new_ttlock.TTLock.gateway.init(params).then((m) => callback(_gatewayDeviceInfoToMap(m))).catchError((e, _) {
       if (e is TTGatewayException) {
-        failedCallback(e.error, e.message);
+        failedCallback(e.code, e.message ?? '');
       } else {
-        failedCallback(TTGatewayError.fail, e.toString());
+        failedCallback(TTGatewayError.failed, e.toString());
       }
     });
   }
 
   /// [map] {"type":x, "ipAddress": "xxx", "subnetMask": "xxx", "router": "xxx", "preferredDns": "xxx", "alternateDns": "xxx"}
-  @Deprecated('Use TTLock.gateway.configIp(mac: ..., ipSetting: TTIpSetting(...)) instead.')
+  @Deprecated('Use TTLock.gateway.configIp(mac, TTIpSetting(...)) instead.')
   static void configIp(
     String mac,
     Map map,
@@ -144,25 +158,25 @@ class TTGateway {
     );
     new_ttlock.TTLock.gateway.configIp(mac, ipSetting).then((_) => callback()).catchError((e, _) {
       if (e is TTGatewayException) {
-        failedCallback(e.error, e.message);
+        failedCallback(e.code, e.message ?? '');
       } else {
-        failedCallback(TTGatewayError.fail, e.toString());
+        failedCallback(TTGatewayError.failed, e.toString());
       }
     });
   }
 
-  @Deprecated('Use TTLock.gateway.configApn(mac: mac, apn: apn) instead.')
+  @Deprecated('Use TTLock.gateway.configApn(mac, apn) instead.')
   static void configApn(
     String mac,
     String apn,
     TTSuccessCallback callback,
     TTGatewayFailedCallback failedCallback,
   ) {
-    new_ttlock.TTLock.gateway.configApn(mac: mac, apn: apn).then((_) => callback()).catchError((e, _) {
+    new_ttlock.TTLock.gateway.configApn(mac, apn).then((_) => callback()).catchError((e, _) {
       if (e is TTGatewayException) {
-        failedCallback(e.error, e.message);
+        failedCallback(e.code, e.message ?? '');
       } else {
-        failedCallback(TTGatewayError.fail, e.toString());
+        failedCallback(TTGatewayError.failed, e.toString());
       }
     });
   }
@@ -175,9 +189,9 @@ class TTGateway {
   ) {
     new_ttlock.TTLock.gateway.enterUpgradeMode(mac).then((_) => callback()).catchError((e, _) {
       if (e is TTGatewayException) {
-        failedCallback(e.error, e.message);
+        failedCallback(e.code, e.message ?? '');
       } else {
-        failedCallback(TTGatewayError.fail, e.toString());
+        failedCallback(TTGatewayError.failed, e.toString());
       }
     });
   }

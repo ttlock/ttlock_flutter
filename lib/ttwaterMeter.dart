@@ -1,19 +1,19 @@
+import 'dart:async';
+
 import 'package:ttlock_premise_flutter/ttlock.dart' as new_ttlock;
 import 'package:ttlock_premise_flutter/ttlock_classic.dart';
-import 'package:ttlock_premise_flutter/errors/tt_accessory_exception.dart';
-import 'package:ttlock_premise_flutter/pigeon/messages.g.dart';
-
-@Deprecated('Use Stream<TTWaterMeterScanModel> from TTLock.accessory.startScanWaterMeter().')
+import 'package:ttlock_premise_flutter/errors/tt_remote_accessory_exception.dart';
+@Deprecated('Use Stream<TTMeterScanModel> from TTLock.waterMeter.accessoryWaterMeterStartScan().')
 typedef TTWaterMeterScanCallback = void Function(TTMeterScanModel scanModel);
 
-@Deprecated('Use Future<TTWaterMeterInitResult> from TTLock.accessory.waterMeterInit(...).')
+@Deprecated('Use Future<TTWaterMeterInitResult> from TTLock.waterMeter.waterMeterInit(...).')
 typedef TTWaterMeterInitCallback = void Function(TTWaterMeterInitResult initResult);
 
-@Deprecated('Use Future<Map<String, Object?>> from TTLock.accessory.waterMeterGetDeviceInfo(waterMeterId).')
+@Deprecated('Use Future<Map<String, Object?>> from TTLock.waterMeter.waterMeterGetDeviceInfo(waterMeterId).')
 typedef TTWaterDeviceInfoCallback = void Function(Map<String, Object?> deviceInfo);
 
-/// Legacy water meter API. Prefer [new_ttlock.TTLock.accessory] instead.
-@Deprecated('Use TTLock.accessory.*waterMeter* APIs instead.')
+/// Legacy water meter API. Prefer [new_ttlock.TTLock.waterMeter] instead.
+@Deprecated('Use TTLock.waterMeter.* APIs instead.')
 class TTWaterMeter {
   @Deprecated('Use TTCommands from package:ttlock_premise_flutter/src/constants/commands.dart')
   static const String COMMAND_CONFIG_SERVER = 'waterMeterConfigServer';
@@ -22,146 +22,155 @@ class TTWaterMeter {
   @Deprecated('Use TTCommands from package:ttlock_premise_flutter/src/constants/commands.dart')
   static const String COMMAND_STOP_SCAN = 'waterMeterStopScan';
 
-  @Deprecated('Use TTLock.accessory.waterMeterConfigServer(...) instead.')
+  static StreamSubscription<TTMeterScanModel>? _scanSub;
+
+  @Deprecated('Use TTLock.waterMeter.waterMeterConfigServer(...) instead.')
   static void configServer({
     required String url,
     required String clientId,
     required String accessToken,
   }) {
-    new_ttlock.TTLock.accessory.waterMeterConfigServer(
-      url: url,
-      clientId: clientId,
-      accessToken: accessToken,
+    new_ttlock.TTLock.waterMeter.waterMeterConfigServer(
+      url,
+      clientId,
+      accessToken,
     );
   }
 
-  @Deprecated('Use TTLock.accessory.startScanWaterMeter() and listen to the stream instead.')
+  @Deprecated('Use TTLock.waterMeter.accessoryWaterMeterStartScan() and listen to the stream instead.')
   static void startScan(TTWaterMeterScanCallback scanCallback) {
-    new_ttlock.TTLock.accessory.waterMeterStartScan().listen(scanCallback);
+    _scanSub?.cancel();
+    _scanSub = new_ttlock.TTLock.waterMeter.accessoryWaterMeterStartScan().listen(scanCallback);
   }
 
-  @Deprecated('Use TTLock.accessory.stopScanWaterMeter() instead.')
+  @Deprecated('Cancel the subscription from accessoryWaterMeterStartScan().')
   static void stopScan() {
-    new_ttlock.TTLock.accessory.waterMeterStopScan();
+    _scanSub?.cancel();
+    _scanSub = null;
   }
 
   static void _fail(Object e, TTRemoteFailedCallback failedCallback) {
-    if (e is TTAccessoryException) {
-      final error = e.code >= 0 && e.code < TTRemoteAccessoryError.values.length
-          ? TTRemoteAccessoryError.values[e.code]
-          : TTRemoteAccessoryError.fail;
-      failedCallback(error, e.message);
+    if (e is TTRemoteAccessoryException) {
+      failedCallback(e.code, e.message ?? '');
       return;
     }
-    failedCallback(TTRemoteAccessoryError.fail, e.toString());
+    failedCallback(TTRemoteAccessoryError.failed, e.toString());
   }
 
-  @Deprecated('Use TTLock.accessory.waterMeterConnect(mac) instead.')
+  @Deprecated('Use TTLock.waterMeter.waterMeterConnect(mac) instead.')
   static void connect(String mac, TTSuccessCallback callback, TTRemoteFailedCallback failedCallback) {
-    new_ttlock.TTLock.accessory.waterMeterConnect(mac).then((_) => callback()).catchError((e, _) => _fail(e, failedCallback));
+    new_ttlock.TTLock.waterMeter.waterMeterConnect(mac).then((_) => callback()).catchError((e, _) => _fail(e, failedCallback));
   }
 
-  @Deprecated('Use TTLock.accessory.waterMeterDisconnect(mac) instead.')
+  @Deprecated('Use TTLock.waterMeter.waterMeterDisconnect(mac) instead.')
   static void disconnect(String mac) {
-    new_ttlock.TTLock.accessory.waterMeterDisconnect(mac);
+    new_ttlock.TTLock.waterMeter.waterMeterDisconnect(mac);
   }
 
-  @Deprecated('Use TTLock.accessory.waterMeterInit(...) instead.')
+  @Deprecated('Use TTLock.waterMeter.waterMeterInit(...) instead.')
   static void init(Map<String, dynamic> info, TTWaterMeterInitCallback callback, TTRemoteFailedCallback failedCallback) {
-    new_ttlock.TTLock.accessory.waterMeterInit(info).then(callback).catchError((e, _) => _fail(e, failedCallback));
+    new_ttlock.TTLock.waterMeter.waterMeterInit(Map<String, Object?>.from(info)).then(callback).catchError((e, _) => _fail(e, failedCallback));
   }
 
-  @Deprecated('Use TTLock.accessory.waterMeterDelete(waterMeterId) instead.')
+  @Deprecated('Use TTLock.waterMeter.waterMeterDelete(waterMeterId) instead.')
   static void delete(String waterMeterId, TTSuccessCallback callback, TTRemoteFailedCallback failedCallback) {
-    new_ttlock.TTLock.accessory.waterMeterDelete(waterMeterId).then((_) => callback()).catchError((e, _) => _fail(e, failedCallback));
+    new_ttlock.TTLock.waterMeter.waterMeterDelete(waterMeterId).then((_) => callback()).catchError((e, _) => _fail(e, failedCallback));
   }
 
-  @Deprecated('Use TTLock.accessory.waterMeterSetPowerOnOff(...) instead.')
+  @Deprecated('Use TTLock.waterMeter.waterMeterSetPowerOnOff(...) instead.')
   static void setPowerOnOff(String waterMeterId, bool isOn, TTSuccessCallback callback, TTRemoteFailedCallback failedCallback) {
-    new_ttlock.TTLock.accessory
-        .waterMeterSetPowerOnOff(waterMeterId: waterMeterId, isOn: isOn)
+    new_ttlock.TTLock.waterMeter
+        .waterMeterSetPowerOnOff(waterMeterId, isOn)
         .then((_) => callback())
         .catchError((e, _) => _fail(e, failedCallback));
   }
 
-  @Deprecated('Use TTLock.accessory.waterMeterSetRemainderM3(...) instead.')
+  @Deprecated('Use TTLock.waterMeter.waterMeterSetRemainderM3(...) instead.')
   static void setRemainderM3(String waterMeterId, num remainderM3, TTSuccessCallback callback, TTRemoteFailedCallback failedCallback) {
-    new_ttlock.TTLock.accessory
-        .waterMeterSetRemainderM3(waterMeterId: waterMeterId, remainderM3: remainderM3)
+    new_ttlock.TTLock.waterMeter
+        .waterMeterSetRemainderM3(waterMeterId, remainderM3.toDouble())
         .then((_) => callback())
         .catchError((e, _) => _fail(e, failedCallback));
   }
 
-  @Deprecated('Use TTLock.accessory.waterMeterClearRemainderM3(...) instead.')
+  @Deprecated('Use TTLock.waterMeter.waterMeterClearRemainderM3(...) instead.')
   static void clearRemainderM3(String waterMeterId, TTSuccessCallback callback, TTRemoteFailedCallback failedCallback) {
-    new_ttlock.TTLock.accessory
-        .waterMeterClearRemainderM3(waterMeterId: waterMeterId)
+    new_ttlock.TTLock.waterMeter
+        .waterMeterClearRemainderM3(waterMeterId)
         .then((_) => callback())
         .catchError((e, _) => _fail(e, failedCallback));
   }
 
-  @Deprecated('Use TTLock.accessory.waterMeterReadData(...) instead.')
+  @Deprecated('Use TTLock.waterMeter.waterMeterReadData(...) instead.')
   static void readData(String waterMeterId, TTSuccessCallback callback, TTRemoteFailedCallback failedCallback) {
-    new_ttlock.TTLock.accessory
-        .waterMeterReadData(waterMeterId: waterMeterId)
+    new_ttlock.TTLock.waterMeter
+        .waterMeterReadData(waterMeterId)
         .then((_) => callback())
         .catchError((e, _) => _fail(e, failedCallback));
   }
 
-  @Deprecated('Use TTLock.accessory.waterMeterSetPayMode(...) instead.')
+  @Deprecated('Use TTLock.waterMeter.waterMeterSetPayMode(...) instead.')
   static void setPayMode(String waterMeterId, int payMode, TTSuccessCallback callback, TTRemoteFailedCallback failedCallback) {
-    new_ttlock.TTLock.accessory
-        .waterMeterSetPayMode(waterMeterId: waterMeterId, payMode: payMode)
+    new_ttlock.TTLock.waterMeter
+        .waterMeterSetPayMode(waterMeterId, payMode)
         .then((_) => callback())
         .catchError((e, _) => _fail(e, failedCallback));
   }
 
-  @Deprecated('Use TTLock.accessory.waterMeterCharge(...) instead.')
+  @Deprecated('Use TTLock.waterMeter.waterMeterCharge(...) instead.')
   static void charge(String waterMeterId, num amount, TTSuccessCallback callback, TTRemoteFailedCallback failedCallback) {
-    new_ttlock.TTLock.accessory
-        .waterMeterCharge(waterMeterId: waterMeterId, amount: amount)
+    new_ttlock.TTLock.waterMeter
+        .waterMeterCharge(waterMeterId, amount.toDouble())
         .then((_) => callback())
         .catchError((e, _) => _fail(e, failedCallback));
   }
 
-  @Deprecated('Use TTLock.accessory.waterMeterSetTotalUsage(...) instead.')
+  @Deprecated('Use TTLock.waterMeter.waterMeterSetTotalUsage(...) instead.')
   static void setTotalUsage(String waterMeterId, num totalM3, TTSuccessCallback callback, TTRemoteFailedCallback failedCallback) {
-    new_ttlock.TTLock.accessory
-        .waterMeterSetTotalUsage(waterMeterId: waterMeterId, totalM3: totalM3)
+    new_ttlock.TTLock.waterMeter
+        .waterMeterSetTotalUsage(waterMeterId, totalM3.toDouble())
         .then((_) => callback())
         .catchError((e, _) => _fail(e, failedCallback));
   }
 
-  @Deprecated('Use TTLock.accessory.waterMeterGetDeviceInfo(waterMeterId) instead.')
+  @Deprecated('Use TTLock.waterMeter.waterMeterGetDeviceInfo(waterMeterId) instead.')
   static void getDeviceInfo(String waterMeterId, TTWaterDeviceInfoCallback callback, TTRemoteFailedCallback failedCallback) {
-    new_ttlock.TTLock.accessory
+    new_ttlock.TTLock.waterMeter
         .waterMeterGetDeviceInfo(waterMeterId)
-        .then(callback)
-        .catchError((e, _) => _fail(e, failedCallback));
+        .then((info) {
+      callback(<String, Object?>{
+        'catOneCardNumber': info.catOneCardNumber,
+        'catOneImsi': info.catOneImsi,
+        'catOneNodeId': info.catOneNodeId,
+        'catOneOperator': info.catOneOperator,
+        'catOneRssi': info.catOneRssi,
+      });
+    }).catchError((e, _) {
+      _fail(e, failedCallback);
+    });
   }
 
-  @Deprecated('Use TTLock.accessory.waterMeterConfigApn(...) instead.')
+  @Deprecated('Use TTLock.waterMeter.waterMeterConfigApn(...) instead.')
   static void configApn(String apn, TTSuccessCallback callback, TTRemoteFailedCallback failedCallback) {
-    new_ttlock.TTLock.accessory
-        .waterMeterConfigApn(apn: apn)
+    new_ttlock.TTLock.waterMeter
+        .waterMeterConfigApn(apn)
         .then((_) => callback())
         .catchError((e, _) => _fail(e, failedCallback));
   }
 
-  @Deprecated('Use TTLock.accessory.waterMeterConfigMeterServer(...) instead.')
+  @Deprecated('Use TTLock.waterMeter.waterMeterConfigMeterServer(...) instead.')
   static void configMeterServer(String ip, String port, TTSuccessCallback callback, TTRemoteFailedCallback failedCallback) {
-    new_ttlock.TTLock.accessory
-        .waterMeterConfigMeterServer(ip: ip, port: port)
+    new_ttlock.TTLock.waterMeter
+        .waterMeterConfigMeterServer(ip, port)
         .then((_) => callback())
         .catchError((e, _) => _fail(e, failedCallback));
   }
 
-  @Deprecated('Use TTLock.accessory.waterMeterReset(waterMeterId) instead.')
+  @Deprecated('Use TTLock.waterMeter.waterMeterReset(waterMeterId) instead.')
   static void reset(String waterMeterId, TTSuccessCallback callback, TTRemoteFailedCallback failedCallback) {
-    new_ttlock.TTLock.accessory
+    new_ttlock.TTLock.waterMeter
         .waterMeterReset(waterMeterId)
         .then((_) => callback())
         .catchError((e, _) => _fail(e, failedCallback));
   }
 }
-

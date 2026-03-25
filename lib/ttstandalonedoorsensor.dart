@@ -1,20 +1,21 @@
+import 'dart:async';
+
 import 'package:ttlock_premise_flutter/ttlock.dart' as new_ttlock;
 import 'package:ttlock_premise_flutter/ttlock_classic.dart';
-import 'package:ttlock_premise_flutter/errors/tt_accessory_exception.dart';
-import 'package:ttlock_premise_flutter/pigeon/messages.g.dart';
+import 'package:ttlock_premise_flutter/errors/tt_remote_accessory_exception.dart';
 import 'dart:convert';
 
-@Deprecated('Use Stream<TTStandaloneDoorSensorScanModel> from TTLock.accessory.startScanStandaloneDoorSensor().')
+@Deprecated('Use Stream<TTStandaloneDoorSensorScanModel> from TTLock.doorSensor.accessoryStandaloneDoorSensorStartScan().')
 typedef TTStandaloneDoorSensorScanCallback = void Function(TTStandaloneDoorSensorScanModel scanModel);
 
-@Deprecated('Use Future<TTStandaloneDoorSensorInfo> from TTLock.accessory.standaloneDoorSensorInit(...).')
+@Deprecated('Use Future<TTStandaloneDoorSensorInfo> from TTLock.doorSensor.standaloneDoorSensorInit(...).')
 typedef TTStandaloneDoorSensorInitCallback = void Function(TTStandaloneDoorSensorInfo info);
 
-@Deprecated('Use Future<String> from TTLock.accessory.getStandaloneDoorSensorFeatureValue(mac: ...).')
+@Deprecated('Use Future<String> from TTLock.doorSensor.standaloneDoorSensorReadFeatureValue(mac).')
 typedef TTStandaloneDoorSensorFeatureValueCallback = void Function(String featureValue);
 
-/// Legacy standalone door sensor API. Prefer [new_ttlock.TTLock.accessory] instead.
-@Deprecated('Use TTLock.accessory.*StandaloneDoorSensor* APIs instead.')
+/// Legacy standalone door sensor API. Prefer [new_ttlock.TTLock.doorSensor] instead.
+@Deprecated('Use TTLock.doorSensor standalone APIs instead.')
 class TTStandaloneDoorSensor {
   @Deprecated('Use TTCommands from package:ttlock_premise_flutter/src/constants/commands.dart')
   static const String COMMAND_START_SCAN = 'standaloneDoorSensorStartScan';
@@ -27,17 +28,21 @@ class TTStandaloneDoorSensor {
   @Deprecated('Use TTCommands from package:ttlock_premise_flutter/src/constants/commands.dart')
   static const String COMMAND_IS_SUPPORT_FUNCTION = 'standaloneDoorIsSupportFunction';
 
-  @Deprecated('Use TTLock.accessory.startScanStandaloneDoorSensor() and listen to the stream instead.')
+  static StreamSubscription<TTStandaloneDoorSensorScanModel>? _scanSub;
+
+  @Deprecated('Use TTLock.doorSensor.accessoryStandaloneDoorSensorStartScan() and listen to the stream instead.')
   static void startScan(TTStandaloneDoorSensorScanCallback scanCallback) {
-    new_ttlock.TTLock.accessory.standaloneDoorSensorStartScan().listen(scanCallback);
+    _scanSub?.cancel();
+    _scanSub = new_ttlock.TTLock.doorSensor.accessoryStandaloneDoorSensorStartScan().listen(scanCallback);
   }
 
-  @Deprecated('Use TTLock.accessory.stopScanStandaloneDoorSensor() instead.')
+  @Deprecated('Cancel the subscription from accessoryStandaloneDoorSensorStartScan().')
   static void stopScan() {
-    new_ttlock.TTLock.accessory.standaloneDoorSensorStopScan();
+    _scanSub?.cancel();
+    _scanSub = null;
   }
 
-  @Deprecated('Use TTLock.accessory.initStandaloneDoorSensor(...) instead.')
+  @Deprecated('Use TTLock.doorSensor.standaloneDoorSensorInit(...) instead.')
   static void init(
     String mac,
     String? standaloneInfoStr,
@@ -56,43 +61,37 @@ class TTStandaloneDoorSensor {
       }
     }
 
-    new_ttlock.TTLock.accessory
-        .standaloneDoorSensorInit(mac: mac, info: Map<String, Object?>.from(info))
+    new_ttlock.TTLock.doorSensor
+        .standaloneDoorSensorInit(mac, Map<String, Object?>.from(info))
         .then(callback)
         .catchError((e, _) {
-      if (e is TTAccessoryException) {
-        final error = e.code >= 0 && e.code < TTRemoteAccessoryError.values.length
-            ? TTRemoteAccessoryError.values[e.code]
-            : TTRemoteAccessoryError.fail;
-        failedCallback(error, e.message);
+      if (e is TTRemoteAccessoryException) {
+        failedCallback(e.code, e.message ?? '');
       } else {
-        failedCallback(TTRemoteAccessoryError.fail, e.toString());
+        failedCallback(TTRemoteAccessoryError.failed, e.toString());
       }
     });
   }
 
-  @Deprecated('Use TTLock.accessory.getStandaloneDoorSensorFeatureValue(mac: ...) instead.')
+  @Deprecated('Use TTLock.doorSensor.standaloneDoorSensorReadFeatureValue(mac) instead.')
   static void getFeatureValue(
     String mac,
     TTStandaloneDoorSensorFeatureValueCallback callback,
     TTRemoteFailedCallback failedCallback,
   ) {
-    new_ttlock.TTLock.accessory
+    new_ttlock.TTLock.doorSensor
         .standaloneDoorSensorReadFeatureValue(mac)
         .then(callback)
         .catchError((e, _) {
-      if (e is TTAccessoryException) {
-        final error = e.code >= 0 && e.code < TTRemoteAccessoryError.values.length
-            ? TTRemoteAccessoryError.values[e.code]
-            : TTRemoteAccessoryError.fail;
-        failedCallback(error, e.message);
+      if (e is TTRemoteAccessoryException) {
+        failedCallback(e.code, e.message ?? '');
       } else {
-        failedCallback(TTRemoteAccessoryError.fail, e.toString());
+        failedCallback(TTRemoteAccessoryError.failed, e.toString());
       }
     });
   }
 
-  @Deprecated('Use TTLock.accessory.isStandaloneDoorSensorSupportFunction(...) instead.')
+  @Deprecated('Use TTLock.doorSensor.standaloneDoorSensorIsSupportFunction(...) instead.')
   static bool isSupportFunction({
     required String featureValue,
     required int supportFunction,
@@ -101,15 +100,14 @@ class TTStandaloneDoorSensor {
     return false;
   }
 
-  @Deprecated('Use TTLock.accessory.standaloneDoorSensorIsSupportFunction(...) instead.')
+  @Deprecated('Use TTLock.doorSensor.standaloneDoorSensorIsSupportFunction(...) instead.')
   static Future<bool> isSupportFunctionAsync({
     required String featureValue,
     required int supportFunction,
   }) {
-    return new_ttlock.TTLock.accessory.standaloneDoorSensorIsSupportFunction(
-      featureValue: featureValue,
-      function: supportFunction,
+    return new_ttlock.TTLock.doorSensor.standaloneDoorSensorIsSupportFunction(
+      featureValue,
+      supportFunction,
     );
   }
 }
-

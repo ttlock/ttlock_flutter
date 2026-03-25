@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:ttlock_premise_flutter/pigeon/messages.g.dart';
@@ -7,7 +8,7 @@ import 'package:ttlock_premise_flutter/errors/tt_lock_exception.dart';
 // 供仅 import ttlock_classic 的调用方使用
 export 'package:ttlock_premise_flutter/pigeon/messages.g.dart';
 
-@Deprecated('Use TTLock from package:ttlock_premise_flutter/ttlock.dart and TTLock.lock / TTLock.gateway / TTLock.accessory instead.')
+@Deprecated('Use TTLock from package:ttlock_premise_flutter/ttlock.dart and TTLock.lock / TTLock.gateway / TTLock.doorSensor / remoteKey / remoteKeypad / waterMeter / electricMeter instead.')
 class TTLock {
   static bool isOnPremise = true;
 
@@ -17,7 +18,7 @@ class TTLock {
   static void _runLock<T>(Future<T> f, void Function(T) success, TTFailedCallback? fail) {
     f.then((r) => success(r)).catchError((e, st) {
       if (e is TTLockException) {
-        fail?.call(e.error, e.message);
+        fail?.call(e.code, e.message ?? '');
       } else {
         fail?.call(TTLockError.fail, e?.toString() ?? 'Unknown error');
       }
@@ -28,14 +29,14 @@ class TTLock {
     _runLock(f, (_) => success?.call(), fail);
   }
 
-  static dynamic _scanLockSub;
-  static dynamic _scanWifiSub;
+  static StreamSubscription<TTLockScanModel>? _scanLockSub;
+  static StreamSubscription<List<dynamic>>? _scanWifiSub;
 
   /// Scan the smart lock being broadcast
   @Deprecated('Use TTLock.lock.startScanLock() and listen to the stream instead.')
   static void startScanLock(TTLockScanCallback scanCallback) {
     _scanLockSub?.cancel();
-    _scanLockSub = new_ttlock.TTLock.lock.startScanLock().listen(
+    _scanLockSub = new_ttlock.TTLock.lock.lockScanLock().listen(
       scanCallback,
       onError: (e) {
         if (e is TTLockException) {
@@ -152,10 +153,10 @@ class TTLock {
       TTFailedCallback failedCallback) {
     _runLockVoid(
       new_ttlock.TTLock.lock.createCustomPasscode(
-        passcode: passcode,
-        startDate: startDate,
-        endDate: endDate,
-        lockData: lockData,
+        passcode,
+        startDate,
+        endDate,
+        lockData,
       ),
       callback,
       failedCallback,
@@ -174,11 +175,11 @@ class TTLock {
       TTFailedCallback failedCallback) {
     _runLockVoid(
       new_ttlock.TTLock.lock.modifyPasscode(
-        passcodeOrigin: passcodeOrigin,
-        passcodeNew: passcodeNew,
-        startDate: startDate,
-        endDate: endDate,
-        lockData: lockData,
+        passcodeOrigin,
+        passcodeNew,
+        startDate,
+        endDate,
+        lockData,
       ),
       callback,
       failedCallback,
@@ -190,7 +191,7 @@ class TTLock {
   static void deletePasscode(String passcode, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     _runLockVoid(
-      new_ttlock.TTLock.lock.deletePasscode(passcode: passcode, lockData: lockData),
+      new_ttlock.TTLock.lock.deletePasscode(passcode, lockData),
       callback,
       failedCallback,
     );
@@ -214,10 +215,7 @@ class TTLock {
   static void setErasePasscode(String erasePasscode, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     _runLockVoid(
-      new_ttlock.TTLock.lock.setErasePasscode(
-        erasePasscode: erasePasscode,
-        lockData: lockData,
-      ),
+      new_ttlock.TTLock.lock.setErasePasscode(erasePasscode, lockData),
       callback,
       failedCallback,
     );
@@ -242,13 +240,13 @@ class TTLock {
       TTFailedCallback failedCallback) {
     _runLockVoid(
       new_ttlock.TTLock.lock.recoverPasscode(
-        passcode: passcode,
-        passcodeNew: passcodeNew,
-        type: type,
-        startDate: startDate,
-        endDate: endDate,
-        cycleType: cycleType,
-        lockData: lockData,
+        passcode,
+        passcodeNew,
+        type,
+        startDate,
+        endDate,
+        cycleType,
+        lockData,
       ),
       callback,
       failedCallback,
@@ -277,12 +275,7 @@ class TTLock {
       TTCardNumberCallback callback,
       TTFailedCallback failedCallback) {
     new_ttlock.TTLock.lock
-        .addCard(
-          cycleList: cycleList,
-          startDate: startDate,
-          endDate: endDate,
-          lockData: lockData,
-        )
+        .lockAddCard(lockData)
         .listen(
           (e) {
             if (e.isProgress) {
@@ -293,7 +286,7 @@ class TTLock {
           },
           onError: (err) {
             if (err is TTLockException) {
-              failedCallback(err.error, err.message);
+              failedCallback(err.code, err.message ?? '');
             } else {
               failedCallback(TTLockError.fail, err?.toString() ?? 'Unknown error');
             }
@@ -322,11 +315,11 @@ class TTLock {
       TTFailedCallback failedCallback) {
     _runLockVoid(
       new_ttlock.TTLock.lock.modifyCardValidityPeriod(
-        cardNumber: cardNumber,
-        cycleList: cycleList,
-        startDate: startDate,
-        endDate: endDate,
-        lockData: lockData,
+        cardNumber,
+        cycleList,
+        startDate,
+        endDate,
+        lockData,
       ),
       callback,
       failedCallback,
@@ -337,10 +330,7 @@ class TTLock {
   static void deleteCard(String cardNumber, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     _runLockVoid(
-      new_ttlock.TTLock.lock.deleteCard(
-        cardNumber: cardNumber,
-        lockData: lockData,
-      ),
+      new_ttlock.TTLock.lock.deleteCard(cardNumber, lockData),
       callback,
       failedCallback,
     );
@@ -376,10 +366,10 @@ class TTLock {
       TTFailedCallback failedCallback) {
     _runLockVoid(
       new_ttlock.TTLock.lock.recoverCard(
-        cardNumber: cardNumber,
-        startDate: startDate,
-        endDate: endDate,
-        lockData: lockData,
+        cardNumber,
+        startDate,
+        endDate,
+        lockData,
       ),
       callback,
       failedCallback,
@@ -413,12 +403,7 @@ class TTLock {
       TTAddFingerprintCallback callback,
       TTFailedCallback failedCallback) {
     new_ttlock.TTLock.lock
-        .addFingerprint(
-          cycleList: cycleList,
-          startDate: startDate,
-          endDate: endDate,
-          lockData: lockData,
-        )
+        .lockAddFingerprint(lockData)
         .listen(
           (e) {
             if (e.isProgress) {
@@ -429,7 +414,7 @@ class TTLock {
           },
           onError: (err) {
             if (err is TTLockException) {
-              failedCallback(err.error, err.message);
+              failedCallback(err.code, err.message ?? '');
             } else {
               failedCallback(TTLockError.fail, err?.toString() ?? 'Unknown error');
             }
@@ -448,11 +433,11 @@ class TTLock {
       TTFailedCallback failedCallback) {
     _runLockVoid(
       new_ttlock.TTLock.lock.modifyFingerprintValidityPeriod(
-        fingerprintNumber: fingerprintNumber,
-        cycleList: cycleList,
-        startDate: startDate,
-        endDate: endDate,
-        lockData: lockData,
+        fingerprintNumber,
+        cycleList,
+        startDate,
+        endDate,
+        lockData,
       ),
       callback,
       failedCallback,
@@ -463,10 +448,7 @@ class TTLock {
   static void deleteFingerprint(String fingerprintNumber, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     _runLockVoid(
-      new_ttlock.TTLock.lock.deleteFingerprint(
-        fingerprintNumber: fingerprintNumber,
-        lockData: lockData,
-      ),
+      new_ttlock.TTLock.lock.deleteFingerprint(fingerprintNumber, lockData),
       callback,
       failedCallback,
     );
@@ -509,10 +491,7 @@ class TTLock {
   static void modifyAdminPasscode(String adminPasscode, String lockData,
       TTLockDataCallback callback, TTFailedCallback failedCallback) {
     _runLock<String?>(
-      new_ttlock.TTLock.lock.modifyAdminPasscode(
-        adminPasscode: adminPasscode,
-        lockData: lockData,
-      ),
+      new_ttlock.TTLock.lock.modifyAdminPasscode(adminPasscode, lockData),
       (lockData) => callback(lockData ?? ''),
       failedCallback,
     );
@@ -522,10 +501,7 @@ class TTLock {
   static void setLockTime(int timestamp, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     _runLockVoid(
-      new_ttlock.TTLock.lock.setLockTime(
-        timestamp: timestamp,
-        lockData: lockData,
-      ),
+      new_ttlock.TTLock.lock.setLockTime(timestamp, lockData),
       callback,
       failedCallback,
     );
@@ -548,10 +524,7 @@ class TTLock {
       TTGetLockOperateRecordCallback callback,
       TTFailedCallback failedCallback) {
     _runLock(
-      new_ttlock.TTLock.lock.getLockOperateRecord(
-        type: type,
-        lockData: lockData,
-      ),
+      new_ttlock.TTLock.lock.getLockOperateRecord(type, lockData),
       callback,
       failedCallback,
     );
@@ -605,10 +578,7 @@ class TTLock {
   static void setLockAutomaticLockingPeriodicTime(int time, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     _runLockVoid(
-      new_ttlock.TTLock.lock.setAutoLockingPeriodicTime(
-        seconds: time,
-        lockData: lockData,
-      ),
+      new_ttlock.TTLock.lock.setAutoLockingPeriodicTime(time, lockData),
       callback,
       failedCallback,
     );
@@ -628,10 +598,7 @@ class TTLock {
   static void setLockRemoteUnlockSwitchState(bool isOn, String lockData,
       TTLockDataCallback callback, TTFailedCallback failedCallback) {
     _runLock(
-      new_ttlock.TTLock.lock.setRemoteUnlockSwitchState(
-        isOn: isOn,
-        lockData: lockData,
-      ),
+      new_ttlock.TTLock.lock.setRemoteUnlockSwitchState(isOn, lockData),
       callback,
       failedCallback,
     );
@@ -641,10 +608,7 @@ class TTLock {
   static void getLockConfig(TTLockConfig config, String lockData,
       TTGetSwitchStateCallback callback, TTFailedCallback failedCallback) {
     _runLock(
-      new_ttlock.TTLock.lock.getLockConfig(
-        config: config,
-        lockData: lockData,
-      ),
+      new_ttlock.TTLock.lock.getLockConfig(config, lockData),
       callback,
       failedCallback,
     );
@@ -654,11 +618,7 @@ class TTLock {
   static void setLockConfig(TTLockConfig config, bool isOn, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     _runLockVoid(
-      new_ttlock.TTLock.lock.setLockConfig(
-        config: config,
-        isOn: isOn,
-        lockData: lockData,
-      ),
+      new_ttlock.TTLock.lock.setLockConfig(config, isOn, lockData),
       callback,
       failedCallback,
     );
@@ -668,10 +628,7 @@ class TTLock {
   static void setLockDirection(TTLockDirection direction, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     _runLockVoid(
-      new_ttlock.TTLock.lock.setLockDirection(
-        direction: direction,
-        lockData: lockData,
-      ),
+      new_ttlock.TTLock.lock.setLockDirection(direction, lockData),
       callback,
       failedCallback,
     );
@@ -691,10 +648,7 @@ class TTLock {
   static void resetLockByCode(String lockMac, String resetCode,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     _runLockVoid(
-      new_ttlock.TTLock.lock.resetLockByCode(
-        lockMac: lockMac,
-        resetCode: resetCode,
-      ),
+      new_ttlock.TTLock.lock.resetLockByCode(lockMac, resetCode),
       callback,
       failedCallback,
     );
@@ -723,12 +677,12 @@ class TTLock {
       TTFailedCallback failedCallback) {
     _runLockVoid(
       new_ttlock.TTLock.lock.addPassageMode(
-        type: type,
-        weekly: weekly,
-        monthly: monthly,
-        startTime: startTime,
-        endTime: endTime,
-        lockData: lockData,
+        type,
+        weekly,
+        monthly,
+        startTime,
+        endTime,
+        lockData,
       ),
       callback,
       failedCallback,
@@ -749,10 +703,7 @@ class TTLock {
   static void activateLift(String floors, String lockData,
       TTLiftCallback callback, TTFailedCallback failedCallback) {
     _runLock(
-      new_ttlock.TTLock.lock.activateLift(
-        floors: floors,
-        lockData: lockData,
-      ),
+      new_ttlock.TTLock.lock.activateLift(floors, lockData),
       (r) => callback(r.lockTime, r.electricQuantity, r.uniqueId),
       failedCallback,
     );
@@ -762,10 +713,7 @@ class TTLock {
   static void setLiftControlable(String floors, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     _runLockVoid(
-      new_ttlock.TTLock.lock.setLiftControlable(
-        floors: floors,
-        lockData: lockData,
-      ),
+      new_ttlock.TTLock.lock.setLiftControlable(floors, lockData),
       callback,
       failedCallback,
     );
@@ -775,10 +723,7 @@ class TTLock {
   static void setLiftWorkMode(TTLiftWorkActivateType type, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     _runLockVoid(
-      new_ttlock.TTLock.lock.setLiftWorkMode(
-        type: type,
-        lockData: lockData,
-      ),
+      new_ttlock.TTLock.lock.setLiftWorkMode(type, lockData),
       callback,
       failedCallback,
     );
@@ -788,10 +733,7 @@ class TTLock {
   static void setPowerSaverWorkMode(TTPowerSaverWorkType type, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     _runLockVoid(
-      new_ttlock.TTLock.lock.setPowerSaverWorkMode(
-        type: type,
-        lockData: lockData,
-      ),
+      new_ttlock.TTLock.lock.setPowerSaverWorkMode(type, lockData),
       callback,
       failedCallback,
     );
@@ -801,10 +743,7 @@ class TTLock {
   static void setPowerSaverControlableLock(String lockMac, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     _runLockVoid(
-      new_ttlock.TTLock.lock.setPowerSaverControlableLock(
-        lockMac: lockMac,
-        lockData: lockData,
-      ),
+      new_ttlock.TTLock.lock.setPowerSaverControlableLock(lockMac, lockData),
       callback,
       failedCallback,
     );
@@ -888,10 +827,10 @@ class TTLock {
       TTFailedCallback failedCallback) {
     _runLockVoid(
       new_ttlock.TTLock.lock.setHotel(
-        hotelInfo: hotelInfo,
-        buildingNumber: buildingNumber,
-        floorNumber: floorNumber,
-        lockData: lockData,
+        hotelInfo,
+        buildingNumber,
+        floorNumber,
+        lockData,
       ),
       callback,
       failedCallback,
@@ -902,10 +841,7 @@ class TTLock {
   static void setHotelCardSector(String sector, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     _runLockVoid(
-      new_ttlock.TTLock.lock.setHotelCardSector(
-        sector: sector,
-        lockData: lockData,
-      ),
+      new_ttlock.TTLock.lock.setHotelCardSector(sector, lockData),
       callback,
       failedCallback,
     );
@@ -921,7 +857,15 @@ class TTLock {
   static void getLockVersion(String lockMac, TTGetLockVersionCallback callback,
       TTFailedCallback failedCallback) {
     _runLock(
-      new_ttlock.TTLock.lock.getLockVersion(lockMac),
+      new_ttlock.TTLock.lock.getLockVersion(lockMac).then(
+        (v) => jsonEncode({
+              'protocolType': v.protocolType,
+              'protocolVersion': v.protocolVersion,
+              'scene': v.scene,
+              'groupId': v.groupId,
+              'orgId': v.orgId,
+            }),
+      ),
       callback,
       failedCallback,
     );
@@ -956,7 +900,7 @@ class TTLock {
       return item?.toString() ?? '';
     }
 
-    _scanWifiSub = new_ttlock.TTLock.lock.scanWifi(lockData).listen(
+    _scanWifiSub = new_ttlock.TTLock.lock.lockScanWifi(lockData).listen(
       (wifiList) {
         for (final item in wifiList) {
           final key = wifiKey(item);
@@ -969,7 +913,7 @@ class TTLock {
       onDone: () => callback(true, allWifiList),
       onError: (e) {
         if (e is TTLockException) {
-          failedCallback(e.error, e.message);
+          failedCallback(e.code, e.message ?? '');
         } else {
           failedCallback(TTLockError.fail, e?.toString() ?? 'Unknown error');
         }
@@ -982,9 +926,9 @@ class TTLock {
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     _runLockVoid(
       new_ttlock.TTLock.lock.configWifi(
-        wifiName: wifiName,
-        wifiPassword: wifiPassword,
-        lockData: lockData,
+        wifiName,
+        wifiPassword,
+        lockData,
       ),
       callback,
       failedCallback,
@@ -995,11 +939,7 @@ class TTLock {
   static void configServer(String ip, String port, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     _runLockVoid(
-      new_ttlock.TTLock.lock.configServer(
-        ip: ip,
-        port: port,
-        lockData: lockData,
-      ),
+      new_ttlock.TTLock.lock.configServer(ip, port, lockData),
       callback,
       failedCallback,
     );
@@ -1033,10 +973,7 @@ class TTLock {
       router: router,
     );
     _runLockVoid(
-      new_ttlock.TTLock.lock.configIp(
-        ipSetting: ipSetting,
-        lockData: lockData,
-      ),
+      new_ttlock.TTLock.lock.configIp(ipSetting, lockData),
       callback,
       failedCallback,
     );
@@ -1049,10 +986,7 @@ class TTLock {
       TTSuccessCallback callback,
       TTFailedCallback failedCallback) {
     _runLockVoid(
-      new_ttlock.TTLock.lock.setSoundVolume(
-        type: type,
-        lockData: lockData,
-      ),
+      new_ttlock.TTLock.lock.setSoundVolume(type, lockData),
       callback,
       failedCallback,
     );
@@ -1105,11 +1039,11 @@ class TTLock {
       TTFailedCallback failedCallback) {
     _runLockVoid(
       new_ttlock.TTLock.lock.addRemoteKey(
-        remoteKeyMac: remoteKeyMac,
-        cycleList: cycleList,
-        startDate: startDate,
-        endDate: endDate,
-        lockData: lockData,
+        remoteKeyMac,
+        cycleList,
+        startDate,
+        endDate,
+        lockData,
       ),
       callback,
       failedCallback,
@@ -1120,10 +1054,7 @@ class TTLock {
   static void deleteRemoteKey(String remoteKeyMac, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     _runLockVoid(
-      new_ttlock.TTLock.lock.deleteRemoteKey(
-        remoteKeyMac: remoteKeyMac,
-        lockData: lockData,
-      ),
+      new_ttlock.TTLock.lock.deleteRemoteKey(remoteKeyMac, lockData),
       callback,
       failedCallback,
     );
@@ -1150,11 +1081,11 @@ class TTLock {
       TTFailedCallback failedCallback) {
     _runLockVoid(
       new_ttlock.TTLock.lock.setRemoteKeyValidDate(
-        remoteKeyMac: remoteKeyMac,
-        cycleList: cycleList,
-        startDate: startDate,
-        endDate: endDate,
-        lockData: lockData,
+        remoteKeyMac,
+        cycleList,
+        startDate,
+        endDate,
+        lockData,
       ),
       callback,
       failedCallback,
@@ -1170,9 +1101,9 @@ class TTLock {
       TTFailedCallback failedCallback) {
     _runLock(
       new_ttlock.TTLock.lock.getRemoteAccessoryElectricQuantity(
-        accessory: remoteAccessory,
-        mac: remoteAccessoryMac,
-        lockData: lockData,
+        remoteAccessory,
+        remoteAccessoryMac,
+        lockData,
       ),
       (r) => callback(r.electricQuantity, r.updateDate),
       failedCallback,
@@ -1183,10 +1114,7 @@ class TTLock {
   static void addDoorSensor(String doorSensorMac, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     _runLockVoid(
-      new_ttlock.TTLock.lock.addDoorSensor(
-        doorSensorMac: doorSensorMac,
-        lockData: lockData,
-      ),
+      new_ttlock.TTLock.lock.addDoorSensor(doorSensorMac, lockData),
       callback,
       failedCallback,
     );
@@ -1206,10 +1134,7 @@ class TTLock {
   static void setDoorSensorAlertTime(String lockData, int alertTime,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     _runLockVoid(
-      new_ttlock.TTLock.lock.setDoorSensorAlertTime(
-        alertTime: alertTime,
-        lockData: lockData,
-      ),
+      new_ttlock.TTLock.lock.setDoorSensorAlertTime(alertTime, lockData),
       callback,
       failedCallback,
     );
@@ -1218,7 +1143,7 @@ class TTLock {
   @Deprecated('Removed from TTLockApi; no replacement in this plugin.')
   static void setLockEnterUpgradeMode(String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
-    failedCallback?.call(
+    failedCallback(
       TTLockError.fail,
       'setLockEnterUpgradeMode is no longer supported',
     );
@@ -1244,12 +1169,7 @@ class TTLock {
       TTAddFaceSuccessCallback callback,
       TTFailedCallback failedCallback) {
     new_ttlock.TTLock.lock
-        .addFace(
-          cycleList: cycleList,
-          startDate: startDate,
-          endDate: endDate,
-          lockData: lockData,
-        )
+        .lockAddFace(lockData)
         .listen(
           (e) {
             if (e.isProgress) {
@@ -1260,7 +1180,7 @@ class TTLock {
           },
           onError: (err) {
             if (err is TTLockException) {
-              failedCallback(err.error, err.message);
+              failedCallback(err.code, err.message ?? '');
             } else {
               failedCallback(TTLockError.fail, err?.toString() ?? 'Unknown error');
             }
@@ -1279,11 +1199,11 @@ class TTLock {
       TTFailedCallback failedCallback) {
     _runLock(
       new_ttlock.TTLock.lock.addFaceData(
-        cycleList: cycleList,
-        startDate: startDate,
-        endDate: endDate,
-        faceFeatureData: faceFeatureData,
-        lockData: lockData,
+        cycleList,
+        startDate,
+        endDate,
+        faceFeatureData,
+        lockData,
       ),
       callback,
       failedCallback,
@@ -1301,11 +1221,11 @@ class TTLock {
       TTFailedCallback failedCallback) {
     _runLockVoid(
       new_ttlock.TTLock.lock.modifyFace(
-        faceNumber: faceNumber,
-        cycleList: cycleList,
-        startDate: startDate,
-        endDate: endDate,
-        lockData: lockData,
+        faceNumber,
+        cycleList,
+        startDate,
+        endDate,
+        lockData,
       ),
       callback,
       failedCallback,
@@ -1326,10 +1246,7 @@ class TTLock {
   static void deleteFace(String faceNumber, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     _runLockVoid(
-      new_ttlock.TTLock.lock.deleteFace(
-        faceNumber: faceNumber,
-        lockData: lockData,
-      ),
+      new_ttlock.TTLock.lock.deleteFace(faceNumber, lockData),
       callback,
       failedCallback,
     );
@@ -1342,10 +1259,7 @@ class TTLock {
         ? TTSensitivityValue.values[value]
         : TTSensitivityValue.medium;
     _runLockVoid(
-      new_ttlock.TTLock.lock.setSensitivity(
-        value: sensitivity,
-        lockData: lockData,
-      ),
+      new_ttlock.TTLock.lock.setSensitivity(sensitivity, lockData),
       callback,
       failedCallback,
     );
@@ -1508,7 +1422,7 @@ typedef TTAddFingerprintProgressCallback = void Function(
 typedef TTAddFingerprintCallback = void Function(String fingerprintNumber);
 typedef TTGetAllFingerprintsCallback = void Function(List fingerprintList);
 typedef TTGetSwitchStateCallback = void Function(bool isOn);
-typedef TTGetLockStatusCallback = void Function(TTLockSwitchState state);
+typedef TTGetLockStatusCallback = void Function(TTLockSwitchState state); 
 typedef TTGetLockDirectionCallback = void Function(TTLockDirection direction);
 
 typedef TTGatewayFailedCallback = void Function(
@@ -1565,7 +1479,7 @@ typedef TTRemoteKeypadGetStoredLockSuccessCallback = void Function(
     List lockMacs);
 
 typedef TTRemoteKeypadFailedCallback = void Function(
-    TTRemoteKeyPadAccessoryError errorCode, String errorMsg);
+    TTMultifunctionalKeypadError errorCode, String errorMsg);
 
 
 typedef TTAddFaceProgressCallback = void Function(

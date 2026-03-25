@@ -1,9 +1,11 @@
+import 'dart:async';
+
 import 'package:ttlock_premise_flutter/ttlock.dart' as new_ttlock;
 import 'package:ttlock_premise_flutter/ttlock_classic.dart';
-import 'package:ttlock_premise_flutter/errors/tt_accessory_exception.dart';
+import 'package:ttlock_premise_flutter/errors/tt_remote_accessory_exception.dart';
 
-/// Legacy door sensor API. Prefer [new_ttlock.TTLock.accessory] instead.
-@Deprecated('Use TTLock.accessory.startScanDoorSensor() / stopScanDoorSensor() / initDoorSensor() instead.')
+/// Legacy door sensor API. Prefer [new_ttlock.TTLock.doorSensor] instead.
+@Deprecated('Use TTLock.doorSensor.accessoryStartScanDoorSensor() / initDoorSensor() instead.')
 class TTDoorSensor {
   @Deprecated('Use TTCommands from package:ttlock_premise_flutter/src/constants/commands.dart')
   static const String COMMAND_START_SCAN_DOOR_SENSOR = 'doorSensorStartScan';
@@ -12,36 +14,37 @@ class TTDoorSensor {
   @Deprecated('Use TTCommands from package:ttlock_premise_flutter/src/constants/commands.dart')
   static const String COMMAND_INIT_DOOR_SENSOR = 'doorSensorInit';
 
-  /// Legacy: scan for door sensors via callback. Prefer [new_ttlock.TTLock.accessory.startScanDoorSensor].
-  @Deprecated('Use TTLock.accessory.startScanDoorSensor() and listen to the stream instead.')
+  static StreamSubscription<TTRemoteAccessoryScanModel>? _scanSub;
+  
+  /// Legacy: scan for door sensors via callback. Prefer [new_ttlock.TTLock.doorSensor.accessoryStartScanDoorSensor].
+  @Deprecated('Use TTLock.doorSensor.accessoryStartScanDoorSensor() and listen to the stream instead.')
   static void startScan(TTRemoteAccessoryScanCallback scanCallback) {
-    new_ttlock.TTLock.accessory.startScanDoorSensor().listen(scanCallback);
+    _scanSub?.cancel();
+    _scanSub = new_ttlock.TTLock.doorSensor.accessoryStartScanDoorSensor().listen(scanCallback);
   }
 
-  /// Legacy: stop door sensor scan. Prefer [new_ttlock.TTLock.accessory.stopScanDoorSensor].
-  @Deprecated('Use TTLock.accessory.stopScanDoorSensor() instead.')
+  /// Legacy: stop door sensor scan. Prefer cancelling the stream subscription.
+  @Deprecated('Cancel the subscription from accessoryStartScanDoorSensor().')
   static void stopScan() {
-    new_ttlock.TTLock.accessory.stopScanDoorSensor();
+    _scanSub?.cancel();
+    _scanSub = null;
   }
 
-  /// Legacy: init door sensor via callbacks. Prefer [new_ttlock.TTLock.accessory.initDoorSensor].
-  @Deprecated('Use TTLock.accessory.initDoorSensor(mac: mac, lockData: lockData) instead.')
+  /// Legacy: init door sensor via callbacks. Prefer [new_ttlock.TTLock.doorSensor.initDoorSensor].
+  @Deprecated('Use TTLock.doorSensor.initDoorSensor(mac, lockData) instead.')
   static void init(
     String mac,
     String lockData,
     TTGetLockSystemCallback callback,
     TTRemoteFailedCallback failedCallback,
   ) {
-    new_ttlock.TTLock.accessory
-        .initDoorSensor(mac: mac, lockData: lockData)
+    new_ttlock.TTLock.doorSensor
+        .initDoorSensor(mac, lockData)
         .then(callback).catchError((e, _) {
-      if (e is TTAccessoryException) {
-        final error = e.code >= 0 && e.code < TTRemoteAccessoryError.values.length
-            ? TTRemoteAccessoryError.values[e.code]
-            : TTRemoteAccessoryError.fail;
-        failedCallback(error, e.message);
+      if (e is TTRemoteAccessoryException) {
+        failedCallback(e.code, e.message ?? '');
       } else {
-        failedCallback(TTRemoteAccessoryError.fail, e.toString());
+        failedCallback(TTRemoteAccessoryError.failed, e.toString());
       }
     });
   }
