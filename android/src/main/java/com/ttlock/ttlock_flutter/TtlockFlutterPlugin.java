@@ -77,11 +77,13 @@ import com.ttlock.bl.sdk.callback.SetAutoLockingPeriodCallback;
 import com.ttlock.bl.sdk.callback.SetDoorSensorAlertTimeCallback;
 import com.ttlock.bl.sdk.callback.SetHotelCardSectorCallback;
 import com.ttlock.bl.sdk.callback.SetHotelDataCallback;
+import com.ttlock.bl.sdk.callback.SetLatchBoltCallback;
 import com.ttlock.bl.sdk.callback.SetLiftControlableFloorsCallback;
 import com.ttlock.bl.sdk.callback.SetLiftWorkModeCallback;
 import com.ttlock.bl.sdk.callback.SetLockConfigCallback;
 import com.ttlock.bl.sdk.callback.SetLockSoundWithSoundVolumeCallback;
 import com.ttlock.bl.sdk.callback.SetLockTimeCallback;
+import com.ttlock.bl.sdk.callback.SetMotorTorqueLevelCallback;
 import com.ttlock.bl.sdk.callback.SetNBAwakeModesCallback;
 import com.ttlock.bl.sdk.callback.SetNBAwakeTimesCallback;
 import com.ttlock.bl.sdk.callback.SetPassageModeCallback;
@@ -91,6 +93,7 @@ import com.ttlock.bl.sdk.callback.SetRemoteUnlockSwitchCallback;
 import com.ttlock.bl.sdk.callback.SetSensitivityCallback;
 import com.ttlock.bl.sdk.callback.SetUnlockDirectionCallback;
 import com.ttlock.bl.sdk.callback.VerifyLockCallback;
+import com.ttlock.bl.sdk.constant.FeatureValue;
 import com.ttlock.bl.sdk.constant.RecoveryData;
 import com.ttlock.bl.sdk.device.Remote;
 import com.ttlock.bl.sdk.device.WirelessDoorSensor;
@@ -426,9 +429,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
   }
 
   public void isSupportFeature(TtlockModel ttlockModel) {
-    boolean isSupport = FeatureValueUtil.isSupportFeature(ttlockModel.lockData, TTLockFunction.flutter2Native(ttlockModel.supportFunction));
+    boolean isSupport = FeatureValueUtil.isSupportFeature(ttlockModel.lockData, ttlockModel.supportFunction);
     ttlockModel.isSupport = isSupport;
-    LogUtil.d(TTLockFunction.flutter2Native(ttlockModel.supportFunction) + ":" + isSupport);
+    LogUtil.d(ttlockModel.supportFunction + ":" + isSupport);
     successCallbackCommand(TTLockCommand.COMMAND_SUPPORT_FEATURE, ttlockModel.toMap());
   }
 
@@ -1053,6 +1056,12 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         break;
       case TTLockCommand.COMMAND_SET_LOCK_REMOTE_UNLOCK_SWITCH_STATE:
         setRemoteUnlockSwitch(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_SET_LOCK_MOTOR_TORQUE_LEVEL:
+        setMotorTorqueLevel(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_SET_LOCK_LATCH_BOLT:
+        setLatchBoltKeepTime(ttlockModel);
         break;
       case TTLockCommand.COMMAND_GET_LOCK_REMOTE_UNLOCK_SWITCH_STATE:
         getRemoteUnlockSwitch(ttlockModel);
@@ -1747,6 +1756,38 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       @Override
       public void onSetRemoteUnlockSwitchSuccess(String lockData) {
         ttlockModel.lockData = lockData;
+        apiSuccess(ttlockModel);
+      }
+
+      @Override
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
+      }
+    });
+  }
+
+  public void setMotorTorqueLevel(final TtlockModel ttlockModel) {
+    TTLockClient.getDefault().setMotorTorqueLevel(
+            ttlockModel.motorTorqueLevel, ttlockModel.lockData,
+            new SetMotorTorqueLevelCallback() {
+              @Override
+              public void onSetSuccess() {
+
+              }
+
+              @Override
+              public void onFail(LockError lockError) {
+
+              }
+            });
+  }
+
+  public void setLatchBoltKeepTime(final TtlockModel ttlockModel) {
+    TTLockClient.getDefault().setLatchBolt(
+            -1, ttlockModel.latchBoltKeepTime, ttlockModel.lockData,
+            new SetLatchBoltCallback() {
+      @Override
+      public void onSetSuccess() {
         apiSuccess(ttlockModel);
       }
 

@@ -75,6 +75,9 @@
 #define command_get_lock_direction @"getLockDirection"
 #define command_set_lock_direction @"setLockDirection"
 
+#define command_set_lock_motor_torque_level @"setLockMotorTorqueLevel"
+#define command_set_lock_latch_bolt @"setLockLatchBolt"
+
 #define command_get_all_passage_modes @"getAllPassageModes"
 #define command_add_passage_mode @"addPassageMode"
 #define command_clear_all_passage_modes @"clearAllPassageModes"

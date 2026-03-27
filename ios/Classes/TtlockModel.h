@@ -101,6 +101,9 @@
 //当前自动闭锁时间
 @property (nonatomic, strong) NSNumber *currentTime;
 
+@property (nonatomic, strong) NSNumber *torqueLevel;
+@property (nonatomic, strong) NSNumber *latchBoltKeepTime;
+
 //管理员密码
 @property (nonatomic, strong) NSString *adminPasscode;
 @property (nonatomic, strong) NSString *erasePasscode;

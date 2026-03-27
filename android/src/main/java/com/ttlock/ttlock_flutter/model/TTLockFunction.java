@@ -116,8 +116,8 @@ public enum TTLockFunction {
                 return FeatureValue.HOTEL_LOCK;
             case noClock:
                 return FeatureValue.LOCK_NO_CLOCK_CHIP;
-            case noBroadcastInNormal:
-                return FeatureValue.CAN_NOT_CLICK_UNLOCK;
+//            case noBroadcastInNormal:
+//                return FeatureValue.CAN_NOT_CLICK_UNLOCK;
             case passageMode:
                 return FeatureValue.PASSAGE_MODE;
             case turnOffAutoLock:

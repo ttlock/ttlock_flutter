@@ -17,7 +17,10 @@ public enum  TTLockConfigConverter {
     wifiLockPowerSavingMode,
     doubleAuth,
     publicMode,
-    lowBatteryAutoUnlock;
+    lowBatteryAutoUnlock,
+    securityM1Card,
+    semiAutomaticModeControl,
+    lockSupervision;
 
     public static TTLockConfigType flutter2Native(int index) {
         if (index < TTLockConfigConverter.class.getEnumConstants().length) {
@@ -46,6 +49,16 @@ public enum  TTLockConfigConverter {
                 return TTLockConfigType.WIFI_LOCK_POWER_SAVING_MODE;
             case doubleAuth:
                 return TTLockConfigType.DOUBLE_CHECK;
+            case publicMode:
+                return  TTLockConfigType.PUBLIC_MODE;
+            case lowBatteryAutoUnlock:
+                return  TTLockConfigType.LOW_BATTERY_UNLOCK;
+            case securityM1Card:
+                return  TTLockConfigType.M1_CARD;
+            case semiAutomaticModeControl:
+                return TTLockConfigType.SEMI_AUTOMATIC_MODE_CONTROL;
+            case lockSupervision:
+                return TTLockConfigType.LOCK_SUPERVISION;
         }
         return null;
     }
@@ -68,6 +81,14 @@ public enum  TTLockConfigConverter {
                 return passageModeAutoUnlock.ordinal();
             case WIFI_LOCK_POWER_SAVING_MODE:
                 return wifiLockPowerSavingMode.ordinal();
+            case PUBLIC_MODE:
+                return publicMode.ordinal();
+            case LOW_BATTERY_UNLOCK:
+                return lowBatteryAutoUnlock.ordinal();
+            case SEMI_AUTOMATIC_MODE_CONTROL:
+                return semiAutomaticModeControl.ordinal();
+            case LOCK_SUPERVISION:
+                return lockSupervision.ordinal();
         }
         return -1;
     }

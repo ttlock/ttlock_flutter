@@ -78,6 +78,9 @@ class TTLock {
   static const String COMMAND_GET_LOCK_CONFIG = "getLockConfig";
   static const String COMMAND_SET_LOCK_CONFIG = "setLockConfig";
 
+  static const String COMMAND_SET_LOCK_MOTOR_TORQUE_LEVEL = "setMotorTorqueLevel";
+  static const String COMMAND_SET_LOCK_LATCH_BOLT = "setLockLatchBolt";
+
   static const String COMMAND_ADD_PASSAGE_MODE = "addPassageMode";
   static const String COMMAND_CLEAR_ALL_PASSAGE_MODE = "clearAllPassageModes";
   static const String COMMAND_FUNCTION_SUPPORT = "functionSupport";
@@ -215,7 +218,7 @@ class TTLock {
       TTFunctionSupportCallback callback) {
     Map map = Map();
     map[TTResponse.lockData] = lockData;
-    map[TTResponse.supportFunction] = fuction.index;
+    map[TTResponse.supportFunction] = fuction.value;
     invoke(COMMAND_FUNCTION_SUPPORT, map, callback);
   }
 
@@ -768,6 +771,22 @@ class TTLock {
     map[TTResponse.lockMac] = lockMac;
     map[TTResponse.resetCode] = resetCode;
     invoke(COMMAND_RESET_LOCK_BY_CODE, map, callback, fail: failedCallback);
+  }
+
+  static void setMotorTorqueLevel(int torqueLevel, String lockData,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.torqueLevel] = torqueLevel;
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_SET_LOCK_MOTOR_TORQUE_LEVEL, map, callback, fail: failedCallback);
+  }
+
+  static void setLockLatchBolt(bool keepTime, String lockData,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.latchBoltKeepTime] = keepTime;
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_SET_LOCK_LATCH_BOLT, map, callback, fail: failedCallback);
   }
 
 // ignore: slash_for_doc_comments
@@ -1888,6 +1907,9 @@ class TTResponse {
 
   static const String sensitivityValue = "sensitivityValue";
 
+  static const String torqueLevel = "torqueLevel";
+  static const String latchBoltKeepTime = "latchBoltKeepTime";
+
 }
 
 class TTLockScanModel {
@@ -2007,7 +2029,10 @@ enum TTLockConfig {
   wifiLockPowerSavingMode,
   doubleAuth,
   publicMode,
-  lowBatteryAutoUnlock
+  lowBatteryAutoUnlock,
+  securityM1Card,
+  semiAutomaticModeControl,
+  lockSupervision;
 }
 
 enum TTLockDirection { left, right }
@@ -2268,72 +2293,106 @@ enum TTRemoteKeyPadAccessoryError {
 }
 
 enum TTLockFuction {
-  passcode,
-  icCard,
-  fingerprint,
-  wristband,
-  autoLock,
-  deletePasscode, //5
-  // 6
-  managePasscode,
-  locking,
-  passcodeVisible,
-  gatewayUnlock,
-  lockFreeze,
-  cyclePassword,
-  unlockSwicth,
-  audioSwitch,
-  nbIoT, //15
+  passcode(0, androidName: 'PASSCODE', iosName: 'TTLockFeatureValuePasscode'),
+  icCard(1, androidName: 'IC', iosName: 'TTLockFeatureValueICCard'),
+  fingerprint(2, androidName: 'FINGER_PRINT', iosName: 'TTLockFeatureValueFingerprint'),
+  wristband(3, androidName: 'WRIST_BAND', iosName: 'TTLockFeatureValueWristband'),
+  autoLock(4, androidName: 'AUTO_LOCK', iosName: 'TTLockFeatureValueAutoLock'),
+  deletePasscode(5, androidName: 'PASSCODE_WITH_DELETE_FUNCTION', iosName: 'TTLockFeatureValueDeletePasscode'),
+  managePasscode(7, androidName: 'MODIFY_PASSCODE_FUNCTION', iosName: 'TTLockFeatureValueManagePasscode'),
+  locking(8, androidName: 'MANUAL_LOCK', iosName: 'TTLockFeatureValueLocking'),
+  passcodeVisible(9, androidName: 'PASSWORD_DISPLAY_OR_HIDE', iosName: 'TTLockFeatureValuePasscodeVisible'),
+  gatewayUnlock(10, androidName: 'GATEWAY_UNLOCK', iosName: 'TTLockFeatureValueGatewayUnlock'),
+  lockFreeze(11, androidName: 'FREEZE_LOCK', iosName: 'TTLockFeatureValueLockFreeze'),
+  cyclePassword(12, androidName: 'CYCLIC_PASSWORD', iosName: 'TTLockFeatureValueCyclePassword'),
+  unlockSwitch(14, androidName: 'CONFIG_GATEWAY_UNLOCK', iosName: 'TTLockFeatureValueRemoteUnlockSwicth'),
+  audioSwitch(15, androidName: 'AUDIO_MANAGEMENT', iosName: 'TTLockFeatureValueAudioSwitch'),
+  nbIoT(16, androidName: 'NB_LOCK', iosName: 'TTLockFeatureValueNBIoT'),
+  getAdminPasscode(18, androidName: 'GET_ADMIN_CODE', iosName: 'TTLockFeatureValueGetAdminPasscode'),
+  hotelCard(19, androidName: 'HOTEL_LOCK', iosName: 'TTLockFeatureValueHotelCard'),
+  noClock(20, androidName: 'LOCK_NO_CLOCK_CHIP', iosName: 'TTLockFeatureValueNoClock'),
+  noBroadcastInNormal(21, androidName: 'SUPPORT_CLOSE_BLUETOOTH_ADVERTISING', iosName: 'TTLockFeatureValueNoBroadcastInNormal'),
+  passageMode(22, androidName: 'PASSAGE_MODE', iosName: 'TTLockFeatureValuePassageMode'),
+  turnOffAutoLock(23, androidName: 'PASSAGE_MODE_AND_AUTO_LOCK_AND_CAN_CLOSE', iosName: 'TTLockFeatureValueTurnOffAutoLock'),
+  wirelessKeypad(24, androidName: 'WIRELESS_KEYBOARD', iosName: 'TTLockFeatureValueWirelessKeypad'),
+  light(25, androidName: 'LAMP', iosName: 'TTLockFeatureValueLight'),
+  hotelCardBlacklist(26, androidName: null, iosName: 'TTLockFeatureValueHotelCardBlacklist'),
+  identityCard(27, androidName: null, iosName: 'TTLockFeatureValueIdentityCard'),
+  tamperAlert(28, androidName: 'TAMPER_ALERT', iosName: 'TTLockFeatureValueTamperAlert'),
+  resetButton(29, androidName: 'RESET_BUTTON', iosName: 'TTLockFeatureValueResetButton'),
+  privacyLock(30, androidName: 'PRIVACY_LOCK', iosName: 'TTLockFeatureValuePrivacyLock'),
+  deadLock(32, androidName: 'DEAD_LOCK', iosName: 'TTLockFeatureValueDeadLock'),
+  cyclicCardOrFingerprint(34, androidName: 'CYCLIC_IC_OR_FINGER_PRINT', iosName: 'TTLockFeatureValueCyclicCardOrFingerprint'),
+  fingerVein(37, androidName: 'FINGER_VEIN', iosName: 'TTLockFeatureValueFingerVein'),
+  ble5G(38, androidName: 'TELINK_CHIP', iosName: 'TTLockFeatureValueBle5G'),
+  nbAwake(39, androidName: 'NB_ACTIVITE_CONFIGURATION', iosName: 'TTLockFeatureValueNBAwake'),
+  recoverCyclePasscode(40, androidName: 'CYCLIC_PASSCODE_CAN_RECOVERY', iosName: 'TTLockFeatureValueRecoverCyclePasscode'),
+  remoteKey(41, androidName: 'REMOTE', iosName: 'TTLockFeatureValueWirelessKeyFob'),
+  getAccessoryElectricQuantity(42, androidName: 'ACCESSORY_BATTERY', iosName: 'TTLockFeatureValueGetAccessoryElectricQuantity'),
+  soundVolumeAndLanguageSetting(43, androidName: 'SOUND_VOLUME_AND_LANGUAGE_SETTING', iosName: 'TTLockFeatureValueSoundVolume'),
+  qrCode(44, androidName: 'QR_CODE', iosName: 'TTLockFeatureValueQRCode'),
+  doorSensorState(45, androidName: 'DOOR_SENSOR', iosName: 'TTLockFeatureValueSensorState'),
+  passageModeAutoUnlockSetting(46, androidName: 'PASSAGE_MODE_AUTO_UNLOCK_SETTING', iosName: 'TTLockFeatureValuePassageModeAutoUnlock'),
+  doorSensor(50, androidName: 'WIRELESS_DOOR_SENSOR', iosName: 'TTLockFeatureValueDoorSensor'),
+  doorSensorAlert(51, androidName: 'DOOR_OPEN_ALARM', iosName: 'TTLockFeatureValueDoorSensorAlert'),
+  sensitivity(52, androidName: 'SENSITIVITY', iosName: 'TTLockFeatureValueSensitivity'),
+  face(53, androidName: 'FACE_3D', iosName: 'TTLockFeatureValueFace'),
+  cpuCard(55, androidName: 'CPU_CARD', iosName: 'TTLockFeatureValueCpuCard'),
+  wifiLock(56, androidName: 'WIFI_LOCK', iosName: 'TTLockFeatureValueWifiLock'),
+  wifiLockStaticIP(58, androidName: 'WIFI_LOCK_SUPPORT_STATIC_IP', iosName: 'TTLockFeatureValueWifiLockStaticIP'),
+  passcodeKeyNumber(60, androidName: 'INCOMPLETE_PASSCODE', iosName: 'TTLockFeatureValuePasscodeKeyNumber'),
+  standAloneActivation(62, androidName: null, iosName: 'TTLockFeatureValueStandAloneActivation'),
+  doubleAuth(63, androidName: 'SUPPORT_DOUBLE_CHECK', iosName: 'TTLockFeatureValueDoubleAuth'),
+  authorizedUnlock(64, androidName: 'APP_AUTH_UNLOCK', iosName: 'TTLockFeatureValueAuthorizedUnlock'),
+  gatewayAuthorizedUnlock(65, androidName: 'GATEWAY_AUTH_UNLOCK', iosName: 'TTLockFeatureValueGatewayAuthorizedUnlock'),
+  noEkeyUnlock(66, androidName: 'DO_NOT_SUPPORT_APP_AND_GATEWAY_UNLOCK', iosName: 'TTLockFeatureValueNoEkeyUnlock'),
+  zhiAnPhotoFace(69, androidName: 'ZHI_AN_FACE_DELIVERY', iosName: 'TTLockFeatureValueZhiAnPhotoFace'),
+  palmVein(70, androidName: 'PALM_VEIN', iosName: 'TTLockFeatureValuePalmVein'),
+  wifiArea(71, androidName: null, iosName: 'TTLockFeatureValueWifiArea'),
+  xiaoCaoCamera(75, androidName: 'SUPPORT_GRASS', iosName: 'TTLockFeatureValueXiaoCaoCamera'),
+  resetLockByCode(76, androidName: 'RESET_LOCK_BY_CODE', iosName: 'TTLockFeatureValueResetLockByCode'),
+  thirdPartyBluetoothDevice(77, androidName: 'SUPPORT_THIRD_PARTY_BLUETOOTH_DEVICE', iosName: null),
+  autoSetAngle(78, androidName: 'AUTO_SET_ANGLE', iosName: 'TTLockFeatureValueAutoSetAngle'),
+  manualSetAngle(79, androidName: 'MANUAL_SET_ANGLE', iosName: 'TTLockFeatureValueManualSetAngle'),
+  controlLatchBolt(80, androidName: 'CONTROL_LATCH_BOLT', iosName: 'TTLockFeatureValueControlLatchBolt'),
+  autoSetUnlockDirection(81, androidName: 'AUTO_SET_UNLOCK_DIRECTION', iosName: 'TTLockFeatureValueAutoSetUnlockDirection'),
+  icCardSecuritySetting(82, androidName: 'SUPPORT_IC_CARD_SECURITY_SETTING', iosName: null),
+  wifiPowerSavingTime(83, androidName: 'SUPPORT_WIFI_SLEEP_MODE_TIMES_SETTING', iosName: 'TTLockFeatureValueWifiPowerSavingTime'),
+  multiFunctionKeypad(84, androidName: 'SUPPORT_MULTI_FUNCTION_KEYPAD', iosName: 'TTLockFeatureValueMultifunctionalKeypad'),
+  doNotSupportTurnOffLatchBolt(85, androidName: 'DO_NOT_SUPPORT_TURN_OFF_LATCH_BOLT', iosName: null),
+  publicMode(86, androidName: 'SUPPORT_PUBLIC_MODE_SETTING', iosName: 'TTLockFeatureValuePublicMode'),
+  lowBatteryAutoUnlock(87, androidName: 'SUPPORT_LOW_BATTERY_UNLOCK_SETTING', iosName: 'TTLockFeatureValueLowBatteryAutoUnlock'),
+  motorDriveTime(88, androidName: 'SUPPORT_MOTOR_DRIVE_TIME_SETTING', iosName: 'TTLockFeatureValueMotorDriveTime'),
+  modifyFeatureValue(89, androidName: 'SUPPORT_MODIFY_FEATURE_VALUE', iosName: 'TTLockFeatureValueModifyFeatureValue'),
+  modifyLockNamePrefix(90, androidName: 'SUPPORT_MODIFY_LOCK_NAME_PREFIX', iosName: 'TTLockFeatureValueModifyLockNamePrefix'),
+  authCode(92, androidName: 'SUPPORT_AUTH_CODE', iosName: 'TTLockFeatureValueAuthCode'),
+  unauthorizedAttemptAlarm(93, androidName: 'UNAUTHORIZED_ATTEMPT_ALARM', iosName: null),
+  powerSaverSupportWifi(96, androidName: 'POWER_SAVER_SUPPORT_WIFI', iosName: 'TTLockFeatureValuePowerSaverSupportWifi'),
+  bluetoothAdvertisingSetting(97, androidName: 'SUPPORT_BLUETOOTH_ADVERTISING_SETTING', iosName: null),
+  workingMode(98, androidName: 'SUPPORT_WORKING_TIMES', iosName: 'TTLockFeatureValueWorkingMode'),
+  supplierCode(99, androidName: 'SUPPORT_SUPPLIER_CODE', iosName: null),
+  catOne(100, androidName: 'SUPPORT_CAT_ONE', iosName: null),
+  forcedOpeningDoorAlarm(102, androidName: 'SUPPORT_FORCED_OPENING_DOOR_ALARM', iosName: null),
+  zhiAnFaceFeatureSecondGeneration(103, androidName: 'ZHI_AN_FACE_FEATURE_SECOND_GENERATION', iosName: null),
+  supportDeadLocking(106, androidName: 'SUPPORT_DEAD_LOCKING', iosName: null),
+  workingTime(107, androidName: null, iosName: 'TTLockFeatureValueWorkingTime'),
+  customQRCode(108, androidName: 'SUPPORT_CUSTOM_QR_CODE', iosName: 'TTLockFeatureValueCustomQRCode'),
+  securityM1Card(109, androidName: 'SUPPORT_SAFE_M1_CARD', iosName: 'TTLockFeatureValueSecurityM1Card'),
+  yiShengPhotoFace(110, androidName: null, iosName: 'TTLockFeatureValueYiShengPhotoFace'),
+  pictureFaceDelivery(112, androidName: 'SUPPORT_PICTURE_FACE_DELIVERY', iosName: null),
+  supportSetAlias(114, androidName: 'SUPPORT_SET_ALIAS', iosName: null),
+  hideWifiCatOneSleepModeSetting(117, androidName: 'HIDE_WIFI_CAT_ONE_SLEEP_MODE_SETTING', iosName: "TTLockFeatureValueHideSleepMode"),
+  semiAutomaticModeControl(119, androidName: null, iosName: "TTLockFeatureValueSemiAutomaticModeControl"),
+  supportSetUserAttributes(120, androidName: null, iosName: "TTLockFeatureValueSetUserAttributes"),
+  supportSupervision(126, androidName: 'SUPPORT_LOCK_SUPERVISION', iosName: "TTLockFeatureValueProofCapture");
+  
+  final int value;
+  final String? androidName;
+  final String? iosName;
 
-  getAdminPasscode, //17
-  hotelCard,
-  noClock,
-  noBroadcastInNormal,
-  passageMode,
-  turnOffAutoLock,
-  wirelessKeypad,
-  light,
-  hotelCardBlacklist,
-  identityCard,
-  tamperAlert,
-  resetButton,
-  privacyLock, //28
-  //31
-  deadLock, //29
-  //33
-  cyclicCardOrFingerprint, //30
-  //35
-  //36
-  fingerVein,
-  ble5G,
-  nbAwake,
-  recoverCyclePasscode,
-  remoteKey,
-  getAccessoryElectricQuantity,
-  soundVolumeAndLanguageSetting,
-  qrCode,
-  doorSensorState,
-  passageModeAutoUnlockSetting,
-  doorSensor, //50
-  doorSensorAlert,
-  sensitivity,
-  face,
-  cpuCard,
-  wifiLock,
-  wifiLockStaticIP,
-  passcodeKeyNumber,
-
-  standAloneActivation,
-  doubleAuth,
-  authorizedUnlock,
-  gatewayAuthorizedUnlock,
-  noEkeyUnlock,
-  zhiAnPhotoFace,
-  palmVein,
-  wifiArea,
-  xiaoCaoCamera,
-  resetLockByCode,
-  multiFunctionKeypad
+  const TTLockFuction(this.value, {this.androidName, this.iosName});
+  static TTLockFuction fromValue(int v) =>
+      TTLockFuction.values.firstWhere((e) => e.value == v);
 }
 
 enum TTFaceState { canStartAdd, error }

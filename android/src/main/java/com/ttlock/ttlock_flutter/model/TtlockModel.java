@@ -90,6 +90,10 @@ public class TtlockModel {
     public int minTime;
     //当前自动闭锁时间
     public int currentTime;
+    //斜舌保持时间
+    public int latchBoltKeepTime;
+    //电机扭力等级
+    public int motorTorqueLevel;
 
     //管理员密码
     public String adminPasscode;
