@@ -207,6 +207,12 @@
 #define command_electric_meter_get_feature_value @"electricMeterGetFeatureValue"
 #define command_electric_meter_enter_upgrade_mode @"electricMeterEnterUpgradeMode"
 
+#define command_electric_meter_get_device_info @"electricMeterGetDeviceInfo"
+#define command_electric_meter_support_function @"electricMeterIsSupportFunction"
+#define command_electric_meter_config_apn @"electricMeterConfigApn"
+#define command_electric_meter_config_meter_server @"electricMeterConfigMeterServer"
+#define command_electric_meter_reset @"electricMeterReset"
+
 
 
 #pragma mark - 水表

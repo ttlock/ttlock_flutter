@@ -62,7 +62,6 @@
 @property (nonatomic, strong) NSString *remainderM3;
 @property (nonatomic, strong) NSString *m3;
 @property (nonatomic, strong) NSString *totalM3;
-@property (nonatomic, strong) NSNumber *WaterMeterFeature;
 @property (nonatomic, strong) NSString *featureValue;
 
 
@@ -159,7 +158,7 @@
 
 //门磁
 @property (nonatomic, strong) NSString * standaloneInfoStr;
-@property (nonatomic, strong) NSNumber *standaloneDoorFeature;
+@property (nonatomic, strong) NSString *standaloneDoorFeature;
 
 
 + (TtlockModel *)modelWithDict:(NSDictionary *)dict;

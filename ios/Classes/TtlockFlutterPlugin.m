@@ -1089,9 +1089,10 @@ typedef NS_ENUM(NSInteger, ErrorDevice) {
     }
     
     else if ([command isEqualToString:command_standalone_door_sensor_get_feature_value]) {
+        
         [TTStandaloneDoorSensor getFeatureValueWithMac:lockModel.mac success:^(NSString * _Nonnull featureValue) {
             NSMutableDictionary * dict = @{}.mutableCopy;
-            dict[@"featureValue"] = featureValue;
+            dict[@"standaloneDoorFeature"] = featureValue;
             [weakSelf successCallbackCommand:command data:dict];
 
         } failure:^(TTStandaloneDoorSensorError error, NSString * _Nonnull errorMsg) {
@@ -1099,7 +1100,7 @@ typedef NS_ENUM(NSInteger, ErrorDevice) {
 
         }];
     } else if ([command isEqualToString:command_standalone_door_sensor_support_function]) {
-        bool isSupport =  [TTStandaloneDoorSensor supportFunction:lockModel.standaloneDoorFeature.intValue featureValue:lockModel.featureValue];
+        bool isSupport =  [TTStandaloneDoorSensor supportFunction:lockModel.supportFunction.intValue featureValue:lockModel.standaloneDoorFeature];
         TtlockModel *data = [TtlockModel new];
         data.isSupport = @(isSupport);
         [weakSelf successCallbackCommand:command data:data];
@@ -1359,6 +1360,48 @@ typedef NS_ENUM(NSInteger, ErrorDevice) {
         }];
     }
     
+    else if ([command isEqualToString:command_electric_meter_support_function]) {
+        bool isSupport = [TTElectricMeter supportFunction:lockModel.supportFunction.intValue featureValue:lockModel.featureValue];
+        TtlockModel *data = [TtlockModel new];
+        data.isSupport = @(isSupport);
+        [weakSelf successCallbackCommand:command data:data];
+    } else if ([command isEqualToString:command_electric_meter_get_device_info]) {
+        [TTElectricMeter getDeviceInfoWithMac:lockModel.mac success:^(TTElectricDeviceInfoModel * _Nonnull model) {
+            NSMutableDictionary *dict = @{}.mutableCopy;
+            dict[@"modelNum"] = model.modelNum;
+            dict[@"hardwareRevision"] = model.hardwareRevision;
+            dict[@"firmwareRevision"] = model.firmwareRevision;
+            dict[@"catOneOperator"] = model.catOneOperator;
+            dict[@"catOneNodeId"] = model.catOneNodeId;
+            dict[@"catOneCardNumber"] = model.catOneCardNumber;
+            dict[@"catOneRssi"] = model.catOneRssi;
+            dict[@"catOneImsi"] = model.catOneImsi;
+            [weakSelf successCallbackCommand:command data:dict];
+        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:nil];
+        }];
+    }else if ([command isEqualToString:command_electric_meter_config_apn]) {
+        [TTElectricMeter configApnWithMac:lockModel.mac apn:lockModel.apn success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:nil];
+        }];
+    }else if ([command isEqualToString:command_electric_meter_config_meter_server]) {
+        [TTElectricMeter configServerWithMac:lockModel.mac serverAddress:lockModel.ip portNumber:lockModel.port success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:nil];
+        }];
+    }else if ([command isEqualToString:command_electric_meter_reset]) {
+        [TTElectricMeter resetWithMac:lockModel.mac success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
+            [weakSelf errorCallbackCommand:command code:error msg:nil];
+        }];
+     
+    }
+    
+    
 #pragma mark - 水表
     else if ([command isEqualToString:command_water_meter_config_server]) {
             [TTWaterMeter setClientParamWithUrl:lockModel.url clientId:lockModel.clientId accessToken:lockModel.accessToken];
@@ -1491,7 +1534,7 @@ typedef NS_ENUM(NSInteger, ErrorDevice) {
             [weakSelf errorCallbackCommand:command code:error msg:nil];
         }];
     } else if ([command isEqualToString:command_water_meter_support_function]) {
-        bool isSupport = [TTWaterMeter supportFunction:lockModel.WaterMeterFeature.intValue featureValue:lockModel.featureValue];
+        bool isSupport = [TTWaterMeter supportFunction:lockModel.supportFunction.intValue featureValue:lockModel.featureValue];
         TtlockModel *data = [TtlockModel new];
         data.isSupport = @(isSupport);
         [weakSelf successCallbackCommand:command data:data];

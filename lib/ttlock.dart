@@ -1478,10 +1478,12 @@ class TTLock {
 
       case COMMAND_FUNCTION_SUPPORT:
       case TTWaterMeter.COMMAND_WATER_METER_SUPPORT_FUNCTION:
+      case TTElectricMeter.COMMAND_ELECTRIC_METER_SUPPORT_FUNCTION:
       case TTStandaloneDoorSensor.COMMAND_STANDALONE_DOOR_SUPPORT_FUNCTION:
         TTFunctionSupportCallback functionSupportCallback = callBack;
         functionSupportCallback(data[TTResponse.isSupport]);
         break;
+
       case COMMAND_GET_NB_AWAKE_MODES:
         TTGetNbAwakeModesCallback getNbAwakeModesCallback = callBack;
         getNbAwakeModesCallback(data[TTResponse.nbAwakeModes]);
@@ -1634,6 +1636,11 @@ class TTLock {
         resultCallback(data[TTResponse.electricMeterId]);
         break;
 
+      case TTElectricMeter.COMMAND_ELECTRIC_METER_GET_DEVICE_INFO:
+        TTElectricMeterDeviceInfoCallback resultCallback = callBack;
+        resultCallback(TTElectricMeterDeviceInfoModel(data));
+        break;
+
       case TTWaterMeter.COMMAND_START_SCAN_WATER_METER:
         TTWaterMeterScanCallback scanCallback = callBack;
         scanCallback(TTWaterMeterScanModel(data));
@@ -1648,11 +1655,6 @@ class TTLock {
       case TTWaterMeter.COMMAND_WATER_METER_GET_DEVICE_INFO:
         TTWaterMeterDeviceInfoCallback resultCallback = callBack;
         resultCallback(TTWaterDeviceInfoModel(data));
-        break;
-
-      case TTWaterMeter.COMMAND_WATER_METER_SUPPORT_FUNCTION:
-        TTFunctionSupportCallback functionSupportCallback = callBack;
-        functionSupportCallback(data[TTResponse.isSupport]);
         break;
 
       case TTDoorSensor.COMMAND_START_SCAN_DOOR_SENSOR:
@@ -1754,7 +1756,7 @@ class TTLock {
         failedCallback(error, errorMessage);
       }
     }
-    
+
     //普通键盘和遥控钥匙失败处理
     else if (command == TTRemoteKey.COMMAND_INIT_REMOTE_KEY ||
         command == TTDoorSensor.COMMAND_INIT_DOOR_SENSOR ||
@@ -1775,9 +1777,7 @@ class TTLock {
       if (failedCallback != null) {
         failedCallback(error, errorMessage);
       }
-    } 
-    
-    else if (command ==
+    } else if (command ==
             TTRemoteKeypad
                 .COMMAND_MULTIFUNCTIONAL_REMOTE_KEYPAD_DELETE_STORED_LOCK ||
         command ==
@@ -2296,6 +2296,8 @@ typedef TTElectricMeterScanCallback = void Function(
     TTElectricMeterScanModel scanModel);
 typedef TTElectricMeterSuccessResultCallback = void Function(
     int electricMeterId);
+typedef TTElectricMeterDeviceInfoCallback = void Function(
+    TTElectricMeterDeviceInfoModel deviceInfoModel);
 
 typedef TTMeterFailedCallback = void Function(
     TTMeterErrorCode errorCode, String message);

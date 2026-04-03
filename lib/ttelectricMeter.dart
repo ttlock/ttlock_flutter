@@ -33,6 +33,17 @@ class TTElectricMeter {
   static const String COMMAND_ELECTRIC_METER_ENTER_UPGRADE_MODE =
       "electricMeterEnterUpgradeMode";
 
+  static const String COMMAND_ELECTRIC_METER_GET_DEVICE_INFO =
+      "electricMeterGetDeviceInfo";
+  static const String COMMAND_ELECTRIC_METER_SUPPORT_FUNCTION =
+      "electricMeterIsSupportFunction";
+
+  static const String COMMAND_ELECTRIC_METER_CONFIG_APN =
+      "electricMeterConfigApn";
+  static const String COMMAND_ELECTRIC_METER_CONFIG_METER_SERVER =
+      "electricMeterConfigMeterServer";
+  static const String COMMAND_ELECTRIC_METER_RESET = "electricMeterReset";
+
   static void configServer(ElectricMeterServerParamMode paramMode) {
     Map map = Map();
     map["url"] = paramMode.url;
@@ -208,6 +219,59 @@ class TTElectricMeter {
   //       COMMAND_ELECTRIC_METER_ENTER_UPGRADE_MODE, map, successCallback,
   //       fail: failedCallback);
   // }
+
+  static void isSupportFunction(
+    String featureValue,
+    TTElectricMeterFeature electricMeterFeature,
+    TTFunctionSupportCallback callback,
+  ) {
+    Map map = Map();
+    map[TTResponse.featureValue] = featureValue;
+    map[TTResponse.supportFunction] = electricMeterFeature.index;
+    TTLock.invoke(
+      COMMAND_ELECTRIC_METER_SUPPORT_FUNCTION,
+      map,
+      callback,
+    );
+  }
+
+  static void getElectricMeterDeviceInfo(
+    String mac,
+    TTElectricMeterDeviceInfoCallback callback,
+    TTMeterFailedCallback failedCallback,
+  ) {
+    Map map = Map();
+    map[TTResponse.mac] = mac;
+    TTLock.invoke(COMMAND_ELECTRIC_METER_GET_DEVICE_INFO, map, callback,
+        fail_callback: failedCallback);
+  }
+
+  static void configApn(String mac, String apn, TTSuccessCallback callback,
+      TTMeterFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.mac] = mac;
+    map[TTResponse.apn] = apn;
+    TTLock.invoke(COMMAND_ELECTRIC_METER_CONFIG_APN, map, callback,
+        fail_callback: failedCallback);
+  }
+
+  static void configElectricMeterServer(String mac, String ip, String port,
+      TTSuccessCallback callback, TTMeterFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.mac] = mac;
+    map[TTResponse.ip] = ip;
+    map[TTResponse.port] = port;
+    TTLock.invoke(COMMAND_ELECTRIC_METER_CONFIG_METER_SERVER, map, callback,
+        fail_callback: failedCallback);
+  }
+
+  static void resetElectricMeter(String mac, TTSuccessCallback callback,
+      TTMeterFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.mac] = mac;
+    TTLock.invoke(COMMAND_ELECTRIC_METER_RESET, map, callback,
+        fail_callback: failedCallback);
+  }
 }
 
 class ElectricMeterServerParamMode {
@@ -235,8 +299,9 @@ class TTElectricMeterScanModel {
   int rssi = -1;
   TTMeterPayMode payMode = TTMeterPayMode.postpaid;
   int scanTime = 0;
+  String executeResponse = '';
 
-   TTElectricMeterScanModel(Map map) {
+  TTElectricMeterScanModel(Map map) {
     this.name = map[TTResponse.name];
     this.mac = map[TTResponse.mac];
     this.isInited = map[TTResponse.isInited];
@@ -250,5 +315,33 @@ class TTElectricMeterScanModel {
         ? TTMeterPayMode.postpaid
         : TTMeterPayMode.prepaid;
     this.scanTime = map[TTResponse.scanTime] ?? 0;
+    this.executeResponse = map[TTResponse.executeResponse] ?? '';
+  }
+}
+
+enum TTElectricMeterFeature {
+  TTElectricMeterFeatureCatOne,
+  TTElectricMeterFeatureTelink
+}
+
+class TTElectricMeterDeviceInfoModel {
+  String modelNum = '';
+  String hardwareRevision = '';
+  String firmwareRevision = '';
+  String catOneOperator = '';
+  String catOneNodeId = '';
+  String catOneCardNumber = '';
+  String catOneRssi = '';
+  String catOneImsi = '';
+
+  TTElectricMeterDeviceInfoModel(Map map) {
+    this.modelNum = map[TTResponse.modelNum] ?? '';
+    this.hardwareRevision = map[TTResponse.hardwareRevision] ?? '';
+    this.firmwareRevision = map[TTResponse.firmwareRevision] ?? '';
+    this.catOneOperator = map[TTResponse.catOneOperator] ?? '';
+    this.catOneNodeId = map[TTResponse.catOneNodeId] ?? '';
+    this.catOneCardNumber = map[TTResponse.catOneCardNumber] ?? '';
+    this.catOneRssi = (map[TTResponse.catOneRssi] ?? '').toString();
+    this.catOneImsi = map[TTResponse.catOneImsi] ?? '';
   }
 }

@@ -253,8 +253,8 @@ class TTWaterMeter {
         fail_callback: failedCallback);
   }
 
-  static void resetWaterMeter(
-      String mac, TTSuccessCallback callback, TTMeterFailedCallback failedCallback) {
+  static void resetWaterMeter(String mac, TTSuccessCallback callback,
+      TTMeterFailedCallback failedCallback) {
     Map map = Map();
     map[TTResponse.mac] = mac;
     TTLock.invoke(COMMAND_WATER_METER_RESET, map, callback,
@@ -321,14 +321,14 @@ class TTWaterDeviceInfoModel {
   String catOneImsi = '';
 
   TTWaterDeviceInfoModel(Map map) {
-    this.modelNum = map[TTResponse.modelNum]??'';
-    this.hardwareRevision = map[TTResponse.hardwareRevision]??'';
-    this.firmwareRevision = map[TTResponse.firmwareRevision]??'';
-    this.catOneOperator = map[TTResponse.catOneOperator]??'';
-    this.catOneNodeId = map[TTResponse.catOneNodeId]??'';
-    this.catOneCardNumber = map[TTResponse.catOneCardNumber]??'';
-    this.catOneRssi = (map[TTResponse.catOneRssi] ?? '').toString(); 
-    this.catOneImsi = map[TTResponse.catOneImsi]??'';
+    this.modelNum = map[TTResponse.modelNum] ?? '';
+    this.hardwareRevision = map[TTResponse.hardwareRevision] ?? '';
+    this.firmwareRevision = map[TTResponse.firmwareRevision] ?? '';
+    this.catOneOperator = map[TTResponse.catOneOperator] ?? '';
+    this.catOneNodeId = map[TTResponse.catOneNodeId] ?? '';
+    this.catOneCardNumber = map[TTResponse.catOneCardNumber] ?? '';
+    this.catOneRssi = (map[TTResponse.catOneRssi] ?? '').toString();
+    this.catOneImsi = map[TTResponse.catOneImsi] ?? '';
   }
 }
 
