@@ -43,20 +43,22 @@ class LockApi: TTLockHostApi {
 
     private fun buildValidityInfo(cycleList: List<TTCycleModel>?, startDate: Long, endDate: Long): ValidityInfo {
         val validityInfo = ValidityInfo()
-        validityInfo.startDate = startDate
-        validityInfo.endDate = endDate
-
+        if(startDate != 0L){
+            validityInfo.startDate = startDate
+        }
+        if(endDate != 0L){
+            validityInfo.endDate = endDate
+        }
         if (cycleList.isNullOrEmpty()) {
             validityInfo.modeType = ValidityInfo.TIMED
-            return validityInfo
+        }else {
+            validityInfo.modeType = ValidityInfo.CYCLIC
+            val cyclicConfigs: List<CyclicConfig> = run {
+                val type = object : TypeToken<List<CyclicConfig>>() {}
+                gson.fromJson(gson.toJson(cycleList), type.type)
+            }
+            validityInfo.cyclicConfigs = cyclicConfigs
         }
-
-        validityInfo.modeType = ValidityInfo.CYCLIC
-        val cyclicConfigs: List<CyclicConfig> = run {
-            val type = object : TypeToken<List<CyclicConfig>>() {}
-            gson.fromJson(gson.toJson(cycleList), type.type)
-        }
-        validityInfo.cyclicConfigs = cyclicConfigs
         return validityInfo
     }
 

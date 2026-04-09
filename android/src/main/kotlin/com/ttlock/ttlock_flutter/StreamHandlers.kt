@@ -286,11 +286,12 @@ class AddLockFaceImpl : LockAddFaceStreamHandler {
             }
 
             override fun onCollectionStatus(status: FaceCollectionStatus) {
-                val err = TTFaceErrorCode.ofRaw(status.getValue()) ?: TTFaceErrorCode.NORMAL
+                val err = faceErrorCodeRevert(status)
+                val state = if(err != TTFaceErrorCode.NORMAL) TTFaceState.ERROR else null
                 sink.success(
                     AddFaceEvent(
                         isProgress = true,
-                        state = TTFaceState.CAN_START_ADD,
+                        state = state,
                         errorCode = err,
                         faceNumber = null
                     )

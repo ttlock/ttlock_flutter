@@ -8,6 +8,7 @@ import com.ttlock.bl.sdk.constant.LockDataSwitchValue
 import com.ttlock.bl.sdk.constant.LockStatus
 import com.ttlock.bl.sdk.electricmeter.model.ElectricMeterError
 import com.ttlock.bl.sdk.entity.AccessoryType
+import com.ttlock.bl.sdk.entity.FaceCollectionStatus
 import com.ttlock.bl.sdk.entity.LockError
 import com.ttlock.bl.sdk.entity.OperateLogType
 import com.ttlock.bl.sdk.entity.PassageModeType
@@ -356,5 +357,31 @@ fun multifunctionalKeypadErrorRevert(error: MultifunctionalKeypadError): TTMulti
         MultifunctionalKeypadError.NO_RESPONSE -> TTMultifunctionalKeypadError.NO_RESPONSE
         MultifunctionalKeypadError.KEYPAD_CONNECT_FAIL -> TTMultifunctionalKeypadError.KEYPAD_CONNECT_FAILED
         MultifunctionalKeypadError.DATA_FORMAT_ERROR -> TTMultifunctionalKeypadError.DATA_FORMAT_ERROR
+    }
+}
+
+fun faceErrorCodeRevert(error: FaceCollectionStatus): TTFaceErrorCode {
+    return when(error) {
+        FaceCollectionStatus.UNKNOWN_STATUS -> TTFaceErrorCode.NORMAL
+        FaceCollectionStatus.NO_FACE_DETECTED -> TTFaceErrorCode.NO_FACE_DETECTED
+        FaceCollectionStatus.FACE_IS_TOO_CLOSE_TO_THE_UPPER_EDGE -> TTFaceErrorCode.TOO_CLOSE_TO_THE_TOP
+        FaceCollectionStatus.FACE_IS_TOO_CLOSE_TO_THE_LOWER_EDGE -> TTFaceErrorCode.TOO_CLOSE_TO_THE_BOTTOM
+        FaceCollectionStatus.FACE_IS_TOO_CLOSE_TO_THE_LEFT_EDGE -> TTFaceErrorCode.TOO_CLOSE_TO_THE_LEFT
+        FaceCollectionStatus.FACE_IS_TOO_CLOSE_TO_THE_RIGHT_EDGE -> TTFaceErrorCode.TOO_CLOSE_TO_THE_RIGHT
+        FaceCollectionStatus.FACE_DISTANCE_IS_TOO_FAR -> TTFaceErrorCode.TOO_FAR_AWAY
+        FaceCollectionStatus.FACE_DISTANCE_IS_TOO_CLOOSE -> TTFaceErrorCode.TOO_CLOSE
+        FaceCollectionStatus.EYEBROW_OCCLUSION -> TTFaceErrorCode.EYEBROWS_COVERED
+        FaceCollectionStatus.EYE_OCCLUSION -> TTFaceErrorCode.EYES_COVERED
+        FaceCollectionStatus.FACE_OCCLUSION -> TTFaceErrorCode.FACE_COVERED
+        FaceCollectionStatus.INPUT_FACE_DIRECTION_ERROR -> TTFaceErrorCode.FACE_DIRECTION
+        FaceCollectionStatus.EYE_OPENING_DETECTED_IN_CLOSED_MODE -> TTFaceErrorCode.EYE_OPENING_DETECTED
+        FaceCollectionStatus.CLOSED_EYE_STATE -> TTFaceErrorCode.EYES_CLOSED_STATUS
+        FaceCollectionStatus.OPEN_AND_CLOSED_EYE_STATE_CAN_NOT_BE_DETECTED -> TTFaceErrorCode.FAILED_TO_DETECT_EYE
+        FaceCollectionStatus.NEED_TO_TURN_LEFT -> TTFaceErrorCode.NEED_TURN_HEAD_TO_LEFT
+        FaceCollectionStatus.NEED_TO_TURN_RIGHT -> TTFaceErrorCode.NEED_TURN_HEAD_TO_RIGHT
+        FaceCollectionStatus.HEAD_UP_REQUIRED -> TTFaceErrorCode.NEED_RAISE_HEAD
+        FaceCollectionStatus.NEED_TO_BOW_YOUR_HEAD -> TTFaceErrorCode.NEED_LOWER_HEAD
+        FaceCollectionStatus.TILT_YOUR_HEAD_TO_THE_LEFT -> TTFaceErrorCode.NEED_TILT_HEAD_TO_LEFT
+        FaceCollectionStatus.TILT_YOUR_HEAD_TO_THE_RIGHT -> TTFaceErrorCode.NEED_TILT_HEAD_TO_RIGHT
     }
 }
