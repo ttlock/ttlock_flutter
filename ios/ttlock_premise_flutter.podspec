@@ -14,11 +14,10 @@ A new flutter plugin project.
   s.author           = { 'Your Company' => 'email@example.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
-  s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
   s.platform = :ios, '12.0'
 #   s.vendored_frameworks = "Frameworks/**/*.framework"
-  s.dependency 'TTLockOnPremise', '2.2.0'
+  s.dependency 'TTLockOnPremise', '2.2.2'
   s.static_framework = true
   s.swift_version = '5.0'
 

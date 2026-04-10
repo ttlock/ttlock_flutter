@@ -3443,7 +3443,7 @@ protocol TTGatewayHostApi {
   func setEventGatewayMac(mac: String) throws
   func connect(mac: String, completion: @escaping (Result<TTGatewayConnectStatus, Error>) -> Void)
   func disconnect(mac: String) throws
-  func init(params: TTGatewayInitParams, completion: @escaping (Result<GatewayDeviceInfo, Error>) -> Void)
+    func `init`(params: TTGatewayInitParams, completion: @escaping (Result<GatewayDeviceInfo, Error>) -> Void)
   func configIp(mac: String, ipSetting: TTIpSetting, completion: @escaping (Result<Void, Error>) -> Void)
   func configApn(mac: String, apn: String, completion: @escaping (Result<Void, Error>) -> Void)
   func getNetworkMac(completion: @escaping (Result<String?, Error>) -> Void)
@@ -3509,7 +3509,7 @@ class TTGatewayHostApiSetup {
       initChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let paramsArg = args[0] as! TTGatewayInitParams
-        api.init(params: paramsArg) { result in
+          api.`init`(params: paramsArg) { result in
           switch result {
           case .success(let res):
             reply(wrapResult(res))

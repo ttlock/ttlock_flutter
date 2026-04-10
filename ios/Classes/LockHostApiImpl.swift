@@ -16,6 +16,20 @@ private func parseJsonArrayString(_ json: String?) -> [[String: Any?]] {
   }
 }
 
+private func lockVersionToJsonString(_ version: TTLockVersion) -> String {
+  var dict: [String: Any] = [
+    "protocolType": String(version.protocolType),
+    "protocolVersion": String(version.protocolVersion),
+    "scene": String(version.scene),
+    "groupId": String(version.groupId),
+    "orgId": String(version.orgId),
+  ]
+  guard let data = try? JSONSerialization.data(withJSONObject: dict) else {
+    return ""
+  }
+  return String(data: data, encoding: .utf8) ?? ""
+}
+
 final class LockHostApiImpl: NSObject, TTLockHostApi {
   private let context: EventContextStore
   init(context: EventContextStore) { self.context = context }
@@ -33,7 +47,7 @@ final class LockHostApiImpl: NSObject, TTLockHostApi {
   func initLock(params: TTLockInitParams, completion: @escaping (Result<String, Error>) -> Void) {
     var payload: [String: Any] = [
       "lockMac": params.lockMac,
-      "lockVersion": params.lockVersion,
+      "lockVersion": lockVersionToJsonString(params.lockVersion),
       "isInited": params.isInited,
     ]
     if params.clientPara != nil {
@@ -534,7 +548,7 @@ final class LockHostApiImpl: NSObject, TTLockHostApi {
   func setAutoLockingPeriodicTime(
     seconds: Int64, lockData: String, completion: @escaping (Result<Void, Error>) -> Void
   ) {
-    TTLock.setAutomaticLockingPeriodicTime(Int32(Int(seconds)), lockData: lockData) {
+      TTLock.setAutomaticLockingPeriodicTime(Int32(seconds), lockData: lockData) {
       completion(.success(()))
     } failure: { errorCode, errorMsg in
       completion(

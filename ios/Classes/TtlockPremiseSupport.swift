@@ -14,7 +14,7 @@ func makeLockApiError(operation: String, error: TTLockOnPremise.TTError, message
 }
 
 func makeGatewayApiError(
-  operation: String, error: TTLockOnPremise.TTGatewayError, message: String? = nil
+  operation: String, error: TTLockOnPremise.TTGatewayStatus, message: String? = nil
 ) -> PigeonError {
   let mapped = gatewayErrorConvert(error)
   let fallback = "\(operation) failed: \(error.rawValue)"
@@ -22,7 +22,7 @@ func makeGatewayApiError(
 }
 
 func makeRemoteAccessoryApiError(
-  operation: String, error: TTLockOnPremise.TTRemoteError, message: String? = nil
+  operation: String, error: TTLockOnPremise.TTKeyFobStatus, message: String? = nil
 ) -> PigeonError {
   let mapped = remoteErrorConvert(error)
   let fallback = "\(operation) failed: \(error.rawValue)"
@@ -30,7 +30,7 @@ func makeRemoteAccessoryApiError(
 }
 
 func makeKeypadAccessoryApiError(
-  operation: String, error: TTLockOnPremise.TTKeypadError, message: String? = nil
+  operation: String, error: TTLockOnPremise.TTKeypadStatus, message: String? = nil
 ) -> PigeonError {
   let mapped = keypadErrorConvert(error)
   let fallback = "\(operation) failed: \(error.rawValue)"
@@ -62,7 +62,7 @@ func makeElectricMeterApiError(
 }
 
 func makeMultifunctionalKeypadApiError(
-  operation: String, error: TTLockOnPremise.TTMultifunctionalKeypadError, message: String? = nil
+  operation: String, error: TTLockOnPremise.TTKeypadStatus, message: String? = nil
 ) -> PigeonError {
   let mapped = multifunctionalKeypadErrorConvert(error)
   let fallback = "\(operation) failed: \(error.rawValue)"

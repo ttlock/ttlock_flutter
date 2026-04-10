@@ -483,6 +483,19 @@ func lockErrorConvert(_ error: TTLockOnPremise.TTError) -> TTLockError {
 //   case dataFormatError = 14
 // }
 
+func gatewayConnectStatusConvert(_ error: TTLockOnPremise.TTGatewayConnectStatus) -> TTGatewayConnectStatus {
+    switch error {
+    case .success:
+        return .success
+    case .timeout:
+        return .timeout
+    case .fail:
+        return .failed
+    @unknown default:
+        return .failed
+    }
+}
+
 func gatewayErrorConvert(_ error: TTLockOnPremise.TTGatewayStatus) -> TTGatewayError {
   switch error {
   case .success:

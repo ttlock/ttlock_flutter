@@ -49,11 +49,7 @@ final class GatewayHostApiImpl: NSObject, TTGatewayHostApi {
 
   func connect(mac: String, completion: @escaping (Result<TTGatewayConnectStatus, Error>) -> Void) {
     TTGateway.connectGateway(withGatewayMac: mac) { nativeStatus in
-      if nativeStatus == .success {
-        completion(.success(.success))
-      } else {
-        completion(.failure(makeGatewayApiError(operation: "gateway.connect", error: nativeStatus)))
-      }
+        completion(.success(gatewayConnectStatusConvert(nativeStatus)))
     }
   }
 
