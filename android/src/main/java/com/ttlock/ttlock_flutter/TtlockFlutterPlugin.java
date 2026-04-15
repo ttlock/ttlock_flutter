@@ -102,8 +102,11 @@ import com.ttlock.bl.sdk.electricmeter.api.ElectricMeterClient;
 import com.ttlock.bl.sdk.electricmeter.callback.AddCallback;
 import com.ttlock.bl.sdk.electricmeter.callback.ChargeCallback;
 import com.ttlock.bl.sdk.electricmeter.callback.ClearRemainingElectricityCallback;
+import com.ttlock.bl.sdk.electricmeter.callback.ConfigApnCallback;
 import com.ttlock.bl.sdk.electricmeter.callback.DeleteCallback;
+import com.ttlock.bl.sdk.electricmeter.callback.GetDeviceInfoCallback;
 import com.ttlock.bl.sdk.electricmeter.callback.GetFeatureValueCallback;
+import com.ttlock.bl.sdk.electricmeter.callback.ResetCallback;
 import com.ttlock.bl.sdk.electricmeter.callback.ReadDataCallback;
 import com.ttlock.bl.sdk.electricmeter.callback.ScanElectricMeterCallback;
 import com.ttlock.bl.sdk.electricmeter.callback.SetMaxPowerCallback;
@@ -112,6 +115,8 @@ import com.ttlock.bl.sdk.electricmeter.callback.SetRemainingElectricityCallback;
 import com.ttlock.bl.sdk.electricmeter.callback.SetWorkModeCallback;
 import com.ttlock.bl.sdk.electricmeter.model.ElectricMeter;
 import com.ttlock.bl.sdk.electricmeter.model.ElectricMeterError;
+import com.ttlock.bl.sdk.electricmeter.model.ElectricMeterInfo;
+import com.ttlock.bl.sdk.meter.model.DeviceInfo;
 import com.ttlock.bl.sdk.entity.AccessoryInfo;
 import com.ttlock.bl.sdk.entity.AccessoryType;
 import com.ttlock.bl.sdk.entity.ActivateLiftFloorsResult;
@@ -143,7 +148,6 @@ import com.ttlock.bl.sdk.gateway.callback.InitGatewayCallback;
 import com.ttlock.bl.sdk.gateway.callback.ScanGatewayCallback;
 import com.ttlock.bl.sdk.gateway.callback.ScanWiFiByGatewayCallback;
 import com.ttlock.bl.sdk.gateway.model.ConfigureGatewayInfo;
-import com.ttlock.bl.sdk.gateway.model.DeviceInfo;
 import com.ttlock.bl.sdk.gateway.model.GatewayError;
 import com.ttlock.bl.sdk.gateway.model.WiFi;
 import com.ttlock.bl.sdk.keypad.InitKeypadCallback;
@@ -172,8 +176,6 @@ import com.ttlock.bl.sdk.util.GsonUtil;
 import com.ttlock.bl.sdk.util.LogUtil;
 import com.ttlock.bl.sdk.watermeter.api.WaterMeterClient;
 import com.ttlock.bl.sdk.watermeter.callback.ClearRemainingWaterCallback;
-import com.ttlock.bl.sdk.watermeter.callback.ConfigApnCallback;
-import com.ttlock.bl.sdk.watermeter.callback.GetDeviceInfoCallback;
 import com.ttlock.bl.sdk.watermeter.callback.RechargeCallback;
 import com.ttlock.bl.sdk.watermeter.callback.SetRemainingWaterCallback;
 import com.ttlock.bl.sdk.watermeter.callback.SetTotalUsageCallback;
@@ -931,9 +933,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     PermissionUtils.doWithConnectPermission(activity, (success) -> {
       if(success)
       {
-        WaterMeterClient.getDefault().getDeviceInfo(params.get(TTParam.MAC).toString(), new GetDeviceInfoCallback() {
+        WaterMeterClient.getDefault().getDeviceInfo(params.get(TTParam.MAC).toString(), new com.ttlock.bl.sdk.watermeter.callback.GetDeviceInfoCallback() {
           @Override
-          public void onGetSuccess(com.ttlock.bl.sdk.watermeter.model.DeviceInfo deviceInfo) {
+          public void onGetSuccess(com.ttlock.bl.sdk.meter.model.DeviceInfo deviceInfo) {
             Map<String, Object> params = new HashMap<>();
             //TODO 后面按需加入
             params.put("modelNum", "");
@@ -950,7 +952,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
           }
 
           @Override
-          public void onFail(WaterMeterError waterMeterError) {
+          public void onFail(com.ttlock.bl.sdk.watermeter.model.WaterMeterError waterMeterError) {
             errorCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_GET_DEVICE_INFO, waterMeterError);
           }
         });
@@ -975,7 +977,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     PermissionUtils.doWithConnectPermission(activity, (success) -> {
       if(success)
       {
-        WaterMeterClient.getDefault().configApn(params.get(TTParam.MAC).toString(), params.get("apn").toString(), new ConfigApnCallback() {
+        WaterMeterClient.getDefault().configApn(params.get(TTParam.MAC).toString(), params.get("apn").toString(), new com.ttlock.bl.sdk.watermeter.callback.ConfigApnCallback() {
           @Override
           public void onConfigSuccess() {
             successCallbackCommand(TTWaterMeterCommand.COMMAND_WATER_METER_CONFIG_APN, new HashMap());
@@ -1096,6 +1098,21 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         break;
       case TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_ENTER_UPGRADE_MODE:
         break;
+      case TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_GET_DEVICE_INFO:
+        electricMeterGetDeviceInfo(params);
+        break;
+      case TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_SUPPORT_FUNCTION:
+        electricMeterIsSupportFunction(params);
+        break;
+      case TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_CONFIG_APN:
+        electricMeterConfigApn(params);
+        break;
+      case TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_CONFIG_METER_SERVER:
+        electricMeterConfigMeterServer(params);
+        break;
+      case TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_RESET:
+        electricMeterReset(params);
+        break;
 
     }
   }
@@ -1196,11 +1213,11 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 //    Log.d("打印价格", String.valueOf(price));
         ElectricMeterClient.getDefault().add(map, new AddCallback() {
           @Override
-          public void onAddSuccess(FirmwareInfo firmwareInfo) {
+          public void onAddSuccess(ElectricMeterInfo electricMeterInfo) {
             //TODO 返回需要增加 electricMeterld
             Map<String, Object> map = new HashMap<>();
             //            dict[@"electricMeterId"] = @(result.electricMeterId);
-            map.put("electricMeterId", -1);
+            map.put("electricMeterId", electricMeterInfo.getElectricMeterId());
             successCallbackCommand(TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_INIT, map);
           }
 
@@ -1444,9 +1461,120 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
   }
 
+  public void electricMeterGetDeviceInfo(Map<String, Object> params)
+  {
+    PermissionUtils.doWithConnectPermission(activity, (success) -> {
+      if(success)
+      {
+        ElectricMeterClient.getDefault().getDeviceInfo(params.get(TTParam.MAC).toString(), new GetDeviceInfoCallback() {
+          @Override
+          public void onGetSuccess(DeviceInfo deviceInfo) {
+            Map<String, Object> result = new HashMap<>();
+            result.put(TTParam.MODEL_NUM, "");
+            result.put(TTParam.HARD_WARE_REVISION, "");
+            result.put(TTParam.FIRMWARE_REVISION, "");
+            result.put("catOneOperator", deviceInfo.getCatOneOperator());
+            result.put("catOneNodeId", deviceInfo.getCatOneNodeId());
+            result.put("catOneCardNumber", deviceInfo.getCatOneCardNumber());
+            result.put("catOneRssi", deviceInfo.getCatOneRssi());
+            result.put("catOneImsi", deviceInfo.getCatOneImsi());
+            successCallbackCommand(TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_GET_DEVICE_INFO, result);
+          }
 
+          @Override
+          public void onFail(ElectricMeterError electricMeterError) {
+            errorCallbackCommand(TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_GET_DEVICE_INFO, electricMeterError);
+          }
+        });
+      }else
+      {
+        callbackCommand(TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_GET_DEVICE_INFO, ResultStateFail, null, ElectricityMeterErrorConvert.bluetoothPowerOff,"no connect permission" );
+      }
+    });
+  }
 
+  public void electricMeterIsSupportFunction(Map<String, Object> params)
+  {
+    boolean isSupport = FeatureValueUtil.isSupportFeatureValue(params.get(TTParam.featureValue).toString(), Integer.parseInt(params.get(TTParam.supportFunction).toString()));
+    HashMap<String,Object> map = new HashMap<>();
+    map.put("isSupport", isSupport);
+    successCallbackCommand(TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_SUPPORT_FUNCTION, map);
+  }
 
+  public void electricMeterConfigApn(Map<String, Object> params)
+  {
+    PermissionUtils.doWithConnectPermission(activity, (success) -> {
+      if(success)
+      {
+        ElectricMeterClient.getDefault().configApn(params.get(TTParam.MAC).toString(), params.get("apn").toString(), new ConfigApnCallback() {
+          @Override
+          public void onConfigSuccess() {
+            successCallbackCommand(TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_CONFIG_APN, new HashMap<>());
+          }
+
+          @Override
+          public void onFail(ElectricMeterError electricMeterError) {
+            errorCallbackCommand(TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_CONFIG_APN, electricMeterError);
+          }
+        });
+
+      }else
+      {
+        callbackCommand(TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_CONFIG_APN, ResultStateFail, null, ElectricityMeterErrorConvert.bluetoothPowerOff,"no connect permission" );
+      }
+    });
+  }
+
+  public void electricMeterConfigMeterServer(Map<String, Object> params)
+  {
+    PermissionUtils.doWithConnectPermission(activity, (success) -> {
+      if(success)
+      {
+        String mac = params.get(TTParam.MAC).toString();
+        String serverAddress = params.get("ip").toString();
+        int port = Integer.parseInt(params.get("port").toString());
+        ElectricMeterClient.getDefault().configServer(mac, serverAddress, port, new com.ttlock.bl.sdk.electricmeter.callback.ConfigServerCallback() {
+          @Override
+          public void onConfigSuccess() {
+            successCallbackCommand(TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_CONFIG_METER_SERVER, new HashMap<>());
+          }
+
+          @Override
+          public void onFail(ElectricMeterError electricMeterError) {
+            errorCallbackCommand(TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_CONFIG_METER_SERVER, electricMeterError);
+          }
+        });
+      }
+      else
+      {
+        callbackCommand(TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_CONFIG_METER_SERVER, ResultStateFail, null, ElectricityMeterErrorConvert.bluetoothPowerOff, "no connect permission");
+      }
+    });
+  }
+
+  public void electricMeterReset(Map<String, Object> params)
+  {
+    PermissionUtils.doWithConnectPermission(activity, (success) -> {
+      if(success)
+      {
+        ElectricMeterClient.getDefault().reset(params.get(TTParam.MAC).toString(), new ResetCallback() {
+          @Override
+          public void onResetSuccess() {
+            successCallbackCommand(TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_RESET, new HashMap<>());
+          }
+
+          @Override
+          public void onFail(ElectricMeterError electricMeterError) {
+            errorCallbackCommand(TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_RESET, electricMeterError);
+          }
+        });
+      }
+      else
+      {
+        callbackCommand(TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_RESET, ResultStateFail, null, ElectricityMeterErrorConvert.bluetoothPowerOff, "no connect permission");
+      }
+    });
+  }
 
   public void isSupportFeature(TtlockModel ttlockModel) {
     boolean isSupport = FeatureValueUtil.isSupportFeature(ttlockModel.lockData, TTLockFunction.flutter2Native(ttlockModel.supportFunction));
@@ -2087,9 +2215,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
     PermissionUtils.doWithConnectPermission(activity, success -> {
       if (success) {
-        GatewayClient.getDefault().initGateway(configureGatewayInfo, new InitGatewayCallback() {
+        GatewayClient.getDefault().initGateway(configureGatewayInfo, new com.ttlock.bl.sdk.gateway.callback.InitGatewayCallback() {
           @Override
-          public void onInitGatewaySuccess(DeviceInfo deviceInfo) {
+          public void onInitGatewaySuccess(com.ttlock.bl.sdk.gateway.model.DeviceInfo deviceInfo) {
             HashMap<String, Object> gatewayInfoMap = new HashMap<>();
             gatewayInfoMap.put("modelNum", deviceInfo.modelNum);
             gatewayInfoMap.put("hardwareRevision", deviceInfo.hardwareRevision);

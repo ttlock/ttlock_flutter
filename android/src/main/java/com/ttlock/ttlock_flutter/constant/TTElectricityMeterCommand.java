@@ -31,7 +31,15 @@ public class TTElectricityMeterCommand {
             "electricMeterGetFeatureValue";
     public static final String COMMAND_ELECTRIC_METER_ENTER_UPGRADE_MODE =
             "electricMeterEnterUpgradeMode";
-
+    public static final String COMMAND_ELECTRIC_METER_GET_DEVICE_INFO =
+            "electricMeterGetDeviceInfo";
+    public static final String COMMAND_ELECTRIC_METER_SUPPORT_FUNCTION =
+            "electricMeterIsSupportFunction";
+    public static final String COMMAND_ELECTRIC_METER_CONFIG_APN =
+            "electricMeterConfigApn";
+    public static final String COMMAND_ELECTRIC_METER_CONFIG_METER_SERVER =
+            "electricMeterConfigMeterServer";
+    public static final String COMMAND_ELECTRIC_METER_RESET = "electricMeterReset";
 
     public static boolean isElectricityMeterCommand(String command) {
         Field[] fields = TTElectricityMeterCommand.class.getDeclaredFields();
