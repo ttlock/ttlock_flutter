@@ -1218,6 +1218,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
             Map<String, Object> map = new HashMap<>();
             //            dict[@"electricMeterId"] = @(result.electricMeterId);
             map.put("electricMeterId", electricMeterInfo.getElectricMeterId());
+            map.put(TTParam.featureValue, electricMeterInfo.getFeatureValue());
             successCallbackCommand(TTElectricityMeterCommand.COMMAND_ELECTRIC_METER_INIT, map);
           }
 

@@ -77,8 +77,8 @@ class TTStandaloneDoorSensorInfo {
     this.electricQuantity = map[TTResponse.electricQuantity] ?? -1;
     this.featureValue = map[TTResponse.featureValue];
     this.wifiMac = map[TTResponse.wifiMac];
-    this.modelNum = map[TTResponse.modelNum];
-    this.hardwareRevision = map[TTResponse.hardwareRevision];
-    this.firmwareRevision = map[TTResponse.firmwareRevision];
+    this.modelNum = map[TTResponse.modelNum] ?? '';
+    this.hardwareRevision = map[TTResponse.hardwareRevision] ?? '';
+    this.firmwareRevision = map[TTResponse.firmwareRevision] ?? '';
   }
 }

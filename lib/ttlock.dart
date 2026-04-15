@@ -1633,7 +1633,7 @@ class TTLock {
 
       case TTElectricMeter.COMMAND_ELECTRIC_METER_INIT:
         TTElectricMeterSuccessResultCallback resultCallback = callBack;
-        resultCallback(data[TTResponse.electricMeterId]);
+        resultCallback(data[TTResponse.electricMeterId], data[TTResponse.featureValue]);
         break;
 
       case TTElectricMeter.COMMAND_ELECTRIC_METER_GET_DEVICE_INFO:
@@ -2295,7 +2295,7 @@ typedef TTAddFaceSuccessCallback = void Function(String faceNumber);
 typedef TTElectricMeterScanCallback = void Function(
     TTElectricMeterScanModel scanModel);
 typedef TTElectricMeterSuccessResultCallback = void Function(
-    int electricMeterId);
+    int electricMeterId, String featureValue);
 typedef TTElectricMeterDeviceInfoCallback = void Function(
     TTElectricMeterDeviceInfoModel deviceInfoModel);
 

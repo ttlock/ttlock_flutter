@@ -1282,6 +1282,7 @@ typedef NS_ENUM(NSInteger, ErrorDevice) {
         [TTElectricMeter addElectricMeterWithInfo:dict success:^(TTElectricMeterAddResult *result){
             NSMutableDictionary *dict = @{}.mutableCopy;
             dict[@"electricMeterId"] = @(result.electricMeterId);
+            dict[@"featureValue"] = result.featureValue;
             [weakSelf successCallbackCommand:command data:dict];
         } failure:^(TTElectricMeterError error, NSString * _Nonnull errorMsg) {
             [weakSelf errorCallbackCommand:command code:error msg:errorMsg];
