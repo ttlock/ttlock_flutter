@@ -116,7 +116,7 @@ class _ScanPageState extends State<ScanPage> {
       initParamMap["number"] = scanModel.name;
       initParamMap["payMode"] = TTMeterPayMode.postpaid.index;
       initParamMap["price"] = '1';
-      TTElectricMeter.init(initParamMap, (int electricMeterId) {
+      TTElectricMeter.init(initParamMap, (int electricMeterId, String featureValue) {
         _dismissLoading();
         Navigator.push(context,
             new MaterialPageRoute(builder: (BuildContext context) {
