@@ -43,6 +43,11 @@ enum Command {
   deleteFingerprint,
   clearFingerprint,
   getAllValidFingerprint,
+  addPalmVein,
+  modifyPalmVein,
+  deletePalmVein,
+  clearPalmVein,
+  getAllValidPalmVein,
 
   getLockAutomaticLockingPeriodicTime,
   setLockAutomaticLockingPeriodicTime,
@@ -115,6 +120,11 @@ class _LockPageState extends State<LockPage> {
     {"Get All Fingerprints": Command.getAllValidFingerprint},
     {"Delete Fingerprint": Command.deleteFingerprint},
     {"Cleaer All Fingerprints": Command.clearFingerprint},
+    {"Add Palm Vein": Command.addPalmVein},
+    {"Modify Palm Vein": Command.modifyPalmVein},
+    {"Get All Palm Veins": Command.getAllValidPalmVein},
+    {"Delete Palm Vein": Command.deletePalmVein},
+    {"Clear All Palm Veins": Command.clearPalmVein},
     {
       "Get Lock Automatic Locking Periodic Time":
           Command.getLockAutomaticLockingPeriodicTime
@@ -171,6 +181,7 @@ class _LockPageState extends State<LockPage> {
   String lockMac = '';
   String? addCardNumber;
   String? addFingerprintNumber;
+  String? addPalmVeinNumber;
   BuildContext? _context;
 
   _LockPageState(String lockData, String lockMac) {
@@ -630,6 +641,64 @@ class _LockPageState extends State<LockPage> {
           _showErrorAndDismiss(errorCode, errorMsg);
         });
         break;
+
+      case Command.addPalmVein:
+        TTLock.addPalmVein(null, startDate, endDate, lockData,
+            (state, palmVeinErrorCode) {
+          print("palm vein state:$state error:$palmVeinErrorCode");
+        }, (palmVeinNumber) {
+          addPalmVeinNumber = palmVeinNumber;
+          _showSuccessAndDismiss("palmVeinNumber: $palmVeinNumber");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+
+      case Command.modifyPalmVein:
+        if (addPalmVeinNumber == null) {
+          _showErrorAndDismiss(
+              TTLockError.fail, 'please add palm vein first');
+          return;
+        }
+        TTLock.modifyPalmVein(
+            null, startDate, endDate, addPalmVeinNumber!, lockData, () {
+          _showSuccessAndDismiss("Success");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+
+      case Command.deletePalmVein:
+        if (addPalmVeinNumber == null) {
+          _showErrorAndDismiss(
+              TTLockError.fail, 'please add palm vein first');
+          return;
+        }
+        TTLock.deletePalmVein(addPalmVeinNumber!, lockData, () {
+          addPalmVeinNumber = null;
+          _showSuccessAndDismiss("Success");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+
+      case Command.clearPalmVein:
+        TTLock.clearPalmVein(lockData, () {
+          addPalmVeinNumber = null;
+          _showSuccessAndDismiss("Success");
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+
+      case Command.getAllValidPalmVein:
+        TTLock.getAllValidPalmVeins(lockData, (palmVeinList) {
+          _showSuccessAndDismiss(palmVeinList.toString());
+        }, (errorCode, errorMsg) {
+          _showErrorAndDismiss(errorCode, errorMsg);
+        });
+        break;
+
       case Command.getLockSystemInfo:
         TTLock.getLockSystemInfo(lockData, (lockSystemInfoModel) {
           _showSuccessAndDismiss(lockSystemInfoModel.modelNum!);

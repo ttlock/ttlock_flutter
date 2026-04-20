@@ -174,6 +174,13 @@
 #define command_face_clear @"faceClear"
 #define command_face_sensitivity @"setSensitivity"
 
+#pragma mark - 掌静脉
+#define command_palm_vein_add @"palmVeinAdd"
+#define command_palm_vein_modify @"palmVeinModify"
+#define command_palm_vein_delete @"palmVeinDelete"
+#define command_palm_vein_clear @"palmVeinClear"
+#define command_get_all_valid_palm_vein @"getAllValidPalmVein"
+
 #define command_get_all_valid_passcode @"getAllValidPasscode"
 #define command_get_all_valid_fingerprint @"getAllValidFingerprint"
 #define command_get_all_valid_card @"getAllValidIcCard"

@@ -23,10 +23,12 @@ import com.ttlock.bl.sdk.callback.AddDoorSensorCallback;
 import com.ttlock.bl.sdk.callback.AddFaceCallback;
 import com.ttlock.bl.sdk.callback.AddFingerprintCallback;
 import com.ttlock.bl.sdk.callback.AddICCardCallback;
+import com.ttlock.bl.sdk.callback.AddPalmVeinCallback;
 import com.ttlock.bl.sdk.callback.AddRemoteCallback;
 import com.ttlock.bl.sdk.callback.ClearAllFingerprintCallback;
 import com.ttlock.bl.sdk.callback.ClearAllICCardCallback;
 import com.ttlock.bl.sdk.callback.ClearFaceCallback;
+import com.ttlock.bl.sdk.callback.ClearPalmVeinCallback;
 import com.ttlock.bl.sdk.callback.ClearPassageModeCallback;
 import com.ttlock.bl.sdk.callback.ClearRemoteCallback;
 import com.ttlock.bl.sdk.callback.ConfigServerCallback;
@@ -37,6 +39,7 @@ import com.ttlock.bl.sdk.callback.DeleteDoorSensorCallback;
 import com.ttlock.bl.sdk.callback.DeleteFaceCallback;
 import com.ttlock.bl.sdk.callback.DeleteFingerprintCallback;
 import com.ttlock.bl.sdk.callback.DeleteICCardCallback;
+import com.ttlock.bl.sdk.callback.DeletePalmVeinCallback;
 import com.ttlock.bl.sdk.callback.DeletePasscodeCallback;
 import com.ttlock.bl.sdk.callback.DeleteRemoteCallback;
 import com.ttlock.bl.sdk.callback.GetAccessoryBatteryLevelCallback;
@@ -44,6 +47,7 @@ import com.ttlock.bl.sdk.callback.GetAdminPasscodeCallback;
 import com.ttlock.bl.sdk.callback.GetAllValidFingerprintCallback;
 import com.ttlock.bl.sdk.callback.GetAllValidICCardCallback;
 import com.ttlock.bl.sdk.callback.GetAllValidPasscodeCallback;
+import com.ttlock.bl.sdk.callback.GetAllPalmVeinsCallback;
 import com.ttlock.bl.sdk.callback.GetAutoLockingPeriodCallback;
 import com.ttlock.bl.sdk.callback.GetBatteryLevelCallback;
 import com.ttlock.bl.sdk.callback.GetLockConfigCallback;
@@ -63,6 +67,7 @@ import com.ttlock.bl.sdk.callback.ModifyAdminPasscodeCallback;
 import com.ttlock.bl.sdk.callback.ModifyFacePeriodCallback;
 import com.ttlock.bl.sdk.callback.ModifyFingerprintPeriodCallback;
 import com.ttlock.bl.sdk.callback.ModifyICCardPeriodCallback;
+import com.ttlock.bl.sdk.callback.ModifyPalmVeinPeriodCallback;
 import com.ttlock.bl.sdk.callback.ModifyPasscodeCallback;
 import com.ttlock.bl.sdk.callback.ModifyRemoteValidityPeriodCallback;
 import com.ttlock.bl.sdk.callback.RecoverLockDataCallback;
@@ -110,6 +115,7 @@ import com.ttlock.bl.sdk.entity.LockError;
 import com.ttlock.bl.sdk.entity.LockVersion;
 import com.ttlock.bl.sdk.entity.NBAwakeMode;
 import com.ttlock.bl.sdk.entity.NBAwakeTime;
+import com.ttlock.bl.sdk.entity.PalmVeinCollectionStatus;
 import com.ttlock.bl.sdk.entity.PassageModeConfig;
 import com.ttlock.bl.sdk.entity.PassageModeType;
 import com.ttlock.bl.sdk.entity.PowerSaverWorkMode;
@@ -241,6 +247,8 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
    */
   private static final int STATUS_FACE_ENTER_ADD_MODE = 0;
   private static final int STATUS_FACE_ERROR = 1;
+  private static final int STATUS_PALM_VEIN_ENTER_ADD_MODE = 0;
+  private static final int STATUS_PALM_VEIN_ERROR = 1;
 
   private Runnable commandTimeOutRunable = new Runnable() {
     @Override
@@ -1117,6 +1125,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       case TTLockCommand.COMMAND_GET_ALL_VALID_FINGERPRINT:
         getAllValidFingerPrints(ttlockModel);
         break;
+      case TTLockCommand.COMMAND_GET_ALL_VALID_PALM_VEIN:
+        getAllValidPalmVeins(ttlockModel);
+        break;
 //      case TTLockCommand.COMMAND_SET_NB_SERVER_INFO:
 //        setNBServerInfo(ttlockModel);
 //        break;
@@ -1212,6 +1223,18 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         break;
       case TTLockCommand.COMMAND_CLEAR_FACE:
         clearFace(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_ADD_PALM_VEIN:
+        addPalmVein(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_MODIFY_PALM_VEIN:
+        modifyPalmVein(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_DELETE_PALM_VEIN:
+        deletePalmVein(ttlockModel);
+        break;
+      case TTLockCommand.COMMAND_CLEAR_PALM_VEIN:
+        clearPalmVein(ttlockModel);
         break;
       case TTLockCommand.COMMAND_SET_SENSITIVITY:
         setSensitivity(ttlockModel);
@@ -2136,6 +2159,21 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     });
   }
 
+  public void getAllValidPalmVeins(final TtlockModel ttlockModel) {
+    TTLockClient.getDefault().getAllValidPalmVeins(ttlockModel.lockData, new GetAllPalmVeinsCallback() {
+      @Override
+      public void onGetAllPalmVeins(String palmVeinListStr) {
+        ttlockModel.palmVeinListString = palmVeinListStr;
+        apiSuccess(ttlockModel);
+      }
+
+      @Override
+      public void onFail(LockError lockError) {
+        apiFail(lockError);
+      }
+    });
+  }
+
   public void getAllValidPasscodes(final TtlockModel ttlockModel) {
     TTLockClient.getDefault().getAllValidPasscodes(ttlockModel.lockData, new GetAllValidPasscodeCallback() {
       @Override
@@ -2891,6 +2929,125 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
     PermissionUtils.doWithConnectPermission(activity, success -> {
       if (success) {
         TTLockClient.getDefault().clearFace(ttlockModel.lockData, new ClearFaceCallback() {
+          @Override
+          public void onClearSuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void addPalmVein(final TtlockModel ttlockModel) {
+    ValidityInfo validityInfo = new ValidityInfo();
+    validityInfo.setStartDate(ttlockModel.startDate);
+    validityInfo.setEndDate(ttlockModel.endDate);
+
+    if (TextUtils.isEmpty(ttlockModel.cycleJsonList)) {
+      validityInfo.setModeType(ValidityInfo.TIMED);
+    } else {
+      validityInfo.setModeType(ValidityInfo.CYCLIC);
+      validityInfo.setCyclicConfigs(GsonUtil.toObject(ttlockModel.cycleJsonList, new TypeToken<List<CyclicConfig>>() {
+      }));
+      ttlockModel.cycleJsonList = null;//clear data
+    }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().addPalmVein(ttlockModel.lockData, validityInfo, new AddPalmVeinCallback() {
+          @Override
+          public void onEnterAddMode() {
+            ttlockModel.state = STATUS_PALM_VEIN_ENTER_ADD_MODE;
+            progressCallbackCommand(commandQue.peek(), ttlockModel.toMap());
+          }
+
+          @Override
+          public void onCollectionStatus(PalmVeinCollectionStatus palmVeinCollectionStatus) {
+            ttlockModel.state = STATUS_PALM_VEIN_ERROR;
+            Map<String, Object> hashMap = ttlockModel.toMap();
+            hashMap.put("errorCode", palmVeinCollectionStatus.getValue());
+            progressCallbackCommand(commandQue.peek(), hashMap);
+          }
+
+          @Override
+          public void onAddFinished(long palmVeinNumber) {
+            ttlockModel.palmVeinNumber = String.valueOf(palmVeinNumber);
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void modifyPalmVein(final TtlockModel ttlockModel) {
+    ValidityInfo validityInfo = new ValidityInfo();
+    validityInfo.setStartDate(ttlockModel.startDate);
+    validityInfo.setEndDate(ttlockModel.endDate);
+
+    if (TextUtils.isEmpty(ttlockModel.cycleJsonList)) {
+      validityInfo.setModeType(ValidityInfo.TIMED);
+    } else {
+      validityInfo.setModeType(ValidityInfo.CYCLIC);
+      validityInfo.setCyclicConfigs(GsonUtil.toObject(ttlockModel.cycleJsonList, new TypeToken<List<CyclicConfig>>() {
+      }));
+      ttlockModel.cycleJsonList = null;//clear data
+    }
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().modifyPalmVeinValidityPeriod(ttlockModel.lockData, Long.valueOf(ttlockModel.palmVeinNumber), validityInfo, new ModifyPalmVeinPeriodCallback() {
+          @Override
+          public void onModifySuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void deletePalmVein(final TtlockModel ttlockModel) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().deletePalmVein(ttlockModel.lockData, Long.valueOf(ttlockModel.palmVeinNumber), new DeletePalmVeinCallback() {
+          @Override
+          public void onDeleteSuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void clearPalmVein(final TtlockModel ttlockModel) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().clearPalmVein(ttlockModel.lockData, new ClearPalmVeinCallback() {
           @Override
           public void onClearSuccess() {
             apiSuccess(ttlockModel);

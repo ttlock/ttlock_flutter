@@ -619,6 +619,14 @@ ErrorDeviceKey
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];
         }];
+    }else if ([command isEqualToString:command_get_all_valid_palm_vein]) {
+        [TTLock getAllValidPalmVeinsWithLockData:lockModel.lockData success:^(NSString *allPalmVeinsJsonString) {
+            TtlockModel *data = [TtlockModel new];
+            data.palmVeinListString = allPalmVeinsJsonString;
+            [weakSelf successCallbackCommand:command data:data];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];
+        }];
     }else if ([command isEqualToString:command_get_lock_system_info]) {
         [TTLock getLockSystemInfoWithLockData:lockModel.lockData success:^(TTSystemInfoModel *systemModel) {
             [weakSelf successCallbackCommand:command data:[weakSelf dicFromObject:systemModel]];
@@ -890,6 +898,45 @@ else if ([command isEqualToString:command_recover_card]) {
     else if ([command isEqualToString:command_face_clear]) {
         
         [TTLock clearFaceWithLockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];
+        }];
+    }
+#pragma mark - 掌静脉
+    else if ([command isEqualToString:command_palm_vein_add]) {
+        NSArray *cycleConfigArray = (NSArray *)[self dictFromJsonStr:lockModel.cycleJsonList];
+        [TTLock addPalmVeinWithCyclicConfig:cycleConfigArray startDate:lockModel.startDate.longLongValue endDate:lockModel.endDate.longLongValue lockData:lockModel.lockData progress:^(TTAddPalmVeinState state, TTPalmVeinErrorCode palmVeinErrorCode) {
+            if (state == TTAddPalmVeinStateCanStartAdd || state == TTAddPalmVeinStateError) {
+                TtlockModel *model = [TtlockModel new];
+                model.state = @(state - 2);
+                model.errorCode = @(palmVeinErrorCode);
+                [weakSelf progressCallbackCommand:command data:model];
+            }
+        } success:^(NSString *palmVeinNumber) {
+            NSDictionary *dict = @{@"palmVeinNumber": palmVeinNumber};
+            [weakSelf successCallbackCommand:command data:dict];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:command_palm_vein_modify]) {
+        NSArray *cycleConfigArray = (NSArray *)[self dictFromJsonStr:lockModel.cycleJsonList];
+        [TTLock modifyPalmVeinValidityWithCyclicConfig:cycleConfigArray palmVeinNumber:lockModel.palmVeinNumber startDate:lockModel.startDate.longLongValue endDate:lockModel.endDate.longLongValue lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:command_palm_vein_delete]) {
+        [TTLock deletePalmVeinNumber:lockModel.palmVeinNumber lockData:lockModel.lockData success:^{
+            [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];
+        }];
+    }
+    else if ([command isEqualToString:command_palm_vein_clear]) {
+        [TTLock clearPalmVeinWithLockData:lockModel.lockData success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];

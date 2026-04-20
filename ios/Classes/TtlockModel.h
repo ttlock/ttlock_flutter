@@ -133,6 +133,10 @@
 
 @property (nonatomic, strong) NSString *faceNumber;
 
+@property (nonatomic, strong) NSString *palmVeinNumber;
+
+@property (nonatomic, strong) NSString *palmVeinListString;
+
 @property (nonatomic, strong) NSNumber *errorCode;
 
 @property (nonatomic, strong) NSString *faceFeatureData;

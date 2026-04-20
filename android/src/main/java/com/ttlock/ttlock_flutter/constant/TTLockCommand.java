@@ -152,6 +152,11 @@ public class TTLockCommand {
     public static final String COMMAND_DELETE_FACE = "faceDelete";
     public static final String COMMAND_MODIFY_FACE = "faceModify";
     public static final String COMMAND_CLEAR_FACE = "faceClear";
+    public static final String COMMAND_ADD_PALM_VEIN = "palmVeinAdd";
+    public static final String COMMAND_MODIFY_PALM_VEIN = "palmVeinModify";
+    public static final String COMMAND_DELETE_PALM_VEIN = "palmVeinDelete";
+    public static final String COMMAND_CLEAR_PALM_VEIN = "palmVeinClear";
+    public static final String COMMAND_GET_ALL_VALID_PALM_VEIN = "getAllValidPalmVein";
 
     public static final String COMMAND_SET_SENSITIVITY = "setSensitivity";
 

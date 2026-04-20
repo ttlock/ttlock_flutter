@@ -153,6 +153,10 @@ public class TtlockModel {
 
     public String faceNumber;
 
+    public String palmVeinNumber;
+
+    public String palmVeinListString;
+
     public int sensitivityValue;
 
     @Override
@@ -215,6 +219,8 @@ public class TtlockModel {
                 ", passcodeListString='" + passcodeListString + '\'' +
                 ", cardListString='" + cardListString + '\'' +
                 ", fingerprintListString='" + fingerprintListString + '\'' +
+                ", palmVeinNumber='" + palmVeinNumber + '\'' +
+                ", palmVeinListString='" + palmVeinListString + '\'' +
                 ", sensitivityValue='" + sensitivityValue + '\'' +
                 '}';
     }

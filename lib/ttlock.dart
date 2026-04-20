@@ -149,6 +149,11 @@ class TTLock {
   static const String COMMAND_MODIFY_FACE = "faceModify";
   static const String COMMAND_DELETE_FACE = "faceDelete";
   static const String COMMAND_CLEAR_FACE = "faceClear";
+  static const String COMMAND_ADD_PALM_VEIN = "palmVeinAdd";
+  static const String COMMAND_MODIFY_PALM_VEIN = "palmVeinModify";
+  static const String COMMAND_DELETE_PALM_VEIN = "palmVeinDelete";
+  static const String COMMAND_CLEAR_PALM_VEIN = "palmVeinClear";
+  static const String COMMAND_GET_ALL_VALID_PALM_VEIN = "getAllValidPalmVein";
 
   static const String COMMAND_SET_SENSITIVITY = "setSensitivity";
 
@@ -1236,6 +1241,66 @@ class TTLock {
     invoke(COMMAND_DELETE_FACE, map, callback, fail: failedCallback);
   }
 
+  static void addPalmVein(
+      List<TTCycleModel>? cycleList,
+      int startDate,
+      int endDate,
+      String lockData,
+      TTAddPalmVeinProgressCallback progressCallback,
+      TTAddPalmVeinSuccessCallback callback,
+      TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.startDate] = startDate;
+    map[TTResponse.endDate] = endDate;
+    map[TTResponse.lockData] = lockData;
+    if (cycleList != null && cycleList.length > 0) {
+      map[TTResponse.cycleJsonList] = convert.jsonEncode(cycleList);
+    }
+    invoke(COMMAND_ADD_PALM_VEIN, map, callback,
+        progress: progressCallback, fail: failedCallback);
+  }
+
+  static void modifyPalmVein(
+      List<TTCycleModel>? cycleList,
+      int startDate,
+      int endDate,
+      String palmVeinNumber,
+      String lockData,
+      TTSuccessCallback callback,
+      TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.startDate] = startDate;
+    map[TTResponse.endDate] = endDate;
+    map[TTResponse.lockData] = lockData;
+    map[TTResponse.palmVeinNumber] = palmVeinNumber;
+    if (cycleList != null && cycleList.length > 0) {
+      map[TTResponse.cycleJsonList] = convert.jsonEncode(cycleList);
+    }
+    invoke(COMMAND_MODIFY_PALM_VEIN, map, callback, fail: failedCallback);
+  }
+
+  static void clearPalmVein(String lockData, TTSuccessCallback callback,
+      TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_CLEAR_PALM_VEIN, map, callback, fail: failedCallback);
+  }
+
+  static void deletePalmVein(String palmVeinNumber, String lockData,
+      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.lockData] = lockData;
+    map[TTResponse.palmVeinNumber] = palmVeinNumber;
+    invoke(COMMAND_DELETE_PALM_VEIN, map, callback, fail: failedCallback);
+  }
+
+  static void getAllValidPalmVeins(String lockData,
+      TTGetAllPalmVeinsCallback callback, TTFailedCallback failedCallback) {
+    Map map = Map();
+    map[TTResponse.lockData] = lockData;
+    invoke(COMMAND_GET_ALL_VALID_PALM_VEIN, map, callback, fail: failedCallback);
+  }
+
   // enum TTSensitivityValue {
 //   off = 0,
 //   low = 1,
@@ -1528,6 +1593,15 @@ class TTLock {
         }
         getAllFingerprintsCallback(fingerprintList);
         break;
+      case COMMAND_GET_ALL_VALID_PALM_VEIN:
+        TTGetAllPalmVeinsCallback getAllPalmVeinsCallback = callBack;
+        List palmVeinList = [];
+        String? palmVeinListString = data[TTResponse.palmVeinListString];
+        if (palmVeinListString != null) {
+          palmVeinList = convert.jsonDecode(palmVeinListString);
+        }
+        getAllPalmVeinsCallback(palmVeinList);
+        break;
       case COMMAND_GET_NB_AWAKE_TIMES:
         TTGetNbAwakeTimesCallback getNbAwakeTimesCallback = callBack;
         List<Map> nbAwakeTimeList = data[TTResponse.nbAwakeTimeList];
@@ -1637,6 +1711,10 @@ class TTLock {
         TTAddFaceSuccessCallback addFaceSuccessCallback = callBack;
         addFaceSuccessCallback(data[TTResponse.faceNumber]);
         break;
+      case COMMAND_ADD_PALM_VEIN:
+        TTAddPalmVeinSuccessCallback addPalmVeinSuccessCallback = callBack;
+        addPalmVeinSuccessCallback(data[TTResponse.palmVeinNumber]);
+        break;
       default:
         TTSuccessCallback successCallback = callBack;
         successCallback();
@@ -1669,6 +1747,11 @@ class TTLock {
         TTAddFaceProgressCallback progressCallback = callBack;
         progressCallback(TTFaceState.values[data[TTResponse.state]],
             TTFaceErrorCode.values[data[TTResponse.errorCode]]);
+        break;
+      case COMMAND_ADD_PALM_VEIN:
+        TTAddPalmVeinProgressCallback progressCallback = callBack;
+        progressCallback(TTPalmVeinState.values[data[TTResponse.state]],
+            TTPalmVeinErrorCode.values[data[TTResponse.errorCode]]);
         break;
       default:
     }
@@ -1849,6 +1932,7 @@ class TTResponse {
   static const String cycleJsonList = "cycleJsonList";
   static const String faceFeatureData = "faceFeatureData";
   static const String faceNumber = "faceNumber";
+  static const String palmVeinNumber = "palmVeinNumber";
 
   static const String minTime = "minTime";
   static const String currentTime = "currentTime";
@@ -1874,6 +1958,7 @@ class TTResponse {
   static const String passcodeListString = "passcodeListString";
   static const String cardListString = "cardListString";
   static const String fingerprintListString = "fingerprintListString";
+  static const String palmVeinListString = "palmVeinListString";
 
   static const String nbServerAddress = "nbServerAddress";
   static const String nbServerPort = "nbServerPort";
@@ -2199,6 +2284,13 @@ typedef TTAddFaceProgressCallback = void Function(
 
 typedef TTAddFaceSuccessCallback = void Function(String faceNumber);
 
+typedef TTAddPalmVeinProgressCallback = void Function(
+    TTPalmVeinState state, TTPalmVeinErrorCode palmVeinErrorCode);
+
+typedef TTAddPalmVeinSuccessCallback = void Function(String palmVeinNumber);
+
+typedef TTGetAllPalmVeinsCallback = void Function(List palmVeinList);
+
 class TTRemoteAccessoryScanModel {
   String name = '';
   String mac = '';
@@ -2419,4 +2511,18 @@ enum TTFaceErrorCode {
   needLowerHead,
   needTiltHeadToLeft,
   needTiltHeadToRight,
+}
+
+enum TTPalmVeinState { canStartAdd, error }
+
+enum TTPalmVeinErrorCode {
+  unknownStatus,
+  noPalmVeinDetected,
+  palmRectConfLow,
+  palmLandmarkConfLow,
+  palmAngleRollError,
+  palmAngleLeanError,
+  palmBlock,
+  palmBlur,
+  palmBack,
 }
