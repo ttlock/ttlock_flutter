@@ -499,8 +499,6 @@ ErrorDeviceKey
         TTGatewayType gatewayType = [dict[@"type"] intValue] + 1;
         
         NSMutableDictionary *paramDict = @{}.mutableCopy;
-        paramDict[@"SSID"] = dict[@"wifi"];
-        paramDict[@"wifiPwd"] = dict[@"wifiPassword"];
         paramDict[@"uid"] = dict[@"ttlockUid"];
         paramDict[@"userPwd"] = dict[@"ttlockLoginPassword"];
         paramDict[@"serverAddress"] = dict[@"serverIp"];
@@ -509,9 +507,16 @@ ErrorDeviceKey
         paramDict[@"companyId"] = dict[@"companyId"];
         paramDict[@"gatewayName"] = dict[@"gatewayName"];
         paramDict[@"branchId"] = dict[@"branchId"];
-        if (gatewayType == TTGateWayTypeG3 || gatewayType == TTGateWayTypeG4) {
+        // plugVersion = Dart type + 1；G2 / G5 / G6 使用真实 WiFi 与密码（与 Android initGateway 一致）
+        if (gatewayType == TTGateWayTypeG2 || gatewayType == TTGateWayTypeG5 || gatewayType == TTGateWayTypeG6) {
+            paramDict[@"SSID"] = dict[@"wifi"];
+            paramDict[@"wifiPwd"] = dict[@"wifiPassword"];
+        } else if (gatewayType == TTGateWayTypeG3 || gatewayType == TTGateWayTypeG4) {
             paramDict[@"SSID"] = @"1";
             paramDict[@"wifiPwd"] = @"1";
+        } else {
+            paramDict[@"SSID"] = dict[@"wifi"];
+            paramDict[@"wifiPwd"] = dict[@"wifiPassword"];
         }
         [TTGateway initializeGatewayWithInfoDic:paramDict block:^(TTSystemInfoModel *systemInfoModel, TTGatewayStatus status) {
              if (status == TTGatewaySuccess) {
