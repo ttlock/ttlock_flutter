@@ -643,7 +643,12 @@ class _LockPageState extends State<LockPage> {
         break;
 
       case Command.addPalmVein:
-        TTLock.addPalmVein(null, startDate, endDate, lockData,
+        startDate = 1776771349307;
+        endDate = 4070889000000;
+        List<TTCycleModel>? cycleList = [
+          TTCycleModel(3, 540,600)
+        ];
+        TTLock.addPalmVein(cycleList, startDate, endDate, lockData,
             (state, palmVeinErrorCode) {
           print("palm vein state:$state error:$palmVeinErrorCode");
         }, (palmVeinNumber) {

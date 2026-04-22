@@ -1751,7 +1751,8 @@ class TTLock {
       case COMMAND_ADD_PALM_VEIN:
         TTAddPalmVeinProgressCallback progressCallback = callBack;
         progressCallback(TTPalmVeinState.values[data[TTResponse.state]],
-            TTPalmVeinErrorCode.values[data[TTResponse.errorCode]]);
+            //进入添加模式后添加 Palm Vein 时，返回的 errorCode 值为 null
+            TTPalmVeinErrorCode.values[data[TTResponse.errorCode]??0]);
         break;
       default:
     }
