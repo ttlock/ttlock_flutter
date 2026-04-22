@@ -1,0 +1,48 @@
+group 'com.ttlock.ttlock_flutter'
+version '1.0'
+
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.5.0'
+    }
+}
+
+rootProject.allprojects {
+    repositories {
+        google()
+        jcenter()
+        flatDir {
+            dirs 'libs'
+        }
+    }
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'org.jetbrains.kotlin.android'
+
+android {
+    compileSdkVersion 34
+    namespace 'com.ttlock.ttlock_flutter'
+    defaultConfig {
+        minSdkVersion 18
+    }
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+//    implementation 'com.tongtonglock:ttlock:3.1.3'
+    implementation 'com.google.code.gson:gson:2.6.2'
+    implementation(name: 'TTLockOnPremise', ext: 'aar')
+    // Phase4 配件真实调用：若 TTLockOnPremise 未包含 standalonedoorsensor/watermeter/electricmeter，请将 ttlock-release.aar 放入 libs 并取消下行注释
+    // implementation(name: 'ttlock-release', ext: 'aar')
+}

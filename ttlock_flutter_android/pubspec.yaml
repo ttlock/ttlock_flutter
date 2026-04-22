@@ -1,0 +1,29 @@
+name: ttlock_flutter_android
+description: Android implementation for ttlock_flutter.
+version: 0.0.3
+homepage: https://github.com/ttlock/ttlock_flutter.git
+publish_to: 'none'
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.3.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  ttlock_flutter_platform_interface:
+    path: ../ttlock_flutter_platform_interface
+  plugin_platform_interface: ^2.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  plugin:
+    implements: ttlock_flutter
+    platforms:
+      android:
+        package: com.ttlock.ttlock_flutter
+        pluginClass: TtlockFlutterPlugin

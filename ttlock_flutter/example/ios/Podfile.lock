@@ -1,0 +1,35 @@
+PODS:
+  - Flutter (1.0.0)
+  - permission_handler_apple (9.3.0):
+    - Flutter
+  - TTLock (3.6.8)
+  - ttlock_flutter_ios (0.0.1):
+    - Flutter
+    - TTLock (= 3.6.8)
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
+  - ttlock_flutter_ios (from `.symlinks/plugins/ttlock_flutter_ios/ios`)
+
+SPEC REPOS:
+  trunk:
+    - TTLock
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  permission_handler_apple:
+    :path: ".symlinks/plugins/permission_handler_apple/ios"
+  ttlock_flutter_ios:
+    :path: ".symlinks/plugins/ttlock_flutter_ios/ios"
+
+SPEC CHECKSUMS:
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
+  TTLock: 38fc351b450e0f0a71fe48fc99e05bd108a87550
+  ttlock_flutter_ios: 748b5671dab23cbdc7e63f93533b825b2858320a
+
+PODFILE CHECKSUM: 53026eaf67b63baa2e316e457f9701dbdf33f41a
+
+COCOAPODS: 1.16.2

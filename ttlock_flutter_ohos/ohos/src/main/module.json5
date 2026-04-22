@@ -1,0 +1,10 @@
+{
+  "module": {
+    "name": "ttlock_flutter_ohos",
+    "type": "har",
+    "deviceTypes": [
+      "default",
+      "tablet"
+    ]
+  }
+}

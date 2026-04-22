@@ -1,0 +1,23 @@
+name: ttlock_flutter_platform_interface
+description: Platform interface and Pigeon messages for ttlock_flutter.
+version: 0.0.3
+homepage: https://github.com/ttlock/ttlock_flutter.git
+publish_to: 'none'
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.3.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  pigeon:
+    git:
+      url: "https://gitcode.com/openharmony-sig/flutter_packages.git"
+      path: "packages/pigeon"
+      ref: "br_pigeon-v25.3.2_ohos"

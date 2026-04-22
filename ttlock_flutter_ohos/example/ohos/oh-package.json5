@@ -1,0 +1,13 @@
+{
+  "modelVersion": "5.0.0",
+  "name": "ttlock_flutter_ohos_example",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "",
+  "author": "",
+  "license": "",
+  "dependencies": {},
+  "devDependencies": {
+    "@ohos/hypium": "1.0.6"
+  }
+}

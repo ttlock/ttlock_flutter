@@ -1,0 +1,32 @@
+name: ttlock_flutter
+description: The ttLock flutter plugin for smart lock and gateway (federated, On-Premise).
+version: 0.0.3
+homepage: https://github.com/ttlock/ttlock_flutter.git
+publish_to: 'none'
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: 1.0.8
+  ttlock_flutter_platform_interface:
+    path: ../ttlock_flutter_platform_interface
+  ttlock_flutter_android:
+    path: ../ttlock_flutter_android
+  ttlock_flutter_ios:
+    path: ../ttlock_flutter_ios
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        default_package: ttlock_flutter_android
+      ios:
+        default_package: ttlock_flutter_ios
