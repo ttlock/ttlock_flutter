@@ -11,6 +11,10 @@
     {
       "name": "EntryAbility_label",
       "value": "ttlock_flutter_ohos_example"
+    },
+    {
+      "name": "bluetooth_reason",
+      "value": "Required to communicate with TTLock Bluetooth devices"
     }
   ]
 }

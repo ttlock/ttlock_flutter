@@ -23,6 +23,8 @@ import 'package:pigeon/pigeon.dart';
     ),
     swiftOut: '../ttlock_flutter_ios/ios/Classes/Messages.swift',
     swiftOptions: SwiftOptions(),
+    arkTSOut: '../ttlock_flutter_ohos/ohos/src/main/ets/components/plugin/Messages.ets',
+    arkTSOptions: ArkTSOptions(),
   ),
 )
 
@@ -872,7 +874,7 @@ abstract class TTLockHostApi {
   ControlLockResult controlLock(String lockData, TTControlAction action);
   @async
   TTLockSwitchState getLockSwitchState(String lockData);
-  bool supportFunction(TTLockFunction function, String lockData);
+  bool supportFunction(TTLockFunction lockFunction, String lockData);
 
   @async
   void createCustomPasscode(String passcode, int startDate, int endDate, String lockData);
@@ -1113,7 +1115,7 @@ abstract class TTAccessoryHostApi {
   TTStandaloneDoorSensorInfo standaloneDoorSensorInit(String mac, Map<String, Object?> info);
   @async
   String standaloneDoorSensorReadFeatureValue(String mac);
-  bool standaloneDoorSensorIsSupportFunction(String featureValue, int function);
+  bool standaloneDoorSensorIsSupportFunction(String featureValue, int lockFunction);
 
   void waterMeterConfigServer(String url, String clientId, String accessToken);
   @async
@@ -1141,7 +1143,7 @@ abstract class TTAccessoryHostApi {
   String waterMeterGetFeatureValue(String waterMeterId);
   @async
   WaterMeterDeviceInfo waterMeterGetDeviceInfo(String waterMeterId);
-  bool waterMeterIsSupportFunction(String featureValue, int function);
+  bool waterMeterIsSupportFunction(String featureValue, int lockFunction);
   @async
   void waterMeterConfigApn(String apn);
   @async
@@ -1173,7 +1175,7 @@ abstract class TTAccessoryHostApi {
   void electricMeterSetMaxPower(String electricMeterId, double maxPower);
   @async
   String electricMeterGetFeatureValue(String electricMeterId);
-  bool electricMeterIsSupportFunction(String featureValue, int function);
+  bool electricMeterIsSupportFunction(String featureValue, int lockFunction);
 }
 
 // -----------------------------

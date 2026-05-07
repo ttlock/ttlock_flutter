@@ -2765,14 +2765,14 @@ class TTLockHostApi {
     }
   }
 
-  Future<bool> supportFunction(TTLockFunction function, String lockData) async {
+  Future<bool> supportFunction(TTLockFunction lockFunction, String lockData) async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.supportFunction$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[function, lockData]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[lockFunction, lockData]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -4897,14 +4897,14 @@ class TTAccessoryHostApi {
     }
   }
 
-  Future<bool> standaloneDoorSensorIsSupportFunction(String featureValue, int function) async {
+  Future<bool> standaloneDoorSensorIsSupportFunction(String featureValue, int lockFunction) async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.standaloneDoorSensorIsSupportFunction$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[featureValue, function]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[featureValue, lockFunction]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -5267,14 +5267,14 @@ class TTAccessoryHostApi {
     }
   }
 
-  Future<bool> waterMeterIsSupportFunction(String featureValue, int function) async {
+  Future<bool> waterMeterIsSupportFunction(String featureValue, int lockFunction) async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterIsSupportFunction$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[featureValue, function]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[featureValue, lockFunction]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -5678,14 +5678,14 @@ class TTAccessoryHostApi {
     }
   }
 
-  Future<bool> electricMeterIsSupportFunction(String featureValue, int function) async {
+  Future<bool> electricMeterIsSupportFunction(String featureValue, int lockFunction) async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterIsSupportFunction$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[featureValue, function]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[featureValue, lockFunction]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {

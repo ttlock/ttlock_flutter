@@ -11,6 +11,10 @@
     {
       "name": "EntryAbility_label",
       "value": "ttlock_flutter_ohos_example"
+    },
+    {
+      "name": "bluetooth_reason",
+      "value": "需要蓝牙以连接 TTLock 锁具设备"
     }
   ]
 }
