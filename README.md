@@ -16,9 +16,11 @@
 
 - `ttlock_flutter`：对外聚合包（业务侧主入口）
 - `ttlock_flutter_platform_interface`：Pigeon 契约定义与生成代码
-- `ttlock_flutter_android`：Android 原生实现（Kotlin）
-- `ttlock_flutter_ios`：iOS 原生实现（Swift）
+- `ttlock_flutter_android`：Android 原生实现（Kotlin），**独立 Git 仓库，以 [Git submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules) 挂在本仓库**（远程见 `.gitmodules`）
+- `ttlock_flutter_ios`：iOS 原生实现（Swift），**同上，为 submodule**
 - `ttlock_flutter_ohos`：OHOS 预留实现（当前阶段未纳入默认聚合）
+
+子模块 URL 与路径由根目录 `.gitmodules` 维护；主仓库**只记录子模块当前检出的提交（commit）**，不记录分支名。
 
 ## 技术方案亮点
 
@@ -35,11 +37,65 @@
 
 ## 快速开始（开发）
 
-1. 进入子包并安装依赖（示例）：
+1. **首次克隆**：请一并拉取子模块，否则 `ttlock_flutter_android` / `ttlock_flutter_ios` 目录为空或过时。
+   - 推荐：`git clone --recurse-submodules <本仓库 URL>`
+   - 若已克隆未带子模块：`git submodule update --init --recursive`
+2. 进入子包并安装依赖（示例）：
    - `cd ttlock_flutter/example`
    - `fvm flutter pub get`
-2. 运行示例应用：
+3. 运行示例应用：
    - `fvm flutter run`
+
+## Git 子模块（Submodule）
+
+### 日常同步
+
+- 拉取主仓库后，更新子模块到主仓库记录的提交：
+  - `git submodule update --init --recursive`
+- 若主仓库某次提交**抬升了子模块指针**，`git pull` 后同样需要执行上述命令（或 `git pull --recurse-submodules`，需 Git 配置/版本支持习惯用法）。
+
+### 在子模块内切换分支开发
+
+子模块目录内是完整 Git 仓库，与普通仓库相同：
+
+```bash
+cd ttlock_flutter_android   # 或 ttlock_flutter_ios
+git fetch
+git checkout <分支名>
+# 可选：git pull
+```
+
+说明：初次进入子模块可能是 **detached HEAD**（停在某个具体 commit），`git checkout` 到分支后即可正常开发。
+
+### 在子模块内改代码并提交
+
+1. 在 `ttlock_flutter_android` / `ttlock_flutter_ios` 内修改、`git add`、`git commit`、`git push` 到**子模块自己的远程**。
+2. 回到主仓库根目录，主仓库会显示子模块「已变更」（新 commit 指针）：
+   - `git add ttlock_flutter_android ttlock_flutter_ios`（按需）
+   - `git commit -m "chore: bump android/ios submodule"`
+   - `git push`
+
+团队其他人 `git pull` 主仓库后，需再执行 `git submodule update --init --recursive` 以检出对应提交。
+
+### 跟踪子模块远程某分支（可选）
+
+若希望在主仓库侧用一条命令把子模块拉到远程分支**最新提交**（仍会生成主仓库里的一次指针提交），可在 `.gitmodules` 中为对应 submodule 增加 `branch = <分支名>`，然后：
+
+```bash
+git submodule update --remote ttlock_flutter_android
+# 或 ttlock_flutter_ios
+```
+
+之后勿忘在主仓库提交子模块指针变更。
+
+### CI / 自动化
+
+- 流水线检出代码时需初始化子模块（例如 GitHub Actions 使用 `submodules: recursive`，或脚本中执行 `git submodule update --init --recursive`），否则 Android/iOS 实现目录缺失会导致构建失败。
+
+### 常见问题
+
+- **子模块目录有改动但切不了分支**：先 `git status`，处理未提交变更或先 `stash` / 提交。
+- **主仓库显示子模块 modified**：通常表示子模块当前 HEAD 与主仓库记录的 commit 不一致；要么在子模块切回记录提交，要么在子模块提交并 push 后在主仓库提交指针更新。
 
 ## 相关文档
 
