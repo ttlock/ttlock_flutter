@@ -1,0 +1,6 @@
+[submodule "ttlock_flutter_android"]
+	path = ttlock_flutter_android
+	url = https://github.com/2000Heart/ttlock_flutter_android.git
+[submodule "ttlock_flutter_ios"]
+	path = ttlock_flutter_ios
+	url = https://github.com/2000Heart/ttlock_flutter_ios.git
