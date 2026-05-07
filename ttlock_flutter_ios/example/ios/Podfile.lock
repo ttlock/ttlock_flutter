@@ -1,0 +1,35 @@
+PODS:
+  - Flutter (1.0.0)
+  - integration_test (0.0.1):
+    - Flutter
+  - ttlock_flutter_ios (0.0.1):
+    - Flutter
+    - TTLockOnPremise (= 2.2.2)
+  - TTLockOnPremise (2.2.2)
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - integration_test (from `.symlinks/plugins/integration_test/ios`)
+  - ttlock_flutter_ios (from `.symlinks/plugins/ttlock_flutter_ios/ios`)
+
+SPEC REPOS:
+  trunk:
+    - TTLockOnPremise
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  integration_test:
+    :path: ".symlinks/plugins/integration_test/ios"
+  ttlock_flutter_ios:
+    :path: ".symlinks/plugins/ttlock_flutter_ios/ios"
+
+SPEC CHECKSUMS:
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  integration_test: 252f60fa39af5e17c3aa9899d35d908a0721b573
+  ttlock_flutter_ios: b1b90c8246c5717f8def91860029110acc6dca93
+  TTLockOnPremise: d232e24622a05cb4b42cc218ec5fa9a886a8baa5
+
+PODFILE CHECKSUM: 3c63482e143d1b91d2d2560aee9fb04ecc74ac7e
+
+COCOAPODS: 1.16.2

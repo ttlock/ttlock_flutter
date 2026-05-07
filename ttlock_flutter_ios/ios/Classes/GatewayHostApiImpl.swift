@@ -1,5 +1,5 @@
 import Foundation
-import TTLockSDK
+import TTLockOnPremise
 
 final class GatewayHostApiImpl: NSObject, TTGatewayHostApi {
 

@@ -1,5 +1,5 @@
 import Foundation
-import TTLockOnPremise
+import TTLockSDK
 
 final class AccessoryHostApiImpl: NSObject, TTAccessoryHostApi {
 

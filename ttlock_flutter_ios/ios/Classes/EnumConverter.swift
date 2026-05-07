@@ -1,7 +1,7 @@
 import Foundation
-import TTLockSDK
+import TTLockOnPremise
 
-func lockConfigConvert(_ config: TTLockConfig) -> TTLockSDK.TTLockConfigType {
+func lockConfigConvert(_ config: TTLockConfig) -> TTLockConfigType {
   switch config {
   case .audio:
     return TTLockConfigType.lockSound
@@ -48,7 +48,7 @@ func powerSaverWorkModeConvert(_ type: TTPowerSaverWorkType) -> TTPowerSaverWork
   }
 }
 
-func passageModeTypeConvert(_ type: TTPassageModeType) -> TTLockSDK.TTPassageModeType {
+func passageModeTypeConvert(_ type: TTPassageModeType) -> TTLockOnPremise.TTPassageModeType {
   switch type {
   case .weekly:
     return .weekly
@@ -76,7 +76,7 @@ func soundVolumeConvert(_ type: TTSoundVolumeType) -> TTSoundVolume {
   }
 }
 
-func controlActionConvert(_ action: TTControlAction) -> TTLockSDK.TTControlAction {
+func controlActionConvert(_ action: TTControlAction) -> TTLockOnPremise.TTControlAction {
   switch action {
   case .unlock:
     return .actionUnlock
@@ -85,7 +85,7 @@ func controlActionConvert(_ action: TTControlAction) -> TTLockSDK.TTControlActio
   }
 }
 
-func lockSwitchStateRevert(_ state: TTLockSDK.TTLockSwitchState) -> TTLockSwitchState {
+func lockSwitchStateRevert(_ state: TTLockOnPremise.TTLockSwitchState) -> TTLockSwitchState {
   switch state {
   case .lock:
     return .lock
@@ -117,7 +117,7 @@ func soundVolumeRevert(_ type: TTSoundVolume) -> TTSoundVolumeType {
   }
 }
 
-func keyboardPwdTypeConvert(_ type: TTPasscodeType) -> TTLockSDK.TTPasscodeType {
+func keyboardPwdTypeConvert(_ type: TTPasscodeType) -> TTLockOnPremise.TTPasscodeType {
   switch type {
   case .permanent:
     return .permanent
@@ -130,7 +130,7 @@ func keyboardPwdTypeConvert(_ type: TTPasscodeType) -> TTLockSDK.TTPasscodeType 
   }
 }
 
-func operateLogTypeConvert(_ type: TTOperateRecordType) -> TTLockSDK.TTOperateLogType {
+func operateLogTypeConvert(_ type: TTOperateRecordType) -> TTLockOnPremise.TTOperateLogType {
   switch type {
   case .latest:
     return .latest
@@ -139,7 +139,7 @@ func operateLogTypeConvert(_ type: TTOperateRecordType) -> TTLockSDK.TTOperateLo
   }
 }
 
-func lockDirectionConvert(_ direction: TTLockDirection) -> TTLockSDK.TTUnlockDirection {
+func lockDirectionConvert(_ direction: TTLockDirection) -> TTLockOnPremise.TTUnlockDirection {
   switch direction {
   case .left:
     return .left
@@ -148,7 +148,7 @@ func lockDirectionConvert(_ direction: TTLockDirection) -> TTLockSDK.TTUnlockDir
   }
 }
 
-func lockDirectionRevert(_ direction: TTLockSDK.TTUnlockDirection) -> TTLockDirection {
+func lockDirectionRevert(_ direction: TTLockOnPremise.TTUnlockDirection) -> TTLockDirection {
   switch direction {
   case .left:
     return .left
@@ -157,7 +157,7 @@ func lockDirectionRevert(_ direction: TTLockSDK.TTUnlockDirection) -> TTLockDire
   }
 }
 
-func sensitivityValueConvert(_ value: TTSensitivityValue) -> TTLockSDK.TTSensitivityValue {
+func sensitivityValueConvert(_ value: TTSensitivityValue) -> TTLockOnPremise.TTSensitivityValue {
   switch value {
   case .off:
     return .off
@@ -170,7 +170,7 @@ func sensitivityValueConvert(_ value: TTSensitivityValue) -> TTLockSDK.TTSensiti
   }
 }
 
-func remoteAccessoryConvert(_ accessory: TTRemoteAccessory) -> TTLockSDK.TTAccessoryType {
+func remoteAccessoryConvert(_ accessory: TTRemoteAccessory) -> TTLockOnPremise.TTAccessoryType {
   switch accessory {
   case .remoteKey:
     return .wirelessKeyFob
@@ -358,7 +358,7 @@ func featureValueConvert(_ function: TTLockFunction) -> TTLockFeatureValue? {
   }
 }
 
-func lockErrorConvert(_ error: TTLockSDK.TTError) -> TTLockError {
+func lockErrorConvert(_ error: TTLockOnPremise.TTError) -> TTLockError {
   switch error {
   case .hadReseted:
     return .reseted
@@ -483,7 +483,7 @@ func lockErrorConvert(_ error: TTLockSDK.TTError) -> TTLockError {
 //   case dataFormatError = 14
 // }
 
-func gatewayConnectStatusConvert(_ error: TTLockSDK.TTGatewayConnectStatus) -> TTGatewayConnectStatus {
+func gatewayConnectStatusConvert(_ error: TTLockOnPremise.TTGatewayConnectStatus) -> TTGatewayConnectStatus {
     switch error {
     case .success:
         return .success
@@ -496,7 +496,7 @@ func gatewayConnectStatusConvert(_ error: TTLockSDK.TTGatewayConnectStatus) -> T
     }
 }
 
-func gatewayErrorConvert(_ error: TTLockSDK.TTGatewayStatus) -> TTGatewayError {
+func gatewayErrorConvert(_ error: TTLockOnPremise.TTGatewayStatus) -> TTGatewayError {
   switch error {
   case .success:
     return .success
@@ -536,7 +536,7 @@ func gatewayErrorConvert(_ error: TTLockSDK.TTGatewayStatus) -> TTGatewayError {
     return .failed
   }
 }
-func faceErrorConvert(_ error: TTLockSDK.TTFaceErrorCode) -> TTFaceErrorCode {
+func faceErrorConvert(_ error: TTLockOnPremise.TTFaceErrorCode) -> TTFaceErrorCode {
   switch error {
   case .noError:
       return .normal
@@ -585,7 +585,7 @@ func faceErrorConvert(_ error: TTLockSDK.TTFaceErrorCode) -> TTFaceErrorCode {
   }
 }
 
-func remoteErrorConvert(_ error: TTLockSDK.TTKeyFobStatus) -> TTRemoteAccessoryError {
+func remoteErrorConvert(_ error: TTLockOnPremise.TTKeyFobStatus) -> TTRemoteAccessoryError {
   switch error {
   case TTKeyFobSuccess:
     return .success
@@ -600,7 +600,7 @@ func remoteErrorConvert(_ error: TTLockSDK.TTKeyFobStatus) -> TTRemoteAccessoryE
   }
 }
 
-func keypadErrorConvert(_ error: TTLockSDK.TTKeypadStatus) -> TTRemoteAccessoryError {
+func keypadErrorConvert(_ error: TTLockOnPremise.TTKeypadStatus) -> TTRemoteAccessoryError {
   switch error {
   case TTKeypadSuccess:
     return .success
@@ -617,7 +617,7 @@ func keypadErrorConvert(_ error: TTLockSDK.TTKeypadStatus) -> TTRemoteAccessoryE
   }
 }
 
-func doorSensorErrorConvert(_ error: TTLockSDK.TTDoorSensorError) -> TTRemoteAccessoryError {
+func doorSensorErrorConvert(_ error: TTLockOnPremise.TTDoorSensorError) -> TTRemoteAccessoryError {
   switch error {
   case .bluetoothPowerOff:
     return .requestFailed
@@ -632,7 +632,7 @@ func doorSensorErrorConvert(_ error: TTLockSDK.TTDoorSensorError) -> TTRemoteAcc
   }
 }
 
-func waterMeterErrorConvert(_ error: TTLockSDK.TTWaterMeterError) -> TTRemoteAccessoryError {
+func waterMeterErrorConvert(_ error: TTLockOnPremise.TTWaterMeterError) -> TTRemoteAccessoryError {
   switch error {
   case .bluetoothPowerOff:
     return .requestFailed
@@ -651,7 +651,7 @@ func waterMeterErrorConvert(_ error: TTLockSDK.TTWaterMeterError) -> TTRemoteAcc
   }
 }
 
-func electricMeterErrorConvert(_ error: TTLockSDK.TTElectricMeterError) -> TTRemoteAccessoryError
+func electricMeterErrorConvert(_ error: TTLockOnPremise.TTElectricMeterError) -> TTRemoteAccessoryError
 {
   switch error {
   case .bluetoothPowerOff:
@@ -671,7 +671,7 @@ func electricMeterErrorConvert(_ error: TTLockSDK.TTElectricMeterError) -> TTRem
   }
 }
 
-func multifunctionalKeypadErrorConvert(_ error: TTLockSDK.TTKeypadStatus)
+func multifunctionalKeypadErrorConvert(_ error: TTLockOnPremise.TTKeypadStatus)
   -> TTMultifunctionalKeypadError
 {
   switch error {

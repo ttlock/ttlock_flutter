@@ -1,6 +1,6 @@
 import Flutter
 import Foundation
-import TTLockSDK
+import TTLockOnPremise
 
 public final class TtlockFlutterPlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {

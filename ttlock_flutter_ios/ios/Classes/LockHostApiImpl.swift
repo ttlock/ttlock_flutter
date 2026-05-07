@@ -1,5 +1,5 @@
 import Foundation
-import TTLockSDK
+import TTLockOnPremise
 
 private func parseJsonArrayString(_ json: String?) -> [[String: Any]] {
   guard
@@ -279,8 +279,8 @@ final class LockHostApiImpl: NSObject, TTLockHostApi {
   func modifyAdminPasscode(
     adminPasscode: String, lockData: String, completion: @escaping (Result<String?, Error>) -> Void
   ) {
-    TTLock.modifyAdminPasscode(adminPasscode, lockData: lockData) {
-      completion(.success(nil))
+    TTLock.modifyAdminPasscode(adminPasscode, lockData: lockData) { newLockData in
+      completion(.success(newLockData))
     } failure: { errorCode, errorMsg in
       completion(
         .failure(

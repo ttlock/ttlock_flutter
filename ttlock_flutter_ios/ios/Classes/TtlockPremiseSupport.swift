@@ -1,12 +1,12 @@
 import Foundation
-import TTLockSDK
+import TTLockOnPremise
 
 enum TtlockPremiseNewArchError: Error {
   case notImplemented(String)
   case invalidValue(String)
 }
 
-func makeLockApiError(operation: String, error: TTLockSDK.TTError, message: String?)
+func makeLockApiError(operation: String, error: TTLockOnPremise.TTError, message: String?)
   -> PigeonError
 {
   let mapped = lockErrorConvert(error)
@@ -15,7 +15,7 @@ func makeLockApiError(operation: String, error: TTLockSDK.TTError, message: Stri
 }
 
 func makeGatewayApiError(
-  operation: String, error: TTLockSDK.TTGatewayStatus, message: String? = nil
+  operation: String, error: TTLockOnPremise.TTGatewayStatus, message: String? = nil
 ) -> PigeonError {
   let mapped = gatewayErrorConvert(error)
   let fallback = "\(operation) failed: \(error.rawValue)"
@@ -23,7 +23,7 @@ func makeGatewayApiError(
 }
 
 func makeRemoteAccessoryApiError(
-  operation: String, error: TTLockSDK.TTKeyFobStatus, message: String? = nil
+  operation: String, error: TTLockOnPremise.TTKeyFobStatus, message: String? = nil
 ) -> PigeonError {
   let mapped = remoteErrorConvert(error)
   let fallback = "\(operation) failed: \(error.rawValue)"
@@ -31,7 +31,7 @@ func makeRemoteAccessoryApiError(
 }
 
 func makeKeypadAccessoryApiError(
-  operation: String, error: TTLockSDK.TTKeypadStatus, message: String? = nil
+  operation: String, error: TTLockOnPremise.TTKeypadStatus, message: String? = nil
 ) -> PigeonError {
   let mapped = keypadErrorConvert(error)
   let fallback = "\(operation) failed: \(error.rawValue)"
@@ -39,7 +39,7 @@ func makeKeypadAccessoryApiError(
 }
 
 func makeDoorSensorApiError(
-  operation: String, error: TTLockSDK.TTDoorSensorError, message: String? = nil
+  operation: String, error: TTLockOnPremise.TTDoorSensorError, message: String? = nil
 ) -> PigeonError {
   let mapped = doorSensorErrorConvert(error)
   let fallback = "\(operation) failed: \(error.rawValue)"
@@ -47,7 +47,7 @@ func makeDoorSensorApiError(
 }
 
 func makeWaterMeterApiError(
-  operation: String, error: TTLockSDK.TTWaterMeterError, message: String? = nil
+  operation: String, error: TTLockOnPremise.TTWaterMeterError, message: String? = nil
 ) -> PigeonError {
   let mapped = waterMeterErrorConvert(error)
   let fallback = "\(operation) failed: \(error.rawValue)"
@@ -55,7 +55,7 @@ func makeWaterMeterApiError(
 }
 
 func makeElectricMeterApiError(
-  operation: String, error: TTLockSDK.TTElectricMeterError, message: String? = nil
+  operation: String, error: TTLockOnPremise.TTElectricMeterError, message: String? = nil
 ) -> PigeonError {
   let mapped = electricMeterErrorConvert(error)
   let fallback = "\(operation) failed: \(error.rawValue)"
@@ -63,7 +63,7 @@ func makeElectricMeterApiError(
 }
 
 func makeMultifunctionalKeypadApiError(
-  operation: String, error: TTLockSDK.TTKeypadStatus, message: String? = nil
+  operation: String, error: TTLockOnPremise.TTKeypadStatus, message: String? = nil
 ) -> PigeonError {
   let mapped = multifunctionalKeypadErrorConvert(error)
   let fallback = "\(operation) failed: \(error.rawValue)"

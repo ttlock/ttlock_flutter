@@ -1,5 +1,5 @@
 import Foundation
-import TTLockSDK
+import TTLockOnPremise
 
 // MARK: - Shared helpers
 
@@ -463,7 +463,7 @@ final class AccessoryStandaloneDoorSensorStartScanStreamHandlerImpl:
     sink.error(
       code: "STANDALONE_DOOR_SENSOR_SDK_UNAVAILABLE",
       message:
-        "当前集成的 TTLock XCFramework 未包含 TTStandaloneDoorSensor；请升级 SDK 或参考 TtlockFlutterPlugin.m 接入独立门磁扫描。",
+        "当前集成的 TTLockOnPremise XCFramework 未包含 TTStandaloneDoorSensor；请升级 SDK 或参考 TtlockFlutterPlugin.m 接入独立门磁扫描。",
       details: nil)
   }
 
