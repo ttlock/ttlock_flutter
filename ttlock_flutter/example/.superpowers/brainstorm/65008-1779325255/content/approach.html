@@ -1,0 +1,76 @@
+<h2>方案设计 — 渐进式重构</h2>
+<p class="subtitle">遵循现有架构风格（Riverpod + freezed + go_router），增量改进</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">推荐</div>
+    <div class="content">
+      <h3>方案 A：保留现有 Provider 模式 + 通用扫描页</h3>
+      <p>每个设备独立 Provider + Page + Model，共享一个参数化 ScanPage</p>
+      <div class="pros-cons" style="margin-top:8px;">
+        <div class="pros">
+          <h4>Pros</h4>
+          <ul>
+            <li>与当前架构一致，改动可控</li>
+            <li>扫描页复用，避免重复代码</li>
+            <li>每个设备边界清晰</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <h4>Cons</h4>
+          <ul>
+            <li>Provider 数量较多</li>
+            <li>配件状态需从锁页面协调</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>方案 B：统一设备抽象层</h3>
+      <p>Device 基类 + DeviceProvider 聚合所有设备类型</p>
+      <div class="pros-cons" style="margin-top:8px;">
+        <div class="pros">
+          <h4>Pros</h4>
+          <ul>
+            <li>统一状态管理</li>
+            <li>Dashboard TabBar 数据聚合方便</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <h4>Cons</h4>
+          <ul>
+            <li>与现有代码风格差异大</li>
+            <li>过度抽象，示例应用的复杂度不需要</li>
+            <li>freezed 联合类型维护成本高</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>方案 C：最小改动</h3>
+      <p>仅在现有扫描页加类型选择，锁页面加配件入口</p>
+      <div class="pros-cons" style="margin-top:8px;">
+        <div class="pros">
+          <h4>Pros</h4>
+          <ul>
+            <li>改动量最小</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <h4>Cons</h4>
+          <ul>
+            <li>扫描页无法复用（配件场景硬编码）</li>
+            <li>不解决持久化和命令 UI 问题</li>
+            <li>治标不治本</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,214 @@
+<h2>TTLock Example App 重构 — 完整设计</h2>
+<p class="subtitle">方案 A：保留现有 Provider 模式 + 通用扫描页</p>
+
+<hr/>
+
+<h3>一、导航架构</h3>
+<div style="display: flex; gap: 8px; margin: 12px 0;">
+  <div style="flex:1; background:#FFF3E0; border-radius:8px; padding:12px; text-align:center;">
+    <div style="font-weight:600;">📊 Dashboard</div>
+    <div style="font-size:0.8em; color:#666;">TabBar（锁/网关/水表/电表）</div>
+  </div>
+  <div style="flex:1; background:#E3F2FD; border-radius:8px; padding:12px; text-align:center;">
+    <div style="font-weight:600;">🔍 扫描</div>
+    <div style="font-size:0.8em; color:#666;">参数化，支持主扫描 + 配件扫描</div>
+  </div>
+  <div style="flex:1; background:#F3E5F5; border-radius:8px; padding:12px; text-align:center;">
+    <div style="font-weight:600;">⚙️ 设置</div>
+    <div style="font-size:0.8em; color:#666;">服务器配置 + 设备管理</div>
+  </div>
+</div>
+
+<div style="background:#F5F5F5; border-radius:6px; padding:12px; font-size:0.85em;">
+<b>路径设计：</b><br/>
+• <code>/</code> — Dashboard（TabBar：锁/网关/水表/电表）<br/>
+• <code>/scan</code> — 主扫描（可选参数 ?type=lock&lockData=xxx）<br/>
+• <code>/settings</code> — 设置<br/>
+• <code>/lock/:mac</code> — 锁详情（命令 + 配件 + 配置）<br/>
+• <code>/gateway/:mac</code> — 网关详情<br/>
+• <code>/door-sensor/:mac</code> — 门磁详情页<br/>
+• <code>/remote-key/:mac</code> — 遥控器详情页<br/>
+• <code>/keypad/:mac</code> — 键盘详情页<br/>
+• <code>/water-meter/:id</code> — 水表详情页<br/>
+• <code>/electric-meter/:id</code> — 电表详情页
+</div>
+
+<hr/>
+
+<h3>二、数据模型与持久化</h3>
+<div style="background:#F5F5F5; border-radius:6px; padding:12px; font-size:0.85em; font-family:monospace; white-space:pre; overflow-x:auto;">
+// 锁 — 持久化（继承现有 SavedDevice）
+@freezed
+class SavedLockDevice with _$SavedLockDevice {
+  const factory SavedLockDevice({
+    required String name,
+    required String mac,
+    required String lockData,
+    required TTLockVersion lockVersion,
+    required DateTime initializedAt,
+  }) = _SavedLockDevice;
+  factory SavedLockDevice.fromJson(Map&lt;String,dynamic&gt; json) =&gt; _$SavedLockDeviceFromJson(json);
+}
+
+// 网关 — 持久化（新增）
+@freezed
+class SavedGatewayDevice with _$SavedGatewayDevice {
+  const factory SavedGatewayDevice({
+    required String name,
+    required String mac,
+    required String gatewayModel,
+    required DateTime initializedAt,
+  }) = _SavedGatewayDevice;
+}
+
+// 水表/电表 — 持久化（新增）
+@freezed
+class SavedMeterDevice with _$SavedMeterDevice {
+  const factory SavedMeterDevice({
+    required String name,
+    required String mac,
+    required String meterId,
+    required String meterType,  // 'water' | 'electric'
+    required DateTime initializedAt,
+  }) = _SavedMeterDevice;
+}
+</div>
+<p><b>配件不持久化：</b>门磁/遥控器/键盘绑定在锁上，每次打开锁详情时通过 SDK 实时查询<br/>
+<b>存储方式：</b>SharedPreferences + JSON 序列化，每类设备独立 Storage 类</p>
+
+<hr/>
+
+<h3>三、通用扫描页 ScanPage</h3>
+<div style="background:#F5F5F5; border-radius:6px; padding:12px; font-size:0.85em; font-family:monospace; white-space:pre; overflow-x:auto;">
+// 扫描配置
+class ScanConfig {
+  final ScanMode mode;           // main / accessory
+  final DeviceType? deviceType;  // 预选设备类型
+  final String? lockData;        // 配件模式：所属锁的 lockData
+  final String? lockMac;         // 配件模式：所属锁的 MAC
+}
+
+enum ScanMode { main, accessory }
+</div>
+
+<div style="display:flex; gap:8px; margin:8px 0;">
+  <div style="flex:1; background:#E3F2FD; border-radius:6px; padding:10px;">
+    <b>主扫描模式</b><br/>
+    <span style="font-size:0.85em;">
+      1. 显示类型选择器（锁/网关/水表/电表）<br/>
+      2. 用户选类型 → 扫描 BLE<br/>
+      3. 设备列表（名称/MAC/信号）<br/>
+      4. 点击 → 初始化 → 持久化 → 跳转详情
+    </span>
+  </div>
+  <div style="flex:1; background:#FFF8E1; border-radius:6px; padding:10px;">
+    <b>配件扫描模式</b><br/>
+    <span style="font-size:0.85em;">
+      1. 不显示类型选择器<br/>
+      2. 直接扫描指定类型（门磁/遥控/键盘）<br/>
+      3. 点击设备 → SDK init（传入 lockData）<br/>
+      4. 成功 → 跳转配件详情页
+    </span>
+  </div>
+</div>
+
+<hr/>
+
+<h3>四、锁详情页（3 个 Section）</h3>
+<div style="display:flex; gap:8px; flex-wrap:wrap; margin:8px 0;">
+  <div style="flex:1; min-width:180px; background:#E3F2FD; border-radius:8px; padding:12px;">
+    <b>Section 1：控制命令</b>
+    <ul style="font-size:0.85em; margin:4px 0; padding-left:16px;">
+      <li>开关锁大按钮</li>
+      <li>密码管理：增/删/改/查</li>
+      <li>卡片管理：查/清</li>
+      <li>指纹管理：查/清</li>
+      <li>人脸管理：清</li>
+      <li>操作记录</li>
+      <li><b>需参数命令 → 弹出配置对话框</b></li>
+    </ul>
+  </div>
+  <div style="flex:1; min-width:180px; background:#FFF8E1; border-radius:8px; padding:12px;">
+    <b>Section 2：绑定配件</b>
+    <ul style="font-size:0.85em; margin:4px 0; padding-left:16px;">
+      <li>🔗 门磁（已绑定/未绑定 + 添加按钮）</li>
+      <li>🔗 遥控器（列表 + 添加按钮）</li>
+      <li>🔗 键盘（状态 + 添加按钮）</li>
+      <li>点击「添加」→ 跳转 ScanPage(配件模式)</li>
+      <li>已绑定配件 → 点击进入详情页</li>
+    </ul>
+  </div>
+  <div style="flex:1; min-width:180px; background:#F3E5F5; border-radius:8px; padding:12px;">
+    <b>Section 3：锁配置</b>
+    <ul style="font-size:0.85em; margin:4px 0; padding-left:16px;">
+      <li>音量 / 方向 / 自动锁定</li>
+      <li>通行模式 / 双认证</li>
+      <li>WiFi 配网</li>
+      <li>电梯控制</li>
+      <li>重置锁 / 重置 Ekey</li>
+    </ul>
+  </div>
+</div>
+
+<h4>命令参数配置对话框</h4>
+<div style="background:#F5F5F5; border-radius:6px; padding:10px; font-size:0.85em;">
+• 创建密码 → 弹窗输入密码 + 起止时间<br/>
+• 设置自动锁定 → 滑动条选择秒数<br/>
+• 配置 WiFi → SSID + 密码输入框<br/>
+• 配置服务器 → IP + Port 输入框<br/>
+• 修改有效期 → 日期选择器
+</div>
+
+<hr/>
+
+<h3>五、文件变更清单</h3>
+
+<div style="display:flex; gap:8px;">
+  <div style="flex:1;">
+    <b style="color:#2E7D32;">新增（~12 个）</b>
+    <div style="font-size:0.8em; margin-top:4px;">
+      • lib/features/scan/scan_config.dart<br/>
+      • lib/features/settings/model/saved_gateway_device.dart<br/>
+      • lib/features/settings/model/saved_meter_device.dart<br/>
+      • lib/core/storage/gateway_storage.dart<br/>
+      • lib/core/storage/meter_storage.dart<br/>
+      • lib/features/lock/widgets/command_dialog.dart<br/>
+      • lib/features/lock/widgets/accessory_section.dart<br/>
+      • lib/features/door_sensor/door_sensor_info_page.dart<br/>
+      • lib/features/remote_key/remote_key_info_page.dart<br/>
+      • lib/features/remote_keypad/keypad_info_page.dart<br/>
+      • lib/core/widgets/device_type_selector.dart<br/>
+    </div>
+  </div>
+  <div style="flex:1;">
+    <b style="color:#E65100;">修改（~10 个）</b>
+    <div style="font-size:0.8em; margin-top:4px;">
+      • lib/features/scan/scan_page.dart<br/>
+      • lib/features/scan/scan_provider.dart<br/>
+      • lib/features/lock/lock_page.dart<br/>
+      • lib/features/lock/lock_provider.dart<br/>
+      • lib/features/dashboard/dashboard_page.dart<br/>
+      • lib/features/dashboard/dashboard_provider.dart<br/>
+      • lib/core/router/routes.dart<br/>
+      • lib/core/router/app_router.dart<br/>
+      • lib/core/storage/device_provider.dart<br/>
+      • lib/core/storage/device_storage.dart<br/>
+    </div>
+  </div>
+</div>
+
+<hr/>
+
+<h3>六、不变的部分</h3>
+<div style="background:#F5F5F5; border-radius:6px; padding:8px; font-size:0.85em;">
+• lib/app.dart — AppShell 3 tab 不变<br/>
+• lib/main.dart — 入口不变<br/>
+• lib/core/theme/ — 主题不变<br/>
+• lib/providers/ttlock_providers.dart — API provider 不变<br/>
+• lib/features/settings/ — 设置页保持现有（设备管理可加入）<br/>
+• 各 accessory page 的 provider 作为配件详情页状态管理复用
+</div>
+
+<hr/>
+
+<p style="text-align:center; font-size:0.9em;">以上是完整设计，整体是否符合你的预期？有无需要调整的细节？</p>

@@ -1,0 +1,87 @@
+<h2>导航架构 v2 — 扫描页通用化</h2>
+<p class="subtitle">扫描页接收参数，适配主扫描和配件扫描两种场景</p>
+
+<div class="mockup" style="max-width:100%;">
+  <div class="mockup-header">导航结构</div>
+  <div class="mockup-body" style="padding: 16px; line-height: 1.6;">
+
+    <div style="background: #E8F5E9; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+      <b>底部 Tab（3 个，保持不变）</b>
+    </div>
+    <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+      <div style="flex:1; background:#FFF3E0; border-radius:8px; padding:12px; text-align:center;">
+        <div style="font-size:1.2em;">📊 Dashboard</div>
+        <div style="font-size:0.8em; color:#666;">/</div>
+        <div style="margin-top:8px; font-size:0.8em;">所有已保存设备概览</div>
+      </div>
+      <div style="flex:1; background:#E3F2FD; border-radius:8px; padding:12px; text-align:center;">
+        <div style="font-size:1.2em;">🔍 扫描</div>
+        <div style="font-size:0.8em; color:#666;">/scan（可接收参数）</div>
+        <div style="margin-top:8px; font-size:0.8em;">主扫描：锁/网关/水电表</div>
+      </div>
+      <div style="flex:1; background:#F3E5F5; border-radius:8px; padding:12px; text-align:center;">
+        <div style="font-size:1.2em;">⚙️ 设置</div>
+        <div style="font-size:0.8em; color:#666;">/settings</div>
+        <div style="margin-top:8px; font-size:0.8em;">服务器 + 设备管理</div>
+      </div>
+    </div>
+
+    <div style="background: #E8F5E9; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+      <b>扫描页的两种使用场景</b>
+    </div>
+    <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+      <div style="flex:1; background:#E3F2FD; border-radius:8px; padding:12px;">
+        <div style="font-weight:600;">场景 A：主扫描（从底部 Tab 进入）</div>
+        <div style="font-size:0.8em; margin-top:8px;">
+          <div>显示设备类型选择器：🔒锁 / 📡网关 / 💧水表 / ⚡电表</div>
+          <div style="margin-top:6px;">选择类型 → 扫描 → 初始化 → 保存并跳转详情</div>
+        </div>
+      </div>
+      <div style="flex:1; background:#FFF8E1; border-radius:8px; padding:12px;">
+        <div style="font-weight:600;">场景 B：配件扫描（从锁详情进入）</div>
+        <div style="font-size:0.8em; margin-top:8px;">
+          <div>传入参数：<code>deviceType=doorSensor|remoteKey|keypad</code> + <code>lockData</code></div>
+          <div style="margin-top:6px;">不显示选择器 → 直接扫描对应类型 → 初始化时自动绑定到锁</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #E8F5E9; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+      <b>锁详情页结构</b>
+    </div>
+    <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+      <div style="flex:1; background:#FFF8E1; border-radius:8px; padding:12px;">
+        <div style="font-weight:600;">🔒 锁详情 /lock/:mac</div>
+        <div style="margin-top:8px; font-size:0.85em;">
+          <b>Section 1：控制命令</b><br/>
+          • 可配置参数的交互式命令面板<br/><br/>
+          <b>Section 2：绑定配件</b><br/>
+          • 🔗 门磁 — 查看信息 / 删除<br/>
+          • 🔗 遥控器 — 查看信息 / 添加 / 删除<br/>
+          • 🔗 键盘 — 查看信息 / 添加指纹/卡片 / 删除<br/>
+          每个配件有「添加」按钮 → 导航到扫描页（场景 B）<br/><br/>
+          <b>Section 3：锁配置</b><br/>
+          • 音量/方向/自动锁定/通行模式等
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 8px; align-items: center; background: #FFF3E0; border-radius: 8px; padding: 12px;">
+      <div style="font-weight:600;">✅ 关键决策总结：</div>
+      <div style="display:flex; gap: 12px; font-size:0.85em; margin-left:12px;">
+        <div>1. 扫描页接收 <code>ScanConfig</code> 参数（deviceType + lockData）</div>
+        <div>2. 配件（门磁/遥控/键盘）从锁页面跳转扫描页</div>
+        <div>3. 水电表/独立门磁从主扫描页进入</div>
+        <div>4. Dashboard 展示所有设备</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="section">
+  <h3>需要你确认</h3>
+  <p>1. 扫描页参数化设计是否符合你的预期？</p>
+  <p>2. 配件扫描初始化时，是扫描到就自动绑定到锁，还是扫描后让用户确认再绑定？</p>
+  <p>3. 锁详情页的配件区是否只需显示「该锁已绑定的配件列表 + 添加按钮」，还是需要完整的 CRUD 管理？</p>
+</div>

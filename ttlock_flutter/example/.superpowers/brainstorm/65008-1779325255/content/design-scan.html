@@ -1,0 +1,43 @@
+<h2>完整设计 — 通用扫描页</h2>
+
+<div class="section">
+  <h3>ScanPage + ScanConfig</h3>
+  <p>扫描页通过 <code>ScanConfig</code> 参数控制行为，复用同一页面</p>
+
+  <div style="background:#F5F5F5; border-radius:6px; padding:12px; margin-top:8px; font-size:0.85em; font-family:monospace; white-space:pre;">
+// 扫描配置
+class ScanConfig {
+  final ScanMode mode;         // main / accessory
+  final DeviceType? deviceType;  // 预选设备类型
+  final String? lockData;     // 配件模式：所属锁的 lockData
+  final String? lockMac;      // 配件模式：所属锁的 MAC
+
+  // 主扫描模式：显示类型选择器 → 用户选类型后扫描
+  // 配件模式：直接扫描指定类型，不显示选择器
+}
+
+enum ScanMode { main, accessory }
+  </div>
+</div>
+
+<div class="section">
+  <h3>主扫描流程（ScanMode.main）</h3>
+  <div style="background:#E3F2FD; border-radius:6px; padding:12px;">
+    <div>1. 显示 4 个设备类型按钮：🔒锁 / 📡网关 / 💧水表 / ⚡电表</div>
+    <div>2. 用户选择类型 → 开始扫描对应 BLE 流</div>
+    <div>3. 扫描结果列表（名称、MAC、信号强度）</div>
+    <div>4. 用户点击 → 执行初始化/连接</div>
+    <div>5. 初始化成功后持久化 → 跳转详情页</div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>配件扫描流程（ScanMode.accessory）</h3>
+  <div style="background:#FFF8E1; border-radius:6px; padding:12px;">
+    <div>1. 不显示类型选择器，直接扫描指定设备类型</div>
+    <div>2. 扫描结果列表</div>
+    <div>3. 用户点击 → 执行 SDK 初始化（自动传入 lockData）</div>
+    <div>4. 初始化成功后 → 展示配件详情页</div>
+    <div>5. 配件详情页有返回按钮回到锁详情页</div>
+  </div>
+</div>

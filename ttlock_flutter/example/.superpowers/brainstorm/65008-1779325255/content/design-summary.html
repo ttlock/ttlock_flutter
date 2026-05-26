@@ -1,0 +1,47 @@
+<h2>完整设计 — 文件变更清单</h2>
+<p class="subtitle">需要修改和新增的文件</p>
+
+<div class="section">
+  <h3>新增文件</h3>
+  <div style="background:#E8F5E9; border-radius:6px; padding:12px; font-size:0.85em;">
+    <div><b>lib/features/scan/scan_config.dart</b> — ScanConfig 模型 + ScanMode 枚举</div>
+    <div><b>lib/features/settings/model/saved_gateway_device.dart</b> — 网关持久化模型（freezed）</div>
+    <div><b>lib/features/settings/model/saved_door_sensor.dart</b> — 门磁持久化模型</div>
+    <div><b>lib/features/settings/model/saved_remote_key.dart</b> — 遥控器持久化模型</div>
+    <div><b>lib/features/settings/model/saved_keypad.dart</b> — 键盘持久化模型</div>
+    <div><b>lib/features/settings/model/saved_meter.dart</b> — 水电表持久化模型</div>
+    <div><b>lib/core/storage/gateway_storage.dart</b> — 网关本地存储</div>
+    <div><b>lib/core/storage/meter_storage.dart</b> — 水电表本地存储</div>
+    <div><b>lib/features/lock/widgets/command_dialog.dart</b> — 命令参数配置弹窗</div>
+    <div><b>lib/features/lock/widgets/accessory_section.dart</b> — 配件区域组件</div>
+    <div><b>lib/features/door_sensor/door_sensor_info.dart</b> — 门磁详情页（重构）</div>
+    <div><b>lib/features/remote_key/remote_key_info.dart</b> — 遥控器详情页</div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>修改文件</h3>
+  <div style="background:#FFF8E1; border-radius:6px; padding:12px; font-size:0.85em;">
+    <div><b>lib/features/scan/scan_page.dart</b> — 接收 ScanConfig 参数，支持两种模式</div>
+    <div><b>lib/features/scan/scan_provider.dart</b> — 重构为支持多种设备类型扫描</div>
+    <div><b>lib/features/lock/lock_page.dart</b> — 3 个 Section 布局 + 配件区域</div>
+    <div><b>lib/features/lock/lock_provider.dart</b> — 添加配件查询状态</div>
+    <div><b>lib/features/dashboard/dashboard_page.dart</b> — TabBar 结构</div>
+    <div><b>lib/features/dashboard/dashboard_provider.dart</b> — 聚合各设备列表</div>
+    <div><b>lib/features/door_sensor/door_sensor_page.dart</b> — 简化/重构为详情页</div>
+    <div><b>lib/core/router/routes.dart</b> — 统一路由定义</div>
+    <div><b>lib/core/router/app_router.dart</b> — 添加新路由</div>
+    <div><b>lib/core/storage/device_storage.dart</b> — 适配新模型（或保留现有）</div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>无需修改的文件</h3>
+  <div style="background:#F5F5F5; border-radius:6px; padding:12px; font-size:0.85em; color:#666;">
+    <div>lib/app.dart — AppShell 保持 3 个 tab</div>
+    <div>lib/main.dart — 入口不变</div>
+    <div>lib/core/theme/ — 主题不变</div>
+    <div>lib/providers/ttlock_providers.dart — API provider 不变</div>
+    <div>lib/features/settings/settings_page.dart — 保持现有，设备管理加入其他 Tab</div>
+  </div>
+</div>

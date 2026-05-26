@@ -1,0 +1,26 @@
+<h2>设计要点汇总 — 准备写文档</h2>
+
+<div style="background:#E8F5E9; border-radius:8px; padding:12px; margin:12px 0;">
+<b>✅ 已确认的约定：</b>
+<ul>
+  <li>所有数据/状态类 → <b>freezed</b></li>
+  <li>所有 Provider → <b>@riverpod codegen</b></li>
+  <li>页面不直接调 Storage → <b>Feature Provider 封装层</b></li>
+  <li>本地数据加载 → <b>Future build() AsyncNotifier</b></li>
+  <li>页面展示 → <b>state.when(loading, error, data)</b></li>
+</ul>
+</div>
+
+<div style="background:#FFF3E0; border-radius:8px; padding:12px; margin:12px 0;">
+<b>✅ 已确认的功能变更：</b>
+<ul>
+  <li>Dashboard → TabBar（锁/网关/水表/电表）</li>
+  <li>扫描页参数化 → ScanConfig（主扫描 + 配件扫描）</li>
+  <li>锁详情 3 Section → 命令/配件入口/配置</li>
+  <li>配件管理：锁详情 → 列表页(+) → 扫描 → 返回刷新</li>
+  <li>所有设备持久化（配件含 boundLockMac）</li>
+  <li>命令参数通过弹窗配置</li>
+</ul>
+</div>
+
+<p style="text-align:center;">无调整的话我开始写 spec 文档</p>

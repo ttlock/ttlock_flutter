@@ -1,0 +1,93 @@
+<h2>App 导航架构设计</h2>
+<p class="subtitle">先确认整体页面结构，再深入细节</p>
+
+<div class="section">
+  <h3>当前问题</h3>
+  <ul>
+    <li>扫描页只扫锁，无法选择设备类型</li>
+    <li>配件页面（门磁、遥控器、键盘、水电表）无路由可达</li>
+    <li>Dashboard 只显示锁，不显示其他设备</li>
+    <li>锁页面没有配件入口</li>
+  </ul>
+</div>
+
+<div class="mockup" style="max-width:100%;">
+  <div class="mockup-header">建议的导航结构</div>
+  <div class="mockup-body" style="padding: 16px; line-height: 1.6;">
+    <div style="background: #E8F5E9; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+      <b>底部 Tab（保持现有 3 个）</b>
+    </div>
+    <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+      <div style="flex:1; background:#FFF3E0; border-radius:8px; padding:12px; text-align:center;">
+        <div style="font-size:1.2em;">📊 Dashboard</div>
+        <div style="font-size:0.8em; color:#666;">/ (首页)</div>
+        <div style="margin-top:8px; font-size:0.8em;">已保存所有设备的概览<br/>锁 / 网关 / 门磁 / 水电表</div>
+      </div>
+      <div style="flex:1; background:#E3F2FD; border-radius:8px; padding:12px; text-align:center;">
+        <div style="font-size:1.2em;">🔍 扫描</div>
+        <div style="font-size:0.8em; color:#666;">/scan</div>
+        <div style="margin-top:8px; font-size:0.8em;">先选类型 → 再扫描<br/>锁、网关、门磁、遥控器、键盘、水电表</div>
+      </div>
+      <div style="flex:1; background:#F3E5F5; border-radius:8px; padding:12px; text-align:center;">
+        <div style="font-size:1.2em;">⚙️ 设置</div>
+        <div style="font-size:0.8em; color:#666;">/settings</div>
+        <div style="margin-top:8px; font-size:0.8em;">服务器配置<br/>设备管理（改名/删除）</div>
+      </div>
+    </div>
+    <div style="background: #E8F5E9; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+      <b>Detail 页面</b>
+    </div>
+    <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+      <div style="flex:1; min-width:180px; background:#FFF8E1; border-radius:8px; padding:12px;">
+        <div style="font-weight:600;">🔒 锁详情</div>
+        <div style="font-size:0.8em; color:#666;">/lock/:mac</div>
+        <div style="margin-top:8px; font-size:0.8em;">
+          • 开关锁<br/>
+          • 可配置参数的命令面板<br/>
+          • 🔗 <b>绑定配件入口</b>：门磁、遥控器、键盘<br/>
+          • 配置项（音量、方向、自动锁定等）
+        </div>
+      </div>
+      <div style="flex:1; min-width:180px; background:#FFF8E1; border-radius:8px; padding:12px;">
+        <div style="font-weight:600;">📡 网关详情</div>
+        <div style="font-size:0.8em; color:#666;">/gateway/:mac</div>
+        <div style="margin-top:8px; font-size:0.8em;">
+          • 状态查看<br/>
+          • 网络配置<br/>
+          • 已关联锁列表
+        </div>
+      </div>
+      <div style="flex:1; min-width:180px; background:#FFF8E1; border-radius:8px; padding:12px;">
+        <div style="font-weight:600;">配件详情页</div>
+        <div style="font-size:0.8em; color:#666;">门磁 / 遥控器 / 键盘 / 水电表</div>
+        <div style="margin-top:8px; font-size:0.8em;">
+          • 设备信息<br/>
+          • 功能操作<br/>
+          • 删除/解绑
+        </div>
+      </div>
+    </div>
+    <div style="background: #E8F5E9; border-radius: 8px; padding: 12px;">
+      <b>扫描流程</b>
+    </div>
+    <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px; font-size: 0.85em;">
+      <div style="background:#E3F2FD; border-radius:6px; padding:8px;">选择设备类型<br/>(锁/网关/门磁等)</div>
+      <div style="font-size:1.5em;">→</div>
+      <div style="background:#E3F2FD; border-radius:6px; padding:8px;">扫描对应类型<br/>(启动对应流)</div>
+      <div style="font-size:1.5em;">→</div>
+      <div style="background:#E3F2FD; border-radius:6px; padding:8px;">点击设备<br/>初始化/连接</div>
+      <div style="font-size:1.5em;">→</div>
+      <div style="background:#E3F2FD; border-radius:6px; padding:8px;">跳转详情页</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>讨论点</h3>
+  <p>以上架构是否符合你的预期？特别是：</p>
+  <ul>
+    <li>底部 3 tab 保持不动？还是需要增减？</li>
+    <li>配件详情页从锁页面进入（门磁/遥控器/键盘绑定在锁上），水电表和独立门磁从 Dashboard 进？</li>
+    <li>扫描页先选类型再扫，是否需要在扫描结果中同时显示附近的所有设备类型？</li>
+  </ul>
+</div>

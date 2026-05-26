@@ -1,0 +1,208 @@
+<h2>TTLock Example App 重构 — 完整设计 v3</h2>
+<p class="subtitle">修正配件管理流程：锁详情 → 配件列表页 → 扫描添加 / 配件详情</p>
+
+<hr/>
+
+<h3>一、导航架构</h3>
+<div style="display: flex; gap: 8px; margin: 12px 0;">
+  <div style="flex:1; background:#FFF3E0; border-radius:8px; padding:12px; text-align:center;">
+    <div style="font-weight:600;">📊 Dashboard</div>
+    <div style="font-size:0.8em; color:#666;">TabBar（锁/网关/水表/电表）</div>
+  </div>
+  <div style="flex:1; background:#E3F2FD; border-radius:8px; padding:12px; text-align:center;">
+    <div style="font-weight:600;">🔍 扫描</div>
+    <div style="font-size:0.8em; color:#666;">参数化，主扫描 + 配件扫描</div>
+  </div>
+  <div style="flex:1; background:#F3E5F5; border-radius:8px; padding:12px; text-align:center;">
+    <div style="font-weight:600;">⚙️ 设置</div>
+    <div style="font-size:0.8em; color:#666;">服务器配置 + 设备管理</div>
+  </div>
+</div>
+
+<div style="background:#F5F5F5; border-radius:6px; padding:12px; font-size:0.85em;">
+<b>路径设计：</b><br/>
+• <code>/</code> — Dashboard（TabBar）<br/>
+• <code>/scan</code> — 主扫描（接受 ?type=&amp;lockData= 参数支持配件模式）<br/>
+• <code>/settings</code> — 设置<br/>
+• <code>/lock/:mac</code> — 锁详情（命令面板 + 配件入口 + 配置）<br/>
+• <code>/gateway/:mac</code> — 网关详情<br/>
+• <code>/lock/:mac/door-sensors</code> — 门磁列表<br/>
+• <code>/lock/:mac/remote-keys</code> — 遥控器列表<br/>
+• <code>/lock/:mac/keypads</code> — 键盘列表<br/>
+• <code>/door-sensor/:mac</code> — 门磁详情页<br/>
+• <code>/remote-key/:mac</code> — 遥控器详情页<br/>
+• <code>/keypad/:mac</code> — 键盘详情页<br/>
+• <code>/water-meter/:id</code> — 水表详情页<br/>
+• <code>/electric-meter/:id</code> — 电表详情页
+</div>
+
+<hr/>
+
+<h3>二、配件管理完整流程</h3>
+
+<div style="background:#FFF8E1; border-radius:6px; padding:12px; margin-bottom:8px;">
+<b>以遥控器为例：</b>
+</div>
+
+<div style="display:flex; gap:0; align-items:center; font-size:0.85em; flex-wrap:wrap;">
+  <div style="background:#E3F2FD; border-radius:6px; padding:8px; text-align:center; min-width:140px;">
+    🔒 锁详情<br/>
+    <span style="font-size:0.8em; color:#666;">Section 配件入口<br/>点击「遥控器」</span>
+  </div>
+  <div style="font-size:1.5em; padding:0 8px;">→</div>
+  <div style="background:#FFF3E0; border-radius:6px; padding:8px; text-align:center; min-width:180px;">
+    📋 遥控器列表 /lock/:mac/remote-keys<br/>
+    <span style="font-size:0.8em; color:#666;">展示该锁所有遥控器<br/>右上角「+」按钮</span>
+  </div>
+  <div style="font-size:1.5em; padding:0 8px;">→</div>
+  <div style="background:#E3F2FD; border-radius:6px; padding:8px; text-align:center; min-width:140px;">
+    🔍 扫描页<br/>
+    <span style="font-size:0.8em; color:#666;">配件模式(remoteKey)<br/>携带 lockMac/lockData</span>
+  </div>
+  <div style="font-size:1.5em; padding:0 8px;">→</div>
+  <div style="background:#E8F5E9; border-radius:6px; padding:8px; text-align:center; min-width:140px;">
+    ✅ 添加成功<br/>
+    <span style="font-size:0.8em; color:#666;">持久化 + pop 回列表页<br/>列表自动刷新</span>
+  </div>
+</div>
+
+<div style="margin-top:12px; display:flex; gap:8px;">
+  <div style="flex:1; background:#E3F2FD; border-radius:6px; padding:10px;">
+    <b>从列表点击已有配件</b><br/>
+    <span style="font-size:0.85em;">
+      列表 → 点击配件 → 配件详情页 → 查看信息/重命名/删除/设置
+    </span>
+  </div>
+  <div style="flex:1; background:#E3F2FD; border-radius:6px; padding:10px;">
+    <b>门磁/键盘同理</b><br/>
+    <span style="font-size:0.85em;">
+      锁详情 → 门磁列表（一般 1 个）→ 添加/详情<br/>
+      锁详情 → 键盘列表（一般 1 个）→ 添加/详情
+    </span>
+  </div>
+</div>
+
+<hr/>
+
+<h3>三、锁详情页（3 个 Section）</h3>
+<div style="display:flex; gap:8px; flex-wrap:wrap; margin:8px 0;">
+  <div style="flex:1; min-width:180px; background:#E3F2FD; border-radius:8px; padding:12px;">
+    <b>Section 1：控制命令</b>
+    <ul style="font-size:0.85em; margin:4px 0; padding-left:16px;">
+      <li>开关锁大按钮</li>
+      <li>密码/卡片/指纹/人脸管理</li>
+      <li>操作记录</li>
+      <li>命令需参数 → 弹窗配置</li>
+    </ul>
+  </div>
+  <div style="flex:1; min-width:180px; background:#FFF8E1; border-radius:8px; padding:12px;">
+    <b>Section 2：配件入口（箭头导航）</b>
+    <ul style="font-size:0.85em; margin:4px 0; padding-left:16px;">
+      <li>🔗 门磁 — 点击 → 门磁列表页</li>
+      <li>🔗 遥控器 — 点击 → 遥控器列表页</li>
+      <li>🔗 键盘 — 点击 → 键盘列表页</li>
+      <li>各入口可显示已绑定数量</li>
+    </ul>
+  </div>
+  <div style="flex:1; min-width:180px; background:#F3E5F5; border-radius:8px; padding:12px;">
+    <b>Section 3：锁配置</b>
+    <ul style="font-size:0.85em; margin:4px 0; padding-left:16px;">
+      <li>音量/方向/自动锁定</li>
+      <li>通行模式/双认证</li>
+      <li>WiFi 配网/服务器</li>
+      <li>电梯/NB-IoT</li>
+      <li>重置</li>
+    </ul>
+  </div>
+</div>
+
+<hr/>
+
+<h3>四、数据模型 — 所有设备全量持久化</h3>
+
+<div style="background:#F5F5F5; border-radius:6px; padding:12px; font-size:0.85em; font-family:monospace; overflow-x:auto;">
+// 锁
+@freezed class SavedLockDevice {
+  name, mac, lockData, lockVersion, initializedAt
+}
+
+// 网关
+@freezed class SavedGatewayDevice {
+  name, mac, gatewayModel, initializedAt
+}
+
+// 门磁（boundLockMac 关联锁）
+@freezed class SavedDoorSensor {
+  name, mac, boundLockMac, initializedAt
+}
+
+// 遥控器（boundLockMac 关联锁）
+@freezed class SavedRemoteKey {
+  name, mac, boundLockMac, initializedAt
+}
+
+// 键盘（boundLockMac 关联锁）
+@freezed class SavedKeypad {
+  name, mac, boundLockMac, isMultiFunction, initializedAt
+}
+
+// 水电表
+@freezed class SavedMeterDevice {
+  name, mac, meterId, meterType, initializedAt
+}
+</div>
+<p><b>存储：</b>SharedPreferences + JSON，每类独立 key</p>
+
+<hr/>
+
+<h3>五、通用扫描页 ScanPage</h3>
+<div style="display:flex; gap:8px; margin:8px 0;">
+  <div style="flex:1; background:#E3F2FD; border-radius:6px; padding:10px;">
+    <b>主扫描模式（从底部 Tab 进入）</b><br/>
+    <span style="font-size:0.85em;">
+      1. 显示类型选择器（锁/网关/水表/电表）<br/>
+      2. 选类型 → BLE 扫描 → 设备列表<br/>
+      3. 点击 → 初始化 → 持久化 → 跳转详情
+    </span>
+  </div>
+  <div style="flex:1; background:#FFF8E1; border-radius:6px; padding:10px;">
+    <b>配件扫描模式（从配件列表页 "+" 进入）</b><br/>
+    <span style="font-size:0.85em;">
+      1. 不显示选择器，直接扫描指定类型<br/>
+      2. 扫描结果列表<br/>
+      3. 点击 → SDK init（传入 lockData）<br/>
+      4. 持久化（含 boundLockMac）→ pop 回列表页（刷新）
+    </span>
+  </div>
+</div>
+
+<hr/>
+
+<h3>六、文件变更清单</h3>
+
+<div style="display:flex; gap:8px;">
+  <div style="flex:1;">
+    <b style="color:#2E7D32;">新增（~16 个）</b>
+    <div style="font-size:0.8em; margin-top:4px;">
+      模型：saved_gateway_device, saved_door_sensor, saved_remote_key, saved_keypad, saved_meter_device<br/>
+      存储：gateway_storage, accessory_storage, meter_storage<br/>
+      页面：door_sensor_list_page, remote_key_list_page, keypad_list_page<br/>
+      详情页：door_sensor_info_page, remote_key_info_page, keypad_info_page<br/>
+      组件：command_dialog, device_type_selector, scan_config
+    </div>
+  </div>
+  <div style="flex:1;">
+    <b style="color:#E65100;">修改（~10 个）</b>
+    <div style="font-size:0.8em; margin-top:4px;">
+      scan_page / scan_provider — 参数化<br/>
+      lock_page / lock_provider — 3 Section + 配件入口<br/>
+      dashboard_page / dashboard_provider — TabBar<br/>
+      routes, app_router — 新路由<br/>
+      device_storage / device_provider — 适配
+    </div>
+  </div>
+</div>
+
+<hr/>
+
+<p style="text-align:center; font-size:0.9em;">配件管理流程已修正：锁详情 → 配件列表页 → 扫描添加 → 返回列表页刷新。门磁/键盘同样走列表页流程。是否符合预期？</p>

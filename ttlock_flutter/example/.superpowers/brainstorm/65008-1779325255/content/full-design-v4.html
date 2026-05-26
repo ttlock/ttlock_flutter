@@ -1,0 +1,175 @@
+<h2>TTLock Example App 重构 — 完整设计 v4</h2>
+<p class="subtitle">含代码约定：freezed 数据类 + @riverpod codegen + Provider 封装层</p>
+
+<hr/>
+
+<h3>代码约定</h3>
+<div style="background:#F5F5F5; border-radius:6px; padding:12px; margin:8px 0; font-size:0.9em;">
+<b>1. 📐 所有数据/状态类使用 freezed</b><br/>
+配置模型、设备模型、页面状态等全部 <code>@freezed</code> + <code>@JsonSerializable</code><br/><br/>
+<b>2. 🏭 Riverpod 使用 @riverpod codegen</b><br/>
+所有 provider 通过 <code>@riverpod</code> 注解 + build_runner 生成 .g.dart<br/><br/>
+<b>3. 🚫 页面不直接调用 Storage</b><br/>
+• Storage 类只被 Feature Provider 调用<br/>
+• Provider 提供方法/数据给页面消费<br/>
+• 例：页面调用 <code>ref.read(lockListProvider.notifier).loadAll()</code> 而非直接操作 SharedPreferences
+</div>
+
+<hr/>
+
+<h3>Provider 分层架构</h3>
+<div style="display:flex; gap:8px; flex-wrap:wrap; margin:12px 0;">
+  <div style="flex:1; min-width:150px; background:#E8F5E9; border-radius:8px; padding:10px;">
+    <b>Storage 层</b><br/>
+    <span style="font-size:0.8em;">
+      纯数据读写<br/>
+      LockStorage<br/>
+      GatewayStorage<br/>
+      AccessoryStorage<br/>
+      MeterStorage<br/>
+      ConfigStorage（已有）
+    </span>
+  </div>
+  <div style="flex:1; min-width:150px; background:#E3F2FD; border-radius:8px; padding:10px;">
+    <b>Feature Provider 层</b><br/>
+    <span style="font-size:0.8em;">
+      封装业务逻辑<br/>
+      @riverpod lockListProvider<br/>
+      @riverpod lockNotifier<br/>
+      @riverpod gatewayListProvider<br/>
+      @riverpod accessoryListProvider(lockMac)<br/>
+      @riverpod scanNotifier<br/>
+      @riverpod meterListProvider
+    </span>
+  </div>
+  <div style="flex:1; min-width:150px; background:#FFF3E0; border-radius:8px; padding:10px;">
+    <b>Page 层</b><br/>
+    <span style="font-size:0.8em;">
+      只消费 Provider<br/>
+      不直接触碰 Storage<br/>
+      <code>ref.watch(xxxProvider)</code><br/>
+      <code>ref.read(xxxProvider.notifier).doXxx()</code>
+    </span>
+  </div>
+</div>
+<div style="font-size:0.85em; color:#666;">
+例：锁列表页 → ref.watch(lockListProvider) → LockListProvider 内部调用 LockStorage
+</div>
+
+<hr/>
+
+<h3>导航架构</h3>
+<div style="display: flex; gap: 8px; margin: 12px 0;">
+  <div style="flex:1; background:#FFF3E0; border-radius:8px; padding:12px; text-align:center;">
+    <div style="font-weight:600;">📊 Dashboard</div>
+    <div style="font-size:0.8em; color:#666;">TabBar（锁/网关/水表/电表）</div>
+  </div>
+  <div style="flex:1; background:#E3F2FD; border-radius:8px; padding:12px; text-align:center;">
+    <div style="font-weight:600;">🔍 扫描</div>
+    <div style="font-size:0.8em; color:#666;">主扫描 + 配件扫描（参数化）</div>
+  </div>
+  <div style="flex:1; background:#F3E5F5; border-radius:8px; padding:12px; text-align:center;">
+    <div style="font-weight:600;">⚙️ 设置</div>
+    <div style="font-size:0.8em; color:#666;">服务器配置 + 设备管理</div>
+  </div>
+</div>
+
+<div style="background:#F5F5F5; border-radius:6px; padding:12px; font-size:0.85em;">
+<b>路由：</b><br/>
+/ → Dashboard · /scan → 扫描 · /settings → 设置<br/>
+/lock/:mac → 锁详情 · /gateway/:mac → 网关详情<br/>
+/lock/:mac/door-sensors → 门磁列表 · /lock/:mac/remote-keys → 遥控器列表 · /lock/:mac/keypads → 键盘列表<br/>
+/door-sensor/:mac → 门磁详情 · /remote-key/:mac → 遥控器详情 · /keypad/:mac → 键盘详情<br/>
+/water-meter/:id → 水表详情 · /electric-meter/:id → 电表详情
+</div>
+
+<hr/>
+
+<h3>锁详情页结构</h3>
+<div style="display:flex; gap:8px; flex-wrap:wrap; margin:8px 0;">
+  <div style="flex:1; min-width:180px; background:#E3F2FD; border-radius:8px; padding:12px;">
+    <b>Section 1：控制命令</b>
+    <ul style="font-size:0.85em; margin:4px 0; padding-left:16px;">
+      <li>开关锁大按钮</li>
+      <li>密码/卡片/指纹/人脸</li>
+      <li>操作记录</li>
+      <li>需要参数 → 弹窗配置</li>
+    </ul>
+  </div>
+  <div style="flex:1; min-width:180px; background:#FFF8E1; border-radius:8px; padding:12px;">
+    <b>Section 2：配件入口</b>
+    <ul style="font-size:0.85em; margin:4px 0; padding-left:16px;">
+      <li>🔗 门磁 → /lock/:mac/door-sensors</li>
+      <li>🔗 遥控器 → /lock/:mac/remote-keys</li>
+      <li>🔗 键盘 → /lock/:mac/keypads</li>
+      <li>显示已绑定数量</li>
+    </ul>
+  </div>
+  <div style="flex:1; min-width:180px; background:#F3E5F5; border-radius:8px; padding:12px;">
+    <b>Section 3：锁配置</b>
+    <ul style="font-size:0.85em; margin:4px 0; padding-left:16px;">
+      <li>音量/方向/自动锁定</li>
+      <li>通行模式/双认证</li>
+      <li>WiFi/服务器/电梯</li>
+      <li>重置</li>
+    </ul>
+  </div>
+</div>
+
+<hr/>
+
+<h3>通用扫描页 ScanPage</h3>
+<div style="display:flex; gap:8px; margin:8px 0;">
+  <div style="flex:1; background:#E3F2FD; border-radius:6px; padding:10px;">
+    <b>主扫描</b><br/>
+    <span style="font-size:0.85em;">
+      类型选择器（锁/网关/水表/电表）<br/>
+      → 扫描 → init → 持久化 → 详情页
+    </span>
+  </div>
+  <div style="flex:1; background:#FFF8E1; border-radius:6px; padding:10px;">
+    <b>配件扫描</b><br/>
+    <span style="font-size:0.85em;">
+      不显示选择器，直接扫指定类型<br/>
+      → 点击 → init（含 lockData）<br/>
+      → 持久化 → pop 回列表页（刷新）
+    </span>
+  </div>
+</div>
+
+<hr/>
+
+<h3>数据模型</h3>
+<p>所有模型 freezed，配件通过 boundLockMac 关联锁。全部持久化到 SharedPreferences。</p>
+
+<hr/>
+
+<h3>文件变更清单</h3>
+<div style="display:flex; gap:8px;">
+  <div style="flex:1;">
+    <b style="color:#2E7D32;">新增（~18 个）</b><br/>
+    <span style="font-size:0.8em;">
+      模型(5): saved_gateway_device, saved_door_sensor, saved_remote_key, saved_keypad, saved_meter<br/>
+      存储(3): gateway_storage, accessory_storage, meter_storage<br/>
+      列表页(3): door_sensor_list_page, remote_key_list_page, keypad_list_page<br/>
+      详情页(3): door_sensor_info_page, remote_key_info_page, keypad_info_page<br/>
+      组件(4): command_dialog, device_type_selector, scan_config, accessory_entry_section
+    </span>
+  </div>
+  <div style="flex:1;">
+    <b style="color:#E65100;">修改（~12 个）</b><br/>
+    <span style="font-size:0.8em;">
+      scan_page / scan_provider<br/>
+      lock_page / lock_provider<br/>
+      dashboard_page / dashboard_provider<br/>
+      routes / app_router<br/>
+      device_storage / device_provider<br/>
+      gateway_page / gateway_provider<br/>
+      settings_page（设备管理入口）
+    </span>
+  </div>
+</div>
+
+<hr/>
+
+<p style="text-align:center; font-size:0.9em;">设计是否完整？若无调整我准备写设计文档了。</p>

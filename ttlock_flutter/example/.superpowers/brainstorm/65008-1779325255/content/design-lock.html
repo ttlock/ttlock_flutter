@@ -1,0 +1,75 @@
+<h2>完整设计 — 锁详情页重构</h2>
+
+<div class="section">
+  <h3>页面布局（3 个 Section）</h3>
+  <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+    <div style="flex:1; min-width:200px; background:#E3F2FD; border-radius:8px; padding:12px;">
+      <div style="font-weight:600; margin-bottom:6px;">Section 1：控制命令</div>
+      <div style="font-size:0.85em;">
+        <div>• 开关锁（大按钮）</div>
+        <div>• 命令列表分组：</div>
+        <div style="margin-left:12px;">
+          🔐 密码管理（增/删/改/查）<br/>
+          💳 卡片管理（查/清）<br/>
+          👆 指纹管理（查/清）<br/>
+          👤 人脸管理（查/清）<br/>
+          📋 操作记录<br/>
+        </div>
+        <div style="margin-top:6px; background:#E8F5E9; padding:6px; border-radius:4px;">
+          <b>改进：</b>需要参数的命令点击后弹出参数配置对话框
+        </div>
+      </div>
+    </div>
+    <div style="flex:1; min-width:200px; background:#FFF8E1; border-radius:8px; padding:12px;">
+      <div style="font-weight:600; margin-bottom:6px;">Section 2：绑定配件</div>
+      <div style="font-size:0.85em;">
+        <div>• 🔗 门磁 — 状态卡片（已绑定/未绑定）</div>
+        <div style="margin-left:12px;">已绑定：显示电量、报警设置 → 点击进入详情</div>
+        <div style="margin-left:12px;">未绑定：「添加门磁」按钮 → 跳转 ScanPage(accessory)</div>
+        <div style="margin-top:4px;">• 🔗 遥控器 — 列表 + 添加按钮</div>
+        <div style="margin-top:4px;">• 🔗 键盘 — 状态卡片 + 添加按钮</div>
+      </div>
+    </div>
+    <div style="flex:1; min-width:200px; background:#F3E5F5; border-radius:8px; padding:12px;">
+      <div style="font-weight:600; margin-bottom:6px;">Section 3：锁配置</div>
+      <div style="font-size:0.85em;">
+        <div>• 🔊 音量设置（选择器）</div>
+        <div>• ↔️ 开门方向（左/右）</div>
+        <div>• ⏱ 自动锁定时间</div>
+        <div>• 🚪 通行模式</div>
+        <div>• 📶 WiFi 配网</div>
+        <div>• 🔄 重置锁</div>
+        <div>• 🛗 电梯控制</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>命令参数配置对话框</h3>
+  <p>对于需要参数的命令，不再硬编码值，改为弹窗输入：</p>
+  <div style="background:#F5F5F5; border-radius:6px; padding:12px; font-size:0.85em;">
+    <b>示例：「创建自定义密码」</b><br/>
+    → 弹出 BottomSheet/Dialog<br/>
+    → 密码输入框（TextFormField）<br/>
+    → 生效起始时间（日期选择器）<br/>
+    → 生效结束时间（日期选择器）<br/>
+    → 【确认执行】按钮 → 调用 API → 显示结果<br/><br/>
+    <b>示例：「设置自动锁定时间」</b><br/>
+    → 弹出 BottomSheet<br/>
+    → 滑动条或数字输入<br/>
+    → 【确认】→ API 调用 → 结果<br/><br/>
+    <b>示例：「配置 WiFi」</b><br/>
+    → SSID 输入框 + 密码输入框<br/>
+    → 【确认】→ API 调用
+  </div>
+</div>
+
+<div class="section">
+  <h3>配件详情页（从锁详情进入）</h3>
+  <div style="background:#F5F5F5; border-radius:6px; padding:12px; font-size:0.85em;">
+    <b>门磁详情页：</b>设备名称、MAC、电量、门未关报警开关、删除门磁<br/>
+    <b>遥控器详情页：</b>设备名称、MAC、电量、有效期设置、删除遥控器<br/>
+    <b>键盘详情页：</b>设备名称、MAC、电量、添加指纹/卡片入口、删除键盘
+  </div>
+</div>

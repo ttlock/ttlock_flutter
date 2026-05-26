@@ -1,0 +1,72 @@
+<h2>导航架构 v4 — Dashboard 只放独立设备</h2>
+
+<div class="mockup" style="max-width:100%;">
+  <div class="mockup-body" style="padding: 16px;">
+
+    <div style="background: #FFF3E0; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+      <b>📊 Dashboard TabBar — 仅独立设备</b>
+    </div>
+    <div style="background: #fff; border: 1px solid #E0E0E0; border-radius: 8px; overflow: hidden; margin-bottom: 16px;">
+      <div style="display: flex; background: #F5F5F5; border-bottom: 1px solid #E0E0E0;">
+        <div style="padding: 10px 20px; font-weight:600; border-bottom: 2px solid #1976D2; color:#1976D2;">🔒 Locks</div>
+        <div style="padding: 10px 20px;">📡 Gateways</div>
+        <div style="padding: 10px 20px;">💧 Water Meters</div>
+        <div style="padding: 10px 20px;">⚡ Electric Meters</div>
+      </div>
+      <div style="padding: 16px; display:flex; flex-wrap:wrap; gap:8px;">
+        <div style="background:#E3F2FD; border-radius:6px; padding:8px; width:100px; text-align:center;">
+          <div>🔒</div>
+          <div style="font-size:0.75em;">Front Door</div>
+        </div>
+        <div style="background:#E3F2FD; border-radius:6px; padding:8px; width:100px; text-align:center;">
+          <div>🔒</div>
+          <div style="font-size:0.75em;">Back Door</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #e8f5e9; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+      <b>🔒 锁详情页结构 /lock/:mac</b>
+    </div>
+    <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
+      <div style="flex:1; min-width:200px; background:#E3F2FD; border-radius:8px; padding:12px;">
+        <div style="font-weight:600; margin-bottom:6px;">命令面板</div>
+        <div style="font-size:0.8em;">开关锁、密码管理、卡片/指纹/人脸<br/>可配置参数（弹窗输入）</div>
+      </div>
+      <div style="flex:1; min-width:200px; background:#FFF8E1; border-radius:8px; padding:12px;">
+        <div style="font-weight:600; margin-bottom:6px;">🔗 绑定配件</div>
+        <div style="font-size:0.8em;">
+          门磁：已绑定 ✓ / 未绑定 →「添加」→ 跳转 /scan<br/>
+          遥控器：已绑定 ✓ / 未绑定 →「添加」<br/>
+          键盘：已绑定 ✓ / 未绑定 →「添加」<br/>
+          每个配件点击进入详情页
+        </div>
+      </div>
+      <div style="flex:1; min-width:200px; background:#F3E5F5; border-radius:8px; padding:12px;">
+        <div style="font-weight:600; margin-bottom:6px;">锁配置</div>
+        <div style="font-size:0.8em;">音量、方向、自动锁定时间、通行模式、WiFi 配网等</div>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 8px; background: #FFF3E0; border-radius: 8px; padding: 12px;">
+      <div style="font-weight:600;">配件扫描流程：</div>
+      <div style="display:flex; gap: 8px; align-items:center; font-size:0.85em;">
+        <div style="background:#FFF8E1; border-radius:4px; padding:4px 8px;">锁详情 → 点「添加门磁」</div>
+        <span>→</span>
+        <div style="background:#E3F2FD; border-radius:4px; padding:4px 8px;">/scan<br/>deviceType=doorSensor<br/>lockData=xxx</div>
+        <span>→</span>
+        <div style="background:#FFF8E1; border-radius:4px; padding:4px 8px;">扫描到设备 → 点击添加</div>
+        <span>→</span>
+        <div style="background:#E8F5E9; border-radius:4px; padding:4px 8px;">自动 init 并绑定到锁</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="section">
+  <h3>配件扫描确认：点击即绑定 vs 确认后绑定？</h3>
+  <p>扫描到配件后点击添加：</p>
+  <p><b>A.</b> 直接调用 SDK init/add 并绑定到锁，成功后返回锁详情</p>
+  <p><b>B.</b> 弹出确认框展示配件信息（名称、MAC、信号），用户确认后再绑定</p>
+</div>

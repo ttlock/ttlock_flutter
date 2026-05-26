@@ -1,0 +1,84 @@
+<h2>导航架构 v3 — Dashboard TabBar + 持久化</h2>
+
+<div class="mockup" style="max-width:100%;">
+  <div class="mockup-body" style="padding: 16px;">
+
+    <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+      <div style="flex:1; background:#FFF3E0; border-radius:8px; padding:12px; text-align:center;">
+        <div style="font-weight:600;">📊 Dashboard</div>
+        <div style="font-size:0.8em; color:#666;">/ 带 TabBar</div>
+      </div>
+      <div style="flex:1; background:#E3F2FD; border-radius:8px; padding:12px; text-align:center;">
+        <div style="font-weight:600;">🔍 扫描</div>
+        <div style="font-size:0.8em; color:#666;">/scan（通用参数化）</div>
+      </div>
+      <div style="flex:1; background:#F3E5F5; border-radius:8px; padding:12px; text-align:center;">
+        <div style="font-weight:600;">⚙️ 设置</div>
+        <div style="font-size:0.8em; color:#666;">/settings</div>
+      </div>
+    </div>
+
+    <div style="background: #FFF3E0; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+      <b>📊 Dashboard 结构</b>
+    </div>
+    <div style="background: #fff; border: 1px solid #E0E0E0; border-radius: 8px; overflow: hidden; margin-bottom: 12px;">
+      <div style="display: flex; background: #F5F5F5; border-bottom: 1px solid #E0E0E0;">
+        <div style="padding: 10px 20px; font-weight:600; border-bottom: 2px solid #1976D2; color:#1976D2;">🔒 Locks</div>
+        <div style="padding: 10px 20px; color:#666;">📡 Gateways</div>
+        <div style="padding: 10px 20px; color:#666;">🔗 Door Sensors</div>
+        <div style="padding: 10px 20px; color:#666;">🔑 Remote Keys</div>
+        <div style="padding: 10px 20px; color:#666;">⌨️ Keypads</div>
+        <div style="padding: 10px 20px; color:#666;">💧 Water Meters</div>
+        <div style="padding: 10px 20px; color:#666;">⚡ Electric Meters</div>
+      </div>
+      <div style="padding: 20px; text-align:center; color:#999;">
+        当前 Tab 的设备列表（卡片形式）
+      </div>
+    </div>
+
+    <div style="background: #E8F5E9; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+      <b>🗄️ 本地持久化设计</b>
+    </div>
+    <div style="font-size:0.85em; margin-bottom: 12px;">
+      <div style="background:#F5F5F5; border-radius:6px; padding:10px; margin-bottom:6px;">
+        <b>锁 SavedLockDevice</b> — lockData, name, mac, lockVersion, initializedAt<br/>
+        <span style="color:#666;">（现有模型扩展，不含配件信息）</span>
+      </div>
+      <div style="background:#F5F5F5; border-radius:6px; padding:10px; margin-bottom:6px;">
+        <b>网关 SavedGatewayDevice</b> — name, mac, gatewayModel, hardwareRevision, initializedAt<br/>
+        <span style="color:#666;">（新增）</span>
+      </div>
+      <div style="background:#F5F5F5; border-radius:6px; padding:10px; margin-bottom:6px;">
+        <b>配件存储方式</b> — 门磁/遥控器/键盘绑定在锁上，作为锁的子设备存储<br/>
+        <span style="color:#666;">关联逻辑：每个配件记录所属锁的 lockData 或锁 MAC</span>
+      </div>
+      <div style="background:#F5F5F5; border-radius:6px; padding:10px;">
+        <b>水电表 SavedMeterDevice</b> — name, mac, id, initializedAt<br/>
+        <span style="color:#666;">（新增独立设备）</span>
+      </div>
+    </div>
+
+    <div style="background: #E3F2FD; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+      <b>整体页面跳转关系</b>
+    </div>
+    <div style="font-size:0.85em; line-height:1.8;">
+      <div>🔒 Dashboard[Locks tab] → 点击锁 → /lock/:mac（锁详情）</div>
+      <div>📡 Dashboard[Gateways tab] → 点击网关 → /gateway/:mac（网关详情）</div>
+      <div>🔗 Dashboard[配件 tab] → 点击配件 → 对应配件详情页</div>
+      <div style="margin-top:6px;">— — —</div>
+      <div style="margin-top:6px;">🔒 锁详情 → 配件区域「添加门磁」→ /scan?type=doorSensor&lockData=xxx</div>
+      <div>🔒 锁详情 → 配件区域「添加遥控器」→ /scan?type=remoteKey&lockData=xxx</div>
+      <div>🔒 锁详情 → 配件区域「添加键盘」→ /scan?type=keypad&lockData=xxx</div>
+      <div style="margin-top:6px;">— — —</div>
+      <div style="margin-top:6px;">🔍 扫描 Tab → 选择类型（锁/网关/水电表）→ 扫描 → 初始化完成 → 保存到本地</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="section">
+  <h3>还需要确认</h3>
+  <p>配件扫描成功后：扫描到门磁/遥控器 → 点击添加 → 是否需要让用户确认，还是直接执行 SDK 的 add/init 并自动绑定？</p>
+  <p><b>A.</b> 扫描到后立即自动初始化并绑定到锁（点击即绑定）</p>
+  <p><b>B.</b> 扫描到后弹出确认对话框，展示配件信息，用户确认后再绑定</p>
+</div>

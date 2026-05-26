@@ -1,0 +1,92 @@
+<h2>完整设计 — 数据模型与持久化</h2>
+<p class="subtitle">设计的基础层</p>
+
+<div class="section">
+  <h3>1. 持久化模型（freezed）</h3>
+  <p>统一存放在 <code>lib/features/settings/model/</code></p>
+  <div style="background:#F5F5F5; border-radius:6px; padding:12px; margin-top:8px; font-size:0.85em; font-family:monospace; white-space:pre;">
+// 锁设备
+@freezed
+class SavedLockDevice with _$SavedLockDevice {
+  const factory SavedLockDevice({
+    required String name,
+    required String mac,
+    required String lockData,
+    required TTLockVersion lockVersion,
+    required DateTime initializedAt,
+  }) = _SavedLockDevice;
+  factory SavedLockDevice.fromJson(Map&lt;String, dynamic&gt; json) => _$SavedLockDeviceFromJson(json);
+}
+
+// 网关设备
+@freezed
+class SavedGatewayDevice with _$SavedGatewayDevice {
+  const factory SavedGatewayDevice({
+    required String name,
+    required String mac,
+    required GatewayDeviceInfo deviceInfo,
+    required DateTime initializedAt,
+  }) = _SavedGatewayDevice;
+  factory SavedGatewayDevice.fromJson(Map&lt;String, dynamic&gt; json) => _$SavedGatewayDeviceFromJson(json);
+}
+
+// 门磁（绑定在锁上）
+@freezed
+class SavedDoorSensor with _$SavedDoorSensor {
+  const factory SavedDoorSensor({
+    required String name,
+    required String mac,
+    required String lockData,       // 所属锁
+    required String lockMac,
+    required DateTime initializedAt,
+  }) = _SavedDoorSensor;
+}
+
+// 遥控器（绑定在锁上）
+@freezed
+class SavedRemoteKey with _$SavedRemoteKey {
+  const factory SavedRemoteKey({...}) = _SavedRemoteKey;
+}
+
+// 键盘（绑定在锁上）
+@freezed
+class SavedKeypad with _$SavedKeypad {
+  const factory SavedKeypad({...}) = _SavedKeypad;
+}
+
+// 水表
+@freezed
+class SavedWaterMeter with _$SavedWaterMeter {...}
+
+// 电表
+@freezed
+class SavedElectricMeter with _$SavedElectricMeter {...}
+  </div>
+</div>
+
+<div class="section">
+  <h3>2. 存储层</h3>
+  <div style="background:#F5F5F5; border-radius:6px; padding:12px;">
+    <div style="font-weight:600;">LockStorage</div>
+    <div>— SharedPreferences 存储 SavedLockDevice 列表</div>
+    <div style="margin-top:6px; font-weight:600;">GatewayStorage</div>
+    <div>— SharedPreferences 存储 SavedGatewayDevice 列表</div>
+    <div style="margin-top:6px; font-weight:600;">MeterStorage</div>
+    <div>— SharedPreferences 存储 水电表 列表</div>
+    <div style="margin-top:6px; font-weight:600;">注意：配件数据不独立持久化</div>
+    <div>— 配件作为锁的子设备，在锁详情页实时从 SDK 读取</div>
+    <div>— 扫描添加后显示详情页，关闭后回到锁详情页</div>
+    <div>— 下次打开锁详情页时重新查询配件状态</div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>3. 锁-配件关联数据</h3>
+  <p>锁详情页打开时，通过 SDK 查询绑定配件：</p>
+  <ul>
+    <li><code>getDoorSensorInfo(lockData)</code> → 门磁状态（存在/不存在 + 电量）</li>
+    <li><code>getAllRemoteKey(lockData)</code> → 遥控器列表</li>
+    <li>SDK 中 keypad 通过 accessory API 查询</li>
+  </ul>
+  <p>配件数据不持久化到本地，每次从锁详情页重新查询 SDK</p>
+</div>
