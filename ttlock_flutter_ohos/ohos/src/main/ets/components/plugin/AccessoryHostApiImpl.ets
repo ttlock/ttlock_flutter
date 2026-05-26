@@ -101,9 +101,12 @@ function electricMeterStatusToMap(model: ElectricMeterStatusModel): Map<string, 
  * 与 iOS 一致，部分接口在当前 SDK 没有等价能力，全部以 `notImplemented` 返回。
  */
 export class AccessoryHostApiImpl extends TTAccessoryHostApi {
-  setEventKeypadMac(mac: string, isMultifunctional: boolean): void {
-    EventContextStore.shared.keypadMac = mac;
-    EventContextStore.shared.isMultifunctionalKeypad = isMultifunctional;
+  setAccessoryAddKeypadFingerprintParam(param: TTKeypadCredentialEventParam): void {
+    EventContextStore.shared.accessoryAddKeypadFingerprint.apply(param);
+  }
+
+  setAccessoryAddKeypadCardParam(param: TTKeypadCredentialEventParam): void {
+    EventContextStore.shared.accessoryAddKeypadCard.apply(param);
   }
 
   initRemoteKey(mac: string, lockData: string, result: Result<TTLockSystemModel>): void {

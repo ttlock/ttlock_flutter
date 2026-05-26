@@ -1222,6 +1222,242 @@ export class TTCycleModel {
   }
 }
 
+/*
+*  [TTEventChannelApi.lockScanWifi] 订阅前通过 [TTLockHostApi.setLockScanWifiParam] 写入。
+* 
+*  Generated class from Pigeon that represents data sent in messages.
+*/
+export class TTLockScanWifiEventParam {
+  private lockData?: string;
+
+  public setLockData(lockData:string):void {
+    this.lockData = lockData;
+  }
+
+  getLockData(): string | undefined{
+    return this.lockData;
+  }
+
+  constructor(lockData?: string) {
+    this.lockData = lockData;
+  }
+
+  toList(): Object[] {
+    let arr: Object[] = new Array();
+    if(this.lockData !==undefined){
+      arr.push(this.lockData);
+    }
+    return arr;
+  }
+
+  static fromList(arr: Object[]): TTLockScanWifiEventParam {
+    let pigeonResult: TTLockScanWifiEventParam = new TTLockScanWifiEventParam();
+    let lockData: Object = arr[0];
+    pigeonResult.setLockData(lockData as string);
+    return pigeonResult;
+  }
+}
+
+/*
+*  lockAddCard / lockAddFingerprint / lockAddFace 订阅前写入（含有效期，毫秒时间戳）。
+* 
+*  Generated class from Pigeon that represents data sent in messages.
+*/
+export class TTLockCredentialEventParam {
+  private lockData?: string;
+
+  public setLockData(lockData:string):void {
+    this.lockData = lockData;
+  }
+
+  getLockData(): string | undefined{
+    return this.lockData;
+  }
+
+  private cycleList?: Array<TTCycleModel>;
+
+  public setCycleList(cycleList:Array<TTCycleModel>):void {
+    this.cycleList = cycleList;
+  }
+
+  getCycleList(): Array<TTCycleModel> | undefined{
+    return this.cycleList;
+  }
+
+  private startDate?: number;
+
+  public setStartDate(startDate:number):void {
+    this.startDate = startDate;
+  }
+
+  getStartDate(): number | undefined{
+    return this.startDate;
+  }
+
+  private endDate?: number;
+
+  public setEndDate(endDate:number):void {
+    this.endDate = endDate;
+  }
+
+  getEndDate(): number | undefined{
+    return this.endDate;
+  }
+
+  constructor(lockData?: string, cycleList?: Array<TTCycleModel>, startDate?: number, endDate?: number) {
+    this.lockData = lockData;
+    this.cycleList = cycleList;
+    this.startDate = startDate;
+    this.endDate = endDate;
+  }
+
+  toList(): Object[] {
+    let arr: Object[] = new Array();
+    if(this.lockData !==undefined){
+      arr.push(this.lockData);
+    }
+    if(this.cycleList !==undefined){
+      arr.push(this.cycleList);
+    }
+    if(this.startDate !==undefined){
+      arr.push(this.startDate);
+    }
+    if(this.endDate !==undefined){
+      arr.push(this.endDate);
+    }
+    return arr;
+  }
+
+  static fromList(arr: Object[]): TTLockCredentialEventParam {
+    let pigeonResult: TTLockCredentialEventParam = new TTLockCredentialEventParam();
+    let lockData: Object = arr[0];
+    pigeonResult.setLockData(lockData as string);
+    let cycleList: Object = arr[1];
+    pigeonResult.setCycleList(cycleList as Array<TTCycleModel>);
+    let startDate: Object = arr[2];
+    pigeonResult.setStartDate(startDate as number);
+    let endDate: Object = arr[3];
+    pigeonResult.setEndDate(endDate as number);
+    return pigeonResult;
+  }
+}
+
+/*
+*  accessoryAddKeypadFingerprint / accessoryAddKeypadCard 订阅前写入。
+* 
+*  Generated class from Pigeon that represents data sent in messages.
+*/
+export class TTKeypadCredentialEventParam {
+  private keypadMac?: string;
+
+  public setKeypadMac(keypadMac:string):void {
+    this.keypadMac = keypadMac;
+  }
+
+  getKeypadMac(): string | undefined{
+    return this.keypadMac;
+  }
+
+  private lockData?: string;
+
+  public setLockData(lockData:string):void {
+    this.lockData = lockData;
+  }
+
+  getLockData(): string | undefined{
+    return this.lockData;
+  }
+
+  private isMultifunctional?: boolean;
+
+  public setIsMultifunctional(isMultifunctional:boolean):void {
+    this.isMultifunctional = isMultifunctional;
+  }
+
+  getIsMultifunctional(): boolean | undefined{
+    return this.isMultifunctional;
+  }
+
+  private cycleList?: Array<TTCycleModel>;
+
+  public setCycleList(cycleList:Array<TTCycleModel>):void {
+    this.cycleList = cycleList;
+  }
+
+  getCycleList(): Array<TTCycleModel> | undefined{
+    return this.cycleList;
+  }
+
+  private startDate?: number;
+
+  public setStartDate(startDate:number):void {
+    this.startDate = startDate;
+  }
+
+  getStartDate(): number | undefined{
+    return this.startDate;
+  }
+
+  private endDate?: number;
+
+  public setEndDate(endDate:number):void {
+    this.endDate = endDate;
+  }
+
+  getEndDate(): number | undefined{
+    return this.endDate;
+  }
+
+  constructor(keypadMac?: string, lockData?: string, isMultifunctional?: boolean, cycleList?: Array<TTCycleModel>, startDate?: number, endDate?: number) {
+    this.keypadMac = keypadMac;
+    this.lockData = lockData;
+    this.isMultifunctional = isMultifunctional;
+    this.cycleList = cycleList;
+    this.startDate = startDate;
+    this.endDate = endDate;
+  }
+
+  toList(): Object[] {
+    let arr: Object[] = new Array();
+    if(this.keypadMac !==undefined){
+      arr.push(this.keypadMac);
+    }
+    if(this.lockData !==undefined){
+      arr.push(this.lockData);
+    }
+    if(this.isMultifunctional !==undefined){
+      arr.push(this.isMultifunctional);
+    }
+    if(this.cycleList !==undefined){
+      arr.push(this.cycleList);
+    }
+    if(this.startDate !==undefined){
+      arr.push(this.startDate);
+    }
+    if(this.endDate !==undefined){
+      arr.push(this.endDate);
+    }
+    return arr;
+  }
+
+  static fromList(arr: Object[]): TTKeypadCredentialEventParam {
+    let pigeonResult: TTKeypadCredentialEventParam = new TTKeypadCredentialEventParam();
+    let keypadMac: Object = arr[0];
+    pigeonResult.setKeypadMac(keypadMac as string);
+    let lockData: Object = arr[1];
+    pigeonResult.setLockData(lockData as string);
+    let isMultifunctional: Object = arr[2];
+    pigeonResult.setIsMultifunctional(isMultifunctional as boolean);
+    let cycleList: Object = arr[3];
+    pigeonResult.setCycleList(cycleList as Array<TTCycleModel>);
+    let startDate: Object = arr[4];
+    pigeonResult.setStartDate(startDate as number);
+    let endDate: Object = arr[5];
+    pigeonResult.setEndDate(endDate as number);
+    return pigeonResult;
+  }
+}
+
 /* Generated class from Pigeon that represents data sent in messages.*/
 export class ControlLockResult {
   private lockTime?: number;
@@ -3499,56 +3735,62 @@ export class PigeonCodec extends StandardMessageCodec {
       case this.getByte(159):
         return TTCycleModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(160):
-        return ControlLockResult.fromList(super.readValue(buffer) as Object[]);
+        return TTLockScanWifiEventParam.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(161):
-        return AutoLockingTime.fromList(super.readValue(buffer) as Object[]);
+        return TTLockCredentialEventParam.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(162):
-        return TTWifiInfoModel.fromList(super.readValue(buffer) as Object[]);
+        return TTKeypadCredentialEventParam.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(163):
-        return CameraLockWifiResult.fromList(super.readValue(buffer) as Object[]);
+        return ControlLockResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(164):
-        return TTLockSystemModel.fromList(super.readValue(buffer) as Object[]);
+        return AutoLockingTime.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(165):
-        return AccessoryElectricQuantityResult.fromList(super.readValue(buffer) as Object[]);
+        return TTWifiInfoModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(166):
-        return TTLockScanModel.fromList(super.readValue(buffer) as Object[]);
+        return CameraLockWifiResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(167):
-        return TTPasscodeModel.fromList(super.readValue(buffer) as Object[]);
+        return TTLockSystemModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(168):
-        return TTICCardModel.fromList(super.readValue(buffer) as Object[]);
+        return AccessoryElectricQuantityResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(169):
-        return TTFingerprintModel.fromList(super.readValue(buffer) as Object[]);
+        return TTLockScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(170):
-        return TTGatewayScanModel.fromList(super.readValue(buffer) as Object[]);
+        return TTPasscodeModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(171):
-        return GatewayDeviceInfo.fromList(super.readValue(buffer) as Object[]);
+        return TTICCardModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(172):
-        return TTRemoteAccessoryScanModel.fromList(super.readValue(buffer) as Object[]);
+        return TTFingerprintModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(173):
-        return TTStandaloneDoorSensorScanModel.fromList(super.readValue(buffer) as Object[]);
+        return TTGatewayScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(174):
-        return TTStandaloneDoorSensorInfo.fromList(super.readValue(buffer) as Object[]);
+        return GatewayDeviceInfo.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(175):
-        return TTMeterScanModel.fromList(super.readValue(buffer) as Object[]);
+        return TTRemoteAccessoryScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(176):
-        return TTWaterMeterInitResult.fromList(super.readValue(buffer) as Object[]);
+        return TTStandaloneDoorSensorScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(177):
-        return TTElectricMeterInitResult.fromList(super.readValue(buffer) as Object[]);
+        return TTStandaloneDoorSensorInfo.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(178):
-        return TTWifiScanResult.fromList(super.readValue(buffer) as Object[]);
+        return TTMeterScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(179):
-        return TTWifiScanEntry.fromList(super.readValue(buffer) as Object[]);
+        return TTWaterMeterInitResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(180):
-        return RemoteKeypadInitResult.fromList(super.readValue(buffer) as Object[]);
+        return TTElectricMeterInitResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(181):
-        return MultifunctionalKeypadInitResult.fromList(super.readValue(buffer) as Object[]);
+        return TTWifiScanResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(182):
-        return WaterMeterDeviceInfo.fromList(super.readValue(buffer) as Object[]);
+        return TTWifiScanEntry.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(183):
-        return AddCardEvent.fromList(super.readValue(buffer) as Object[]);
+        return RemoteKeypadInitResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(184):
-        return AddFingerprintEvent.fromList(super.readValue(buffer) as Object[]);
+        return MultifunctionalKeypadInitResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(185):
+        return WaterMeterDeviceInfo.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(186):
+        return AddCardEvent.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(187):
+        return AddFingerprintEvent.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(188):
         return AddFaceEvent.fromList(super.readValue(buffer) as Object[]);
       default:
         return super.readValueOfType(type, buffer);
@@ -3649,83 +3891,92 @@ export class PigeonCodec extends StandardMessageCodec {
     } else if (value instanceof TTCycleModel) {
       stream.writeUint8(this.getByte(159));
       this.writeValue(stream, (value as TTCycleModel).toList());
-    } else if (value instanceof ControlLockResult) {
+    } else if (value instanceof TTLockScanWifiEventParam) {
       stream.writeUint8(this.getByte(160));
+      this.writeValue(stream, (value as TTLockScanWifiEventParam).toList());
+    } else if (value instanceof TTLockCredentialEventParam) {
+      stream.writeUint8(this.getByte(161));
+      this.writeValue(stream, (value as TTLockCredentialEventParam).toList());
+    } else if (value instanceof TTKeypadCredentialEventParam) {
+      stream.writeUint8(this.getByte(162));
+      this.writeValue(stream, (value as TTKeypadCredentialEventParam).toList());
+    } else if (value instanceof ControlLockResult) {
+      stream.writeUint8(this.getByte(163));
       this.writeValue(stream, (value as ControlLockResult).toList());
     } else if (value instanceof AutoLockingTime) {
-      stream.writeUint8(this.getByte(161));
+      stream.writeUint8(this.getByte(164));
       this.writeValue(stream, (value as AutoLockingTime).toList());
     } else if (value instanceof TTWifiInfoModel) {
-      stream.writeUint8(this.getByte(162));
+      stream.writeUint8(this.getByte(165));
       this.writeValue(stream, (value as TTWifiInfoModel).toList());
     } else if (value instanceof CameraLockWifiResult) {
-      stream.writeUint8(this.getByte(163));
+      stream.writeUint8(this.getByte(166));
       this.writeValue(stream, (value as CameraLockWifiResult).toList());
     } else if (value instanceof TTLockSystemModel) {
-      stream.writeUint8(this.getByte(164));
+      stream.writeUint8(this.getByte(167));
       this.writeValue(stream, (value as TTLockSystemModel).toList());
     } else if (value instanceof AccessoryElectricQuantityResult) {
-      stream.writeUint8(this.getByte(165));
+      stream.writeUint8(this.getByte(168));
       this.writeValue(stream, (value as AccessoryElectricQuantityResult).toList());
     } else if (value instanceof TTLockScanModel) {
-      stream.writeUint8(this.getByte(166));
+      stream.writeUint8(this.getByte(169));
       this.writeValue(stream, (value as TTLockScanModel).toList());
     } else if (value instanceof TTPasscodeModel) {
-      stream.writeUint8(this.getByte(167));
+      stream.writeUint8(this.getByte(170));
       this.writeValue(stream, (value as TTPasscodeModel).toList());
     } else if (value instanceof TTICCardModel) {
-      stream.writeUint8(this.getByte(168));
+      stream.writeUint8(this.getByte(171));
       this.writeValue(stream, (value as TTICCardModel).toList());
     } else if (value instanceof TTFingerprintModel) {
-      stream.writeUint8(this.getByte(169));
+      stream.writeUint8(this.getByte(172));
       this.writeValue(stream, (value as TTFingerprintModel).toList());
     } else if (value instanceof TTGatewayScanModel) {
-      stream.writeUint8(this.getByte(170));
+      stream.writeUint8(this.getByte(173));
       this.writeValue(stream, (value as TTGatewayScanModel).toList());
     } else if (value instanceof GatewayDeviceInfo) {
-      stream.writeUint8(this.getByte(171));
+      stream.writeUint8(this.getByte(174));
       this.writeValue(stream, (value as GatewayDeviceInfo).toList());
     } else if (value instanceof TTRemoteAccessoryScanModel) {
-      stream.writeUint8(this.getByte(172));
+      stream.writeUint8(this.getByte(175));
       this.writeValue(stream, (value as TTRemoteAccessoryScanModel).toList());
     } else if (value instanceof TTStandaloneDoorSensorScanModel) {
-      stream.writeUint8(this.getByte(173));
+      stream.writeUint8(this.getByte(176));
       this.writeValue(stream, (value as TTStandaloneDoorSensorScanModel).toList());
     } else if (value instanceof TTStandaloneDoorSensorInfo) {
-      stream.writeUint8(this.getByte(174));
+      stream.writeUint8(this.getByte(177));
       this.writeValue(stream, (value as TTStandaloneDoorSensorInfo).toList());
     } else if (value instanceof TTMeterScanModel) {
-      stream.writeUint8(this.getByte(175));
+      stream.writeUint8(this.getByte(178));
       this.writeValue(stream, (value as TTMeterScanModel).toList());
     } else if (value instanceof TTWaterMeterInitResult) {
-      stream.writeUint8(this.getByte(176));
+      stream.writeUint8(this.getByte(179));
       this.writeValue(stream, (value as TTWaterMeterInitResult).toList());
     } else if (value instanceof TTElectricMeterInitResult) {
-      stream.writeUint8(this.getByte(177));
+      stream.writeUint8(this.getByte(180));
       this.writeValue(stream, (value as TTElectricMeterInitResult).toList());
     } else if (value instanceof TTWifiScanResult) {
-      stream.writeUint8(this.getByte(178));
+      stream.writeUint8(this.getByte(181));
       this.writeValue(stream, (value as TTWifiScanResult).toList());
     } else if (value instanceof TTWifiScanEntry) {
-      stream.writeUint8(this.getByte(179));
+      stream.writeUint8(this.getByte(182));
       this.writeValue(stream, (value as TTWifiScanEntry).toList());
     } else if (value instanceof RemoteKeypadInitResult) {
-      stream.writeUint8(this.getByte(180));
+      stream.writeUint8(this.getByte(183));
       this.writeValue(stream, (value as RemoteKeypadInitResult).toList());
     } else if (value instanceof MultifunctionalKeypadInitResult) {
-      stream.writeUint8(this.getByte(181));
+      stream.writeUint8(this.getByte(184));
       this.writeValue(stream, (value as MultifunctionalKeypadInitResult).toList());
     } else if (value instanceof WaterMeterDeviceInfo) {
-      stream.writeUint8(this.getByte(182));
+      stream.writeUint8(this.getByte(185));
       this.writeValue(stream, (value as WaterMeterDeviceInfo).toList());
     } else if (value instanceof AddCardEvent) {
-      stream.writeUint8(this.getByte(183));
+      stream.writeUint8(this.getByte(186));
       this.writeValue(stream, (value as AddCardEvent).toList());
     } else if (value instanceof AddFingerprintEvent) {
-      stream.writeUint8(this.getByte(184));
+      stream.writeUint8(this.getByte(187));
       this.writeValue(stream, (value as AddFingerprintEvent).toList());
     } else if (value instanceof AddFaceEvent) {
-      stream.writeUint8(this.getByte(185));
+      stream.writeUint8(this.getByte(188));
       this.writeValue(stream, (value as AddFaceEvent).toList());
     } else {
       super.writeValue(stream, value);
@@ -3741,8 +3992,14 @@ export interface Result<T> {
 }
 /* Generated abstract class from Pigeon that represents a handler of messages from Flutter.*/
 export abstract class TTLockHostApi {
-  /* 在订阅锁相关 EventChannel（如 lockScanWifi、lockAddCard）前设置 lockData，比依赖其它接口副作用更可靠。*/
-  abstract setEventLockData(lockData: string ): void;
+  /* 订阅 [TTEventChannelApi.lockScanWifi] 前调用。*/
+  abstract setLockScanWifiParam(param: TTLockScanWifiEventParam ): void;
+  /* 订阅 [TTEventChannelApi.lockAddCard] 前调用。*/
+  abstract setLockAddCardParam(param: TTLockCredentialEventParam ): void;
+  /* 订阅 [TTEventChannelApi.lockAddFingerprint] 前调用。*/
+  abstract setLockAddFingerprintParam(param: TTLockCredentialEventParam ): void;
+  /* 订阅 [TTEventChannelApi.lockAddFace] 前调用。*/
+  abstract setLockAddFaceParam(param: TTLockCredentialEventParam ): void;
 
   abstract getBluetoothState(): TTBluetoothState;
 
@@ -3902,14 +4159,83 @@ export abstract class TTLockHostApi {
     {
       let channel: BasicMessageChannel<Object> =
           new BasicMessageChannel(
-              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.setEventLockData", TTLockHostApi.getCodec());
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.setLockScanWifiParam", TTLockHostApi.getCodec());
       if (api != null) {
         channel.setMessageHandler({
             onMessage(message: Object ,reply: Reply<Object> ) {
               let args: Array<Object> = message as Array<Object>;
               let res: Array<Object> = [];
               try {
-                api!.setEventLockData(args[0] as string);
+                api!.setLockScanWifiParam(args[0] as TTLockScanWifiEventParam);
+                res.push(null);
+              }
+ catch (error) {
+                let wrappedError: Array<Object> = wrapError(error);
+                res = wrappedError;
+              }
+              reply.reply(res);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.setLockAddCardParam", TTLockHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              let res: Array<Object> = [];
+              try {
+                api!.setLockAddCardParam(args[0] as TTLockCredentialEventParam);
+                res.push(null);
+              }
+ catch (error) {
+                let wrappedError: Array<Object> = wrapError(error);
+                res = wrappedError;
+              }
+              reply.reply(res);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.setLockAddFingerprintParam", TTLockHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              let res: Array<Object> = [];
+              try {
+                api!.setLockAddFingerprintParam(args[0] as TTLockCredentialEventParam);
+                res.push(null);
+              }
+ catch (error) {
+                let wrappedError: Array<Object> = wrapError(error);
+                res = wrappedError;
+              }
+              reply.reply(res);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.setLockAddFaceParam", TTLockHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              let res: Array<Object> = [];
+              try {
+                api!.setLockAddFaceParam(args[0] as TTLockCredentialEventParam);
                 res.push(null);
               }
  catch (error) {
@@ -3931,7 +4257,7 @@ export abstract class TTLockHostApi {
             onMessage(message: Object ,reply: Reply<Object> ) {
               let res: Array<Object> = [];
               try {
-                let output: TTBluetoothState = api!.getBluetoothState();
+                let output: TTBluetoothStateEnum = new TTBluetoothStateEnum(api!.getBluetoothState(args[0] as TTBluetoothState).toString());
                 res.push(output);
               }
  catch (error) {
@@ -4134,7 +4460,7 @@ export abstract class TTLockHostApi {
               }
               let resultCallback: Result<TTLockSwitchState> = new ResultImp();
 
-              api!.getLockSwitchState(args[0] as string, resultCallback);
+              api!.getLockSwitchState(new stringEnum(args[0] as string), resultCallback);
             } });
       } else {
         channel.setMessageHandler(null);
@@ -5216,7 +5542,7 @@ export abstract class TTLockHostApi {
               }
               let resultCallback: Result<TTLockDirection> = new ResultImp();
 
-              api!.getLockDirection(args[0] as string, resultCallback);
+              api!.getLockDirection(new stringEnum(args[0] as string), resultCallback);
             } });
       } else {
         channel.setMessageHandler(null);
@@ -5748,7 +6074,7 @@ export abstract class TTLockHostApi {
               }
               let resultCallback: Result<TTSoundVolumeType> = new ResultImp();
 
-              api!.getSoundVolume(args[0] as string, resultCallback);
+              api!.getSoundVolume(new stringEnum(args[0] as string), resultCallback);
             } });
       } else {
         channel.setMessageHandler(null);
@@ -6010,8 +6336,8 @@ export abstract class TTLockHostApi {
 }
 /* Generated abstract class from Pigeon that represents a handler of messages from Flutter.*/
 export abstract class TTGatewayHostApi {
-  /* 在订阅 gatewayGetNearbyWifi 等流前设置网关 MAC。*/
-  abstract setEventGatewayMac(mac: string ): void;
+  /* 订阅 [TTEventChannelApi.gatewayGetNearbyWifi] 前调用。*/
+  abstract setGatewayGetNearbyWifiParam(gatewayMac: string ): void;
 
   abstract connect(mac: string , result: Result<TTGatewayConnectStatus>): void;
 
@@ -6035,14 +6361,14 @@ export abstract class TTGatewayHostApi {
     {
       let channel: BasicMessageChannel<Object> =
           new BasicMessageChannel(
-              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTGatewayHostApi.setEventGatewayMac", TTGatewayHostApi.getCodec());
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTGatewayHostApi.setGatewayGetNearbyWifiParam", TTGatewayHostApi.getCodec());
       if (api != null) {
         channel.setMessageHandler({
             onMessage(message: Object ,reply: Reply<Object> ) {
               let args: Array<Object> = message as Array<Object>;
               let res: Array<Object> = [];
               try {
-                api!.setEventGatewayMac(args[0] as string);
+                api!.setGatewayGetNearbyWifiParam(args[0] as string);
                 res.push(null);
               }
  catch (error) {
@@ -6077,7 +6403,7 @@ export abstract class TTGatewayHostApi {
               }
               let resultCallback: Result<TTGatewayConnectStatus> = new ResultImp();
 
-              api!.connect(args[0] as string, resultCallback);
+              api!.connect(new stringEnum(args[0] as string), resultCallback);
             } });
       } else {
         channel.setMessageHandler(null);
@@ -6244,8 +6570,10 @@ export abstract class TTGatewayHostApi {
 }
 /* Generated abstract class from Pigeon that represents a handler of messages from Flutter.*/
 export abstract class TTAccessoryHostApi {
-  /* 在订阅键盘相关 EventChannel（accessoryAddKeypadFingerprint / accessoryAddKeypadCard）前设置键盘 MAC 及是否为多功能键盘。*/
-  abstract setEventKeypadMac(mac: string , isMultifunctional: boolean ): void;
+  /* 订阅 [TTEventChannelApi.accessoryAddKeypadFingerprint] 前调用。*/
+  abstract setAccessoryAddKeypadFingerprintParam(param: TTKeypadCredentialEventParam ): void;
+  /* 订阅 [TTEventChannelApi.accessoryAddKeypadCard] 前调用。*/
+  abstract setAccessoryAddKeypadCardParam(param: TTKeypadCredentialEventParam ): void;
 
   abstract initRemoteKey(mac: string , lockData: string , result: Result<TTLockSystemModel>): void;
 
@@ -6337,14 +6665,37 @@ export abstract class TTAccessoryHostApi {
     {
       let channel: BasicMessageChannel<Object> =
           new BasicMessageChannel(
-              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.setEventKeypadMac", TTAccessoryHostApi.getCodec());
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.setAccessoryAddKeypadFingerprintParam", TTAccessoryHostApi.getCodec());
       if (api != null) {
         channel.setMessageHandler({
             onMessage(message: Object ,reply: Reply<Object> ) {
               let args: Array<Object> = message as Array<Object>;
               let res: Array<Object> = [];
               try {
-                api!.setEventKeypadMac(args[0] as string, args[1] as boolean);
+                api!.setAccessoryAddKeypadFingerprintParam(args[0] as TTKeypadCredentialEventParam);
+                res.push(null);
+              }
+ catch (error) {
+                let wrappedError: Array<Object> = wrapError(error);
+                res = wrappedError;
+              }
+              reply.reply(res);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.setAccessoryAddKeypadCardParam", TTAccessoryHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              let res: Array<Object> = [];
+              try {
+                api!.setAccessoryAddKeypadCardParam(args[0] as TTKeypadCredentialEventParam);
                 res.push(null);
               }
  catch (error) {

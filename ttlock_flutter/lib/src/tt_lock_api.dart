@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:ttlock_flutter_platform_interface/pigeon/messages.g.dart' as pigeon;
 import 'package:ttlock_flutter_platform_interface/pigeon/messages.g.dart';
 
+import 'event_stream_params.dart';
 import 'pigeon_errors.dart';
 
 /// 锁相关 Pigeon API：将 [PlatformException] 转为 [TTLockException]（见 `package:ttlock_flutter/errors`）。
@@ -20,50 +21,82 @@ class TTLockApi {
 
   Stream<pigeon.TTLockScanModel> lockScanLock() => pigeon.lockScanLock();
 
-  /// 订阅前会先调用 [setEventLockData]；[lockData] 不能为空字符串。
+  /// 订阅前调用 [setLockScanWifiParam]；[lockData] 不能为空字符串。
   Stream<TTWifiScanResult> lockScanWifi(String lockData) {
     if (lockData.isEmpty) {
       throw ArgumentError.value(lockData, 'lockData', 'must not be empty');
     }
     return Stream<void>.fromFuture(
-      runLockApi(() => _host.setEventLockData(lockData)),
+      runLockApi(
+        () => _host.setLockScanWifiParam(
+          pigeon.TTLockScanWifiEventParam(lockData: lockData),
+        ),
+      ),
     ).asyncExpand((_) => pigeon.lockScanWifi());
   }
 
-  /// 订阅前会先调用 [setEventLockData]；[lockData] 不能为空字符串。
-  Stream<pigeon.AddCardEvent> lockAddCard(String lockData) {
+  /// 订阅前调用 [setLockAddCardParam]。
+  Stream<pigeon.AddCardEvent> lockAddCard(
+    String lockData, {
+    List<pigeon.TTCycleModel>? cycleList,
+    int? startDate,
+    int? endDate,
+  }) {
     if (lockData.isEmpty) {
       throw ArgumentError.value(lockData, 'lockData', 'must not be empty');
     }
+    final param = buildLockCredentialParam(
+      lockData: lockData,
+      cycleList: cycleList,
+      startDate: startDate,
+      endDate: endDate,
+    );
     return Stream<void>.fromFuture(
-      runLockApi(() => _host.setEventLockData(lockData)),
+      runLockApi(() => _host.setLockAddCardParam(param)),
     ).asyncExpand((_) => pigeon.lockAddCard());
   }
 
-  /// 订阅前会先调用 [setEventLockData]；[lockData] 不能为空字符串。
-  Stream<pigeon.AddFingerprintEvent> lockAddFingerprint(String lockData) {
+  /// 订阅前调用 [setLockAddFingerprintParam]。
+  Stream<pigeon.AddFingerprintEvent> lockAddFingerprint(
+    String lockData, {
+    List<pigeon.TTCycleModel>? cycleList,
+    int? startDate,
+    int? endDate,
+  }) {
     if (lockData.isEmpty) {
       throw ArgumentError.value(lockData, 'lockData', 'must not be empty');
     }
+    final param = buildLockCredentialParam(
+      lockData: lockData,
+      cycleList: cycleList,
+      startDate: startDate,
+      endDate: endDate,
+    );
     return Stream<void>.fromFuture(
-      runLockApi(() => _host.setEventLockData(lockData)),
+      runLockApi(() => _host.setLockAddFingerprintParam(param)),
     ).asyncExpand((_) => pigeon.lockAddFingerprint());
   }
 
-  /// 订阅前会先调用 [setEventLockData]；[lockData] 不能为空字符串。
-  Stream<pigeon.AddFaceEvent> lockAddFace(String lockData) {
+  /// 订阅前调用 [setLockAddFaceParam]。
+  Stream<pigeon.AddFaceEvent> lockAddFace(
+    String lockData, {
+    List<pigeon.TTCycleModel>? cycleList,
+    int? startDate,
+    int? endDate,
+  }) {
     if (lockData.isEmpty) {
       throw ArgumentError.value(lockData, 'lockData', 'must not be empty');
     }
+    final param = buildLockCredentialParam(
+      lockData: lockData,
+      cycleList: cycleList,
+      startDate: startDate,
+      endDate: endDate,
+    );
     return Stream<void>.fromFuture(
-      runLockApi(() => _host.setEventLockData(lockData)),
+      runLockApi(() => _host.setLockAddFaceParam(param)),
     ).asyncExpand((_) => pigeon.lockAddFace());
   }
-
-  /// 在订阅 [lockScanWifi]、[lockAddCard]、[lockAddFingerprint]、[lockAddFace] 等流之前设置 `lockData`（推荐，不依赖其它接口副作用）。
-  /// 上述 stream 方法已内置调用，一般无需单独调用。
-  // Future<void> setEventLockData(String lockData) =>
-  //     runLockApi(() => _host.setEventLockData(lockData));
 
   Future<pigeon.TTBluetoothState> getBluetoothState() =>
       runLockApi(() => _host.getBluetoothState());

@@ -54,7 +54,7 @@ export function makeNoLockDataError(operation: string): FlutterError {
   return new FlutterError(
     NO_LOCK_DATA_CODE,
     'noLockData',
-    `请先通过 setEventLockData 设置 lockData 后再使用 ${operation}`,
+    `请先通过 set*Param 设置参数后再使用 ${operation}`,
   );
 }
 
@@ -62,7 +62,7 @@ export function makeNoGatewayError(operation: string): FlutterError {
   return new FlutterError(
     NO_GATEWAY_CODE,
     'noGateway',
-    `请先通过 setEventGatewayMac 设置网关 MAC 后再使用 ${operation}`,
+    `请先通过 setGatewayGetNearbyWifiParam 设置网关 MAC 后再使用 ${operation}`,
   );
 }
 
@@ -70,7 +70,7 @@ export function makeNoKeypadError(operation: string): FlutterError {
   return new FlutterError(
     NO_KEYPAD_CODE,
     'noKeypad',
-    `请先通过 setEventKeypadMac 设置键盘 MAC 后再使用 ${operation}`,
+    `请先通过 setAccessoryAddKeypad*Param 设置键盘参数后再使用 ${operation}`,
   );
 }
 
@@ -170,11 +170,56 @@ export function makeElectricMeterApiError(operation: string, error: SNError, mes
 }
 
 /**
- * 由 ETS 端 host 调用方与 EventChannel 共享的运行期上下文。
- *
- * 与 iOS 端 `EventContextStore` 一致：在订阅 EventChannel（如 lockAddCard、accessoryAddKeypadFingerprint）
- * 之前，先通过 host API 写入 lockData / gatewayMac / keypadMac 等关键字段。
+ * 各 EventChannel 专用参数槽；由对应 HostApi `set*Param` 写入（与 Android/iOS 对齐）。
  */
+export class LockScanWifiSlot {
+  lockData: string | null = null;
+}
+
+export class LockCredentialSlot {
+  lockData: string | null = null;
+  cycleList: Array<TTCycleModel> | null = null;
+  startDateMs: number = 0;
+  endDateMs: number = 0;
+
+  apply(param: TTLockCredentialEventParam): void {
+    this.lockData = param.getLockData();
+    this.startDateMs = param.getStartDate();
+    this.endDateMs = param.getEndDate();
+    this.cycleList = param.getCycleList();
+  }
+
+  toValidityRange(): ValidityRange {
+    return new ValidityRange(this.startDateMs, this.endDateMs, this.cycleList);
+  }
+}
+
+export class GatewayNearbyWifiSlot {
+  gatewayMac: string | null = null;
+}
+
+export class KeypadCredentialSlot {
+  keypadMac: string | null = null;
+  lockData: string | null = null;
+  isMultifunctionalKeypad: boolean = false;
+  cycleList: Array<TTCycleModel> | null = null;
+  startDateMs: number = 0;
+  endDateMs: number = 0;
+
+  apply(param: TTKeypadCredentialEventParam): void {
+    this.keypadMac = param.getKeypadMac();
+    this.lockData = param.getLockData();
+    this.isMultifunctionalKeypad = param.getIsMultifunctional();
+    this.startDateMs = param.getStartDate();
+    this.endDateMs = param.getEndDate();
+    this.cycleList = param.getCycleList();
+  }
+
+  toValidityRange(): ValidityRange {
+    return new ValidityRange(this.startDateMs, this.endDateMs, this.cycleList);
+  }
+}
+
 export class EventContextStore {
   private static _instance: EventContextStore | null = null;
 
@@ -185,41 +230,30 @@ export class EventContextStore {
     return EventContextStore._instance as EventContextStore;
   }
 
-  lockData: string | null = null;
-  gatewayMac: string | null = null;
-  keypadMac: string | null = null;
-  isMultifunctionalKeypad: boolean = false;
+  lockScanWifi: LockScanWifiSlot = new LockScanWifiSlot();
+  lockAddCard: LockCredentialSlot = new LockCredentialSlot();
+  lockAddFingerprint: LockCredentialSlot = new LockCredentialSlot();
+  lockAddFace: LockCredentialSlot = new LockCredentialSlot();
+  gatewayGetNearbyWifi: GatewayNearbyWifiSlot = new GatewayNearbyWifiSlot();
+  accessoryAddKeypadFingerprint: KeypadCredentialSlot = new KeypadCredentialSlot();
+  accessoryAddKeypadCard: KeypadCredentialSlot = new KeypadCredentialSlot();
 
   /** 由最近一次 gatewayInit 缓存，供 getNetworkMac 复用（OHOS SDK 没有独立接口）。*/
   cachedNetworkMac: string | null = null;
-
-  /** 与 Android `LockStreamParams` 对齐：加卡/指纹/人脸等流的周期配置与有效期（毫秒）。*/
-  streamCyclicConfigMaps: Array<TTCycleModel> | null = null;
-  streamValidityStartMs: number | null = null;
-  streamValidityEndMs: number | null = null;
 
   /** 用于 readData / payMode 等接口缓存最近一次连接的表具 MAC。*/
   latestWaterMeterMac: string | null = null;
   latestElectricMeterMac: string | null = null;
 
-  validityRangeForAddOperations(): ValidityRange {
-    const nowMs = Date.now();
-    const start = this.streamValidityStartMs !== null ? this.streamValidityStartMs : nowMs;
-    const end = this.streamValidityEndMs !== null
-      ? this.streamValidityEndMs
-      : nowMs + 30 * 24 * 3600 * 1000;
-    return new ValidityRange(start, end, this.streamCyclicConfigMaps);
-  }
-
   reset(): void {
-    this.lockData = null;
-    this.gatewayMac = null;
-    this.keypadMac = null;
-    this.isMultifunctionalKeypad = false;
+    this.lockScanWifi = new LockScanWifiSlot();
+    this.lockAddCard = new LockCredentialSlot();
+    this.lockAddFingerprint = new LockCredentialSlot();
+    this.lockAddFace = new LockCredentialSlot();
+    this.gatewayGetNearbyWifi = new GatewayNearbyWifiSlot();
+    this.accessoryAddKeypadFingerprint = new KeypadCredentialSlot();
+    this.accessoryAddKeypadCard = new KeypadCredentialSlot();
     this.cachedNetworkMac = null;
-    this.streamCyclicConfigMaps = null;
-    this.streamValidityStartMs = null;
-    this.streamValidityEndMs = null;
     this.latestWaterMeterMac = null;
     this.latestElectricMeterMac = null;
   }

@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(fvm flutter *)",
+      "Bash(fvm dart *)",
+      "Bash(grep -v \"^$\")",
+      "Bash(./gradlew clean *)",
+      "WebSearch",
+      "mcp__plugin_context7_context7__resolve-library-id",
+      "mcp__plugin_context7_context7__query-docs",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:pub.dev)",
+      "Bash(~/.pub-cache/hosted/pub.dev/go_router-14.8.0/lib/src/annotations.dart)"
+    ]
+  },
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true
+  }
+}

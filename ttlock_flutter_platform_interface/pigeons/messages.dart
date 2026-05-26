@@ -124,6 +124,47 @@ class TTCycleModel {
   });
 }
 
+/// [TTEventChannelApi.lockScanWifi] 订阅前通过 [TTLockHostApi.setLockScanWifiParam] 写入。
+class TTLockScanWifiEventParam {
+  final String lockData;
+
+  TTLockScanWifiEventParam({required this.lockData});
+}
+
+/// lockAddCard / lockAddFingerprint / lockAddFace 订阅前写入（含有效期，毫秒时间戳）。
+class TTLockCredentialEventParam {
+  final String lockData;
+  final List<TTCycleModel>? cycleList;
+  final int startDate;
+  final int endDate;
+
+  TTLockCredentialEventParam({
+    required this.lockData,
+    this.cycleList,
+    required this.startDate,
+    required this.endDate,
+  });
+}
+
+/// accessoryAddKeypadFingerprint / accessoryAddKeypadCard 订阅前写入。
+class TTKeypadCredentialEventParam {
+  final String keypadMac;
+  final String lockData;
+  final bool isMultifunctional;
+  final List<TTCycleModel>? cycleList;
+  final int startDate;
+  final int endDate;
+
+  TTKeypadCredentialEventParam({
+    required this.keypadMac,
+    required this.lockData,
+    required this.isMultifunctional,
+    this.cycleList,
+    required this.startDate,
+    required this.endDate,
+  });
+}
+
 class ControlLockResult {
   final int lockTime;
   final int electricQuantity;
@@ -854,8 +895,17 @@ enum TTFaceErrorCode {
 // -----------------------------
 @HostApi()
 abstract class TTLockHostApi {
-  /// 在订阅锁相关 EventChannel（如 lockScanWifi、lockAddCard）前设置 lockData，比依赖其它接口副作用更可靠。
-  void setEventLockData(String lockData);
+  /// 订阅 [TTEventChannelApi.lockScanWifi] 前调用。
+  void setLockScanWifiParam(TTLockScanWifiEventParam param);
+
+  /// 订阅 [TTEventChannelApi.lockAddCard] 前调用。
+  void setLockAddCardParam(TTLockCredentialEventParam param);
+
+  /// 订阅 [TTEventChannelApi.lockAddFingerprint] 前调用。
+  void setLockAddFingerprintParam(TTLockCredentialEventParam param);
+
+  /// 订阅 [TTEventChannelApi.lockAddFace] 前调用。
+  void setLockAddFaceParam(TTLockCredentialEventParam param);
 
   // One-shot lock operations (subset; extend as needed)
   TTBluetoothState getBluetoothState();
@@ -1074,8 +1124,8 @@ abstract class TTLockHostApi {
 
 @HostApi()
 abstract class TTGatewayHostApi {
-  /// 在订阅 gatewayGetNearbyWifi 等流前设置网关 MAC。
-  void setEventGatewayMac(String mac);
+  /// 订阅 [TTEventChannelApi.gatewayGetNearbyWifi] 前调用。
+  void setGatewayGetNearbyWifiParam(String gatewayMac);
 
   @async
   TTGatewayConnectStatus connect(String mac);
@@ -1093,8 +1143,11 @@ abstract class TTGatewayHostApi {
 
 @HostApi()
 abstract class TTAccessoryHostApi {
-  /// 在订阅键盘相关 EventChannel（accessoryAddKeypadFingerprint / accessoryAddKeypadCard）前设置键盘 MAC 及是否为多功能键盘。
-  void setEventKeypadMac(String mac, bool isMultifunctional);
+  /// 订阅 [TTEventChannelApi.accessoryAddKeypadFingerprint] 前调用。
+  void setAccessoryAddKeypadFingerprintParam(TTKeypadCredentialEventParam param);
+
+  /// 订阅 [TTEventChannelApi.accessoryAddKeypadCard] 前调用。
+  void setAccessoryAddKeypadCardParam(TTKeypadCredentialEventParam param);
 
   @async
   TTLockSystemModel initRemoteKey(String mac, String lockData);

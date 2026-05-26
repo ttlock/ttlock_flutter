@@ -33,12 +33,12 @@ import {
  * `getNetworkMac` 调用读取。
  */
 export class GatewayHostApiImpl extends TTGatewayHostApi {
-  setEventGatewayMac(mac: string): void {
-    EventContextStore.shared.gatewayMac = mac;
+  setGatewayGetNearbyWifiParam(gatewayMac: string): void {
+    EventContextStore.shared.gatewayGetNearbyWifi.gatewayMac = gatewayMac;
   }
 
   connect(mac: string, result: Result<TTGatewayConnectStatus>): void {
-    EventContextStore.shared.gatewayMac = mac;
+    EventContextStore.shared.gatewayGetNearbyWifi.gatewayMac = mac;
     TTLock.connectGateway(mac, {
       success: (_: void): void => {
         result.success(TTGatewayConnectStatus.SUCCESS);

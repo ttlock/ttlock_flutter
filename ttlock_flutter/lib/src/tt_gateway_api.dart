@@ -22,13 +22,13 @@ class TTGatewayApi {
 
   Stream<pigeon.TTGatewayScanModel> gatewayStartScan() => pigeon.gatewayStartScan();
 
-  /// 订阅前会先调用 [setEventGatewayMac]；[gatewayMac] 不能为空字符串。
+  /// 订阅前会先调用 [setGatewayGetNearbyWifiParam]；[gatewayMac] 不能为空字符串。
   Stream<pigeon.TTWifiScanResult> gatewayGetNearbyWifi({required String gatewayMac}) {
     if (gatewayMac.isEmpty) {
       throw ArgumentError.value(gatewayMac, 'gatewayMac', 'must not be empty');
     }
     return Stream<void>.fromFuture(
-      runGatewayApi(() => _host.setEventGatewayMac(gatewayMac)),
+      runGatewayApi(() => _host.setGatewayGetNearbyWifiParam(gatewayMac)),
     ).asyncExpand((_) => pigeon.gatewayGetNearbyWifi());
   }
 

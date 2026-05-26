@@ -141,7 +141,15 @@ class TTRemoteKeypad {
     TTFailedCallback lockFailedCallback,
     TTRemoteKeypadFailedCallback keyPadFailedCallback,
   ) {
-    new_ttlock.TTLock.remoteKeypad.accessoryAddKeypadFingerprint(mac).listen(
+    new_ttlock.TTLock.remoteKeypad
+        .accessoryAddKeypadFingerprint(
+          keypadMac: mac,
+          lockData: lockData,
+          cycleList: cycleList,
+          startDate: startDate,
+          endDate: endDate,
+        )
+        .listen(
       (event) {
         if (event.isProgress) {
           progressCallback(event.currentCount!, event.totalCount!);
@@ -176,7 +184,15 @@ class TTRemoteKeypad {
     TTCardNumberCallback callback,
     TTFailedCallback failedCallback,
   ) {
-    new_ttlock.TTLock.remoteKeypad.accessoryAddKeypadCard(keypadMac).listen(
+    new_ttlock.TTLock.remoteKeypad
+        .accessoryAddKeypadCard(
+          keypadMac: keypadMac,
+          lockData: lockData,
+          cycleList: cycleList,
+          startDate: startDate,
+          endDate: endDate,
+        )
+        .listen(
       (event) {
         if (event.isProgress) {
           progressCallback();

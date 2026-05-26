@@ -116,8 +116,20 @@ function hashMapToMap(map: HashMap<string, Object>): Map<string, Object> {
  * `makeNotImplementedError` 返回，与 iOS 一致。
  */
 export class LockHostApiImpl extends TTLockHostApi {
-  setEventLockData(lockData: string): void {
-    EventContextStore.shared.lockData = lockData;
+  setLockScanWifiParam(param: TTLockScanWifiEventParam): void {
+    EventContextStore.shared.lockScanWifi.lockData = param.getLockData();
+  }
+
+  setLockAddCardParam(param: TTLockCredentialEventParam): void {
+    EventContextStore.shared.lockAddCard.apply(param);
+  }
+
+  setLockAddFingerprintParam(param: TTLockCredentialEventParam): void {
+    EventContextStore.shared.lockAddFingerprint.apply(param);
+  }
+
+  setLockAddFaceParam(param: TTLockCredentialEventParam): void {
+    EventContextStore.shared.lockAddFace.apply(param);
   }
 
   getBluetoothState(): TTBluetoothState {

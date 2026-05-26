@@ -223,10 +223,10 @@ class LockScanLockHandler implements StreamHandler {
 
 class LockScanWifiHandler implements StreamHandler {
   onListen(_args: Object, events: EventSink): void {
-    const lockData: string | null = EventContextStore.shared.lockData;
+    const lockData: string | null = EventContextStore.shared.lockScanWifi.lockData;
     if (lockData === null || lockData.length === 0) {
       events.error(NO_LOCK_DATA,
-        '请先通过 setEventLockData 设置 lockData 后再使用 lockScanWifi', null);
+        '请先通过 setLockScanWifiParam 设置 lockData 后再使用 lockScanWifi', null);
       return;
     }
     TTLock.lockScanNearbyWifi(lockData, {
@@ -245,13 +245,14 @@ class LockScanWifiHandler implements StreamHandler {
 
 class LockAddCardHandler implements StreamHandler {
   onListen(_args: Object, events: EventSink): void {
-    const lockData: string | null = EventContextStore.shared.lockData;
+    const slot = EventContextStore.shared.lockAddCard;
+    const lockData: string | null = slot.lockData;
     if (lockData === null || lockData.length === 0) {
       events.error(NO_LOCK_DATA,
-        '请先通过 setEventLockData 设置 lockData 后再使用 lockAddCard', null);
+        '请先通过 setLockAddCardParam 设置参数后再使用 lockAddCard', null);
       return;
     }
-    const range: ValidityRange = EventContextStore.shared.validityRangeForAddOperations();
+    const range: ValidityRange = slot.toValidityRange();
     const cyclic: CycleConfigEntry[] | null = cycleListToConfig(range.cyclic);
     TTLock.addICCard(lockData, range.start, range.end, cyclic, {
       success: (model: ITTLockAddICCardModel): void => {
@@ -273,13 +274,14 @@ class LockAddCardHandler implements StreamHandler {
 
 class LockAddFingerprintHandler implements StreamHandler {
   onListen(_args: Object, events: EventSink): void {
-    const lockData: string | null = EventContextStore.shared.lockData;
+    const slot = EventContextStore.shared.lockAddFingerprint;
+    const lockData: string | null = slot.lockData;
     if (lockData === null || lockData.length === 0) {
       events.error(NO_LOCK_DATA,
-        '请先通过 setEventLockData 设置 lockData 后再使用 lockAddFingerprint', null);
+        '请先通过 setLockAddFingerprintParam 设置参数后再使用 lockAddFingerprint', null);
       return;
     }
-    const range: ValidityRange = EventContextStore.shared.validityRangeForAddOperations();
+    const range: ValidityRange = slot.toValidityRange();
     const cyclic: CycleConfigEntry[] | null = cycleListToConfig(range.cyclic);
     TTLock.addFingerprint(lockData, range.start, range.end, cyclic, {
       success: (model: ITTLockAddFingerprintModel): void => {
@@ -301,13 +303,14 @@ class LockAddFingerprintHandler implements StreamHandler {
 
 class LockAddFaceHandler implements StreamHandler {
   onListen(_args: Object, events: EventSink): void {
-    const lockData: string | null = EventContextStore.shared.lockData;
+    const slot = EventContextStore.shared.lockAddFace;
+    const lockData: string | null = slot.lockData;
     if (lockData === null || lockData.length === 0) {
       events.error(NO_LOCK_DATA,
-        '请先通过 setEventLockData 设置 lockData 后再使用 lockAddFace', null);
+        '请先通过 setLockAddFaceParam 设置参数后再使用 lockAddFace', null);
       return;
     }
-    const range: ValidityRange = EventContextStore.shared.validityRangeForAddOperations();
+    const range: ValidityRange = slot.toValidityRange();
     const cyclic: CycleConfigEntry[] | null = cycleListToConfig(range.cyclic);
     TTLock.addFace(lockData, range.start, range.end, cyclic, {
       success: (model: IFaceModel): void => {
@@ -348,10 +351,10 @@ class GatewayStartScanHandler implements StreamHandler {
 
 class GatewayGetNearbyWifiHandler implements StreamHandler {
   onListen(_args: Object, events: EventSink): void {
-    const mac: string | null = EventContextStore.shared.gatewayMac;
+    const mac: string | null = EventContextStore.shared.gatewayGetNearbyWifi.gatewayMac;
     if (mac === null || mac.length === 0) {
       events.error(NO_GATEWAY,
-        '请先通过 setEventGatewayMac 设置已连接网关 MAC 后再使用 gatewayGetNearbyWifi', null);
+        '请先通过 setGatewayGetNearbyWifiParam 设置网关 MAC 后再使用 gatewayGetNearbyWifi', null);
       return;
     }
     TTLock.scanWiFiByGateway({
@@ -398,19 +401,20 @@ class AccessoryStartScanRemoteKeypadHandler implements StreamHandler {
 
 class AccessoryAddKeypadFingerprintHandler implements StreamHandler {
   onListen(_args: Object, events: EventSink): void {
-    const lockData: string | null = EventContextStore.shared.lockData;
+    const slot = EventContextStore.shared.accessoryAddKeypadFingerprint;
+    const lockData: string | null = slot.lockData;
     if (lockData === null || lockData.length === 0) {
-      events.error(NO_LOCK_DATA, '请先设置 lockData（多功能键盘需先 initMultifunctionalKeypad）', null);
+      events.error(NO_LOCK_DATA, '请先通过 setAccessoryAddKeypadFingerprintParam 设置 lockData', null);
       return;
     }
-    const keypadMac: string | null = EventContextStore.shared.keypadMac;
+    const keypadMac: string | null = slot.keypadMac;
     if (keypadMac === null || keypadMac.length === 0) {
-      events.error(NO_KEYPAD, '请先通过 setEventKeypadMac 设置键盘 MAC', null);
+      events.error(NO_KEYPAD, '请先通过 setAccessoryAddKeypadFingerprintParam 设置 keypadMac', null);
       return;
     }
-    const range: ValidityRange = EventContextStore.shared.validityRangeForAddOperations();
+    const range: ValidityRange = slot.toValidityRange();
     const cyclic: CycleConfigEntry[] | null = cycleListToConfig(range.cyclic);
-    const isMulti: boolean = EventContextStore.shared.isMultifunctionalKeypad;
+    const isMulti: boolean = slot.isMultifunctionalKeypad;
     TTLock.multifunctionalKeyPadAddFingerprint(
       keypadMac,
       lockData,
@@ -441,17 +445,18 @@ class AccessoryAddKeypadFingerprintHandler implements StreamHandler {
 
 class AccessoryAddKeypadCardHandler implements StreamHandler {
   onListen(_args: Object, events: EventSink): void {
-    const lockData: string | null = EventContextStore.shared.lockData;
+    const slot = EventContextStore.shared.accessoryAddKeypadCard;
+    const lockData: string | null = slot.lockData;
     if (lockData === null || lockData.length === 0) {
-      events.error(NO_LOCK_DATA, '请先设置 lockData', null);
+      events.error(NO_LOCK_DATA, '请先通过 setAccessoryAddKeypadCardParam 设置 lockData', null);
       return;
     }
-    const keypadMac: string | null = EventContextStore.shared.keypadMac;
+    const keypadMac: string | null = slot.keypadMac;
     if (keypadMac === null || keypadMac.length === 0) {
-      events.error(NO_KEYPAD, '请先通过 setEventKeypadMac 设置键盘 MAC', null);
+      events.error(NO_KEYPAD, '请先通过 setAccessoryAddKeypadCardParam 设置 keypadMac', null);
       return;
     }
-    const range: ValidityRange = EventContextStore.shared.validityRangeForAddOperations();
+    const range: ValidityRange = slot.toValidityRange();
     const cyclic: CycleConfigEntry[] | null = cycleListToConfig(range.cyclic);
     TTLock.multifunctionalKeyPadAddCard(
       keypadMac,

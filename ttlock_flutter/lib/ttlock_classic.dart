@@ -275,7 +275,12 @@ class TTLock {
       TTCardNumberCallback callback,
       TTFailedCallback failedCallback) {
     new_ttlock.TTLock.lock
-        .lockAddCard(lockData)
+        .lockAddCard(
+          lockData,
+          cycleList: cycleList,
+          startDate: startDate,
+          endDate: endDate,
+        )
         .listen(
           (e) {
             if (e.isProgress) {
@@ -403,7 +408,12 @@ class TTLock {
       TTAddFingerprintCallback callback,
       TTFailedCallback failedCallback) {
     new_ttlock.TTLock.lock
-        .lockAddFingerprint(lockData)
+        .lockAddFingerprint(
+          lockData,
+          cycleList: cycleList,
+          startDate: startDate,
+          endDate: endDate,
+        )
         .listen(
           (e) {
             if (e.isProgress) {
@@ -1175,7 +1185,12 @@ class TTLock {
       TTAddFaceSuccessCallback callback,
       TTFailedCallback failedCallback) {
     new_ttlock.TTLock.lock
-        .lockAddFace(lockData)
+        .lockAddFace(
+          lockData,
+          cycleList: cycleList,
+          startDate: startDate,
+          endDate: endDate,
+        )
         .listen(
           (e) {
             if (e.isProgress) {
