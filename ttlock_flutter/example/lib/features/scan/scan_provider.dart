@@ -15,6 +15,7 @@ import '../../features/settings/model/saved_keypad.dart';
 import '../../features/settings/model/saved_lock_device.dart';
 import '../../features/settings/model/saved_meter_device.dart';
 import '../../features/settings/model/saved_remote_key.dart';
+import '../../features/lock/lock_cache_initializer.dart';
 import '../../providers/ttlock_providers.dart';
 import 'scan_config.dart';
 
@@ -254,6 +255,11 @@ class ScanNotifier extends _$ScanNotifier {
             lockVersion: device.lockVersion!,
             isInited: device.isInited,
           ));
+          await initializeLockLocalCache(
+            api: api,
+            lockMac: device.mac,
+            lockData: lockData,
+          );
           await ref.read(lockListNotifierProvider.notifier).addDevice(
                 SavedLockDevice.fromLockVersion(
                   name: device.name,

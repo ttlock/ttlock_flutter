@@ -160,7 +160,7 @@ class _AccessoryCountsProviderElement
 }
 
 String _$doorSensorListNotifierHash() =>
-    r'1759d8278587cadf399a8e459481ffd48bd2492d';
+    r'06bb2b92df23430e9fab29dc3f94358c9db4a1bf';
 
 abstract class _$DoorSensorListNotifier
     extends BuildlessAutoDisposeAsyncNotifier<List<SavedDoorSensor>> {
@@ -310,7 +310,7 @@ class _DoorSensorListNotifierProviderElement
 }
 
 String _$remoteKeyListNotifierHash() =>
-    r'0692528c3a0565544a9518d03ce9b3ffa0927d3c';
+    r'7fb5667a4318c49d2257eeacd52fde15186b64a3';
 
 abstract class _$RemoteKeyListNotifier
     extends BuildlessAutoDisposeAsyncNotifier<List<SavedRemoteKey>> {
@@ -460,7 +460,7 @@ class _RemoteKeyListNotifierProviderElement
 }
 
 String _$keypadListNotifierHash() =>
-    r'831b0a363ae3923c74f3eb1a7971d993f4c44216';
+    r'18a461a54a62e90ea91c15b2a19de1cf73033c0f';
 
 abstract class _$KeypadListNotifier
     extends BuildlessAutoDisposeAsyncNotifier<List<SavedKeypad>> {

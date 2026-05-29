@@ -2,10 +2,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../features/settings/model/saved_lock_device.dart';
+import 'lock_local_storage.dart';
 import 'lock_storage.dart';
 
 part 'lock_list_provider.g.dart';
 
+final _lockLocalStorage = LockLocalStorage();
 final _lockStorage = LockStorage();
 
 @riverpod
@@ -22,6 +24,7 @@ class LockListNotifier extends _$LockListNotifier {
   Future<void> removeDevice(String mac) async {
     final list = (state.valueOrNull ?? []).where((d) => d.mac != mac).toList();
     await _lockStorage.save(list);
+    await _lockLocalStorage.delete(mac);
     ref.invalidateSelf();
   }
 

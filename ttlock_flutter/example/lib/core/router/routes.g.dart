@@ -135,6 +135,60 @@ RouteBase get $lockRoute => GoRouteData.$route(
       factory: _$LockRoute._fromState,
       routes: [
         GoRouteData.$route(
+          path: 'passcodes',
+          factory: _$PasscodeListRoute._fromState,
+        ),
+        GoRouteData.$route(
+          path: 'passcodes/add',
+          factory: _$PasscodeAddRoute._fromState,
+        ),
+        GoRouteData.$route(
+          path: 'cards',
+          factory: _$CardListRoute._fromState,
+        ),
+        GoRouteData.$route(
+          path: 'cards/add',
+          factory: _$CardAddRoute._fromState,
+        ),
+        GoRouteData.$route(
+          path: 'fingerprints',
+          factory: _$FingerprintListRoute._fromState,
+        ),
+        GoRouteData.$route(
+          path: 'fingerprints/add',
+          factory: _$FingerprintAddRoute._fromState,
+        ),
+        GoRouteData.$route(
+          path: 'faces',
+          factory: _$FaceManageRoute._fromState,
+        ),
+        GoRouteData.$route(
+          path: 'faces/add',
+          factory: _$FaceAddRoute._fromState,
+        ),
+        GoRouteData.$route(
+          path: 'settings',
+          factory: _$LockSettingsRoute._fromState,
+          routes: [
+            GoRouteData.$route(
+              path: 'basic-info',
+              factory: _$LockBasicInfoRoute._fromState,
+            ),
+            GoRouteData.$route(
+              path: 'network',
+              factory: _$LockNetworkSettingsRoute._fromState,
+            ),
+            GoRouteData.$route(
+              path: 'passage-mode',
+              factory: _$LockPassageModeRoute._fromState,
+            ),
+            GoRouteData.$route(
+              path: 'advanced',
+              factory: _$LockAdvancedSettingsRoute._fromState,
+            ),
+          ],
+        ),
+        GoRouteData.$route(
           path: 'door-sensors',
           factory: _$DoorSensorListRoute._fromState,
         ),
@@ -159,6 +213,350 @@ mixin _$LockRoute on GoRouteData {
   @override
   String get location => GoRouteData.$location(
         '/lock/${Uri.encodeComponent(_self.mac)}',
+      );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin _$PasscodeListRoute on GoRouteData {
+  static PasscodeListRoute _fromState(GoRouterState state) => PasscodeListRoute(
+        state.pathParameters['mac']!,
+      );
+
+  PasscodeListRoute get _self => this as PasscodeListRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+        '/lock/${Uri.encodeComponent(_self.mac)}/passcodes',
+      );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin _$PasscodeAddRoute on GoRouteData {
+  static PasscodeAddRoute _fromState(GoRouterState state) => PasscodeAddRoute(
+        state.pathParameters['mac']!,
+      );
+
+  PasscodeAddRoute get _self => this as PasscodeAddRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+        '/lock/${Uri.encodeComponent(_self.mac)}/passcodes/add',
+      );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin _$CardListRoute on GoRouteData {
+  static CardListRoute _fromState(GoRouterState state) => CardListRoute(
+        state.pathParameters['mac']!,
+      );
+
+  CardListRoute get _self => this as CardListRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+        '/lock/${Uri.encodeComponent(_self.mac)}/cards',
+      );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin _$CardAddRoute on GoRouteData {
+  static CardAddRoute _fromState(GoRouterState state) => CardAddRoute(
+        state.pathParameters['mac']!,
+      );
+
+  CardAddRoute get _self => this as CardAddRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+        '/lock/${Uri.encodeComponent(_self.mac)}/cards/add',
+      );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin _$FingerprintListRoute on GoRouteData {
+  static FingerprintListRoute _fromState(GoRouterState state) =>
+      FingerprintListRoute(
+        state.pathParameters['mac']!,
+      );
+
+  FingerprintListRoute get _self => this as FingerprintListRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+        '/lock/${Uri.encodeComponent(_self.mac)}/fingerprints',
+      );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin _$FingerprintAddRoute on GoRouteData {
+  static FingerprintAddRoute _fromState(GoRouterState state) =>
+      FingerprintAddRoute(
+        state.pathParameters['mac']!,
+      );
+
+  FingerprintAddRoute get _self => this as FingerprintAddRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+        '/lock/${Uri.encodeComponent(_self.mac)}/fingerprints/add',
+      );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin _$FaceManageRoute on GoRouteData {
+  static FaceManageRoute _fromState(GoRouterState state) => FaceManageRoute(
+        state.pathParameters['mac']!,
+      );
+
+  FaceManageRoute get _self => this as FaceManageRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+        '/lock/${Uri.encodeComponent(_self.mac)}/faces',
+      );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin _$FaceAddRoute on GoRouteData {
+  static FaceAddRoute _fromState(GoRouterState state) => FaceAddRoute(
+        state.pathParameters['mac']!,
+      );
+
+  FaceAddRoute get _self => this as FaceAddRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+        '/lock/${Uri.encodeComponent(_self.mac)}/faces/add',
+      );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin _$LockSettingsRoute on GoRouteData {
+  static LockSettingsRoute _fromState(GoRouterState state) => LockSettingsRoute(
+        state.pathParameters['mac']!,
+      );
+
+  LockSettingsRoute get _self => this as LockSettingsRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+        '/lock/${Uri.encodeComponent(_self.mac)}/settings',
+      );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin _$LockBasicInfoRoute on GoRouteData {
+  static LockBasicInfoRoute _fromState(GoRouterState state) =>
+      LockBasicInfoRoute(
+        state.pathParameters['mac']!,
+      );
+
+  LockBasicInfoRoute get _self => this as LockBasicInfoRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+        '/lock/${Uri.encodeComponent(_self.mac)}/settings/basic-info',
+      );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin _$LockNetworkSettingsRoute on GoRouteData {
+  static LockNetworkSettingsRoute _fromState(GoRouterState state) =>
+      LockNetworkSettingsRoute(
+        state.pathParameters['mac']!,
+      );
+
+  LockNetworkSettingsRoute get _self => this as LockNetworkSettingsRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+        '/lock/${Uri.encodeComponent(_self.mac)}/settings/network',
+      );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin _$LockPassageModeRoute on GoRouteData {
+  static LockPassageModeRoute _fromState(GoRouterState state) =>
+      LockPassageModeRoute(
+        state.pathParameters['mac']!,
+      );
+
+  LockPassageModeRoute get _self => this as LockPassageModeRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+        '/lock/${Uri.encodeComponent(_self.mac)}/settings/passage-mode',
+      );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin _$LockAdvancedSettingsRoute on GoRouteData {
+  static LockAdvancedSettingsRoute _fromState(GoRouterState state) =>
+      LockAdvancedSettingsRoute(
+        state.pathParameters['mac']!,
+      );
+
+  LockAdvancedSettingsRoute get _self => this as LockAdvancedSettingsRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+        '/lock/${Uri.encodeComponent(_self.mac)}/settings/advanced',
       );
 
   @override

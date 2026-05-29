@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'scan_provider.dart';
+part of 'face_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$scanNotifierHash() => r'5d5ae8306da2cb833bc142c7eba454491a030cdb';
+String _$faceListHash() => r'8d8e27f205813a6dfee7a6d0329bb420008ab0fe';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,38 +29,39 @@ class _SystemHash {
   }
 }
 
-abstract class _$ScanNotifier extends BuildlessAutoDisposeNotifier<ScanState> {
-  late final ScanConfig config;
+abstract class _$FaceList
+    extends BuildlessAutoDisposeAsyncNotifier<List<CachedFace>> {
+  late final String lockMac;
 
-  ScanState build(
-    ScanConfig config,
+  FutureOr<List<CachedFace>> build(
+    String lockMac,
   );
 }
 
-/// See also [ScanNotifier].
-@ProviderFor(ScanNotifier)
-const scanNotifierProvider = ScanNotifierFamily();
+/// See also [FaceList].
+@ProviderFor(FaceList)
+const faceListProvider = FaceListFamily();
 
-/// See also [ScanNotifier].
-class ScanNotifierFamily extends Family<ScanState> {
-  /// See also [ScanNotifier].
-  const ScanNotifierFamily();
+/// See also [FaceList].
+class FaceListFamily extends Family<AsyncValue<List<CachedFace>>> {
+  /// See also [FaceList].
+  const FaceListFamily();
 
-  /// See also [ScanNotifier].
-  ScanNotifierProvider call(
-    ScanConfig config,
+  /// See also [FaceList].
+  FaceListProvider call(
+    String lockMac,
   ) {
-    return ScanNotifierProvider(
-      config,
+    return FaceListProvider(
+      lockMac,
     );
   }
 
   @override
-  ScanNotifierProvider getProviderOverride(
-    covariant ScanNotifierProvider provider,
+  FaceListProvider getProviderOverride(
+    covariant FaceListProvider provider,
   ) {
     return call(
-      provider.config,
+      provider.lockMac,
     );
   }
 
@@ -76,80 +77,80 @@ class ScanNotifierFamily extends Family<ScanState> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'scanNotifierProvider';
+  String? get name => r'faceListProvider';
 }
 
-/// See also [ScanNotifier].
-class ScanNotifierProvider
-    extends AutoDisposeNotifierProviderImpl<ScanNotifier, ScanState> {
-  /// See also [ScanNotifier].
-  ScanNotifierProvider(
-    ScanConfig config,
+/// See also [FaceList].
+class FaceListProvider
+    extends AutoDisposeAsyncNotifierProviderImpl<FaceList, List<CachedFace>> {
+  /// See also [FaceList].
+  FaceListProvider(
+    String lockMac,
   ) : this._internal(
-          () => ScanNotifier()..config = config,
-          from: scanNotifierProvider,
-          name: r'scanNotifierProvider',
+          () => FaceList()..lockMac = lockMac,
+          from: faceListProvider,
+          name: r'faceListProvider',
           debugGetCreateSourceHash:
               const bool.fromEnvironment('dart.vm.product')
                   ? null
-                  : _$scanNotifierHash,
-          dependencies: ScanNotifierFamily._dependencies,
-          allTransitiveDependencies:
-              ScanNotifierFamily._allTransitiveDependencies,
-          config: config,
+                  : _$faceListHash,
+          dependencies: FaceListFamily._dependencies,
+          allTransitiveDependencies: FaceListFamily._allTransitiveDependencies,
+          lockMac: lockMac,
         );
 
-  ScanNotifierProvider._internal(
+  FaceListProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
     required super.allTransitiveDependencies,
     required super.debugGetCreateSourceHash,
     required super.from,
-    required this.config,
+    required this.lockMac,
   }) : super.internal();
 
-  final ScanConfig config;
+  final String lockMac;
 
   @override
-  ScanState runNotifierBuild(
-    covariant ScanNotifier notifier,
+  FutureOr<List<CachedFace>> runNotifierBuild(
+    covariant FaceList notifier,
   ) {
     return notifier.build(
-      config,
+      lockMac,
     );
   }
 
   @override
-  Override overrideWith(ScanNotifier Function() create) {
+  Override overrideWith(FaceList Function() create) {
     return ProviderOverride(
       origin: this,
-      override: ScanNotifierProvider._internal(
-        () => create()..config = config,
+      override: FaceListProvider._internal(
+        () => create()..lockMac = lockMac,
         from: from,
         name: null,
         dependencies: null,
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
-        config: config,
+        lockMac: lockMac,
       ),
     );
   }
 
   @override
-  AutoDisposeNotifierProviderElement<ScanNotifier, ScanState> createElement() {
-    return _ScanNotifierProviderElement(this);
+  AutoDisposeAsyncNotifierProviderElement<FaceList, List<CachedFace>>
+      createElement() {
+    return _FaceListProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is ScanNotifierProvider && other.config == config;
+    return other is FaceListProvider && other.lockMac == lockMac;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, config.hashCode);
+    hash = _SystemHash.combine(hash, lockMac.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -157,18 +158,18 @@ class ScanNotifierProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin ScanNotifierRef on AutoDisposeNotifierProviderRef<ScanState> {
-  /// The parameter `config` of this provider.
-  ScanConfig get config;
+mixin FaceListRef on AutoDisposeAsyncNotifierProviderRef<List<CachedFace>> {
+  /// The parameter `lockMac` of this provider.
+  String get lockMac;
 }
 
-class _ScanNotifierProviderElement
-    extends AutoDisposeNotifierProviderElement<ScanNotifier, ScanState>
-    with ScanNotifierRef {
-  _ScanNotifierProviderElement(super.provider);
+class _FaceListProviderElement
+    extends AutoDisposeAsyncNotifierProviderElement<FaceList, List<CachedFace>>
+    with FaceListRef {
+  _FaceListProviderElement(super.provider);
 
   @override
-  ScanConfig get config => (origin as ScanNotifierProvider).config;
+  String get lockMac => (origin as FaceListProvider).lockMac;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

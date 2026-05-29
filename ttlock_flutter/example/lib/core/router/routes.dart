@@ -6,7 +6,20 @@ import '../../features/door_sensor/door_sensor_info_page.dart';
 import '../../features/door_sensor/door_sensor_list_page.dart';
 import '../../features/electric_meter/electric_meter_page.dart';
 import '../../features/gateway/gateway_page.dart';
+import '../../features/lock/card/card_add_page.dart';
+import '../../features/lock/card/card_list_page.dart';
+import '../../features/lock/face/face_add_page.dart';
+import '../../features/lock/face/face_manage_page.dart';
+import '../../features/lock/fingerprint/fingerprint_add_page.dart';
+import '../../features/lock/fingerprint/fingerprint_list_page.dart';
 import '../../features/lock/lock_page.dart';
+import '../../features/lock/passcode/passcode_add_page.dart';
+import '../../features/lock/passcode/passcode_list_page.dart';
+import '../../features/lock/settings/lock_advanced_settings_page.dart';
+import '../../features/lock/settings/lock_basic_info_page.dart';
+import '../../features/lock/settings/lock_network_settings_page.dart';
+import '../../features/lock/settings/lock_passage_mode_page.dart';
+import '../../features/lock/settings/lock_settings_page.dart';
 import '../../features/remote_key/remote_key_info_page.dart';
 import '../../features/remote_key/remote_key_list_page.dart';
 import '../../features/remote_keypad/keypad_info_page.dart';
@@ -105,6 +118,23 @@ class SettingsRoute extends GoRouteData with _$SettingsRoute {
 @TypedGoRoute<LockRoute>(
   path: '/lock/:mac',
   routes: [
+    TypedGoRoute<PasscodeListRoute>(path: 'passcodes'),
+    TypedGoRoute<PasscodeAddRoute>(path: 'passcodes/add'),
+    TypedGoRoute<CardListRoute>(path: 'cards'),
+    TypedGoRoute<CardAddRoute>(path: 'cards/add'),
+    TypedGoRoute<FingerprintListRoute>(path: 'fingerprints'),
+    TypedGoRoute<FingerprintAddRoute>(path: 'fingerprints/add'),
+    TypedGoRoute<FaceManageRoute>(path: 'faces'),
+    TypedGoRoute<FaceAddRoute>(path: 'faces/add'),
+    TypedGoRoute<LockSettingsRoute>(
+      path: 'settings',
+      routes: [
+        TypedGoRoute<LockBasicInfoRoute>(path: 'basic-info'),
+        TypedGoRoute<LockNetworkSettingsRoute>(path: 'network'),
+        TypedGoRoute<LockPassageModeRoute>(path: 'passage-mode'),
+        TypedGoRoute<LockAdvancedSettingsRoute>(path: 'advanced'),
+      ],
+    ),
     TypedGoRoute<DoorSensorListRoute>(path: 'door-sensors'),
     TypedGoRoute<RemoteKeyListRoute>(path: 'remote-keys'),
     TypedGoRoute<KeypadListRoute>(path: 'keypads'),
@@ -118,6 +148,136 @@ class LockRoute extends GoRouteData with _$LockRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) =>
       LockPage(mac: mac);
+}
+
+class PasscodeListRoute extends GoRouteData with _$PasscodeListRoute {
+  const PasscodeListRoute(this.mac);
+
+  final String mac;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      PasscodeListPage(lockMac: mac);
+}
+
+class PasscodeAddRoute extends GoRouteData with _$PasscodeAddRoute {
+  const PasscodeAddRoute(this.mac);
+
+  final String mac;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      PasscodeAddPage(lockMac: mac);
+}
+
+class CardListRoute extends GoRouteData with _$CardListRoute {
+  const CardListRoute(this.mac);
+
+  final String mac;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      CardListPage(lockMac: mac);
+}
+
+class CardAddRoute extends GoRouteData with _$CardAddRoute {
+  const CardAddRoute(this.mac);
+
+  final String mac;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      CardAddPage(lockMac: mac);
+}
+
+class FingerprintListRoute extends GoRouteData with _$FingerprintListRoute {
+  const FingerprintListRoute(this.mac);
+
+  final String mac;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      FingerprintListPage(lockMac: mac);
+}
+
+class FingerprintAddRoute extends GoRouteData with _$FingerprintAddRoute {
+  const FingerprintAddRoute(this.mac);
+
+  final String mac;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      FingerprintAddPage(lockMac: mac);
+}
+
+class FaceManageRoute extends GoRouteData with _$FaceManageRoute {
+  const FaceManageRoute(this.mac);
+
+  final String mac;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      FaceManagePage(lockMac: mac);
+}
+
+class FaceAddRoute extends GoRouteData with _$FaceAddRoute {
+  const FaceAddRoute(this.mac);
+
+  final String mac;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      FaceAddPage(lockMac: mac);
+}
+
+class LockSettingsRoute extends GoRouteData with _$LockSettingsRoute {
+  const LockSettingsRoute(this.mac);
+
+  final String mac;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      LockSettingsPage(lockMac: mac);
+}
+
+class LockBasicInfoRoute extends GoRouteData with _$LockBasicInfoRoute {
+  const LockBasicInfoRoute(this.mac);
+
+  final String mac;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      LockBasicInfoPage(lockMac: mac);
+}
+
+class LockNetworkSettingsRoute extends GoRouteData with _$LockNetworkSettingsRoute {
+  const LockNetworkSettingsRoute(this.mac);
+
+  final String mac;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      LockNetworkSettingsPage(lockMac: mac);
+}
+
+class LockPassageModeRoute extends GoRouteData with _$LockPassageModeRoute {
+  const LockPassageModeRoute(this.mac);
+
+  final String mac;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      LockPassageModePage(lockMac: mac);
+}
+
+class LockAdvancedSettingsRoute extends GoRouteData with _$LockAdvancedSettingsRoute {
+  const LockAdvancedSettingsRoute(this.mac);
+
+  final String mac;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      LockAdvancedSettingsPage(lockMac: mac);
 }
 
 class DoorSensorListRoute extends GoRouteData with _$DoorSensorListRoute {

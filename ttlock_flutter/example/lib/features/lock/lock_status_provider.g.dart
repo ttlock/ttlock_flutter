@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'scan_provider.dart';
+part of 'lock_status_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$scanNotifierHash() => r'5d5ae8306da2cb833bc142c7eba454491a030cdb';
+String _$lockStatusHash() => r'926b4aaed8abe939cd6a227b63733918367104cd';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,38 +29,39 @@ class _SystemHash {
   }
 }
 
-abstract class _$ScanNotifier extends BuildlessAutoDisposeNotifier<ScanState> {
-  late final ScanConfig config;
+abstract class _$LockStatus
+    extends BuildlessAutoDisposeAsyncNotifier<LockStatusState> {
+  late final String lockMac;
 
-  ScanState build(
-    ScanConfig config,
+  FutureOr<LockStatusState> build(
+    String lockMac,
   );
 }
 
-/// See also [ScanNotifier].
-@ProviderFor(ScanNotifier)
-const scanNotifierProvider = ScanNotifierFamily();
+/// See also [LockStatus].
+@ProviderFor(LockStatus)
+const lockStatusProvider = LockStatusFamily();
 
-/// See also [ScanNotifier].
-class ScanNotifierFamily extends Family<ScanState> {
-  /// See also [ScanNotifier].
-  const ScanNotifierFamily();
+/// See also [LockStatus].
+class LockStatusFamily extends Family<AsyncValue<LockStatusState>> {
+  /// See also [LockStatus].
+  const LockStatusFamily();
 
-  /// See also [ScanNotifier].
-  ScanNotifierProvider call(
-    ScanConfig config,
+  /// See also [LockStatus].
+  LockStatusProvider call(
+    String lockMac,
   ) {
-    return ScanNotifierProvider(
-      config,
+    return LockStatusProvider(
+      lockMac,
     );
   }
 
   @override
-  ScanNotifierProvider getProviderOverride(
-    covariant ScanNotifierProvider provider,
+  LockStatusProvider getProviderOverride(
+    covariant LockStatusProvider provider,
   ) {
     return call(
-      provider.config,
+      provider.lockMac,
     );
   }
 
@@ -76,80 +77,81 @@ class ScanNotifierFamily extends Family<ScanState> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'scanNotifierProvider';
+  String? get name => r'lockStatusProvider';
 }
 
-/// See also [ScanNotifier].
-class ScanNotifierProvider
-    extends AutoDisposeNotifierProviderImpl<ScanNotifier, ScanState> {
-  /// See also [ScanNotifier].
-  ScanNotifierProvider(
-    ScanConfig config,
+/// See also [LockStatus].
+class LockStatusProvider
+    extends AutoDisposeAsyncNotifierProviderImpl<LockStatus, LockStatusState> {
+  /// See also [LockStatus].
+  LockStatusProvider(
+    String lockMac,
   ) : this._internal(
-          () => ScanNotifier()..config = config,
-          from: scanNotifierProvider,
-          name: r'scanNotifierProvider',
+          () => LockStatus()..lockMac = lockMac,
+          from: lockStatusProvider,
+          name: r'lockStatusProvider',
           debugGetCreateSourceHash:
               const bool.fromEnvironment('dart.vm.product')
                   ? null
-                  : _$scanNotifierHash,
-          dependencies: ScanNotifierFamily._dependencies,
+                  : _$lockStatusHash,
+          dependencies: LockStatusFamily._dependencies,
           allTransitiveDependencies:
-              ScanNotifierFamily._allTransitiveDependencies,
-          config: config,
+              LockStatusFamily._allTransitiveDependencies,
+          lockMac: lockMac,
         );
 
-  ScanNotifierProvider._internal(
+  LockStatusProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
     required super.allTransitiveDependencies,
     required super.debugGetCreateSourceHash,
     required super.from,
-    required this.config,
+    required this.lockMac,
   }) : super.internal();
 
-  final ScanConfig config;
+  final String lockMac;
 
   @override
-  ScanState runNotifierBuild(
-    covariant ScanNotifier notifier,
+  FutureOr<LockStatusState> runNotifierBuild(
+    covariant LockStatus notifier,
   ) {
     return notifier.build(
-      config,
+      lockMac,
     );
   }
 
   @override
-  Override overrideWith(ScanNotifier Function() create) {
+  Override overrideWith(LockStatus Function() create) {
     return ProviderOverride(
       origin: this,
-      override: ScanNotifierProvider._internal(
-        () => create()..config = config,
+      override: LockStatusProvider._internal(
+        () => create()..lockMac = lockMac,
         from: from,
         name: null,
         dependencies: null,
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
-        config: config,
+        lockMac: lockMac,
       ),
     );
   }
 
   @override
-  AutoDisposeNotifierProviderElement<ScanNotifier, ScanState> createElement() {
-    return _ScanNotifierProviderElement(this);
+  AutoDisposeAsyncNotifierProviderElement<LockStatus, LockStatusState>
+      createElement() {
+    return _LockStatusProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is ScanNotifierProvider && other.config == config;
+    return other is LockStatusProvider && other.lockMac == lockMac;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, config.hashCode);
+    hash = _SystemHash.combine(hash, lockMac.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -157,18 +159,18 @@ class ScanNotifierProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin ScanNotifierRef on AutoDisposeNotifierProviderRef<ScanState> {
-  /// The parameter `config` of this provider.
-  ScanConfig get config;
+mixin LockStatusRef on AutoDisposeAsyncNotifierProviderRef<LockStatusState> {
+  /// The parameter `lockMac` of this provider.
+  String get lockMac;
 }
 
-class _ScanNotifierProviderElement
-    extends AutoDisposeNotifierProviderElement<ScanNotifier, ScanState>
-    with ScanNotifierRef {
-  _ScanNotifierProviderElement(super.provider);
+class _LockStatusProviderElement
+    extends AutoDisposeAsyncNotifierProviderElement<LockStatus, LockStatusState>
+    with LockStatusRef {
+  _LockStatusProviderElement(super.provider);
 
   @override
-  ScanConfig get config => (origin as ScanNotifierProvider).config;
+  String get lockMac => (origin as LockStatusProvider).lockMac;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

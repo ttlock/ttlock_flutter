@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:ttlock_flutter/ttlock.dart';
+
 import '../../providers/ttlock_providers.dart';
 import 'model/lock_state.dart';
 
@@ -11,7 +12,12 @@ class LockNotifier extends _$LockNotifier {
   LockState build() => const LockState();
 
   void setContext(String lockData, {String? lockMac, String? lockName}) {
-    state = state.copyWith(lockData: lockData, lockMac: lockMac, lockName: lockName);
+    state = state.copyWith(
+      lockData: lockData,
+      lockMac: lockMac,
+      lockName: lockName,
+      errorMessage: null,
+    );
   }
 
   Future<void> initLock(TTLockInitParams params) async {
@@ -19,7 +25,11 @@ class LockNotifier extends _$LockNotifier {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final lockData = await runLockApi(() => api.initLock(params));
-      state = state.copyWith(lockData: lockData, isConnected: true, isLoading: false);
+      state = state.copyWith(
+        lockData: lockData,
+        isConnected: true,
+        isLoading: false,
+      );
     } on TTLockException catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
     }
@@ -30,7 +40,11 @@ class LockNotifier extends _$LockNotifier {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final result = await runLockApi(() => api.controlLock(lockData, action));
-      state = state.copyWith(isLoading: false, lastResult: 'lockTime=${result.lockTime}, electricQuantity=${result.electricQuantity}');
+      state = state.copyWith(
+        isLoading: false,
+        lastResult:
+            'lockTime=${result.lockTime}, electricQuantity=${result.electricQuantity}',
+      );
       return null;
     } on TTLockException catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
@@ -42,7 +56,10 @@ class LockNotifier extends _$LockNotifier {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final result = await runLockApi(fn);
-      state = state.copyWith(isLoading: false, lastResult: result?.toString() ?? 'success');
+      state = state.copyWith(
+        isLoading: false,
+        lastResult: result?.toString() ?? 'success',
+      );
       return result;
     } on TTLockException catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
