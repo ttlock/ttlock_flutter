@@ -33,48 +33,48 @@ class TTWaterMeterApi {
   Future<void> waterMeterDisconnect(String mac) =>
       runRemoteAccessoryApi(() => _host.waterMeterDisconnect(mac));
 
-  Future<pigeon.TTWaterMeterInitResult> waterMeterInit(Map<String, Object?> params) =>
+  Future<pigeon.TTWaterMeterInitResult> waterMeterInit(pigeon.TTWaterMeterInitParam params) =>
       runRemoteAccessoryApi(() => _host.waterMeterInit(params));
 
-  Future<void> waterMeterDelete(String waterMeterId) =>
-      runRemoteAccessoryApi(() => _host.waterMeterDelete(waterMeterId));
+  Future<void> waterMeterDelete(String mac) =>
+      runRemoteAccessoryApi(() => _host.waterMeterDelete(mac));
 
-  Future<void> waterMeterSetPowerOnOff(String waterMeterId, bool isOn) =>
-      runRemoteAccessoryApi(() => _host.waterMeterSetPowerOnOff(waterMeterId, isOn));
+  Future<void> waterMeterSetPowerOnOff(String mac, bool isOn) =>
+      runRemoteAccessoryApi(() => _host.waterMeterSetPowerOnOff(mac, isOn));
 
-  Future<void> waterMeterSetRemainderM3(String waterMeterId, double remainderM3) =>
-      runRemoteAccessoryApi(() => _host.waterMeterSetRemainderM3(waterMeterId, remainderM3));
+  Future<void> waterMeterSetRemainderM3(String mac, double remainderM3) =>
+      runRemoteAccessoryApi(() => _host.waterMeterSetRemainderM3(mac, remainderM3));
 
-  Future<void> waterMeterClearRemainderM3(String waterMeterId) =>
-      runRemoteAccessoryApi(() => _host.waterMeterClearRemainderM3(waterMeterId));
+  Future<void> waterMeterClearRemainderM3(String mac) =>
+      runRemoteAccessoryApi(() => _host.waterMeterClearRemainderM3(mac));
 
-  Future<Map<String, Object?>> waterMeterReadData(String waterMeterId) =>
-      runRemoteAccessoryApi(() => _host.waterMeterReadData(waterMeterId));
+  Future<void> waterMeterReadData(String mac) =>
+      runRemoteAccessoryApi(() => _host.waterMeterReadData(mac));
 
-  Future<void> waterMeterSetPayMode(String waterMeterId, int payMode) =>
-      runRemoteAccessoryApi(() => _host.waterMeterSetPayMode(waterMeterId, payMode));
+  Future<void> waterMeterSetPayMode(String mac, pigeon.TTMeterPayMode payMode, double price) =>
+      runRemoteAccessoryApi(() => _host.waterMeterSetPayMode(mac, payMode, price));
 
-  Future<void> waterMeterCharge(String waterMeterId, double amount) =>
-      runRemoteAccessoryApi(() => _host.waterMeterCharge(waterMeterId, amount));
+  Future<void> waterMeterCharge(String mac, double amount, double m3) =>
+      runRemoteAccessoryApi(() => _host.waterMeterCharge(mac, amount, m3));
 
-  Future<void> waterMeterSetTotalUsage(String waterMeterId, double totalM3) =>
-      runRemoteAccessoryApi(() => _host.waterMeterSetTotalUsage(waterMeterId, totalM3));
+  Future<void> waterMeterSetTotalUsage(String mac, double totalM3) =>
+      runRemoteAccessoryApi(() => _host.waterMeterSetTotalUsage(mac, totalM3));
 
-  Future<String> waterMeterGetFeatureValue(String waterMeterId) =>
-      runRemoteAccessoryApi(() => _host.waterMeterGetFeatureValue(waterMeterId));
+  Future<String> waterMeterGetFeatureValue(String mac) =>
+      runRemoteAccessoryApi(() => _host.waterMeterGetFeatureValue(mac));
 
-  Future<pigeon.WaterMeterDeviceInfo> waterMeterGetDeviceInfo(String waterMeterId) =>
-      runRemoteAccessoryApi(() => _host.waterMeterGetDeviceInfo(waterMeterId));
+  Future<pigeon.WaterMeterDeviceInfo> waterMeterGetDeviceInfo(String mac) =>
+      runRemoteAccessoryApi(() => _host.waterMeterGetDeviceInfo(mac));
 
-  Future<bool> waterMeterIsSupportFunction(String featureValue, int function) =>
+  Future<bool> waterMeterIsSupportFunction(String featureValue, pigeon.TTWaterMeterFeature function) =>
       runRemoteAccessoryApi(() => _host.waterMeterIsSupportFunction(featureValue, function));
 
-  Future<void> waterMeterConfigApn(String apn) =>
-      runRemoteAccessoryApi(() => _host.waterMeterConfigApn(apn));
+  Future<void> waterMeterConfigApn(String mac, String apn) =>
+      runRemoteAccessoryApi(() => _host.waterMeterConfigApn(mac, apn));
 
-  Future<void> waterMeterConfigMeterServer(String ip, String port) =>
-      runRemoteAccessoryApi(() => _host.waterMeterConfigMeterServer(ip, port));
+  Future<void> waterMeterConfigMeterServer(String mac, String ip, String port) =>
+      runRemoteAccessoryApi(() => _host.waterMeterConfigMeterServer(mac, ip, port));
 
-  Future<void> waterMeterReset(String waterMeterId) =>
-      runRemoteAccessoryApi(() => _host.waterMeterReset(waterMeterId));
+  Future<void> waterMeterReset(String mac) =>
+      runRemoteAccessoryApi(() => _host.waterMeterReset(mac));
 }

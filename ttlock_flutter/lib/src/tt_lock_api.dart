@@ -464,4 +464,18 @@ class TTLockApi {
 
   Future<void> setDoorSensorAlertTime(int alertTime, String lockData) =>
       runLockApi(() => _host.setDoorSensorAlertTime(alertTime, lockData));
+
+  // ---- New API methods ----
+
+  Future<int> getLightTime(String lockData) =>
+      runLockApi(() => _host.getLightTime(lockData));
+
+  Future<void> setLightTime(int seconds, String lockData) =>
+      runLockApi(() => _host.setLightTime(seconds, lockData));
+
+  Future<List<pigeon.TTPassageModeModel>> getPassageModes(String lockData) =>
+      runLockApi(() => _host.getPassageModes(lockData));
+
+  Future<pigeon.TTSensitivityValue> getSensitivity(String lockData) =>
+      runLockApi(() => _host.getSensitivity(lockData));
 }

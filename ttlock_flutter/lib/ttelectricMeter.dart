@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:ttlock_flutter/ttlock.dart' as new_ttlock;
 import 'package:ttlock_flutter/ttlock_classic.dart';
 import 'package:ttlock_flutter/errors/tt_remote_accessory_exception.dart';
+import 'package:ttlock_flutter_platform_interface/pigeon/messages.g.dart' as pigeon;
 
 @Deprecated('Use Stream<TTMeterScanModel> from TTLock.electricMeter.accessoryElectricMeterStartScan().')
 typedef TTElectricMeterScanCallback = void Function(TTMeterScanModel scanModel);
@@ -67,7 +68,12 @@ class TTElectricMeter {
 
   @Deprecated('Use TTLock.electricMeter.electricMeterInit(...) instead.')
   static void init(Map<String, dynamic> info, TTElectricMeterInitCallback callback, TTRemoteFailedCallback failedCallback) {
-    new_ttlock.TTLock.electricMeter.electricMeterInit(Map<String, Object?>.from(info)).then(callback).catchError((e, _) => _fail(e, failedCallback));
+    new_ttlock.TTLock.electricMeter.electricMeterInit(pigeon.TTElectricMeterInitParam(
+      mac: info['mac'] as String? ?? '',
+      name: info['number'] as String? ?? '',
+      payMode: (info['payMode'] as int?) == 0 ? pigeon.TTMeterPayMode.postpaid : pigeon.TTMeterPayMode.prepaid,
+      price: (info['price'] as num?)?.toDouble() ?? 0.0,
+    )).then(callback).catchError((e, _) => _fail(e, failedCallback));
   }
 
   @Deprecated('Use TTLock.electricMeter.electricMeterDelete(electricMeterId) instead.')
@@ -110,7 +116,7 @@ class TTElectricMeter {
   @Deprecated('Use TTLock.electricMeter.electricMeterSetPayMode(...) instead.')
   static void setPayMode(String electricMeterId, int payMode, TTSuccessCallback callback, TTRemoteFailedCallback failedCallback) {
     new_ttlock.TTLock.electricMeter
-        .electricMeterSetPayMode(electricMeterId, payMode)
+        .electricMeterSetPayMode(electricMeterId, payMode == 0 ? pigeon.TTMeterPayMode.postpaid : pigeon.TTMeterPayMode.prepaid, 0.0)
         .then((_) => callback())
         .catchError((e, _) => _fail(e, failedCallback));
   }
@@ -118,7 +124,7 @@ class TTElectricMeter {
   @Deprecated('Use TTLock.electricMeter.electricMeterCharge(...) instead.')
   static void charge(String electricMeterId, num amount, TTSuccessCallback callback, TTRemoteFailedCallback failedCallback) {
     new_ttlock.TTLock.electricMeter
-        .electricMeterCharge(electricMeterId, amount.toDouble())
+        .electricMeterCharge(electricMeterId, amount.toDouble(), 0.0)
         .then((_) => callback())
         .catchError((e, _) => _fail(e, failedCallback));
   }

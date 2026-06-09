@@ -246,6 +246,22 @@ class AccessoryElectricQuantityResult {
 }
 
 // Scan Models
+class TTPassageModeModel {
+  final TTPassageModeType type;
+  final List<int>? weekly;
+  final List<int>? monthly;
+  final int startDate;
+  final int endDate;
+
+  TTPassageModeModel({
+    required this.type,
+    this.weekly,
+    this.monthly,
+    required this.startDate,
+    required this.endDate,
+  });
+}
+
 class TTLockScanModel {
   final String lockName;
   final String lockMac;
@@ -410,22 +426,22 @@ class TTMeterScanModel {
 }
 
 class TTWaterMeterInitResult {
-  final String waterMeterId;
-  final String? featureValue;
+  final int waterMeterId;
+  final String featureValue;
 
   TTWaterMeterInitResult({
     required this.waterMeterId,
-    this.featureValue,
+    required this.featureValue,
   });
 }
 
 class TTElectricMeterInitResult {
-  final String electricMeterId;
-  final String? featureValue;
+  final int electricMeterId;
+  final String featureValue;
 
   TTElectricMeterInitResult({
     required this.electricMeterId,
-    this.featureValue,
+    required this.featureValue,
   });
 }
 
@@ -488,19 +504,63 @@ class MultifunctionalKeypadInitResult {
 }
 
 class WaterMeterDeviceInfo {
-   final String catOneCardNumber;
-    final String catOneImsi;
-    final String catOneNodeId;
-    final String catOneOperator;
-    final int catOneRssi;
+  final String catOneCardNumber;
+  final String catOneImsi;
+  final String catOneNodeId;
+  final String catOneOperator;
+  final int catOneRssi;
 
-    WaterMeterDeviceInfo({
-      required this.catOneCardNumber,
-      required this.catOneImsi,
-      required this.catOneNodeId,
-      required this.catOneOperator,
-      required this.catOneRssi,
-    });
+  WaterMeterDeviceInfo({
+    required this.catOneCardNumber,
+    required this.catOneImsi,
+    required this.catOneNodeId,
+    required this.catOneOperator,
+    required this.catOneRssi,
+  });
+}
+
+class ElectricMeterDeviceInfo {
+  final String catOneCardNumber;
+  final String catOneImsi;
+  final String catOneNodeId;
+  final String catOneOperator;
+  final int catOneRssi;
+
+  ElectricMeterDeviceInfo({
+    required this.catOneCardNumber,
+    required this.catOneImsi,
+    required this.catOneNodeId,
+    required this.catOneOperator,
+    required this.catOneRssi,
+  });
+}
+
+class TTWaterMeterInitParam {
+  final String mac;
+  final String name;
+  final TTMeterPayMode payMode;
+  final double price;
+
+  TTWaterMeterInitParam({
+    required this.mac,
+    required this.name,
+    required this.payMode,
+    required this.price,
+  });
+}
+
+class TTElectricMeterInitParam {
+  final String mac;
+  final String name;
+  final TTMeterPayMode payMode;
+  final double price;
+
+  TTElectricMeterInitParam({
+    required this.mac,
+    required this.name,
+    required this.payMode,
+    required this.price,
+  });
 }
 
 // Event Models
@@ -866,6 +926,20 @@ enum TTFaceState {
   error,
 }
 
+enum TTWaterMeterFeature {
+  catOne,
+}
+
+enum TTElectricMeterFeature {
+  catOne,
+  telink,
+}
+
+enum TTMeterPayMode {
+  postpaid,
+  prepaid,
+}
+
 enum TTFaceErrorCode {
   normal,
   noFaceDetected,
@@ -1034,6 +1108,11 @@ abstract class TTLockHostApi {
   void setLockConfig(TTLockConfig config, bool isOn, String lockData);
 
   @async
+  int getLightTime(String lockData);
+  @async
+  void setLightTime(int seconds, String lockData);
+
+  @async
   TTLockDirection getLockDirection(String lockData);
   @async
   void setLockDirection(TTLockDirection direction, String lockData);
@@ -1049,6 +1128,8 @@ abstract class TTLockHostApi {
   );
   @async
   void clearAllPassageModes(String lockData);
+  @async
+  List<TTPassageModeModel> getPassageModes(String lockData);
 
   @async
   ControlLockResult activateLift(String floors, String lockData);
@@ -1089,6 +1170,8 @@ abstract class TTLockHostApi {
   TTSoundVolumeType getSoundVolume(String lockData);
   @async
   void setSensitivity(TTSensitivityValue value, String lockData);
+  @async
+  TTSensitivityValue getSensitivity(String lockData);
 
   @async
   void setRemoteKeyValidDate(String remoteKeyMac, List<TTCycleModel>? cycleList, int startDate, int endDate, String lockData);
@@ -1170,65 +1253,73 @@ abstract class TTAccessoryHostApi {
   String standaloneDoorSensorReadFeatureValue(String mac);
   bool standaloneDoorSensorIsSupportFunction(String featureValue, int lockFunction);
 
-  void waterMeterConfigServer(String url, String clientId, String accessToken);
-  @async
-  void waterMeterConnect(String mac);
-  void waterMeterDisconnect(String mac);
-  @async
-  TTWaterMeterInitResult waterMeterInit(Map<String, Object?> params);
-  @async
-  void waterMeterDelete(String waterMeterId);
-  @async
-  void waterMeterSetPowerOnOff(String waterMeterId, bool isOn);
-  @async
-  void waterMeterSetRemainderM3(String waterMeterId, double remainderM3);
-  @async
-  void waterMeterClearRemainderM3(String waterMeterId);
-  @async
-  Map<String, Object?> waterMeterReadData(String waterMeterId);
-  @async
-  void waterMeterSetPayMode(String waterMeterId, int payMode);
-  @async
-  void waterMeterCharge(String waterMeterId, double amount);
-  @async
-  void waterMeterSetTotalUsage(String waterMeterId, double totalM3);
-  @async
-  String waterMeterGetFeatureValue(String waterMeterId);
-  @async
-  WaterMeterDeviceInfo waterMeterGetDeviceInfo(String waterMeterId);
-  bool waterMeterIsSupportFunction(String featureValue, int lockFunction);
-  @async
-  void waterMeterConfigApn(String apn);
-  @async
-  void waterMeterConfigMeterServer(String ip, String port);
-  @async
-  void waterMeterReset(String waterMeterId);
-
   void electricMeterConfigServer(String url, String clientId, String accessToken);
   @async
   void electricMeterConnect(String mac);
   void electricMeterDisconnect(String mac);
   @async
-  TTElectricMeterInitResult electricMeterInit(Map<String, Object?> params);
+  TTElectricMeterInitResult electricMeterInit(TTElectricMeterInitParam params);
   @async
-  void electricMeterDelete(String electricMeterId);
+  void electricMeterDelete(String mac);
   @async
-  void electricMeterSetPowerOnOff(String electricMeterId, bool isOn);
+  void electricMeterSetPowerOnOff(String mac, bool isOn);
   @async
-  void electricMeterSetRemainderKwh(String electricMeterId, double remainderKwh);
+  void electricMeterSetRemainderKwh(String mac, double remainderKwh);
   @async
-  void electricMeterClearRemainderKwh(String electricMeterId);
+  void electricMeterClearRemainderKwh(String mac);
   @async
-  Map<String, Object?> electricMeterReadData(String electricMeterId);
+  void electricMeterReadData(String mac);
   @async
-  void electricMeterSetPayMode(String electricMeterId, int payMode);
+  void electricMeterSetPayMode(String mac, TTMeterPayMode payMode, double price);
   @async
-  void electricMeterCharge(String electricMeterId, double amount);
+  void electricMeterCharge(String mac, double amount, double kwh);
   @async
-  void electricMeterSetMaxPower(String electricMeterId, double maxPower);
+  void electricMeterSetMaxPower(String mac, double maxPower);
   @async
-  String electricMeterGetFeatureValue(String electricMeterId);
-  bool electricMeterIsSupportFunction(String featureValue, int lockFunction);
+  String electricMeterGetFeatureValue(String mac);
+  bool electricMeterIsSupportFunction(String featureValue, TTElectricMeterFeature lockFunction);
+  @async
+  ElectricMeterDeviceInfo electricMeterGetDeviceInfo(String mac);
+  @async
+  void electricMeterConfigApn(String mac, String apn);
+  @async
+  void electricMeterConfigMeterServer(String mac, String ip, String port);
+  @async
+  void electricMeterReset(String mac);
+
+  void waterMeterConfigServer(String url, String clientId, String accessToken);
+  @async
+  void waterMeterConnect(String mac);
+  void waterMeterDisconnect(String mac);
+  @async
+  TTWaterMeterInitResult waterMeterInit(TTWaterMeterInitParam params);
+  @async
+  void waterMeterDelete(String mac);
+  @async
+  void waterMeterSetPowerOnOff(String mac, bool isOn);
+  @async
+  void waterMeterSetRemainderM3(String mac, double remainderM3);
+  @async
+  void waterMeterClearRemainderM3(String mac);
+  @async
+  void waterMeterReadData(String mac);
+  @async
+  void waterMeterSetPayMode(String mac, TTMeterPayMode payMode, double price);
+  @async
+  void waterMeterCharge(String mac, double amount, double m3);
+  @async
+  void waterMeterSetTotalUsage(String mac, double totalM3);
+  @async
+  String waterMeterGetFeatureValue(String mac);
+  @async
+  WaterMeterDeviceInfo waterMeterGetDeviceInfo(String mac);
+  bool waterMeterIsSupportFunction(String featureValue, TTWaterMeterFeature lockFunction);
+  @async
+  void waterMeterConfigApn(String mac, String apn);
+  @async
+  void waterMeterConfigMeterServer(String mac, String ip, String port);
+  @async
+  void waterMeterReset(String mac);
 }
 
 // -----------------------------

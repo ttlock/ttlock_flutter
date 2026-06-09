@@ -33,36 +33,48 @@ class TTElectricMeterApi {
   Future<void> electricMeterDisconnect(String mac) =>
       runRemoteAccessoryApi(() => _host.electricMeterDisconnect(mac));
 
-  Future<pigeon.TTElectricMeterInitResult> electricMeterInit(Map<String, Object?> params) =>
+  Future<pigeon.TTElectricMeterInitResult> electricMeterInit(pigeon.TTElectricMeterInitParam params) =>
       runRemoteAccessoryApi(() => _host.electricMeterInit(params));
 
-  Future<void> electricMeterDelete(String electricMeterId) =>
-      runRemoteAccessoryApi(() => _host.electricMeterDelete(electricMeterId));
+  Future<void> electricMeterDelete(String mac) =>
+      runRemoteAccessoryApi(() => _host.electricMeterDelete(mac));
 
-  Future<void> electricMeterSetPowerOnOff(String electricMeterId, bool isOn) =>
-      runRemoteAccessoryApi(() => _host.electricMeterSetPowerOnOff(electricMeterId, isOn));
+  Future<void> electricMeterSetPowerOnOff(String mac, bool isOn) =>
+      runRemoteAccessoryApi(() => _host.electricMeterSetPowerOnOff(mac, isOn));
 
-  Future<void> electricMeterSetRemainderKwh(String electricMeterId, double remainderKwh) =>
-      runRemoteAccessoryApi(() => _host.electricMeterSetRemainderKwh(electricMeterId, remainderKwh));
+  Future<void> electricMeterSetRemainderKwh(String mac, double remainderKwh) =>
+      runRemoteAccessoryApi(() => _host.electricMeterSetRemainderKwh(mac, remainderKwh));
 
-  Future<void> electricMeterClearRemainderKwh(String electricMeterId) =>
-      runRemoteAccessoryApi(() => _host.electricMeterClearRemainderKwh(electricMeterId));
+  Future<void> electricMeterClearRemainderKwh(String mac) =>
+      runRemoteAccessoryApi(() => _host.electricMeterClearRemainderKwh(mac));
 
-  Future<Map<String, Object?>> electricMeterReadData(String electricMeterId) =>
-      runRemoteAccessoryApi(() => _host.electricMeterReadData(electricMeterId));
+  Future<void> electricMeterReadData(String mac) =>
+      runRemoteAccessoryApi(() => _host.electricMeterReadData(mac));
 
-  Future<void> electricMeterSetPayMode(String electricMeterId, int payMode) =>
-      runRemoteAccessoryApi(() => _host.electricMeterSetPayMode(electricMeterId, payMode));
+  Future<void> electricMeterSetPayMode(String mac, pigeon.TTMeterPayMode payMode, double price) =>
+      runRemoteAccessoryApi(() => _host.electricMeterSetPayMode(mac, payMode, price));
 
-  Future<void> electricMeterCharge(String electricMeterId, double amount) =>
-      runRemoteAccessoryApi(() => _host.electricMeterCharge(electricMeterId, amount));
+  Future<void> electricMeterCharge(String mac, double amount, double kwh) =>
+      runRemoteAccessoryApi(() => _host.electricMeterCharge(mac, amount, kwh));
 
-  Future<void> electricMeterSetMaxPower(String electricMeterId, double maxPower) =>
-      runRemoteAccessoryApi(() => _host.electricMeterSetMaxPower(electricMeterId, maxPower));
+  Future<void> electricMeterSetMaxPower(String mac, double maxPower) =>
+      runRemoteAccessoryApi(() => _host.electricMeterSetMaxPower(mac, maxPower));
 
-  Future<String> electricMeterGetFeatureValue(String electricMeterId) =>
-      runRemoteAccessoryApi(() => _host.electricMeterGetFeatureValue(electricMeterId));
+  Future<String> electricMeterGetFeatureValue(String mac) =>
+      runRemoteAccessoryApi(() => _host.electricMeterGetFeatureValue(mac));
 
-  Future<bool> electricMeterIsSupportFunction(String featureValue, int function) =>
+  Future<bool> electricMeterIsSupportFunction(String featureValue, pigeon.TTElectricMeterFeature function) =>
       runRemoteAccessoryApi(() => _host.electricMeterIsSupportFunction(featureValue, function));
+
+  Future<pigeon.ElectricMeterDeviceInfo> electricMeterGetDeviceInfo(String mac) =>
+      runRemoteAccessoryApi(() => _host.electricMeterGetDeviceInfo(mac));
+
+  Future<void> electricMeterConfigApn(String mac, String apn) =>
+      runRemoteAccessoryApi(() => _host.electricMeterConfigApn(mac, apn));
+
+  Future<void> electricMeterConfigMeterServer(String mac, String ip, String port) =>
+      runRemoteAccessoryApi(() => _host.electricMeterConfigMeterServer(mac, ip, port));
+
+  Future<void> electricMeterReset(String mac) =>
+      runRemoteAccessoryApi(() => _host.electricMeterReset(mac));
 }

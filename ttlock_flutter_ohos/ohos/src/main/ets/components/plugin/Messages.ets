@@ -613,6 +613,50 @@ export class TTFaceStateEnum {
 }
 
 /* Generated enum from Pigeon that represents data sent in messages.*/
+export enum TTWaterMeterFeature {
+  CAT_ONE
+}
+
+/* Generated enum Companion class from Pigeon that represents data sent 
+   in messages.Do not delete otherwise enum type data transfer will be failed*/
+export class TTWaterMeterFeatureEnum {
+  index: string|null = null;
+	constructor(index: string){
+    this.index = index;
+  }
+}
+
+/* Generated enum from Pigeon that represents data sent in messages.*/
+export enum TTElectricMeterFeature {
+  CAT_ONE,
+  TELINK
+}
+
+/* Generated enum Companion class from Pigeon that represents data sent 
+   in messages.Do not delete otherwise enum type data transfer will be failed*/
+export class TTElectricMeterFeatureEnum {
+  index: string|null = null;
+	constructor(index: string){
+    this.index = index;
+  }
+}
+
+/* Generated enum from Pigeon that represents data sent in messages.*/
+export enum TTMeterPayMode {
+  POSTPAID,
+  PREPAID
+}
+
+/* Generated enum Companion class from Pigeon that represents data sent 
+   in messages.Do not delete otherwise enum type data transfer will be failed*/
+export class TTMeterPayModeEnum {
+  index: string|null = null;
+	constructor(index: string){
+    this.index = index;
+  }
+}
+
+/* Generated enum from Pigeon that represents data sent in messages.*/
 export enum TTFaceErrorCode {
   NORMAL,
   NO_FACE_DETECTED,
@@ -1907,6 +1951,103 @@ export class AccessoryElectricQuantityResult {
 }
 
 /* Generated class from Pigeon that represents data sent in messages.*/
+export class TTPassageModeModel {
+  private type?: TTPassageModeType;
+
+  public setType(type:TTPassageModeType):void {
+    this.type = type;
+  }
+
+  getType(): TTPassageModeType | undefined{
+    return this.type;
+  }
+
+  private weekly?: Array<number>;
+
+  public setWeekly(weekly:Array<number>):void {
+    this.weekly = weekly;
+  }
+
+  getWeekly(): Array<number> | undefined{
+    return this.weekly;
+  }
+
+  private monthly?: Array<number>;
+
+  public setMonthly(monthly:Array<number>):void {
+    this.monthly = monthly;
+  }
+
+  getMonthly(): Array<number> | undefined{
+    return this.monthly;
+  }
+
+  private startDate?: number;
+
+  public setStartDate(startDate:number):void {
+    this.startDate = startDate;
+  }
+
+  getStartDate(): number | undefined{
+    return this.startDate;
+  }
+
+  private endDate?: number;
+
+  public setEndDate(endDate:number):void {
+    this.endDate = endDate;
+  }
+
+  getEndDate(): number | undefined{
+    return this.endDate;
+  }
+
+  constructor(type?: TTPassageModeType, weekly?: Array<number>, monthly?: Array<number>, startDate?: number, endDate?: number) {
+    this.type = type;
+    this.weekly = weekly;
+    this.monthly = monthly;
+    this.startDate = startDate;
+    this.endDate = endDate;
+  }
+
+  toList(): Object[] {
+    let arr: Object[] = new Array();
+    if(this.type !==undefined){
+      const typeStr = TTPassageModeType[this.type as number];
+      arr.push(new TTPassageModeTypeEnum(typeStr));
+    }
+    if(this.weekly !==undefined){
+      arr.push(this.weekly);
+    }
+    if(this.monthly !==undefined){
+      arr.push(this.monthly);
+    }
+    if(this.startDate !==undefined){
+      arr.push(this.startDate);
+    }
+    if(this.endDate !==undefined){
+      arr.push(this.endDate);
+    }
+    return arr;
+  }
+
+  static fromList(arr: Object[]): TTPassageModeModel {
+    let pigeonResult: TTPassageModeModel = new TTPassageModeModel();
+    const typeStr: string = arr[0]! as string;
+    pigeonResult.setType(TTPassageModeType[typeStr]);
+    let weekly: Object = arr[1];
+    pigeonResult.setWeekly(weekly as Array<number>);
+    let monthly: Object = arr[2];
+    pigeonResult.setMonthly(monthly as Array<number>);
+    let startDate: Object = arr[3];
+    pigeonResult.setStartDate(startDate as number);
+    let endDate: Object = arr[4];
+    pigeonResult.setEndDate(endDate as number);
+    return pigeonResult;
+  }
+}
+
+/* Generated class from Pigeon that represents data sent in messages.*/
 export class TTLockScanModel {
   private lockName?: string;
 
@@ -2886,13 +3027,13 @@ export class TTMeterScanModel {
 
 /* Generated class from Pigeon that represents data sent in messages.*/
 export class TTWaterMeterInitResult {
-  private waterMeterId?: string;
+  private waterMeterId?: number;
 
-  public setWaterMeterId(waterMeterId:string):void {
+  public setWaterMeterId(waterMeterId:number):void {
     this.waterMeterId = waterMeterId;
   }
 
-  getWaterMeterId(): string | undefined{
+  getWaterMeterId(): number | undefined{
     return this.waterMeterId;
   }
 
@@ -2906,7 +3047,7 @@ export class TTWaterMeterInitResult {
     return this.featureValue;
   }
 
-  constructor(waterMeterId?: string, featureValue?: string) {
+  constructor(waterMeterId?: number, featureValue?: string) {
     this.waterMeterId = waterMeterId;
     this.featureValue = featureValue;
   }
@@ -2925,7 +3066,7 @@ export class TTWaterMeterInitResult {
   static fromList(arr: Object[]): TTWaterMeterInitResult {
     let pigeonResult: TTWaterMeterInitResult = new TTWaterMeterInitResult();
     let waterMeterId: Object = arr[0];
-    pigeonResult.setWaterMeterId(waterMeterId as string);
+    pigeonResult.setWaterMeterId(waterMeterId as number);
     let featureValue: Object = arr[1];
     pigeonResult.setFeatureValue(featureValue as string);
     return pigeonResult;
@@ -2934,13 +3075,13 @@ export class TTWaterMeterInitResult {
 
 /* Generated class from Pigeon that represents data sent in messages.*/
 export class TTElectricMeterInitResult {
-  private electricMeterId?: string;
+  private electricMeterId?: number;
 
-  public setElectricMeterId(electricMeterId:string):void {
+  public setElectricMeterId(electricMeterId:number):void {
     this.electricMeterId = electricMeterId;
   }
 
-  getElectricMeterId(): string | undefined{
+  getElectricMeterId(): number | undefined{
     return this.electricMeterId;
   }
 
@@ -2954,7 +3095,7 @@ export class TTElectricMeterInitResult {
     return this.featureValue;
   }
 
-  constructor(electricMeterId?: string, featureValue?: string) {
+  constructor(electricMeterId?: number, featureValue?: string) {
     this.electricMeterId = electricMeterId;
     this.featureValue = featureValue;
   }
@@ -2973,7 +3114,7 @@ export class TTElectricMeterInitResult {
   static fromList(arr: Object[]): TTElectricMeterInitResult {
     let pigeonResult: TTElectricMeterInitResult = new TTElectricMeterInitResult();
     let electricMeterId: Object = arr[0];
-    pigeonResult.setElectricMeterId(electricMeterId as string);
+    pigeonResult.setElectricMeterId(electricMeterId as number);
     let featureValue: Object = arr[1];
     pigeonResult.setFeatureValue(featureValue as string);
     return pigeonResult;
@@ -3397,6 +3538,264 @@ export class WaterMeterDeviceInfo {
 }
 
 /* Generated class from Pigeon that represents data sent in messages.*/
+export class ElectricMeterDeviceInfo {
+  private catOneCardNumber?: string;
+
+  public setCatOneCardNumber(catOneCardNumber:string):void {
+    this.catOneCardNumber = catOneCardNumber;
+  }
+
+  getCatOneCardNumber(): string | undefined{
+    return this.catOneCardNumber;
+  }
+
+  private catOneImsi?: string;
+
+  public setCatOneImsi(catOneImsi:string):void {
+    this.catOneImsi = catOneImsi;
+  }
+
+  getCatOneImsi(): string | undefined{
+    return this.catOneImsi;
+  }
+
+  private catOneNodeId?: string;
+
+  public setCatOneNodeId(catOneNodeId:string):void {
+    this.catOneNodeId = catOneNodeId;
+  }
+
+  getCatOneNodeId(): string | undefined{
+    return this.catOneNodeId;
+  }
+
+  private catOneOperator?: string;
+
+  public setCatOneOperator(catOneOperator:string):void {
+    this.catOneOperator = catOneOperator;
+  }
+
+  getCatOneOperator(): string | undefined{
+    return this.catOneOperator;
+  }
+
+  private catOneRssi?: number;
+
+  public setCatOneRssi(catOneRssi:number):void {
+    this.catOneRssi = catOneRssi;
+  }
+
+  getCatOneRssi(): number | undefined{
+    return this.catOneRssi;
+  }
+
+  constructor(catOneCardNumber?: string, catOneImsi?: string, catOneNodeId?: string, catOneOperator?: string, catOneRssi?: number) {
+    this.catOneCardNumber = catOneCardNumber;
+    this.catOneImsi = catOneImsi;
+    this.catOneNodeId = catOneNodeId;
+    this.catOneOperator = catOneOperator;
+    this.catOneRssi = catOneRssi;
+  }
+
+  toList(): Object[] {
+    let arr: Object[] = new Array();
+    if(this.catOneCardNumber !==undefined){
+      arr.push(this.catOneCardNumber);
+    }
+    if(this.catOneImsi !==undefined){
+      arr.push(this.catOneImsi);
+    }
+    if(this.catOneNodeId !==undefined){
+      arr.push(this.catOneNodeId);
+    }
+    if(this.catOneOperator !==undefined){
+      arr.push(this.catOneOperator);
+    }
+    if(this.catOneRssi !==undefined){
+      arr.push(this.catOneRssi);
+    }
+    return arr;
+  }
+
+  static fromList(arr: Object[]): ElectricMeterDeviceInfo {
+    let pigeonResult: ElectricMeterDeviceInfo = new ElectricMeterDeviceInfo();
+    let catOneCardNumber: Object = arr[0];
+    pigeonResult.setCatOneCardNumber(catOneCardNumber as string);
+    let catOneImsi: Object = arr[1];
+    pigeonResult.setCatOneImsi(catOneImsi as string);
+    let catOneNodeId: Object = arr[2];
+    pigeonResult.setCatOneNodeId(catOneNodeId as string);
+    let catOneOperator: Object = arr[3];
+    pigeonResult.setCatOneOperator(catOneOperator as string);
+    let catOneRssi: Object = arr[4];
+    pigeonResult.setCatOneRssi(catOneRssi as number);
+    return pigeonResult;
+  }
+}
+
+/* Generated class from Pigeon that represents data sent in messages.*/
+export class TTWaterMeterInitParam {
+  private mac?: string;
+
+  public setMac(mac:string):void {
+    this.mac = mac;
+  }
+
+  getMac(): string | undefined{
+    return this.mac;
+  }
+
+  private name?: string;
+
+  public setName(name:string):void {
+    this.name = name;
+  }
+
+  getName(): string | undefined{
+    return this.name;
+  }
+
+  private payMode?: TTMeterPayMode;
+
+  public setPayMode(payMode:TTMeterPayMode):void {
+    this.payMode = payMode;
+  }
+
+  getPayMode(): TTMeterPayMode | undefined{
+    return this.payMode;
+  }
+
+  private price?: number;
+
+  public setPrice(price:number):void {
+    this.price = price;
+  }
+
+  getPrice(): number | undefined{
+    return this.price;
+  }
+
+  constructor(mac?: string, name?: string, payMode?: TTMeterPayMode, price?: number) {
+    this.mac = mac;
+    this.name = name;
+    this.payMode = payMode;
+    this.price = price;
+  }
+
+  toList(): Object[] {
+    let arr: Object[] = new Array();
+    if(this.mac !==undefined){
+      arr.push(this.mac);
+    }
+    if(this.name !==undefined){
+      arr.push(this.name);
+    }
+    if(this.payMode !==undefined){
+      const payModeStr = TTMeterPayMode[this.payMode as number];
+      arr.push(new TTMeterPayModeEnum(payModeStr));
+    }
+    if(this.price !==undefined){
+      arr.push(this.price);
+    }
+    return arr;
+  }
+
+  static fromList(arr: Object[]): TTWaterMeterInitParam {
+    let pigeonResult: TTWaterMeterInitParam = new TTWaterMeterInitParam();
+    let mac: Object = arr[0];
+    pigeonResult.setMac(mac as string);
+    let name: Object = arr[1];
+    pigeonResult.setName(name as string);
+    const payModeStr: string = arr[2]! as string;
+    pigeonResult.setPayMode(TTMeterPayMode[payModeStr]);
+    let price: Object = arr[3];
+    pigeonResult.setPrice(price as number);
+    return pigeonResult;
+  }
+}
+
+/* Generated class from Pigeon that represents data sent in messages.*/
+export class TTElectricMeterInitParam {
+  private mac?: string;
+
+  public setMac(mac:string):void {
+    this.mac = mac;
+  }
+
+  getMac(): string | undefined{
+    return this.mac;
+  }
+
+  private name?: string;
+
+  public setName(name:string):void {
+    this.name = name;
+  }
+
+  getName(): string | undefined{
+    return this.name;
+  }
+
+  private payMode?: TTMeterPayMode;
+
+  public setPayMode(payMode:TTMeterPayMode):void {
+    this.payMode = payMode;
+  }
+
+  getPayMode(): TTMeterPayMode | undefined{
+    return this.payMode;
+  }
+
+  private price?: number;
+
+  public setPrice(price:number):void {
+    this.price = price;
+  }
+
+  getPrice(): number | undefined{
+    return this.price;
+  }
+
+  constructor(mac?: string, name?: string, payMode?: TTMeterPayMode, price?: number) {
+    this.mac = mac;
+    this.name = name;
+    this.payMode = payMode;
+    this.price = price;
+  }
+
+  toList(): Object[] {
+    let arr: Object[] = new Array();
+    if(this.mac !==undefined){
+      arr.push(this.mac);
+    }
+    if(this.name !==undefined){
+      arr.push(this.name);
+    }
+    if(this.payMode !==undefined){
+      const payModeStr = TTMeterPayMode[this.payMode as number];
+      arr.push(new TTMeterPayModeEnum(payModeStr));
+    }
+    if(this.price !==undefined){
+      arr.push(this.price);
+    }
+    return arr;
+  }
+
+  static fromList(arr: Object[]): TTElectricMeterInitParam {
+    let pigeonResult: TTElectricMeterInitParam = new TTElectricMeterInitParam();
+    let mac: Object = arr[0];
+    pigeonResult.setMac(mac as string);
+    let name: Object = arr[1];
+    pigeonResult.setName(name as string);
+    const payModeStr: string = arr[2]! as string;
+    pigeonResult.setPayMode(TTMeterPayMode[payModeStr]);
+    let price: Object = arr[3];
+    pigeonResult.setPrice(price as number);
+    return pigeonResult;
+  }
+}
+
+/* Generated class from Pigeon that represents data sent in messages.*/
 export class AddCardEvent {
   private isProgress?: boolean;
 
@@ -3722,75 +4121,95 @@ export class PigeonCodec extends StandardMessageCodec {
       }
       case this.getByte(154): {
         let value: Object= super.readValue(buffer);
+        return value == null ? null : TTWaterMeterFeature[value as number];
+      }
+      case this.getByte(155): {
+        let value: Object= super.readValue(buffer);
+        return value == null ? null : TTElectricMeterFeature[value as number];
+      }
+      case this.getByte(156): {
+        let value: Object= super.readValue(buffer);
+        return value == null ? null : TTMeterPayMode[value as number];
+      }
+      case this.getByte(157): {
+        let value: Object= super.readValue(buffer);
         return value == null ? null : TTFaceErrorCode[value as number];
       }
-      case this.getByte(155):
-        return TTLockVersion.fromList(super.readValue(buffer) as Object[]);
-      case this.getByte(156):
-        return TTLockInitParams.fromList(super.readValue(buffer) as Object[]);
-      case this.getByte(157):
-        return TTGatewayInitParams.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(158):
-        return TTIpSetting.fromList(super.readValue(buffer) as Object[]);
+        return TTLockVersion.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(159):
-        return TTCycleModel.fromList(super.readValue(buffer) as Object[]);
+        return TTLockInitParams.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(160):
-        return TTLockScanWifiEventParam.fromList(super.readValue(buffer) as Object[]);
+        return TTGatewayInitParams.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(161):
-        return TTLockCredentialEventParam.fromList(super.readValue(buffer) as Object[]);
+        return TTIpSetting.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(162):
-        return TTKeypadCredentialEventParam.fromList(super.readValue(buffer) as Object[]);
+        return TTCycleModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(163):
-        return ControlLockResult.fromList(super.readValue(buffer) as Object[]);
+        return TTLockScanWifiEventParam.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(164):
-        return AutoLockingTime.fromList(super.readValue(buffer) as Object[]);
+        return TTLockCredentialEventParam.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(165):
-        return TTWifiInfoModel.fromList(super.readValue(buffer) as Object[]);
+        return TTKeypadCredentialEventParam.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(166):
-        return CameraLockWifiResult.fromList(super.readValue(buffer) as Object[]);
+        return ControlLockResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(167):
-        return TTLockSystemModel.fromList(super.readValue(buffer) as Object[]);
+        return AutoLockingTime.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(168):
-        return AccessoryElectricQuantityResult.fromList(super.readValue(buffer) as Object[]);
+        return TTWifiInfoModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(169):
-        return TTLockScanModel.fromList(super.readValue(buffer) as Object[]);
+        return CameraLockWifiResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(170):
-        return TTPasscodeModel.fromList(super.readValue(buffer) as Object[]);
+        return TTLockSystemModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(171):
-        return TTICCardModel.fromList(super.readValue(buffer) as Object[]);
+        return AccessoryElectricQuantityResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(172):
-        return TTFingerprintModel.fromList(super.readValue(buffer) as Object[]);
+        return TTPassageModeModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(173):
-        return TTGatewayScanModel.fromList(super.readValue(buffer) as Object[]);
+        return TTLockScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(174):
-        return GatewayDeviceInfo.fromList(super.readValue(buffer) as Object[]);
+        return TTPasscodeModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(175):
-        return TTRemoteAccessoryScanModel.fromList(super.readValue(buffer) as Object[]);
+        return TTICCardModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(176):
-        return TTStandaloneDoorSensorScanModel.fromList(super.readValue(buffer) as Object[]);
+        return TTFingerprintModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(177):
-        return TTStandaloneDoorSensorInfo.fromList(super.readValue(buffer) as Object[]);
+        return TTGatewayScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(178):
-        return TTMeterScanModel.fromList(super.readValue(buffer) as Object[]);
+        return GatewayDeviceInfo.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(179):
-        return TTWaterMeterInitResult.fromList(super.readValue(buffer) as Object[]);
+        return TTRemoteAccessoryScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(180):
-        return TTElectricMeterInitResult.fromList(super.readValue(buffer) as Object[]);
+        return TTStandaloneDoorSensorScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(181):
-        return TTWifiScanResult.fromList(super.readValue(buffer) as Object[]);
+        return TTStandaloneDoorSensorInfo.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(182):
-        return TTWifiScanEntry.fromList(super.readValue(buffer) as Object[]);
+        return TTMeterScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(183):
-        return RemoteKeypadInitResult.fromList(super.readValue(buffer) as Object[]);
+        return TTWaterMeterInitResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(184):
-        return MultifunctionalKeypadInitResult.fromList(super.readValue(buffer) as Object[]);
+        return TTElectricMeterInitResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(185):
-        return WaterMeterDeviceInfo.fromList(super.readValue(buffer) as Object[]);
+        return TTWifiScanResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(186):
-        return AddCardEvent.fromList(super.readValue(buffer) as Object[]);
+        return TTWifiScanEntry.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(187):
-        return AddFingerprintEvent.fromList(super.readValue(buffer) as Object[]);
+        return RemoteKeypadInitResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(188):
+        return MultifunctionalKeypadInitResult.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(189):
+        return WaterMeterDeviceInfo.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(190):
+        return ElectricMeterDeviceInfo.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(191):
+        return TTWaterMeterInitParam.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(192):
+        return TTElectricMeterInitParam.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(193):
+        return AddCardEvent.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(194):
+        return AddFingerprintEvent.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(195):
         return AddFaceEvent.fromList(super.readValue(buffer) as Object[]);
       default:
         return super.readValueOfType(type, buffer);
@@ -3873,110 +4292,131 @@ export class PigeonCodec extends StandardMessageCodec {
     } else if (value instanceof TTFaceStateEnum) {
       stream.writeUint8(this.getByte(153));
       this.writeValue(stream, value == null ? null : TTFaceState[value.index as string]);
-    } else if (value instanceof TTFaceErrorCodeEnum) {
+    } else if (value instanceof TTWaterMeterFeatureEnum) {
       stream.writeUint8(this.getByte(154));
+      this.writeValue(stream, value == null ? null : TTWaterMeterFeature[value.index as string]);
+    } else if (value instanceof TTElectricMeterFeatureEnum) {
+      stream.writeUint8(this.getByte(155));
+      this.writeValue(stream, value == null ? null : TTElectricMeterFeature[value.index as string]);
+    } else if (value instanceof TTMeterPayModeEnum) {
+      stream.writeUint8(this.getByte(156));
+      this.writeValue(stream, value == null ? null : TTMeterPayMode[value.index as string]);
+    } else if (value instanceof TTFaceErrorCodeEnum) {
+      stream.writeUint8(this.getByte(157));
       this.writeValue(stream, value == null ? null : TTFaceErrorCode[value.index as string]);
     } else if (value instanceof TTLockVersion) {
-      stream.writeUint8(this.getByte(155));
+      stream.writeUint8(this.getByte(158));
       this.writeValue(stream, (value as TTLockVersion).toList());
     } else if (value instanceof TTLockInitParams) {
-      stream.writeUint8(this.getByte(156));
+      stream.writeUint8(this.getByte(159));
       this.writeValue(stream, (value as TTLockInitParams).toList());
     } else if (value instanceof TTGatewayInitParams) {
-      stream.writeUint8(this.getByte(157));
+      stream.writeUint8(this.getByte(160));
       this.writeValue(stream, (value as TTGatewayInitParams).toList());
     } else if (value instanceof TTIpSetting) {
-      stream.writeUint8(this.getByte(158));
+      stream.writeUint8(this.getByte(161));
       this.writeValue(stream, (value as TTIpSetting).toList());
     } else if (value instanceof TTCycleModel) {
-      stream.writeUint8(this.getByte(159));
+      stream.writeUint8(this.getByte(162));
       this.writeValue(stream, (value as TTCycleModel).toList());
     } else if (value instanceof TTLockScanWifiEventParam) {
-      stream.writeUint8(this.getByte(160));
+      stream.writeUint8(this.getByte(163));
       this.writeValue(stream, (value as TTLockScanWifiEventParam).toList());
     } else if (value instanceof TTLockCredentialEventParam) {
-      stream.writeUint8(this.getByte(161));
+      stream.writeUint8(this.getByte(164));
       this.writeValue(stream, (value as TTLockCredentialEventParam).toList());
     } else if (value instanceof TTKeypadCredentialEventParam) {
-      stream.writeUint8(this.getByte(162));
+      stream.writeUint8(this.getByte(165));
       this.writeValue(stream, (value as TTKeypadCredentialEventParam).toList());
     } else if (value instanceof ControlLockResult) {
-      stream.writeUint8(this.getByte(163));
+      stream.writeUint8(this.getByte(166));
       this.writeValue(stream, (value as ControlLockResult).toList());
     } else if (value instanceof AutoLockingTime) {
-      stream.writeUint8(this.getByte(164));
+      stream.writeUint8(this.getByte(167));
       this.writeValue(stream, (value as AutoLockingTime).toList());
     } else if (value instanceof TTWifiInfoModel) {
-      stream.writeUint8(this.getByte(165));
+      stream.writeUint8(this.getByte(168));
       this.writeValue(stream, (value as TTWifiInfoModel).toList());
     } else if (value instanceof CameraLockWifiResult) {
-      stream.writeUint8(this.getByte(166));
+      stream.writeUint8(this.getByte(169));
       this.writeValue(stream, (value as CameraLockWifiResult).toList());
     } else if (value instanceof TTLockSystemModel) {
-      stream.writeUint8(this.getByte(167));
+      stream.writeUint8(this.getByte(170));
       this.writeValue(stream, (value as TTLockSystemModel).toList());
     } else if (value instanceof AccessoryElectricQuantityResult) {
-      stream.writeUint8(this.getByte(168));
+      stream.writeUint8(this.getByte(171));
       this.writeValue(stream, (value as AccessoryElectricQuantityResult).toList());
+    } else if (value instanceof TTPassageModeModel) {
+      stream.writeUint8(this.getByte(172));
+      this.writeValue(stream, (value as TTPassageModeModel).toList());
     } else if (value instanceof TTLockScanModel) {
-      stream.writeUint8(this.getByte(169));
+      stream.writeUint8(this.getByte(173));
       this.writeValue(stream, (value as TTLockScanModel).toList());
     } else if (value instanceof TTPasscodeModel) {
-      stream.writeUint8(this.getByte(170));
+      stream.writeUint8(this.getByte(174));
       this.writeValue(stream, (value as TTPasscodeModel).toList());
     } else if (value instanceof TTICCardModel) {
-      stream.writeUint8(this.getByte(171));
+      stream.writeUint8(this.getByte(175));
       this.writeValue(stream, (value as TTICCardModel).toList());
     } else if (value instanceof TTFingerprintModel) {
-      stream.writeUint8(this.getByte(172));
+      stream.writeUint8(this.getByte(176));
       this.writeValue(stream, (value as TTFingerprintModel).toList());
     } else if (value instanceof TTGatewayScanModel) {
-      stream.writeUint8(this.getByte(173));
+      stream.writeUint8(this.getByte(177));
       this.writeValue(stream, (value as TTGatewayScanModel).toList());
     } else if (value instanceof GatewayDeviceInfo) {
-      stream.writeUint8(this.getByte(174));
+      stream.writeUint8(this.getByte(178));
       this.writeValue(stream, (value as GatewayDeviceInfo).toList());
     } else if (value instanceof TTRemoteAccessoryScanModel) {
-      stream.writeUint8(this.getByte(175));
+      stream.writeUint8(this.getByte(179));
       this.writeValue(stream, (value as TTRemoteAccessoryScanModel).toList());
     } else if (value instanceof TTStandaloneDoorSensorScanModel) {
-      stream.writeUint8(this.getByte(176));
+      stream.writeUint8(this.getByte(180));
       this.writeValue(stream, (value as TTStandaloneDoorSensorScanModel).toList());
     } else if (value instanceof TTStandaloneDoorSensorInfo) {
-      stream.writeUint8(this.getByte(177));
+      stream.writeUint8(this.getByte(181));
       this.writeValue(stream, (value as TTStandaloneDoorSensorInfo).toList());
     } else if (value instanceof TTMeterScanModel) {
-      stream.writeUint8(this.getByte(178));
+      stream.writeUint8(this.getByte(182));
       this.writeValue(stream, (value as TTMeterScanModel).toList());
     } else if (value instanceof TTWaterMeterInitResult) {
-      stream.writeUint8(this.getByte(179));
+      stream.writeUint8(this.getByte(183));
       this.writeValue(stream, (value as TTWaterMeterInitResult).toList());
     } else if (value instanceof TTElectricMeterInitResult) {
-      stream.writeUint8(this.getByte(180));
+      stream.writeUint8(this.getByte(184));
       this.writeValue(stream, (value as TTElectricMeterInitResult).toList());
     } else if (value instanceof TTWifiScanResult) {
-      stream.writeUint8(this.getByte(181));
+      stream.writeUint8(this.getByte(185));
       this.writeValue(stream, (value as TTWifiScanResult).toList());
     } else if (value instanceof TTWifiScanEntry) {
-      stream.writeUint8(this.getByte(182));
+      stream.writeUint8(this.getByte(186));
       this.writeValue(stream, (value as TTWifiScanEntry).toList());
     } else if (value instanceof RemoteKeypadInitResult) {
-      stream.writeUint8(this.getByte(183));
+      stream.writeUint8(this.getByte(187));
       this.writeValue(stream, (value as RemoteKeypadInitResult).toList());
     } else if (value instanceof MultifunctionalKeypadInitResult) {
-      stream.writeUint8(this.getByte(184));
+      stream.writeUint8(this.getByte(188));
       this.writeValue(stream, (value as MultifunctionalKeypadInitResult).toList());
     } else if (value instanceof WaterMeterDeviceInfo) {
-      stream.writeUint8(this.getByte(185));
+      stream.writeUint8(this.getByte(189));
       this.writeValue(stream, (value as WaterMeterDeviceInfo).toList());
+    } else if (value instanceof ElectricMeterDeviceInfo) {
+      stream.writeUint8(this.getByte(190));
+      this.writeValue(stream, (value as ElectricMeterDeviceInfo).toList());
+    } else if (value instanceof TTWaterMeterInitParam) {
+      stream.writeUint8(this.getByte(191));
+      this.writeValue(stream, (value as TTWaterMeterInitParam).toList());
+    } else if (value instanceof TTElectricMeterInitParam) {
+      stream.writeUint8(this.getByte(192));
+      this.writeValue(stream, (value as TTElectricMeterInitParam).toList());
     } else if (value instanceof AddCardEvent) {
-      stream.writeUint8(this.getByte(186));
+      stream.writeUint8(this.getByte(193));
       this.writeValue(stream, (value as AddCardEvent).toList());
     } else if (value instanceof AddFingerprintEvent) {
-      stream.writeUint8(this.getByte(187));
+      stream.writeUint8(this.getByte(194));
       this.writeValue(stream, (value as AddFingerprintEvent).toList());
     } else if (value instanceof AddFaceEvent) {
-      stream.writeUint8(this.getByte(188));
+      stream.writeUint8(this.getByte(195));
       this.writeValue(stream, (value as AddFaceEvent).toList());
     } else {
       super.writeValue(stream, value);
@@ -4093,6 +4533,10 @@ export abstract class TTLockHostApi {
 
   abstract setLockConfig(config: TTLockConfig , isOn: boolean , lockData: string , result: Result<void>): void;
 
+  abstract getLightTime(lockData: string , result: Result<number>): void;
+
+  abstract setLightTime(seconds: number , lockData: string , result: Result<void>): void;
+
   abstract getLockDirection(lockData: string , result: Result<TTLockDirection>): void;
 
   abstract setLockDirection(direction: TTLockDirection , lockData: string , result: Result<void>): void;
@@ -4100,6 +4544,8 @@ export abstract class TTLockHostApi {
   abstract addPassageMode(type: TTPassageModeType , weekly: Array<number> , monthly: Array<number> , startTime: number , endTime: number , lockData: string , result: Result<void>): void;
 
   abstract clearAllPassageModes(lockData: string , result: Result<void>): void;
+
+  abstract getPassageModes(lockData: string , result: Result<Array<TTPassageModeModel>>): void;
 
   abstract activateLift(floors: string , lockData: string , result: Result<ControlLockResult>): void;
 
@@ -4134,6 +4580,8 @@ export abstract class TTLockHostApi {
   abstract getSoundVolume(lockData: string , result: Result<TTSoundVolumeType>): void;
 
   abstract setSensitivity(value: TTSensitivityValue , lockData: string , result: Result<void>): void;
+
+  abstract getSensitivity(lockData: string , result: Result<TTSensitivityValue>): void;
 
   abstract setRemoteKeyValidDate(remoteKeyMac: string , cycleList: Array<TTCycleModel> , startDate: number , endDate: number , lockData: string , result: Result<void>): void;
 
@@ -5523,6 +5971,62 @@ export abstract class TTLockHostApi {
     {
       let channel: BasicMessageChannel<Object> =
           new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.getLightTime", TTLockHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<number>{
+                    success(result: number): void {
+                      let res: Array<Object> = [];
+                      res.push(result);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<number> = new ResultImp();
+
+              api!.getLightTime(args[0] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.setLightTime", TTLockHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<void>{
+                    success(result: void): void {
+                      let res: Array<Object> = [];
+                      res.push(null);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<void> = new ResultImp();
+
+              api!.setLightTime(args[0] as number, args[1] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
               binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.getLockDirection", TTLockHostApi.getCodec());
       if (api != null) {
         channel.setMessageHandler({
@@ -5627,6 +6131,34 @@ export abstract class TTLockHostApi {
               let resultCallback: Result<void> = new ResultImp();
 
               api!.clearAllPassageModes(args[0] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.getPassageModes", TTLockHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<Array<TTPassageModeModel>>{
+                    success(result: Array<TTPassageModeModel>): void {
+                      let res: Array<Object> = [];
+                      res.push(result);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<Array<TTPassageModeModel>> = new ResultImp();
+
+              api!.getPassageModes(args[0] as string, resultCallback);
             } });
       } else {
         channel.setMessageHandler(null);
@@ -6103,6 +6635,34 @@ export abstract class TTLockHostApi {
               let resultCallback: Result<void> = new ResultImp();
 
               api!.setSensitivity(args[0] as TTSensitivityValue, args[1] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.getSensitivity", TTLockHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<TTSensitivityValue>{
+                    success(result: TTSensitivityValue): void {
+                      let res: Array<Object> = [];
+                      res.push(result);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<TTSensitivityValue> = new ResultImp();
+
+              api!.getSensitivity(new stringEnum(args[0] as string), resultCallback);
             } });
       } else {
         channel.setMessageHandler(null);
@@ -6593,69 +7153,77 @@ export abstract class TTAccessoryHostApi {
 
   abstract standaloneDoorSensorIsSupportFunction(featureValue: string , lockFunction: number ): boolean;
 
-  abstract waterMeterConfigServer(url: string , clientId: string , accessToken: string ): void;
-
-  abstract waterMeterConnect(mac: string , result: Result<void>): void;
-
-  abstract waterMeterDisconnect(mac: string ): void;
-
-  abstract waterMeterInit(params: Map<string, Object> , result: Result<TTWaterMeterInitResult>): void;
-
-  abstract waterMeterDelete(waterMeterId: string , result: Result<void>): void;
-
-  abstract waterMeterSetPowerOnOff(waterMeterId: string , isOn: boolean , result: Result<void>): void;
-
-  abstract waterMeterSetRemainderM3(waterMeterId: string , remainderM3: number , result: Result<void>): void;
-
-  abstract waterMeterClearRemainderM3(waterMeterId: string , result: Result<void>): void;
-
-  abstract waterMeterReadData(waterMeterId: string , result: Result<Map<string, Object>>): void;
-
-  abstract waterMeterSetPayMode(waterMeterId: string , payMode: number , result: Result<void>): void;
-
-  abstract waterMeterCharge(waterMeterId: string , amount: number , result: Result<void>): void;
-
-  abstract waterMeterSetTotalUsage(waterMeterId: string , totalM3: number , result: Result<void>): void;
-
-  abstract waterMeterGetFeatureValue(waterMeterId: string , result: Result<string>): void;
-
-  abstract waterMeterGetDeviceInfo(waterMeterId: string , result: Result<WaterMeterDeviceInfo>): void;
-
-  abstract waterMeterIsSupportFunction(featureValue: string , lockFunction: number ): boolean;
-
-  abstract waterMeterConfigApn(apn: string , result: Result<void>): void;
-
-  abstract waterMeterConfigMeterServer(ip: string , port: string , result: Result<void>): void;
-
-  abstract waterMeterReset(waterMeterId: string , result: Result<void>): void;
-
   abstract electricMeterConfigServer(url: string , clientId: string , accessToken: string ): void;
 
   abstract electricMeterConnect(mac: string , result: Result<void>): void;
 
   abstract electricMeterDisconnect(mac: string ): void;
 
-  abstract electricMeterInit(params: Map<string, Object> , result: Result<TTElectricMeterInitResult>): void;
+  abstract electricMeterInit(params: TTElectricMeterInitParam , result: Result<TTElectricMeterInitResult>): void;
 
-  abstract electricMeterDelete(electricMeterId: string , result: Result<void>): void;
+  abstract electricMeterDelete(mac: string , result: Result<void>): void;
 
-  abstract electricMeterSetPowerOnOff(electricMeterId: string , isOn: boolean , result: Result<void>): void;
+  abstract electricMeterSetPowerOnOff(mac: string , isOn: boolean , result: Result<void>): void;
 
-  abstract electricMeterSetRemainderKwh(electricMeterId: string , remainderKwh: number , result: Result<void>): void;
+  abstract electricMeterSetRemainderKwh(mac: string , remainderKwh: number , result: Result<void>): void;
 
-  abstract electricMeterClearRemainderKwh(electricMeterId: string , result: Result<void>): void;
+  abstract electricMeterClearRemainderKwh(mac: string , result: Result<void>): void;
 
-  abstract electricMeterReadData(electricMeterId: string , result: Result<Map<string, Object>>): void;
+  abstract electricMeterReadData(mac: string , result: Result<void>): void;
 
-  abstract electricMeterSetPayMode(electricMeterId: string , payMode: number , result: Result<void>): void;
+  abstract electricMeterSetPayMode(mac: string , payMode: TTMeterPayMode , price: number , result: Result<void>): void;
 
-  abstract electricMeterCharge(electricMeterId: string , amount: number , result: Result<void>): void;
+  abstract electricMeterCharge(mac: string , amount: number , kwh: number , result: Result<void>): void;
 
-  abstract electricMeterSetMaxPower(electricMeterId: string , maxPower: number , result: Result<void>): void;
+  abstract electricMeterSetMaxPower(mac: string , maxPower: number , result: Result<void>): void;
 
-  abstract electricMeterGetFeatureValue(electricMeterId: string , result: Result<string>): void;
+  abstract electricMeterGetFeatureValue(mac: string , result: Result<string>): void;
 
-  abstract electricMeterIsSupportFunction(featureValue: string , lockFunction: number ): boolean;
+  abstract electricMeterIsSupportFunction(featureValue: string , lockFunction: TTElectricMeterFeature ): boolean;
+
+  abstract electricMeterGetDeviceInfo(mac: string , result: Result<ElectricMeterDeviceInfo>): void;
+
+  abstract electricMeterConfigApn(mac: string , apn: string , result: Result<void>): void;
+
+  abstract electricMeterConfigMeterServer(mac: string , ip: string , port: string , result: Result<void>): void;
+
+  abstract electricMeterReset(mac: string , result: Result<void>): void;
+
+  abstract waterMeterConfigServer(url: string , clientId: string , accessToken: string ): void;
+
+  abstract waterMeterConnect(mac: string , result: Result<void>): void;
+
+  abstract waterMeterDisconnect(mac: string ): void;
+
+  abstract waterMeterInit(params: TTWaterMeterInitParam , result: Result<TTWaterMeterInitResult>): void;
+
+  abstract waterMeterDelete(mac: string , result: Result<void>): void;
+
+  abstract waterMeterSetPowerOnOff(mac: string , isOn: boolean , result: Result<void>): void;
+
+  abstract waterMeterSetRemainderM3(mac: string , remainderM3: number , result: Result<void>): void;
+
+  abstract waterMeterClearRemainderM3(mac: string , result: Result<void>): void;
+
+  abstract waterMeterReadData(mac: string , result: Result<void>): void;
+
+  abstract waterMeterSetPayMode(mac: string , payMode: TTMeterPayMode , price: number , result: Result<void>): void;
+
+  abstract waterMeterCharge(mac: string , amount: number , m3: number , result: Result<void>): void;
+
+  abstract waterMeterSetTotalUsage(mac: string , totalM3: number , result: Result<void>): void;
+
+  abstract waterMeterGetFeatureValue(mac: string , result: Result<string>): void;
+
+  abstract waterMeterGetDeviceInfo(mac: string , result: Result<WaterMeterDeviceInfo>): void;
+
+  abstract waterMeterIsSupportFunction(featureValue: string , lockFunction: TTWaterMeterFeature ): boolean;
+
+  abstract waterMeterConfigApn(mac: string , apn: string , result: Result<void>): void;
+
+  abstract waterMeterConfigMeterServer(mac: string , ip: string , port: string , result: Result<void>): void;
+
+  abstract waterMeterReset(mac: string , result: Result<void>): void;
   /** The codec used by TTAccessoryHostApi. */
   static getCodec(): MessageCodec<Object>{
     return PigeonCodec.INSTANCE;
@@ -6958,495 +7526,6 @@ export abstract class TTAccessoryHostApi {
     {
       let channel: BasicMessageChannel<Object> =
           new BasicMessageChannel(
-              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterConfigServer", TTAccessoryHostApi.getCodec());
-      if (api != null) {
-        channel.setMessageHandler({
-            onMessage(message: Object ,reply: Reply<Object> ) {
-              let args: Array<Object> = message as Array<Object>;
-              let res: Array<Object> = [];
-              try {
-                api!.waterMeterConfigServer(args[0] as string, args[1] as string, args[2] as string);
-                res.push(null);
-              }
- catch (error) {
-                let wrappedError: Array<Object> = wrapError(error);
-                res = wrappedError;
-              }
-              reply.reply(res);
-            } });
-      } else {
-        channel.setMessageHandler(null);
-      }
-    }
-    {
-      let channel: BasicMessageChannel<Object> =
-          new BasicMessageChannel(
-              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterConnect", TTAccessoryHostApi.getCodec());
-      if (api != null) {
-        channel.setMessageHandler({
-            onMessage(message: Object ,reply: Reply<Object> ) {
-              let args: Array<Object> = message as Array<Object>;
-              class ResultImp implements Result<void>{
-                    success(result: void): void {
-                      let res: Array<Object> = [];
-                      res.push(null);
-                      reply.reply(res);
-                    }
-
-                    error(error: Error): void {
-                      let wrappedError: Array<Object> = wrapError(error);
-                      reply.reply(wrappedError);
-                    }
-              }
-              let resultCallback: Result<void> = new ResultImp();
-
-              api!.waterMeterConnect(args[0] as string, resultCallback);
-            } });
-      } else {
-        channel.setMessageHandler(null);
-      }
-    }
-    {
-      let channel: BasicMessageChannel<Object> =
-          new BasicMessageChannel(
-              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterDisconnect", TTAccessoryHostApi.getCodec());
-      if (api != null) {
-        channel.setMessageHandler({
-            onMessage(message: Object ,reply: Reply<Object> ) {
-              let args: Array<Object> = message as Array<Object>;
-              let res: Array<Object> = [];
-              try {
-                api!.waterMeterDisconnect(args[0] as string);
-                res.push(null);
-              }
- catch (error) {
-                let wrappedError: Array<Object> = wrapError(error);
-                res = wrappedError;
-              }
-              reply.reply(res);
-            } });
-      } else {
-        channel.setMessageHandler(null);
-      }
-    }
-    {
-      let channel: BasicMessageChannel<Object> =
-          new BasicMessageChannel(
-              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterInit", TTAccessoryHostApi.getCodec());
-      if (api != null) {
-        channel.setMessageHandler({
-            onMessage(message: Object ,reply: Reply<Object> ) {
-              let args: Array<Object> = message as Array<Object>;
-              class ResultImp implements Result<TTWaterMeterInitResult>{
-                    success(result: TTWaterMeterInitResult): void {
-                      let res: Array<Object> = [];
-                      res.push(result);
-                      reply.reply(res);
-                    }
-
-                    error(error: Error): void {
-                      let wrappedError: Array<Object> = wrapError(error);
-                      reply.reply(wrappedError);
-                    }
-              }
-              let resultCallback: Result<TTWaterMeterInitResult> = new ResultImp();
-
-              api!.waterMeterInit(args[0] as Map<string, Object>, resultCallback);
-            } });
-      } else {
-        channel.setMessageHandler(null);
-      }
-    }
-    {
-      let channel: BasicMessageChannel<Object> =
-          new BasicMessageChannel(
-              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterDelete", TTAccessoryHostApi.getCodec());
-      if (api != null) {
-        channel.setMessageHandler({
-            onMessage(message: Object ,reply: Reply<Object> ) {
-              let args: Array<Object> = message as Array<Object>;
-              class ResultImp implements Result<void>{
-                    success(result: void): void {
-                      let res: Array<Object> = [];
-                      res.push(null);
-                      reply.reply(res);
-                    }
-
-                    error(error: Error): void {
-                      let wrappedError: Array<Object> = wrapError(error);
-                      reply.reply(wrappedError);
-                    }
-              }
-              let resultCallback: Result<void> = new ResultImp();
-
-              api!.waterMeterDelete(args[0] as string, resultCallback);
-            } });
-      } else {
-        channel.setMessageHandler(null);
-      }
-    }
-    {
-      let channel: BasicMessageChannel<Object> =
-          new BasicMessageChannel(
-              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterSetPowerOnOff", TTAccessoryHostApi.getCodec());
-      if (api != null) {
-        channel.setMessageHandler({
-            onMessage(message: Object ,reply: Reply<Object> ) {
-              let args: Array<Object> = message as Array<Object>;
-              class ResultImp implements Result<void>{
-                    success(result: void): void {
-                      let res: Array<Object> = [];
-                      res.push(null);
-                      reply.reply(res);
-                    }
-
-                    error(error: Error): void {
-                      let wrappedError: Array<Object> = wrapError(error);
-                      reply.reply(wrappedError);
-                    }
-              }
-              let resultCallback: Result<void> = new ResultImp();
-
-              api!.waterMeterSetPowerOnOff(args[0] as string, args[1] as boolean, resultCallback);
-            } });
-      } else {
-        channel.setMessageHandler(null);
-      }
-    }
-    {
-      let channel: BasicMessageChannel<Object> =
-          new BasicMessageChannel(
-              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterSetRemainderM3", TTAccessoryHostApi.getCodec());
-      if (api != null) {
-        channel.setMessageHandler({
-            onMessage(message: Object ,reply: Reply<Object> ) {
-              let args: Array<Object> = message as Array<Object>;
-              class ResultImp implements Result<void>{
-                    success(result: void): void {
-                      let res: Array<Object> = [];
-                      res.push(null);
-                      reply.reply(res);
-                    }
-
-                    error(error: Error): void {
-                      let wrappedError: Array<Object> = wrapError(error);
-                      reply.reply(wrappedError);
-                    }
-              }
-              let resultCallback: Result<void> = new ResultImp();
-
-              api!.waterMeterSetRemainderM3(args[0] as string, args[1] as number, resultCallback);
-            } });
-      } else {
-        channel.setMessageHandler(null);
-      }
-    }
-    {
-      let channel: BasicMessageChannel<Object> =
-          new BasicMessageChannel(
-              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterClearRemainderM3", TTAccessoryHostApi.getCodec());
-      if (api != null) {
-        channel.setMessageHandler({
-            onMessage(message: Object ,reply: Reply<Object> ) {
-              let args: Array<Object> = message as Array<Object>;
-              class ResultImp implements Result<void>{
-                    success(result: void): void {
-                      let res: Array<Object> = [];
-                      res.push(null);
-                      reply.reply(res);
-                    }
-
-                    error(error: Error): void {
-                      let wrappedError: Array<Object> = wrapError(error);
-                      reply.reply(wrappedError);
-                    }
-              }
-              let resultCallback: Result<void> = new ResultImp();
-
-              api!.waterMeterClearRemainderM3(args[0] as string, resultCallback);
-            } });
-      } else {
-        channel.setMessageHandler(null);
-      }
-    }
-    {
-      let channel: BasicMessageChannel<Object> =
-          new BasicMessageChannel(
-              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterReadData", TTAccessoryHostApi.getCodec());
-      if (api != null) {
-        channel.setMessageHandler({
-            onMessage(message: Object ,reply: Reply<Object> ) {
-              let args: Array<Object> = message as Array<Object>;
-              class ResultImp implements Result<Map<string, Object>>{
-                    success(result: Map<string, Object>): void {
-                      let res: Array<Object> = [];
-                      res.push(result);
-                      reply.reply(res);
-                    }
-
-                    error(error: Error): void {
-                      let wrappedError: Array<Object> = wrapError(error);
-                      reply.reply(wrappedError);
-                    }
-              }
-              let resultCallback: Result<Map<string, Object>> = new ResultImp();
-
-              api!.waterMeterReadData(args[0] as string, resultCallback);
-            } });
-      } else {
-        channel.setMessageHandler(null);
-      }
-    }
-    {
-      let channel: BasicMessageChannel<Object> =
-          new BasicMessageChannel(
-              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterSetPayMode", TTAccessoryHostApi.getCodec());
-      if (api != null) {
-        channel.setMessageHandler({
-            onMessage(message: Object ,reply: Reply<Object> ) {
-              let args: Array<Object> = message as Array<Object>;
-              class ResultImp implements Result<void>{
-                    success(result: void): void {
-                      let res: Array<Object> = [];
-                      res.push(null);
-                      reply.reply(res);
-                    }
-
-                    error(error: Error): void {
-                      let wrappedError: Array<Object> = wrapError(error);
-                      reply.reply(wrappedError);
-                    }
-              }
-              let resultCallback: Result<void> = new ResultImp();
-
-              api!.waterMeterSetPayMode(args[0] as string, args[1] as number, resultCallback);
-            } });
-      } else {
-        channel.setMessageHandler(null);
-      }
-    }
-    {
-      let channel: BasicMessageChannel<Object> =
-          new BasicMessageChannel(
-              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterCharge", TTAccessoryHostApi.getCodec());
-      if (api != null) {
-        channel.setMessageHandler({
-            onMessage(message: Object ,reply: Reply<Object> ) {
-              let args: Array<Object> = message as Array<Object>;
-              class ResultImp implements Result<void>{
-                    success(result: void): void {
-                      let res: Array<Object> = [];
-                      res.push(null);
-                      reply.reply(res);
-                    }
-
-                    error(error: Error): void {
-                      let wrappedError: Array<Object> = wrapError(error);
-                      reply.reply(wrappedError);
-                    }
-              }
-              let resultCallback: Result<void> = new ResultImp();
-
-              api!.waterMeterCharge(args[0] as string, args[1] as number, resultCallback);
-            } });
-      } else {
-        channel.setMessageHandler(null);
-      }
-    }
-    {
-      let channel: BasicMessageChannel<Object> =
-          new BasicMessageChannel(
-              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterSetTotalUsage", TTAccessoryHostApi.getCodec());
-      if (api != null) {
-        channel.setMessageHandler({
-            onMessage(message: Object ,reply: Reply<Object> ) {
-              let args: Array<Object> = message as Array<Object>;
-              class ResultImp implements Result<void>{
-                    success(result: void): void {
-                      let res: Array<Object> = [];
-                      res.push(null);
-                      reply.reply(res);
-                    }
-
-                    error(error: Error): void {
-                      let wrappedError: Array<Object> = wrapError(error);
-                      reply.reply(wrappedError);
-                    }
-              }
-              let resultCallback: Result<void> = new ResultImp();
-
-              api!.waterMeterSetTotalUsage(args[0] as string, args[1] as number, resultCallback);
-            } });
-      } else {
-        channel.setMessageHandler(null);
-      }
-    }
-    {
-      let channel: BasicMessageChannel<Object> =
-          new BasicMessageChannel(
-              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterGetFeatureValue", TTAccessoryHostApi.getCodec());
-      if (api != null) {
-        channel.setMessageHandler({
-            onMessage(message: Object ,reply: Reply<Object> ) {
-              let args: Array<Object> = message as Array<Object>;
-              class ResultImp implements Result<string>{
-                    success(result: string): void {
-                      let res: Array<Object> = [];
-                      res.push(result);
-                      reply.reply(res);
-                    }
-
-                    error(error: Error): void {
-                      let wrappedError: Array<Object> = wrapError(error);
-                      reply.reply(wrappedError);
-                    }
-              }
-              let resultCallback: Result<string> = new ResultImp();
-
-              api!.waterMeterGetFeatureValue(args[0] as string, resultCallback);
-            } });
-      } else {
-        channel.setMessageHandler(null);
-      }
-    }
-    {
-      let channel: BasicMessageChannel<Object> =
-          new BasicMessageChannel(
-              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterGetDeviceInfo", TTAccessoryHostApi.getCodec());
-      if (api != null) {
-        channel.setMessageHandler({
-            onMessage(message: Object ,reply: Reply<Object> ) {
-              let args: Array<Object> = message as Array<Object>;
-              class ResultImp implements Result<WaterMeterDeviceInfo>{
-                    success(result: WaterMeterDeviceInfo): void {
-                      let res: Array<Object> = [];
-                      res.push(result);
-                      reply.reply(res);
-                    }
-
-                    error(error: Error): void {
-                      let wrappedError: Array<Object> = wrapError(error);
-                      reply.reply(wrappedError);
-                    }
-              }
-              let resultCallback: Result<WaterMeterDeviceInfo> = new ResultImp();
-
-              api!.waterMeterGetDeviceInfo(args[0] as string, resultCallback);
-            } });
-      } else {
-        channel.setMessageHandler(null);
-      }
-    }
-    {
-      let channel: BasicMessageChannel<Object> =
-          new BasicMessageChannel(
-              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterIsSupportFunction", TTAccessoryHostApi.getCodec());
-      if (api != null) {
-        channel.setMessageHandler({
-            onMessage(message: Object ,reply: Reply<Object> ) {
-              let args: Array<Object> = message as Array<Object>;
-              let res: Array<Object> = [];
-              try {
-                let output: boolean = api!.waterMeterIsSupportFunction(args[0] as string, args[1] as number);
-                res.push(output);
-              }
- catch (error) {
-                let wrappedError: Array<Object> = wrapError(error);
-                res = wrappedError;
-              }
-              reply.reply(res);
-            } });
-      } else {
-        channel.setMessageHandler(null);
-      }
-    }
-    {
-      let channel: BasicMessageChannel<Object> =
-          new BasicMessageChannel(
-              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterConfigApn", TTAccessoryHostApi.getCodec());
-      if (api != null) {
-        channel.setMessageHandler({
-            onMessage(message: Object ,reply: Reply<Object> ) {
-              let args: Array<Object> = message as Array<Object>;
-              class ResultImp implements Result<void>{
-                    success(result: void): void {
-                      let res: Array<Object> = [];
-                      res.push(null);
-                      reply.reply(res);
-                    }
-
-                    error(error: Error): void {
-                      let wrappedError: Array<Object> = wrapError(error);
-                      reply.reply(wrappedError);
-                    }
-              }
-              let resultCallback: Result<void> = new ResultImp();
-
-              api!.waterMeterConfigApn(args[0] as string, resultCallback);
-            } });
-      } else {
-        channel.setMessageHandler(null);
-      }
-    }
-    {
-      let channel: BasicMessageChannel<Object> =
-          new BasicMessageChannel(
-              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterConfigMeterServer", TTAccessoryHostApi.getCodec());
-      if (api != null) {
-        channel.setMessageHandler({
-            onMessage(message: Object ,reply: Reply<Object> ) {
-              let args: Array<Object> = message as Array<Object>;
-              class ResultImp implements Result<void>{
-                    success(result: void): void {
-                      let res: Array<Object> = [];
-                      res.push(null);
-                      reply.reply(res);
-                    }
-
-                    error(error: Error): void {
-                      let wrappedError: Array<Object> = wrapError(error);
-                      reply.reply(wrappedError);
-                    }
-              }
-              let resultCallback: Result<void> = new ResultImp();
-
-              api!.waterMeterConfigMeterServer(args[0] as string, args[1] as string, resultCallback);
-            } });
-      } else {
-        channel.setMessageHandler(null);
-      }
-    }
-    {
-      let channel: BasicMessageChannel<Object> =
-          new BasicMessageChannel(
-              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterReset", TTAccessoryHostApi.getCodec());
-      if (api != null) {
-        channel.setMessageHandler({
-            onMessage(message: Object ,reply: Reply<Object> ) {
-              let args: Array<Object> = message as Array<Object>;
-              class ResultImp implements Result<void>{
-                    success(result: void): void {
-                      let res: Array<Object> = [];
-                      res.push(null);
-                      reply.reply(res);
-                    }
-
-                    error(error: Error): void {
-                      let wrappedError: Array<Object> = wrapError(error);
-                      reply.reply(wrappedError);
-                    }
-              }
-              let resultCallback: Result<void> = new ResultImp();
-
-              api!.waterMeterReset(args[0] as string, resultCallback);
-            } });
-      } else {
-        channel.setMessageHandler(null);
-      }
-    }
-    {
-      let channel: BasicMessageChannel<Object> =
-          new BasicMessageChannel(
               binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterConfigServer", TTAccessoryHostApi.getCodec());
       if (api != null) {
         channel.setMessageHandler({
@@ -7540,7 +7619,7 @@ export abstract class TTAccessoryHostApi {
               }
               let resultCallback: Result<TTElectricMeterInitResult> = new ResultImp();
 
-              api!.electricMeterInit(args[0] as Map<string, Object>, resultCallback);
+              api!.electricMeterInit(args[0] as TTElectricMeterInitParam, resultCallback);
             } });
       } else {
         channel.setMessageHandler(null);
@@ -7666,10 +7745,10 @@ export abstract class TTAccessoryHostApi {
         channel.setMessageHandler({
             onMessage(message: Object ,reply: Reply<Object> ) {
               let args: Array<Object> = message as Array<Object>;
-              class ResultImp implements Result<Map<string, Object>>{
-                    success(result: Map<string, Object>): void {
+              class ResultImp implements Result<void>{
+                    success(result: void): void {
                       let res: Array<Object> = [];
-                      res.push(result);
+                      res.push(null);
                       reply.reply(res);
                     }
 
@@ -7678,7 +7757,7 @@ export abstract class TTAccessoryHostApi {
                       reply.reply(wrappedError);
                     }
               }
-              let resultCallback: Result<Map<string, Object>> = new ResultImp();
+              let resultCallback: Result<void> = new ResultImp();
 
               api!.electricMeterReadData(args[0] as string, resultCallback);
             } });
@@ -7708,7 +7787,7 @@ export abstract class TTAccessoryHostApi {
               }
               let resultCallback: Result<void> = new ResultImp();
 
-              api!.electricMeterSetPayMode(args[0] as string, args[1] as number, resultCallback);
+              api!.electricMeterSetPayMode(args[0] as string, args[1] as TTMeterPayMode, args[2] as number, resultCallback);
             } });
       } else {
         channel.setMessageHandler(null);
@@ -7736,7 +7815,7 @@ export abstract class TTAccessoryHostApi {
               }
               let resultCallback: Result<void> = new ResultImp();
 
-              api!.electricMeterCharge(args[0] as string, args[1] as number, resultCallback);
+              api!.electricMeterCharge(args[0] as string, args[1] as number, args[2] as number, resultCallback);
             } });
       } else {
         channel.setMessageHandler(null);
@@ -7808,7 +7887,7 @@ export abstract class TTAccessoryHostApi {
               let args: Array<Object> = message as Array<Object>;
               let res: Array<Object> = [];
               try {
-                let output: boolean = api!.electricMeterIsSupportFunction(args[0] as string, args[1] as number);
+                let output: boolean = api!.electricMeterIsSupportFunction(args[0] as string, args[1] as TTElectricMeterFeature);
                 res.push(output);
               }
  catch (error) {
@@ -7816,6 +7895,607 @@ export abstract class TTAccessoryHostApi {
                 res = wrappedError;
               }
               reply.reply(res);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterGetDeviceInfo", TTAccessoryHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<ElectricMeterDeviceInfo>{
+                    success(result: ElectricMeterDeviceInfo): void {
+                      let res: Array<Object> = [];
+                      res.push(result);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<ElectricMeterDeviceInfo> = new ResultImp();
+
+              api!.electricMeterGetDeviceInfo(args[0] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterConfigApn", TTAccessoryHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<void>{
+                    success(result: void): void {
+                      let res: Array<Object> = [];
+                      res.push(null);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<void> = new ResultImp();
+
+              api!.electricMeterConfigApn(args[0] as string, args[1] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterConfigMeterServer", TTAccessoryHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<void>{
+                    success(result: void): void {
+                      let res: Array<Object> = [];
+                      res.push(null);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<void> = new ResultImp();
+
+              api!.electricMeterConfigMeterServer(args[0] as string, args[1] as string, args[2] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterReset", TTAccessoryHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<void>{
+                    success(result: void): void {
+                      let res: Array<Object> = [];
+                      res.push(null);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<void> = new ResultImp();
+
+              api!.electricMeterReset(args[0] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterConfigServer", TTAccessoryHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              let res: Array<Object> = [];
+              try {
+                api!.waterMeterConfigServer(args[0] as string, args[1] as string, args[2] as string);
+                res.push(null);
+              }
+ catch (error) {
+                let wrappedError: Array<Object> = wrapError(error);
+                res = wrappedError;
+              }
+              reply.reply(res);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterConnect", TTAccessoryHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<void>{
+                    success(result: void): void {
+                      let res: Array<Object> = [];
+                      res.push(null);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<void> = new ResultImp();
+
+              api!.waterMeterConnect(args[0] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterDisconnect", TTAccessoryHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              let res: Array<Object> = [];
+              try {
+                api!.waterMeterDisconnect(args[0] as string);
+                res.push(null);
+              }
+ catch (error) {
+                let wrappedError: Array<Object> = wrapError(error);
+                res = wrappedError;
+              }
+              reply.reply(res);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterInit", TTAccessoryHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<TTWaterMeterInitResult>{
+                    success(result: TTWaterMeterInitResult): void {
+                      let res: Array<Object> = [];
+                      res.push(result);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<TTWaterMeterInitResult> = new ResultImp();
+
+              api!.waterMeterInit(args[0] as TTWaterMeterInitParam, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterDelete", TTAccessoryHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<void>{
+                    success(result: void): void {
+                      let res: Array<Object> = [];
+                      res.push(null);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<void> = new ResultImp();
+
+              api!.waterMeterDelete(args[0] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterSetPowerOnOff", TTAccessoryHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<void>{
+                    success(result: void): void {
+                      let res: Array<Object> = [];
+                      res.push(null);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<void> = new ResultImp();
+
+              api!.waterMeterSetPowerOnOff(args[0] as string, args[1] as boolean, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterSetRemainderM3", TTAccessoryHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<void>{
+                    success(result: void): void {
+                      let res: Array<Object> = [];
+                      res.push(null);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<void> = new ResultImp();
+
+              api!.waterMeterSetRemainderM3(args[0] as string, args[1] as number, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterClearRemainderM3", TTAccessoryHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<void>{
+                    success(result: void): void {
+                      let res: Array<Object> = [];
+                      res.push(null);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<void> = new ResultImp();
+
+              api!.waterMeterClearRemainderM3(args[0] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterReadData", TTAccessoryHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<void>{
+                    success(result: void): void {
+                      let res: Array<Object> = [];
+                      res.push(null);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<void> = new ResultImp();
+
+              api!.waterMeterReadData(args[0] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterSetPayMode", TTAccessoryHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<void>{
+                    success(result: void): void {
+                      let res: Array<Object> = [];
+                      res.push(null);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<void> = new ResultImp();
+
+              api!.waterMeterSetPayMode(args[0] as string, args[1] as TTMeterPayMode, args[2] as number, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterCharge", TTAccessoryHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<void>{
+                    success(result: void): void {
+                      let res: Array<Object> = [];
+                      res.push(null);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<void> = new ResultImp();
+
+              api!.waterMeterCharge(args[0] as string, args[1] as number, args[2] as number, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterSetTotalUsage", TTAccessoryHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<void>{
+                    success(result: void): void {
+                      let res: Array<Object> = [];
+                      res.push(null);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<void> = new ResultImp();
+
+              api!.waterMeterSetTotalUsage(args[0] as string, args[1] as number, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterGetFeatureValue", TTAccessoryHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<string>{
+                    success(result: string): void {
+                      let res: Array<Object> = [];
+                      res.push(result);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<string> = new ResultImp();
+
+              api!.waterMeterGetFeatureValue(args[0] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterGetDeviceInfo", TTAccessoryHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<WaterMeterDeviceInfo>{
+                    success(result: WaterMeterDeviceInfo): void {
+                      let res: Array<Object> = [];
+                      res.push(result);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<WaterMeterDeviceInfo> = new ResultImp();
+
+              api!.waterMeterGetDeviceInfo(args[0] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterIsSupportFunction", TTAccessoryHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              let res: Array<Object> = [];
+              try {
+                let output: boolean = api!.waterMeterIsSupportFunction(args[0] as string, args[1] as TTWaterMeterFeature);
+                res.push(output);
+              }
+ catch (error) {
+                let wrappedError: Array<Object> = wrapError(error);
+                res = wrappedError;
+              }
+              reply.reply(res);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterConfigApn", TTAccessoryHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<void>{
+                    success(result: void): void {
+                      let res: Array<Object> = [];
+                      res.push(null);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<void> = new ResultImp();
+
+              api!.waterMeterConfigApn(args[0] as string, args[1] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterConfigMeterServer", TTAccessoryHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<void>{
+                    success(result: void): void {
+                      let res: Array<Object> = [];
+                      res.push(null);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<void> = new ResultImp();
+
+              api!.waterMeterConfigMeterServer(args[0] as string, args[1] as string, args[2] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterReset", TTAccessoryHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<void>{
+                    success(result: void): void {
+                      let res: Array<Object> = [];
+                      res.push(null);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<void> = new ResultImp();
+
+              api!.waterMeterReset(args[0] as string, resultCallback);
             } });
       } else {
         channel.setMessageHandler(null);

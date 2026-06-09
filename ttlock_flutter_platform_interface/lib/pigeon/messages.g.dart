@@ -349,6 +349,20 @@ enum TTFaceState {
   error,
 }
 
+enum TTWaterMeterFeature {
+  catOne,
+}
+
+enum TTElectricMeterFeature {
+  catOne,
+  telink,
+}
+
+enum TTMeterPayMode {
+  postpaid,
+  prepaid,
+}
+
 enum TTFaceErrorCode {
   normal,
   noFaceDetected,
@@ -1200,6 +1214,67 @@ class AccessoryElectricQuantityResult {
 ;
 }
 
+class TTPassageModeModel {
+  TTPassageModeModel({
+    required this.type,
+    this.weekly,
+    this.monthly,
+    required this.startDate,
+    required this.endDate,
+  });
+
+  TTPassageModeType type;
+
+  List<int>? weekly;
+
+  List<int>? monthly;
+
+  int startDate;
+
+  int endDate;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      type,
+      weekly,
+      monthly,
+      startDate,
+      endDate,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static TTPassageModeModel decode(Object result) {
+    result as List<Object?>;
+    return TTPassageModeModel(
+      type: result[0]! as TTPassageModeType,
+      weekly: (result[1] as List<Object?>?)?.cast<int>(),
+      monthly: (result[2] as List<Object?>?)?.cast<int>(),
+      startDate: result[3]! as int,
+      endDate: result[4]! as int,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! TTPassageModeModel || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(encode(), other.encode());
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => Object.hashAll(_toList())
+;
+}
+
 class TTLockScanModel {
   TTLockScanModel({
     required this.lockName,
@@ -1818,12 +1893,12 @@ class TTMeterScanModel {
 class TTWaterMeterInitResult {
   TTWaterMeterInitResult({
     required this.waterMeterId,
-    this.featureValue,
+    required this.featureValue,
   });
 
-  String waterMeterId;
+  int waterMeterId;
 
-  String? featureValue;
+  String featureValue;
 
   List<Object?> _toList() {
     return <Object?>[
@@ -1838,8 +1913,8 @@ class TTWaterMeterInitResult {
   static TTWaterMeterInitResult decode(Object result) {
     result as List<Object?>;
     return TTWaterMeterInitResult(
-      waterMeterId: result[0]! as String,
-      featureValue: result[1] as String?,
+      waterMeterId: result[0]! as int,
+      featureValue: result[1]! as String,
     );
   }
 
@@ -1864,12 +1939,12 @@ class TTWaterMeterInitResult {
 class TTElectricMeterInitResult {
   TTElectricMeterInitResult({
     required this.electricMeterId,
-    this.featureValue,
+    required this.featureValue,
   });
 
-  String electricMeterId;
+  int electricMeterId;
 
-  String? featureValue;
+  String featureValue;
 
   List<Object?> _toList() {
     return <Object?>[
@@ -1884,8 +1959,8 @@ class TTElectricMeterInitResult {
   static TTElectricMeterInitResult decode(Object result) {
     result as List<Object?>;
     return TTElectricMeterInitResult(
-      electricMeterId: result[0]! as String,
-      featureValue: result[1] as String?,
+      electricMeterId: result[0]! as int,
+      featureValue: result[1]! as String,
     );
   }
 
@@ -2192,6 +2267,179 @@ class WaterMeterDeviceInfo {
 ;
 }
 
+class ElectricMeterDeviceInfo {
+  ElectricMeterDeviceInfo({
+    required this.catOneCardNumber,
+    required this.catOneImsi,
+    required this.catOneNodeId,
+    required this.catOneOperator,
+    required this.catOneRssi,
+  });
+
+  String catOneCardNumber;
+
+  String catOneImsi;
+
+  String catOneNodeId;
+
+  String catOneOperator;
+
+  int catOneRssi;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      catOneCardNumber,
+      catOneImsi,
+      catOneNodeId,
+      catOneOperator,
+      catOneRssi,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static ElectricMeterDeviceInfo decode(Object result) {
+    result as List<Object?>;
+    return ElectricMeterDeviceInfo(
+      catOneCardNumber: result[0]! as String,
+      catOneImsi: result[1]! as String,
+      catOneNodeId: result[2]! as String,
+      catOneOperator: result[3]! as String,
+      catOneRssi: result[4]! as int,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! ElectricMeterDeviceInfo || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(encode(), other.encode());
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => Object.hashAll(_toList())
+;
+}
+
+class TTWaterMeterInitParam {
+  TTWaterMeterInitParam({
+    required this.mac,
+    required this.name,
+    required this.payMode,
+    required this.price,
+  });
+
+  String mac;
+
+  String name;
+
+  TTMeterPayMode payMode;
+
+  double price;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      mac,
+      name,
+      payMode,
+      price,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static TTWaterMeterInitParam decode(Object result) {
+    result as List<Object?>;
+    return TTWaterMeterInitParam(
+      mac: result[0]! as String,
+      name: result[1]! as String,
+      payMode: result[2]! as TTMeterPayMode,
+      price: result[3]! as double,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! TTWaterMeterInitParam || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(encode(), other.encode());
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => Object.hashAll(_toList())
+;
+}
+
+class TTElectricMeterInitParam {
+  TTElectricMeterInitParam({
+    required this.mac,
+    required this.name,
+    required this.payMode,
+    required this.price,
+  });
+
+  String mac;
+
+  String name;
+
+  TTMeterPayMode payMode;
+
+  double price;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      mac,
+      name,
+      payMode,
+      price,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static TTElectricMeterInitParam decode(Object result) {
+    result as List<Object?>;
+    return TTElectricMeterInitParam(
+      mac: result[0]! as String,
+      name: result[1]! as String,
+      payMode: result[2]! as TTMeterPayMode,
+      price: result[3]! as double,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! TTElectricMeterInitParam || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(encode(), other.encode());
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => Object.hashAll(_toList())
+;
+}
+
 class AddCardEvent {
   AddCardEvent({
     required this.isProgress,
@@ -2433,110 +2681,131 @@ class _PigeonCodec extends StandardMessageCodec {
     }    else if (value is TTFaceState) {
       buffer.putUint8(153);
       writeValue(buffer, value.index);
-    }    else if (value is TTFaceErrorCode) {
+    }    else if (value is TTWaterMeterFeature) {
       buffer.putUint8(154);
       writeValue(buffer, value.index);
-    }    else if (value is TTLockVersion) {
+    }    else if (value is TTElectricMeterFeature) {
       buffer.putUint8(155);
-      writeValue(buffer, value.encode());
-    }    else if (value is TTLockInitParams) {
+      writeValue(buffer, value.index);
+    }    else if (value is TTMeterPayMode) {
       buffer.putUint8(156);
-      writeValue(buffer, value.encode());
-    }    else if (value is TTGatewayInitParams) {
+      writeValue(buffer, value.index);
+    }    else if (value is TTFaceErrorCode) {
       buffer.putUint8(157);
-      writeValue(buffer, value.encode());
-    }    else if (value is TTIpSetting) {
+      writeValue(buffer, value.index);
+    }    else if (value is TTLockVersion) {
       buffer.putUint8(158);
       writeValue(buffer, value.encode());
-    }    else if (value is TTCycleModel) {
+    }    else if (value is TTLockInitParams) {
       buffer.putUint8(159);
       writeValue(buffer, value.encode());
-    }    else if (value is TTLockScanWifiEventParam) {
+    }    else if (value is TTGatewayInitParams) {
       buffer.putUint8(160);
       writeValue(buffer, value.encode());
-    }    else if (value is TTLockCredentialEventParam) {
+    }    else if (value is TTIpSetting) {
       buffer.putUint8(161);
       writeValue(buffer, value.encode());
-    }    else if (value is TTKeypadCredentialEventParam) {
+    }    else if (value is TTCycleModel) {
       buffer.putUint8(162);
       writeValue(buffer, value.encode());
-    }    else if (value is ControlLockResult) {
+    }    else if (value is TTLockScanWifiEventParam) {
       buffer.putUint8(163);
       writeValue(buffer, value.encode());
-    }    else if (value is AutoLockingTime) {
+    }    else if (value is TTLockCredentialEventParam) {
       buffer.putUint8(164);
       writeValue(buffer, value.encode());
-    }    else if (value is TTWifiInfoModel) {
+    }    else if (value is TTKeypadCredentialEventParam) {
       buffer.putUint8(165);
       writeValue(buffer, value.encode());
-    }    else if (value is CameraLockWifiResult) {
+    }    else if (value is ControlLockResult) {
       buffer.putUint8(166);
       writeValue(buffer, value.encode());
-    }    else if (value is TTLockSystemModel) {
+    }    else if (value is AutoLockingTime) {
       buffer.putUint8(167);
       writeValue(buffer, value.encode());
-    }    else if (value is AccessoryElectricQuantityResult) {
+    }    else if (value is TTWifiInfoModel) {
       buffer.putUint8(168);
       writeValue(buffer, value.encode());
-    }    else if (value is TTLockScanModel) {
+    }    else if (value is CameraLockWifiResult) {
       buffer.putUint8(169);
       writeValue(buffer, value.encode());
-    }    else if (value is TTPasscodeModel) {
+    }    else if (value is TTLockSystemModel) {
       buffer.putUint8(170);
       writeValue(buffer, value.encode());
-    }    else if (value is TTICCardModel) {
+    }    else if (value is AccessoryElectricQuantityResult) {
       buffer.putUint8(171);
       writeValue(buffer, value.encode());
-    }    else if (value is TTFingerprintModel) {
+    }    else if (value is TTPassageModeModel) {
       buffer.putUint8(172);
       writeValue(buffer, value.encode());
-    }    else if (value is TTGatewayScanModel) {
+    }    else if (value is TTLockScanModel) {
       buffer.putUint8(173);
       writeValue(buffer, value.encode());
-    }    else if (value is GatewayDeviceInfo) {
+    }    else if (value is TTPasscodeModel) {
       buffer.putUint8(174);
       writeValue(buffer, value.encode());
-    }    else if (value is TTRemoteAccessoryScanModel) {
+    }    else if (value is TTICCardModel) {
       buffer.putUint8(175);
       writeValue(buffer, value.encode());
-    }    else if (value is TTStandaloneDoorSensorScanModel) {
+    }    else if (value is TTFingerprintModel) {
       buffer.putUint8(176);
       writeValue(buffer, value.encode());
-    }    else if (value is TTStandaloneDoorSensorInfo) {
+    }    else if (value is TTGatewayScanModel) {
       buffer.putUint8(177);
       writeValue(buffer, value.encode());
-    }    else if (value is TTMeterScanModel) {
+    }    else if (value is GatewayDeviceInfo) {
       buffer.putUint8(178);
       writeValue(buffer, value.encode());
-    }    else if (value is TTWaterMeterInitResult) {
+    }    else if (value is TTRemoteAccessoryScanModel) {
       buffer.putUint8(179);
       writeValue(buffer, value.encode());
-    }    else if (value is TTElectricMeterInitResult) {
+    }    else if (value is TTStandaloneDoorSensorScanModel) {
       buffer.putUint8(180);
       writeValue(buffer, value.encode());
-    }    else if (value is TTWifiScanResult) {
+    }    else if (value is TTStandaloneDoorSensorInfo) {
       buffer.putUint8(181);
       writeValue(buffer, value.encode());
-    }    else if (value is TTWifiScanEntry) {
+    }    else if (value is TTMeterScanModel) {
       buffer.putUint8(182);
       writeValue(buffer, value.encode());
-    }    else if (value is RemoteKeypadInitResult) {
+    }    else if (value is TTWaterMeterInitResult) {
       buffer.putUint8(183);
       writeValue(buffer, value.encode());
-    }    else if (value is MultifunctionalKeypadInitResult) {
+    }    else if (value is TTElectricMeterInitResult) {
       buffer.putUint8(184);
       writeValue(buffer, value.encode());
-    }    else if (value is WaterMeterDeviceInfo) {
+    }    else if (value is TTWifiScanResult) {
       buffer.putUint8(185);
       writeValue(buffer, value.encode());
-    }    else if (value is AddCardEvent) {
+    }    else if (value is TTWifiScanEntry) {
       buffer.putUint8(186);
       writeValue(buffer, value.encode());
-    }    else if (value is AddFingerprintEvent) {
+    }    else if (value is RemoteKeypadInitResult) {
       buffer.putUint8(187);
       writeValue(buffer, value.encode());
-    }    else if (value is AddFaceEvent) {
+    }    else if (value is MultifunctionalKeypadInitResult) {
       buffer.putUint8(188);
+      writeValue(buffer, value.encode());
+    }    else if (value is WaterMeterDeviceInfo) {
+      buffer.putUint8(189);
+      writeValue(buffer, value.encode());
+    }    else if (value is ElectricMeterDeviceInfo) {
+      buffer.putUint8(190);
+      writeValue(buffer, value.encode());
+    }    else if (value is TTWaterMeterInitParam) {
+      buffer.putUint8(191);
+      writeValue(buffer, value.encode());
+    }    else if (value is TTElectricMeterInitParam) {
+      buffer.putUint8(192);
+      writeValue(buffer, value.encode());
+    }    else if (value is AddCardEvent) {
+      buffer.putUint8(193);
+      writeValue(buffer, value.encode());
+    }    else if (value is AddFingerprintEvent) {
+      buffer.putUint8(194);
+      writeValue(buffer, value.encode());
+    }    else if (value is AddFaceEvent) {
+      buffer.putUint8(195);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -2623,74 +2892,91 @@ class _PigeonCodec extends StandardMessageCodec {
         return value == null ? null : TTFaceState.values[value];
       case 154: 
         final int? value = readValue(buffer) as int?;
-        return value == null ? null : TTFaceErrorCode.values[value];
+        return value == null ? null : TTWaterMeterFeature.values[value];
       case 155: 
-        return TTLockVersion.decode(readValue(buffer)!);
+        final int? value = readValue(buffer) as int?;
+        return value == null ? null : TTElectricMeterFeature.values[value];
       case 156: 
-        return TTLockInitParams.decode(readValue(buffer)!);
+        final int? value = readValue(buffer) as int?;
+        return value == null ? null : TTMeterPayMode.values[value];
       case 157: 
-        return TTGatewayInitParams.decode(readValue(buffer)!);
+        final int? value = readValue(buffer) as int?;
+        return value == null ? null : TTFaceErrorCode.values[value];
       case 158: 
-        return TTIpSetting.decode(readValue(buffer)!);
+        return TTLockVersion.decode(readValue(buffer)!);
       case 159: 
-        return TTCycleModel.decode(readValue(buffer)!);
+        return TTLockInitParams.decode(readValue(buffer)!);
       case 160: 
-        return TTLockScanWifiEventParam.decode(readValue(buffer)!);
+        return TTGatewayInitParams.decode(readValue(buffer)!);
       case 161: 
-        return TTLockCredentialEventParam.decode(readValue(buffer)!);
+        return TTIpSetting.decode(readValue(buffer)!);
       case 162: 
-        return TTKeypadCredentialEventParam.decode(readValue(buffer)!);
+        return TTCycleModel.decode(readValue(buffer)!);
       case 163: 
-        return ControlLockResult.decode(readValue(buffer)!);
+        return TTLockScanWifiEventParam.decode(readValue(buffer)!);
       case 164: 
-        return AutoLockingTime.decode(readValue(buffer)!);
+        return TTLockCredentialEventParam.decode(readValue(buffer)!);
       case 165: 
-        return TTWifiInfoModel.decode(readValue(buffer)!);
+        return TTKeypadCredentialEventParam.decode(readValue(buffer)!);
       case 166: 
-        return CameraLockWifiResult.decode(readValue(buffer)!);
+        return ControlLockResult.decode(readValue(buffer)!);
       case 167: 
-        return TTLockSystemModel.decode(readValue(buffer)!);
+        return AutoLockingTime.decode(readValue(buffer)!);
       case 168: 
-        return AccessoryElectricQuantityResult.decode(readValue(buffer)!);
+        return TTWifiInfoModel.decode(readValue(buffer)!);
       case 169: 
-        return TTLockScanModel.decode(readValue(buffer)!);
+        return CameraLockWifiResult.decode(readValue(buffer)!);
       case 170: 
-        return TTPasscodeModel.decode(readValue(buffer)!);
+        return TTLockSystemModel.decode(readValue(buffer)!);
       case 171: 
-        return TTICCardModel.decode(readValue(buffer)!);
+        return AccessoryElectricQuantityResult.decode(readValue(buffer)!);
       case 172: 
-        return TTFingerprintModel.decode(readValue(buffer)!);
+        return TTPassageModeModel.decode(readValue(buffer)!);
       case 173: 
-        return TTGatewayScanModel.decode(readValue(buffer)!);
+        return TTLockScanModel.decode(readValue(buffer)!);
       case 174: 
-        return GatewayDeviceInfo.decode(readValue(buffer)!);
+        return TTPasscodeModel.decode(readValue(buffer)!);
       case 175: 
-        return TTRemoteAccessoryScanModel.decode(readValue(buffer)!);
+        return TTICCardModel.decode(readValue(buffer)!);
       case 176: 
-        return TTStandaloneDoorSensorScanModel.decode(readValue(buffer)!);
+        return TTFingerprintModel.decode(readValue(buffer)!);
       case 177: 
-        return TTStandaloneDoorSensorInfo.decode(readValue(buffer)!);
+        return TTGatewayScanModel.decode(readValue(buffer)!);
       case 178: 
-        return TTMeterScanModel.decode(readValue(buffer)!);
+        return GatewayDeviceInfo.decode(readValue(buffer)!);
       case 179: 
-        return TTWaterMeterInitResult.decode(readValue(buffer)!);
+        return TTRemoteAccessoryScanModel.decode(readValue(buffer)!);
       case 180: 
-        return TTElectricMeterInitResult.decode(readValue(buffer)!);
+        return TTStandaloneDoorSensorScanModel.decode(readValue(buffer)!);
       case 181: 
-        return TTWifiScanResult.decode(readValue(buffer)!);
+        return TTStandaloneDoorSensorInfo.decode(readValue(buffer)!);
       case 182: 
-        return TTWifiScanEntry.decode(readValue(buffer)!);
+        return TTMeterScanModel.decode(readValue(buffer)!);
       case 183: 
-        return RemoteKeypadInitResult.decode(readValue(buffer)!);
+        return TTWaterMeterInitResult.decode(readValue(buffer)!);
       case 184: 
-        return MultifunctionalKeypadInitResult.decode(readValue(buffer)!);
+        return TTElectricMeterInitResult.decode(readValue(buffer)!);
       case 185: 
-        return WaterMeterDeviceInfo.decode(readValue(buffer)!);
+        return TTWifiScanResult.decode(readValue(buffer)!);
       case 186: 
-        return AddCardEvent.decode(readValue(buffer)!);
+        return TTWifiScanEntry.decode(readValue(buffer)!);
       case 187: 
-        return AddFingerprintEvent.decode(readValue(buffer)!);
+        return RemoteKeypadInitResult.decode(readValue(buffer)!);
       case 188: 
+        return MultifunctionalKeypadInitResult.decode(readValue(buffer)!);
+      case 189: 
+        return WaterMeterDeviceInfo.decode(readValue(buffer)!);
+      case 190: 
+        return ElectricMeterDeviceInfo.decode(readValue(buffer)!);
+      case 191: 
+        return TTWaterMeterInitParam.decode(readValue(buffer)!);
+      case 192: 
+        return TTElectricMeterInitParam.decode(readValue(buffer)!);
+      case 193: 
+        return AddCardEvent.decode(readValue(buffer)!);
+      case 194: 
+        return AddFingerprintEvent.decode(readValue(buffer)!);
+      case 195: 
         return AddFaceEvent.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -3977,6 +4263,57 @@ class TTLockHostApi {
     }
   }
 
+  Future<int> getLightTime(String lockData) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.getLightTime$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[lockData]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else if (pigeonVar_replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (pigeonVar_replyList[0] as int?)!;
+    }
+  }
+
+  Future<void> setLightTime(int seconds, String lockData) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.setLightTime$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[seconds, lockData]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
   Future<TTLockDirection> getLockDirection(String lockData) async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.getLockDirection$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
@@ -4071,6 +4408,34 @@ class TTLockHostApi {
       );
     } else {
       return;
+    }
+  }
+
+  Future<List<TTPassageModeModel>> getPassageModes(String lockData) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.getPassageModes$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[lockData]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else if (pigeonVar_replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (pigeonVar_replyList[0] as List<Object?>?)!.cast<TTPassageModeModel>();
     }
   }
 
@@ -4492,6 +4857,34 @@ class TTLockHostApi {
       );
     } else {
       return;
+    }
+  }
+
+  Future<TTSensitivityValue> getSensitivity(String lockData) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.getSensitivity$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[lockData]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else if (pigeonVar_replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (pigeonVar_replyList[0] as TTSensitivityValue?)!;
     }
   }
 
@@ -5202,445 +5595,6 @@ class TTAccessoryHostApi {
     }
   }
 
-  Future<void> waterMeterConfigServer(String url, String clientId, String accessToken) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterConfigServer$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[url, clientId, accessToken]);
-    final List<Object?>? pigeonVar_replyList =
-        await pigeonVar_sendFuture as List<Object?>?;
-    if (pigeonVar_replyList == null) {
-      throw _createConnectionError(pigeonVar_channelName);
-    } else if (pigeonVar_replyList.length > 1) {
-      throw PlatformException(
-        code: pigeonVar_replyList[0]! as String,
-        message: pigeonVar_replyList[1] as String?,
-        details: pigeonVar_replyList[2],
-      );
-    } else {
-      return;
-    }
-  }
-
-  Future<void> waterMeterConnect(String mac) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterConnect$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac]);
-    final List<Object?>? pigeonVar_replyList =
-        await pigeonVar_sendFuture as List<Object?>?;
-    if (pigeonVar_replyList == null) {
-      throw _createConnectionError(pigeonVar_channelName);
-    } else if (pigeonVar_replyList.length > 1) {
-      throw PlatformException(
-        code: pigeonVar_replyList[0]! as String,
-        message: pigeonVar_replyList[1] as String?,
-        details: pigeonVar_replyList[2],
-      );
-    } else {
-      return;
-    }
-  }
-
-  Future<void> waterMeterDisconnect(String mac) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterDisconnect$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac]);
-    final List<Object?>? pigeonVar_replyList =
-        await pigeonVar_sendFuture as List<Object?>?;
-    if (pigeonVar_replyList == null) {
-      throw _createConnectionError(pigeonVar_channelName);
-    } else if (pigeonVar_replyList.length > 1) {
-      throw PlatformException(
-        code: pigeonVar_replyList[0]! as String,
-        message: pigeonVar_replyList[1] as String?,
-        details: pigeonVar_replyList[2],
-      );
-    } else {
-      return;
-    }
-  }
-
-  Future<TTWaterMeterInitResult> waterMeterInit(Map<String, Object?> params) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterInit$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[params]);
-    final List<Object?>? pigeonVar_replyList =
-        await pigeonVar_sendFuture as List<Object?>?;
-    if (pigeonVar_replyList == null) {
-      throw _createConnectionError(pigeonVar_channelName);
-    } else if (pigeonVar_replyList.length > 1) {
-      throw PlatformException(
-        code: pigeonVar_replyList[0]! as String,
-        message: pigeonVar_replyList[1] as String?,
-        details: pigeonVar_replyList[2],
-      );
-    } else if (pigeonVar_replyList[0] == null) {
-      throw PlatformException(
-        code: 'null-error',
-        message: 'Host platform returned null value for non-null return value.',
-      );
-    } else {
-      return (pigeonVar_replyList[0] as TTWaterMeterInitResult?)!;
-    }
-  }
-
-  Future<void> waterMeterDelete(String waterMeterId) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterDelete$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[waterMeterId]);
-    final List<Object?>? pigeonVar_replyList =
-        await pigeonVar_sendFuture as List<Object?>?;
-    if (pigeonVar_replyList == null) {
-      throw _createConnectionError(pigeonVar_channelName);
-    } else if (pigeonVar_replyList.length > 1) {
-      throw PlatformException(
-        code: pigeonVar_replyList[0]! as String,
-        message: pigeonVar_replyList[1] as String?,
-        details: pigeonVar_replyList[2],
-      );
-    } else {
-      return;
-    }
-  }
-
-  Future<void> waterMeterSetPowerOnOff(String waterMeterId, bool isOn) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterSetPowerOnOff$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[waterMeterId, isOn]);
-    final List<Object?>? pigeonVar_replyList =
-        await pigeonVar_sendFuture as List<Object?>?;
-    if (pigeonVar_replyList == null) {
-      throw _createConnectionError(pigeonVar_channelName);
-    } else if (pigeonVar_replyList.length > 1) {
-      throw PlatformException(
-        code: pigeonVar_replyList[0]! as String,
-        message: pigeonVar_replyList[1] as String?,
-        details: pigeonVar_replyList[2],
-      );
-    } else {
-      return;
-    }
-  }
-
-  Future<void> waterMeterSetRemainderM3(String waterMeterId, double remainderM3) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterSetRemainderM3$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[waterMeterId, remainderM3]);
-    final List<Object?>? pigeonVar_replyList =
-        await pigeonVar_sendFuture as List<Object?>?;
-    if (pigeonVar_replyList == null) {
-      throw _createConnectionError(pigeonVar_channelName);
-    } else if (pigeonVar_replyList.length > 1) {
-      throw PlatformException(
-        code: pigeonVar_replyList[0]! as String,
-        message: pigeonVar_replyList[1] as String?,
-        details: pigeonVar_replyList[2],
-      );
-    } else {
-      return;
-    }
-  }
-
-  Future<void> waterMeterClearRemainderM3(String waterMeterId) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterClearRemainderM3$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[waterMeterId]);
-    final List<Object?>? pigeonVar_replyList =
-        await pigeonVar_sendFuture as List<Object?>?;
-    if (pigeonVar_replyList == null) {
-      throw _createConnectionError(pigeonVar_channelName);
-    } else if (pigeonVar_replyList.length > 1) {
-      throw PlatformException(
-        code: pigeonVar_replyList[0]! as String,
-        message: pigeonVar_replyList[1] as String?,
-        details: pigeonVar_replyList[2],
-      );
-    } else {
-      return;
-    }
-  }
-
-  Future<Map<String, Object?>> waterMeterReadData(String waterMeterId) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterReadData$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[waterMeterId]);
-    final List<Object?>? pigeonVar_replyList =
-        await pigeonVar_sendFuture as List<Object?>?;
-    if (pigeonVar_replyList == null) {
-      throw _createConnectionError(pigeonVar_channelName);
-    } else if (pigeonVar_replyList.length > 1) {
-      throw PlatformException(
-        code: pigeonVar_replyList[0]! as String,
-        message: pigeonVar_replyList[1] as String?,
-        details: pigeonVar_replyList[2],
-      );
-    } else if (pigeonVar_replyList[0] == null) {
-      throw PlatformException(
-        code: 'null-error',
-        message: 'Host platform returned null value for non-null return value.',
-      );
-    } else {
-      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!.cast<String, Object?>();
-    }
-  }
-
-  Future<void> waterMeterSetPayMode(String waterMeterId, int payMode) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterSetPayMode$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[waterMeterId, payMode]);
-    final List<Object?>? pigeonVar_replyList =
-        await pigeonVar_sendFuture as List<Object?>?;
-    if (pigeonVar_replyList == null) {
-      throw _createConnectionError(pigeonVar_channelName);
-    } else if (pigeonVar_replyList.length > 1) {
-      throw PlatformException(
-        code: pigeonVar_replyList[0]! as String,
-        message: pigeonVar_replyList[1] as String?,
-        details: pigeonVar_replyList[2],
-      );
-    } else {
-      return;
-    }
-  }
-
-  Future<void> waterMeterCharge(String waterMeterId, double amount) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterCharge$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[waterMeterId, amount]);
-    final List<Object?>? pigeonVar_replyList =
-        await pigeonVar_sendFuture as List<Object?>?;
-    if (pigeonVar_replyList == null) {
-      throw _createConnectionError(pigeonVar_channelName);
-    } else if (pigeonVar_replyList.length > 1) {
-      throw PlatformException(
-        code: pigeonVar_replyList[0]! as String,
-        message: pigeonVar_replyList[1] as String?,
-        details: pigeonVar_replyList[2],
-      );
-    } else {
-      return;
-    }
-  }
-
-  Future<void> waterMeterSetTotalUsage(String waterMeterId, double totalM3) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterSetTotalUsage$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[waterMeterId, totalM3]);
-    final List<Object?>? pigeonVar_replyList =
-        await pigeonVar_sendFuture as List<Object?>?;
-    if (pigeonVar_replyList == null) {
-      throw _createConnectionError(pigeonVar_channelName);
-    } else if (pigeonVar_replyList.length > 1) {
-      throw PlatformException(
-        code: pigeonVar_replyList[0]! as String,
-        message: pigeonVar_replyList[1] as String?,
-        details: pigeonVar_replyList[2],
-      );
-    } else {
-      return;
-    }
-  }
-
-  Future<String> waterMeterGetFeatureValue(String waterMeterId) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterGetFeatureValue$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[waterMeterId]);
-    final List<Object?>? pigeonVar_replyList =
-        await pigeonVar_sendFuture as List<Object?>?;
-    if (pigeonVar_replyList == null) {
-      throw _createConnectionError(pigeonVar_channelName);
-    } else if (pigeonVar_replyList.length > 1) {
-      throw PlatformException(
-        code: pigeonVar_replyList[0]! as String,
-        message: pigeonVar_replyList[1] as String?,
-        details: pigeonVar_replyList[2],
-      );
-    } else if (pigeonVar_replyList[0] == null) {
-      throw PlatformException(
-        code: 'null-error',
-        message: 'Host platform returned null value for non-null return value.',
-      );
-    } else {
-      return (pigeonVar_replyList[0] as String?)!;
-    }
-  }
-
-  Future<WaterMeterDeviceInfo> waterMeterGetDeviceInfo(String waterMeterId) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterGetDeviceInfo$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[waterMeterId]);
-    final List<Object?>? pigeonVar_replyList =
-        await pigeonVar_sendFuture as List<Object?>?;
-    if (pigeonVar_replyList == null) {
-      throw _createConnectionError(pigeonVar_channelName);
-    } else if (pigeonVar_replyList.length > 1) {
-      throw PlatformException(
-        code: pigeonVar_replyList[0]! as String,
-        message: pigeonVar_replyList[1] as String?,
-        details: pigeonVar_replyList[2],
-      );
-    } else if (pigeonVar_replyList[0] == null) {
-      throw PlatformException(
-        code: 'null-error',
-        message: 'Host platform returned null value for non-null return value.',
-      );
-    } else {
-      return (pigeonVar_replyList[0] as WaterMeterDeviceInfo?)!;
-    }
-  }
-
-  Future<bool> waterMeterIsSupportFunction(String featureValue, int lockFunction) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterIsSupportFunction$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[featureValue, lockFunction]);
-    final List<Object?>? pigeonVar_replyList =
-        await pigeonVar_sendFuture as List<Object?>?;
-    if (pigeonVar_replyList == null) {
-      throw _createConnectionError(pigeonVar_channelName);
-    } else if (pigeonVar_replyList.length > 1) {
-      throw PlatformException(
-        code: pigeonVar_replyList[0]! as String,
-        message: pigeonVar_replyList[1] as String?,
-        details: pigeonVar_replyList[2],
-      );
-    } else if (pigeonVar_replyList[0] == null) {
-      throw PlatformException(
-        code: 'null-error',
-        message: 'Host platform returned null value for non-null return value.',
-      );
-    } else {
-      return (pigeonVar_replyList[0] as bool?)!;
-    }
-  }
-
-  Future<void> waterMeterConfigApn(String apn) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterConfigApn$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[apn]);
-    final List<Object?>? pigeonVar_replyList =
-        await pigeonVar_sendFuture as List<Object?>?;
-    if (pigeonVar_replyList == null) {
-      throw _createConnectionError(pigeonVar_channelName);
-    } else if (pigeonVar_replyList.length > 1) {
-      throw PlatformException(
-        code: pigeonVar_replyList[0]! as String,
-        message: pigeonVar_replyList[1] as String?,
-        details: pigeonVar_replyList[2],
-      );
-    } else {
-      return;
-    }
-  }
-
-  Future<void> waterMeterConfigMeterServer(String ip, String port) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterConfigMeterServer$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[ip, port]);
-    final List<Object?>? pigeonVar_replyList =
-        await pigeonVar_sendFuture as List<Object?>?;
-    if (pigeonVar_replyList == null) {
-      throw _createConnectionError(pigeonVar_channelName);
-    } else if (pigeonVar_replyList.length > 1) {
-      throw PlatformException(
-        code: pigeonVar_replyList[0]! as String,
-        message: pigeonVar_replyList[1] as String?,
-        details: pigeonVar_replyList[2],
-      );
-    } else {
-      return;
-    }
-  }
-
-  Future<void> waterMeterReset(String waterMeterId) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterReset$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[waterMeterId]);
-    final List<Object?>? pigeonVar_replyList =
-        await pigeonVar_sendFuture as List<Object?>?;
-    if (pigeonVar_replyList == null) {
-      throw _createConnectionError(pigeonVar_channelName);
-    } else if (pigeonVar_replyList.length > 1) {
-      throw PlatformException(
-        code: pigeonVar_replyList[0]! as String,
-        message: pigeonVar_replyList[1] as String?,
-        details: pigeonVar_replyList[2],
-      );
-    } else {
-      return;
-    }
-  }
-
   Future<void> electricMeterConfigServer(String url, String clientId, String accessToken) async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterConfigServer$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
@@ -5710,7 +5664,7 @@ class TTAccessoryHostApi {
     }
   }
 
-  Future<TTElectricMeterInitResult> electricMeterInit(Map<String, Object?> params) async {
+  Future<TTElectricMeterInitResult> electricMeterInit(TTElectricMeterInitParam params) async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterInit$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
@@ -5738,14 +5692,14 @@ class TTAccessoryHostApi {
     }
   }
 
-  Future<void> electricMeterDelete(String electricMeterId) async {
+  Future<void> electricMeterDelete(String mac) async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterDelete$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[electricMeterId]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -5761,14 +5715,14 @@ class TTAccessoryHostApi {
     }
   }
 
-  Future<void> electricMeterSetPowerOnOff(String electricMeterId, bool isOn) async {
+  Future<void> electricMeterSetPowerOnOff(String mac, bool isOn) async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterSetPowerOnOff$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[electricMeterId, isOn]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac, isOn]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -5784,14 +5738,14 @@ class TTAccessoryHostApi {
     }
   }
 
-  Future<void> electricMeterSetRemainderKwh(String electricMeterId, double remainderKwh) async {
+  Future<void> electricMeterSetRemainderKwh(String mac, double remainderKwh) async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterSetRemainderKwh$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[electricMeterId, remainderKwh]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac, remainderKwh]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -5807,14 +5761,14 @@ class TTAccessoryHostApi {
     }
   }
 
-  Future<void> electricMeterClearRemainderKwh(String electricMeterId) async {
+  Future<void> electricMeterClearRemainderKwh(String mac) async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterClearRemainderKwh$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[electricMeterId]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -5830,14 +5784,14 @@ class TTAccessoryHostApi {
     }
   }
 
-  Future<Map<String, Object?>> electricMeterReadData(String electricMeterId) async {
+  Future<void> electricMeterReadData(String mac) async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterReadData$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[electricMeterId]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -5848,24 +5802,19 @@ class TTAccessoryHostApi {
         message: pigeonVar_replyList[1] as String?,
         details: pigeonVar_replyList[2],
       );
-    } else if (pigeonVar_replyList[0] == null) {
-      throw PlatformException(
-        code: 'null-error',
-        message: 'Host platform returned null value for non-null return value.',
-      );
     } else {
-      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!.cast<String, Object?>();
+      return;
     }
   }
 
-  Future<void> electricMeterSetPayMode(String electricMeterId, int payMode) async {
+  Future<void> electricMeterSetPayMode(String mac, TTMeterPayMode payMode, double price) async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterSetPayMode$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[electricMeterId, payMode]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac, payMode, price]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -5881,14 +5830,14 @@ class TTAccessoryHostApi {
     }
   }
 
-  Future<void> electricMeterCharge(String electricMeterId, double amount) async {
+  Future<void> electricMeterCharge(String mac, double amount, double kwh) async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterCharge$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[electricMeterId, amount]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac, amount, kwh]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -5904,14 +5853,14 @@ class TTAccessoryHostApi {
     }
   }
 
-  Future<void> electricMeterSetMaxPower(String electricMeterId, double maxPower) async {
+  Future<void> electricMeterSetMaxPower(String mac, double maxPower) async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterSetMaxPower$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[electricMeterId, maxPower]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac, maxPower]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -5927,14 +5876,14 @@ class TTAccessoryHostApi {
     }
   }
 
-  Future<String> electricMeterGetFeatureValue(String electricMeterId) async {
+  Future<String> electricMeterGetFeatureValue(String mac) async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterGetFeatureValue$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[electricMeterId]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -5955,7 +5904,7 @@ class TTAccessoryHostApi {
     }
   }
 
-  Future<bool> electricMeterIsSupportFunction(String featureValue, int lockFunction) async {
+  Future<bool> electricMeterIsSupportFunction(String featureValue, TTElectricMeterFeature lockFunction) async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterIsSupportFunction$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
@@ -5980,6 +5929,537 @@ class TTAccessoryHostApi {
       );
     } else {
       return (pigeonVar_replyList[0] as bool?)!;
+    }
+  }
+
+  Future<ElectricMeterDeviceInfo> electricMeterGetDeviceInfo(String mac) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterGetDeviceInfo$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else if (pigeonVar_replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (pigeonVar_replyList[0] as ElectricMeterDeviceInfo?)!;
+    }
+  }
+
+  Future<void> electricMeterConfigApn(String mac, String apn) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterConfigApn$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac, apn]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
+  Future<void> electricMeterConfigMeterServer(String mac, String ip, String port) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterConfigMeterServer$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac, ip, port]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
+  Future<void> electricMeterReset(String mac) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterReset$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
+  Future<void> waterMeterConfigServer(String url, String clientId, String accessToken) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterConfigServer$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[url, clientId, accessToken]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
+  Future<void> waterMeterConnect(String mac) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterConnect$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
+  Future<void> waterMeterDisconnect(String mac) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterDisconnect$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
+  Future<TTWaterMeterInitResult> waterMeterInit(TTWaterMeterInitParam params) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterInit$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[params]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else if (pigeonVar_replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (pigeonVar_replyList[0] as TTWaterMeterInitResult?)!;
+    }
+  }
+
+  Future<void> waterMeterDelete(String mac) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterDelete$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
+  Future<void> waterMeterSetPowerOnOff(String mac, bool isOn) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterSetPowerOnOff$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac, isOn]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
+  Future<void> waterMeterSetRemainderM3(String mac, double remainderM3) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterSetRemainderM3$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac, remainderM3]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
+  Future<void> waterMeterClearRemainderM3(String mac) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterClearRemainderM3$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
+  Future<void> waterMeterReadData(String mac) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterReadData$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
+  Future<void> waterMeterSetPayMode(String mac, TTMeterPayMode payMode, double price) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterSetPayMode$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac, payMode, price]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
+  Future<void> waterMeterCharge(String mac, double amount, double m3) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterCharge$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac, amount, m3]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
+  Future<void> waterMeterSetTotalUsage(String mac, double totalM3) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterSetTotalUsage$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac, totalM3]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
+  Future<String> waterMeterGetFeatureValue(String mac) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterGetFeatureValue$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else if (pigeonVar_replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (pigeonVar_replyList[0] as String?)!;
+    }
+  }
+
+  Future<WaterMeterDeviceInfo> waterMeterGetDeviceInfo(String mac) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterGetDeviceInfo$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else if (pigeonVar_replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (pigeonVar_replyList[0] as WaterMeterDeviceInfo?)!;
+    }
+  }
+
+  Future<bool> waterMeterIsSupportFunction(String featureValue, TTWaterMeterFeature lockFunction) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterIsSupportFunction$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[featureValue, lockFunction]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else if (pigeonVar_replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (pigeonVar_replyList[0] as bool?)!;
+    }
+  }
+
+  Future<void> waterMeterConfigApn(String mac, String apn) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterConfigApn$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac, apn]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
+  Future<void> waterMeterConfigMeterServer(String mac, String ip, String port) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterConfigMeterServer$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac, ip, port]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
+  Future<void> waterMeterReset(String mac) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterReset$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else {
+      return;
     }
   }
 }
