@@ -102,7 +102,7 @@ class FingerprintList extends _$FingerprintList {
       ));
       return c.copyWith(fingerprints: list, credentialsFetchedAt: DateTime.now());
     });
-    ref.invalidate(fingerprintListProvider(lockMac));
+    ref.invalidateSelf();
   }
 
   Stream<AddFingerprintEvent> addFingerprintStream(

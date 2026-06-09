@@ -105,7 +105,7 @@ class LockSettingsPage extends ConsumerWidget {
   Future<void> _refreshCapabilities(BuildContext context, WidgetRef ref) async {
     await runSettingsOperation(
       context,
-      action: () => ref.read(lockCapabilitiesProvider(lockMac).notifier).refreshFromLock(),
+      action: () => ref.read(lockCapabilitiesProvider(lockMac).notifier).refresh(),
       successMessage: 'Capabilities refreshed',
     );
   }

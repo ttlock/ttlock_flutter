@@ -565,10 +565,10 @@ packages:
     dependency: transitive
     description:
       name: permission_handler_apple
-      sha256: f000131e755c54cf4d84a5d8bd6e4149e262cc31c5a8b1d698de1ac85fa41023
+      sha256: e20daf680eef1ca62ffe8c8c526b778cc386d50137c77ac71c8ec9c88c13fb9d
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "9.4.7"
+    version: "9.4.9"
   permission_handler_html:
     dependency: transitive
     description:
@@ -869,7 +869,7 @@ packages:
     description:
       path: "."
       ref: premise
-      resolved-ref: "855f0c91150cc7ff2f0172499f6c0617e63b4494"
+      resolved-ref: "69caff6a57cb176812b94af59dd2051c9fe3f4a2"
       url: "https://github.com/2000Heart/ttlock_flutter_android.git"
     source: git
     version: "0.0.3"
@@ -887,7 +887,7 @@ packages:
     description:
       path: ttlock_flutter_ohos
       ref: mix
-      resolved-ref: "1be1f9fd4337442151175ccb96fd507e73be854e"
+      resolved-ref: "0baabf37ef9034e7e9ffda3e76bc904c398cf24f"
       url: "https://github.com/ttlock/ttlock_flutter.git"
     source: git
     version: "0.0.1"
@@ -896,7 +896,7 @@ packages:
     description:
       path: ttlock_flutter_platform_interface
       ref: mix
-      resolved-ref: "1be1f9fd4337442151175ccb96fd507e73be854e"
+      resolved-ref: "0baabf37ef9034e7e9ffda3e76bc904c398cf24f"
       url: "https://github.com/ttlock/ttlock_flutter.git"
     source: git
     version: "0.0.3"

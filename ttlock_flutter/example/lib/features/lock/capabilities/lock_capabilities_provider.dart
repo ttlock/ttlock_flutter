@@ -18,10 +18,10 @@ class LockCapabilities extends _$LockCapabilities {
 
     final lock = await ref.read(lockByMacProvider(lockMac).future);
     if (lock == null) return {};
-    return refreshFromLock(showLoader: false);
+    return refreshFromLock();
   }
 
-  Future<Set<TTLockFunction>> refreshFromLock({bool showLoader = true}) async {
+  Future<Set<TTLockFunction>> refreshFromLock() async {
     final lock = await ref.read(lockByMacProvider(lockMac).future);
     if (lock == null) return {};
 
@@ -35,8 +35,13 @@ class LockCapabilities extends _$LockCapabilities {
             capabilitiesProbedAt: now,
           ),
         );
-
-    ref.invalidateSelf();
     return supported;
   }
+
+  Future<void> refresh() async {
+    await refreshFromLock();
+    ref.invalidateSelf();
+  }
 }
+
+

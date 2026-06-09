@@ -91,7 +91,7 @@ class CardList extends _$CardList {
       list.add(CachedCard(cardNumber: cardNumber, startDate: start, endDate: end));
       return c.copyWith(cards: list, credentialsFetchedAt: DateTime.now());
     });
-    ref.invalidate(cardListProvider(lockMac));
+    ref.invalidateSelf();
   }
 
   Stream<AddCardEvent> addCardStream(
