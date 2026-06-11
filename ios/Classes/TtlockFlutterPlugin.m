@@ -527,6 +527,8 @@ ErrorDeviceKey
                  resultDict[@"hardwareRevision"] = systemInfoModel.hardwareRevision;
                  resultDict[@"firmwareRevision"] = systemInfoModel.firmwareRevision;
                  resultDict[@"networkMac"] = mac;
+                 resultDict[@"pinCode"] = systemInfoModel.pinCode;
+                 resultDict[@"mtCode"] = systemInfoModel.mtCode;
                  
                  [weakSelf successCallbackCommand:command data:resultDict];
              }else{
