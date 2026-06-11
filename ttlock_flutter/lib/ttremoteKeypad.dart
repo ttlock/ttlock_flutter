@@ -151,10 +151,12 @@ class TTRemoteKeypad {
         )
         .listen(
       (event) {
-        if (event.isProgress) {
-          progressCallback(event.currentCount!, event.totalCount!);
-        } else {
-          callback(event.fingerprintNumber!);
+        switch (event.phase) {
+          case TTAddFingerprintPhase.waiting:
+          case TTAddFingerprintPhase.collecting:
+            progressCallback(event.currentCount ?? 0, event.totalCount ?? 0);
+          case TTAddFingerprintPhase.success:
+            callback(event.fingerprintNumber!);
         }
       },
       onError: (e) {
@@ -194,10 +196,11 @@ class TTRemoteKeypad {
         )
         .listen(
       (event) {
-        if (event.isProgress) {
-          progressCallback();
-        } else {
-          callback(event.cardNumber!);
+        switch (event.phase) {
+          case TTAddCardPhase.waiting:
+            progressCallback();
+          case TTAddCardPhase.success:
+            callback(event.cardNumber!);
         }
       },
       onError: (e) {

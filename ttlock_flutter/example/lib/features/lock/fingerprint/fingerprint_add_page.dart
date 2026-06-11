@@ -50,26 +50,28 @@ class _FingerprintAddPageState extends ConsumerState<FingerprintAddPage> {
         .listen(
       (event) async {
         if (!mounted) return;
-        if (event.isProgress) {
-          final total = event.totalCount ?? 1;
-          final current = event.currentCount ?? 0;
-          setState(() {
-            _message = 'Scan $current / $total';
-            _progress = total > 0 ? current / total : null;
-          });
-        }
-        if (event.fingerprintNumber != null) {
-          await ref.read(fingerprintListProvider(widget.lockMac).notifier).onFingerprintAdded(
-                widget.lockMac,
-                event.fingerprintNumber!,
-                range.startDate,
-                range.endDate,
-              );
-          toastification.show(
-            title: Text('Fingerprint added: ${event.fingerprintNumber}'),
-            type: ToastificationType.success,
-          );
-          Navigator.pop(context);
+        switch (event.phase) {
+          case TTAddFingerprintPhase.waiting:
+          case TTAddFingerprintPhase.collecting:
+            final total = event.totalCount ?? 1;
+            final current = event.currentCount ?? 0;
+            setState(() {
+              _message = 'Scan $current / $total';
+              _progress = event.collectionProgress;
+            });
+          case TTAddFingerprintPhase.success:
+            final fingerprintNumber = event.credentialNumber!;
+            await ref.read(fingerprintListProvider(widget.lockMac).notifier).onFingerprintAdded(
+                  widget.lockMac,
+                  fingerprintNumber,
+                  range.startDate,
+                  range.endDate,
+                );
+            toastification.show(
+              title: Text('Fingerprint added: $fingerprintNumber'),
+              type: ToastificationType.success,
+            );
+            Navigator.pop(context);
         }
       },
       onError: (e) {

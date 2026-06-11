@@ -283,10 +283,11 @@ class TTLock {
         )
         .listen(
           (e) {
-            if (e.isProgress) {
-              progressCallback();
-            } else {
-              callback(e.cardNumber!);
+            switch (e.phase) {
+              case TTAddCardPhase.waiting:
+                progressCallback();
+              case TTAddCardPhase.success:
+                callback(e.cardNumber!);
             }
           },
           onError: (err) {
@@ -416,10 +417,12 @@ class TTLock {
         )
         .listen(
           (e) {
-            if (e.isProgress) {
-              progressCallback(e.currentCount!, e.totalCount!);
-            } else {
-              callback(e.fingerprintNumber!);
+            switch (e.phase) {
+              case TTAddFingerprintPhase.waiting:
+              case TTAddFingerprintPhase.collecting:
+                progressCallback(e.currentCount ?? 0, e.totalCount ?? 0);
+              case TTAddFingerprintPhase.success:
+                callback(e.fingerprintNumber!);
             }
           },
           onError: (err) {
@@ -1193,10 +1196,17 @@ class TTLock {
         )
         .listen(
           (e) {
-            if (e.isProgress) {
-              progressCallback(e.state!, e.errorCode!);
-            } else {
-              callback(e.faceNumber!);
+            switch (e.phase) {
+              case TTAddFacePhase.canStartAdd:
+              case TTAddFacePhase.error:
+                progressCallback(e.legacyFaceState!, e.errorCode!);
+              case TTAddFacePhase.collecting:
+                progressCallback(
+                  TTFaceState.canStartAdd,
+                  e.errorCode ?? TTFaceErrorCode.normal,
+                );
+              case TTAddFacePhase.success:
+                callback(e.faceNumber!);
             }
           },
           onError: (err) {

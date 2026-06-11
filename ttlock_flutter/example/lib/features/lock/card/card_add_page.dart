@@ -49,21 +49,22 @@ class _CardAddPageState extends ConsumerState<CardAddPage> {
         .listen(
       (event) async {
         if (!mounted) return;
-        if (event.isProgress) {
-          setState(() => _message = 'Reading card…');
-        }
-        if (event.cardNumber != null) {
-          await ref.read(cardListProvider(widget.lockMac).notifier).onCardAdded(
-                widget.lockMac,
-                event.cardNumber!,
-                range.startDate,
-                range.endDate,
-              );
-          toastification.show(
-            title: Text('Card added: ${event.cardNumber}'),
-            type: ToastificationType.success,
-          );
-          Navigator.pop(context);
+        switch (event.phase) {
+          case TTAddCardPhase.waiting:
+            setState(() => _message = 'Reading card…');
+          case TTAddCardPhase.success:
+            final cardNumber = event.credentialNumber!;
+            await ref.read(cardListProvider(widget.lockMac).notifier).onCardAdded(
+                  widget.lockMac,
+                  cardNumber,
+                  range.startDate,
+                  range.endDate,
+                );
+            toastification.show(
+              title: Text('Card added: $cardNumber'),
+              type: ToastificationType.success,
+            );
+            Navigator.pop(context);
         }
       },
       onError: (e) {

@@ -564,24 +564,61 @@ class TTElectricMeterInitParam {
 }
 
 // Event Models
+
+/// 刷卡录入流阶段。
+enum TTAddCardPhase {
+  /// 已进入刷卡模式，等待用户刷卡。
+  waiting,
+
+  /// 刷卡成功，[AddCardEvent.cardNumber] 有效。
+  success,
+}
+
+/// 指纹录入流阶段。
+enum TTAddFingerprintPhase {
+  /// 已进入录入模式，等待首次按压。
+  waiting,
+
+  /// 采集中，见 [AddFingerprintEvent.currentCount] / [totalCount]。
+  collecting,
+
+  /// 录入成功，[AddFingerprintEvent.fingerprintNumber] 有效。
+  success,
+}
+
+/// 人脸录入流阶段。
+enum TTAddFacePhase {
+  /// 可开始人脸采集。
+  canStartAdd,
+
+  /// 采集中，见 [AddFaceEvent.errorCode] 获取实时反馈。
+  collecting,
+
+  /// 采集异常，见 [AddFaceEvent.errorCode]。
+  error,
+
+  /// 录入成功，[AddFaceEvent.faceNumber] 有效。
+  success,
+}
+
 class AddCardEvent {
-  final bool isProgress;
+  final TTAddCardPhase phase;
   final String? cardNumber;
 
   AddCardEvent({
-    required this.isProgress,
+    required this.phase,
     this.cardNumber,
   });
 }
 
 class AddFingerprintEvent {
-  final bool isProgress;
+  final TTAddFingerprintPhase phase;
   final int? currentCount;
   final int? totalCount;
   final String? fingerprintNumber;
 
   AddFingerprintEvent({
-    required this.isProgress,
+    required this.phase,
     this.currentCount,
     this.totalCount,
     this.fingerprintNumber,
@@ -589,14 +626,12 @@ class AddFingerprintEvent {
 }
 
 class AddFaceEvent {
-  final bool isProgress;
-  final TTFaceState? state;
+  final TTAddFacePhase phase;
   final TTFaceErrorCode? errorCode;
   final String? faceNumber;
 
   AddFaceEvent({
-    required this.isProgress,
-    this.state,
+    required this.phase,
     this.errorCode,
     this.faceNumber,
   });

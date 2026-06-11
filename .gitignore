@@ -25,3 +25,4 @@ migrate_working_dir/
 
 # FVM Version Cache
 .fvm/
+*.code-workspace

@@ -43,6 +43,87 @@ function wrapError(error: Error): Array<Object> {
   return errorList;
 }
 
+/*
+*  刷卡录入流阶段。
+* 
+*  Generated enum from Pigeon that represents data sent in messages.
+*/
+export enum TTAddCardPhase {
+  /* 已进入刷卡模式，等待用户刷卡。*/
+  WAITING,
+  /* 刷卡成功，[AddCardEvent.cardNumber] 有效。*/
+  SUCCESS
+}
+
+/*
+*  刷卡录入流阶段。
+* 
+*  Generated enum Companion class from Pigeon that represents data sent 
+   in messages.Do not delete otherwise enum type data transfer will be failed
+*/
+export class TTAddCardPhaseEnum {
+  index: string|null = null;
+	constructor(index: string){
+    this.index = index;
+  }
+}
+
+/*
+*  指纹录入流阶段。
+* 
+*  Generated enum from Pigeon that represents data sent in messages.
+*/
+export enum TTAddFingerprintPhase {
+  /* 已进入录入模式，等待首次按压。*/
+  WAITING,
+  /* 采集中，见 [AddFingerprintEvent.currentCount] / [totalCount]。*/
+  COLLECTING,
+  /* 录入成功，[AddFingerprintEvent.fingerprintNumber] 有效。*/
+  SUCCESS
+}
+
+/*
+*  指纹录入流阶段。
+* 
+*  Generated enum Companion class from Pigeon that represents data sent 
+   in messages.Do not delete otherwise enum type data transfer will be failed
+*/
+export class TTAddFingerprintPhaseEnum {
+  index: string|null = null;
+	constructor(index: string){
+    this.index = index;
+  }
+}
+
+/*
+*  人脸录入流阶段。
+* 
+*  Generated enum from Pigeon that represents data sent in messages.
+*/
+export enum TTAddFacePhase {
+  /* 可开始人脸采集。*/
+  CAN_START_ADD,
+  /* 采集中，见 [AddFaceEvent.errorCode] 获取实时反馈。*/
+  COLLECTING,
+  /* 采集异常，见 [AddFaceEvent.errorCode]。*/
+  ERROR,
+  /* 录入成功，[AddFaceEvent.faceNumber] 有效。*/
+  SUCCESS
+}
+
+/*
+*  人脸录入流阶段。
+* 
+*  Generated enum Companion class from Pigeon that represents data sent 
+   in messages.Do not delete otherwise enum type data transfer will be failed
+*/
+export class TTAddFacePhaseEnum {
+  index: string|null = null;
+	constructor(index: string){
+    this.index = index;
+  }
+}
+
 /* Generated enum from Pigeon that represents data sent in messages.*/
 export enum TTBluetoothState {
   UNKNOW,
@@ -3797,14 +3878,14 @@ export class TTElectricMeterInitParam {
 
 /* Generated class from Pigeon that represents data sent in messages.*/
 export class AddCardEvent {
-  private isProgress?: boolean;
+  private phase?: TTAddCardPhase;
 
-  public setIsProgress(isProgress:boolean):void {
-    this.isProgress = isProgress;
+  public setPhase(phase:TTAddCardPhase):void {
+    this.phase = phase;
   }
 
-  getIsProgress(): boolean | undefined{
-    return this.isProgress;
+  getPhase(): TTAddCardPhase | undefined{
+    return this.phase;
   }
 
   private cardNumber?: string;
@@ -3817,15 +3898,16 @@ export class AddCardEvent {
     return this.cardNumber;
   }
 
-  constructor(isProgress?: boolean, cardNumber?: string) {
-    this.isProgress = isProgress;
+  constructor(phase?: TTAddCardPhase, cardNumber?: string) {
+    this.phase = phase;
     this.cardNumber = cardNumber;
   }
 
   toList(): Object[] {
     let arr: Object[] = new Array();
-    if(this.isProgress !==undefined){
-      arr.push(this.isProgress);
+    if(this.phase !==undefined){
+      const phaseStr = TTAddCardPhase[this.phase as number];
+      arr.push(new TTAddCardPhaseEnum(phaseStr));
     }
     if(this.cardNumber !==undefined){
       arr.push(this.cardNumber);
@@ -3835,8 +3917,8 @@ export class AddCardEvent {
 
   static fromList(arr: Object[]): AddCardEvent {
     let pigeonResult: AddCardEvent = new AddCardEvent();
-    let isProgress: Object = arr[0];
-    pigeonResult.setIsProgress(isProgress as boolean);
+    const phaseStr: string = arr[0]! as string;
+    pigeonResult.setPhase(TTAddCardPhase[phaseStr]);
     let cardNumber: Object = arr[1];
     pigeonResult.setCardNumber(cardNumber as string);
     return pigeonResult;
@@ -3845,14 +3927,14 @@ export class AddCardEvent {
 
 /* Generated class from Pigeon that represents data sent in messages.*/
 export class AddFingerprintEvent {
-  private isProgress?: boolean;
+  private phase?: TTAddFingerprintPhase;
 
-  public setIsProgress(isProgress:boolean):void {
-    this.isProgress = isProgress;
+  public setPhase(phase:TTAddFingerprintPhase):void {
+    this.phase = phase;
   }
 
-  getIsProgress(): boolean | undefined{
-    return this.isProgress;
+  getPhase(): TTAddFingerprintPhase | undefined{
+    return this.phase;
   }
 
   private currentCount?: number;
@@ -3885,8 +3967,8 @@ export class AddFingerprintEvent {
     return this.fingerprintNumber;
   }
 
-  constructor(isProgress?: boolean, currentCount?: number, totalCount?: number, fingerprintNumber?: string) {
-    this.isProgress = isProgress;
+  constructor(phase?: TTAddFingerprintPhase, currentCount?: number, totalCount?: number, fingerprintNumber?: string) {
+    this.phase = phase;
     this.currentCount = currentCount;
     this.totalCount = totalCount;
     this.fingerprintNumber = fingerprintNumber;
@@ -3894,8 +3976,9 @@ export class AddFingerprintEvent {
 
   toList(): Object[] {
     let arr: Object[] = new Array();
-    if(this.isProgress !==undefined){
-      arr.push(this.isProgress);
+    if(this.phase !==undefined){
+      const phaseStr = TTAddFingerprintPhase[this.phase as number];
+      arr.push(new TTAddFingerprintPhaseEnum(phaseStr));
     }
     if(this.currentCount !==undefined){
       arr.push(this.currentCount);
@@ -3911,8 +3994,8 @@ export class AddFingerprintEvent {
 
   static fromList(arr: Object[]): AddFingerprintEvent {
     let pigeonResult: AddFingerprintEvent = new AddFingerprintEvent();
-    let isProgress: Object = arr[0];
-    pigeonResult.setIsProgress(isProgress as boolean);
+    const phaseStr: string = arr[0]! as string;
+    pigeonResult.setPhase(TTAddFingerprintPhase[phaseStr]);
     let currentCount: Object = arr[1];
     pigeonResult.setCurrentCount(currentCount as number);
     let totalCount: Object = arr[2];
@@ -3925,24 +4008,14 @@ export class AddFingerprintEvent {
 
 /* Generated class from Pigeon that represents data sent in messages.*/
 export class AddFaceEvent {
-  private isProgress?: boolean;
+  private phase?: TTAddFacePhase;
 
-  public setIsProgress(isProgress:boolean):void {
-    this.isProgress = isProgress;
+  public setPhase(phase:TTAddFacePhase):void {
+    this.phase = phase;
   }
 
-  getIsProgress(): boolean | undefined{
-    return this.isProgress;
-  }
-
-  private state?: TTFaceState;
-
-  public setState(state:TTFaceState):void {
-    this.state = state;
-  }
-
-  getState(): TTFaceState | undefined{
-    return this.state;
+  getPhase(): TTAddFacePhase | undefined{
+    return this.phase;
   }
 
   private errorCode?: TTFaceErrorCode;
@@ -3965,21 +4038,17 @@ export class AddFaceEvent {
     return this.faceNumber;
   }
 
-  constructor(isProgress?: boolean, state?: TTFaceState, errorCode?: TTFaceErrorCode, faceNumber?: string) {
-    this.isProgress = isProgress;
-    this.state = state;
+  constructor(phase?: TTAddFacePhase, errorCode?: TTFaceErrorCode, faceNumber?: string) {
+    this.phase = phase;
     this.errorCode = errorCode;
     this.faceNumber = faceNumber;
   }
 
   toList(): Object[] {
     let arr: Object[] = new Array();
-    if(this.isProgress !==undefined){
-      arr.push(this.isProgress);
-    }
-    if(this.state !==undefined){
-      const stateStr = TTFaceState[this.state as number];
-      arr.push(new TTFaceStateEnum(stateStr));
+    if(this.phase !==undefined){
+      const phaseStr = TTAddFacePhase[this.phase as number];
+      arr.push(new TTAddFacePhaseEnum(phaseStr));
     }
     if(this.errorCode !==undefined){
       const errorCodeStr = TTFaceErrorCode[this.errorCode as number];
@@ -3993,13 +4062,11 @@ export class AddFaceEvent {
 
   static fromList(arr: Object[]): AddFaceEvent {
     let pigeonResult: AddFaceEvent = new AddFaceEvent();
-    let isProgress: Object = arr[0];
-    pigeonResult.setIsProgress(isProgress as boolean);
-    const stateStr: string = arr[1]! as string;
-    pigeonResult.setState(TTFaceState[stateStr]);
-    const errorCodeStr: string = arr[2]! as string;
+    const phaseStr: string = arr[0]! as string;
+    pigeonResult.setPhase(TTAddFacePhase[phaseStr]);
+    const errorCodeStr: string = arr[1]! as string;
     pigeonResult.setErrorCode(TTFaceErrorCode[errorCodeStr]);
-    let faceNumber: Object = arr[3];
+    let faceNumber: Object = arr[2];
     pigeonResult.setFaceNumber(faceNumber as string);
     return pigeonResult;
   }
@@ -4021,195 +4088,207 @@ export class PigeonCodec extends StandardMessageCodec {
     switch (type) {
       case this.getByte(129): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTBluetoothState[value as number];
+        return value == null ? null : TTAddCardPhase[value as number];
       }
       case this.getByte(130): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTPasscodeType[value as number];
+        return value == null ? null : TTAddFingerprintPhase[value as number];
       }
       case this.getByte(131): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTOperateRecordType[value as number];
+        return value == null ? null : TTAddFacePhase[value as number];
       }
       case this.getByte(132): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTControlAction[value as number];
+        return value == null ? null : TTBluetoothState[value as number];
       }
       case this.getByte(133): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTLockSwitchState[value as number];
+        return value == null ? null : TTPasscodeType[value as number];
       }
       case this.getByte(134): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTPassageModeType[value as number];
+        return value == null ? null : TTOperateRecordType[value as number];
       }
       case this.getByte(135): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTLockConfig[value as number];
+        return value == null ? null : TTControlAction[value as number];
       }
       case this.getByte(136): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTLockDirection[value as number];
+        return value == null ? null : TTLockSwitchState[value as number];
       }
       case this.getByte(137): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTSoundVolumeType[value as number];
+        return value == null ? null : TTPassageModeType[value as number];
       }
       case this.getByte(138): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTSensitivityValue[value as number];
+        return value == null ? null : TTLockConfig[value as number];
       }
       case this.getByte(139): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTLockError[value as number];
+        return value == null ? null : TTLockDirection[value as number];
       }
       case this.getByte(140): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTErrorDevice[value as number];
+        return value == null ? null : TTSoundVolumeType[value as number];
       }
       case this.getByte(141): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTLiftWorkActivateType[value as number];
+        return value == null ? null : TTSensitivityValue[value as number];
       }
       case this.getByte(142): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTPowerSaverWorkType[value as number];
+        return value == null ? null : TTLockError[value as number];
       }
       case this.getByte(143): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTGatewayType[value as number];
+        return value == null ? null : TTErrorDevice[value as number];
       }
       case this.getByte(144): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTGatewayConnectStatus[value as number];
+        return value == null ? null : TTLiftWorkActivateType[value as number];
       }
       case this.getByte(145): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTGatewayError[value as number];
+        return value == null ? null : TTPowerSaverWorkType[value as number];
       }
       case this.getByte(146): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTRemoteAccessoryError[value as number];
+        return value == null ? null : TTGatewayType[value as number];
       }
       case this.getByte(147): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTMultifunctionalKeypadError[value as number];
+        return value == null ? null : TTGatewayConnectStatus[value as number];
       }
       case this.getByte(148): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTRemoteAccessory[value as number];
+        return value == null ? null : TTGatewayError[value as number];
       }
       case this.getByte(149): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTIpSettingType[value as number];
+        return value == null ? null : TTRemoteAccessoryError[value as number];
       }
       case this.getByte(150): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTNbAwakeMode[value as number];
+        return value == null ? null : TTMultifunctionalKeypadError[value as number];
       }
       case this.getByte(151): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTNbAwakeTimeType[value as number];
+        return value == null ? null : TTRemoteAccessory[value as number];
       }
       case this.getByte(152): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTLockFunction[value as number];
+        return value == null ? null : TTIpSettingType[value as number];
       }
       case this.getByte(153): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTFaceState[value as number];
+        return value == null ? null : TTNbAwakeMode[value as number];
       }
       case this.getByte(154): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTWaterMeterFeature[value as number];
+        return value == null ? null : TTNbAwakeTimeType[value as number];
       }
       case this.getByte(155): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTElectricMeterFeature[value as number];
+        return value == null ? null : TTLockFunction[value as number];
       }
       case this.getByte(156): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTMeterPayMode[value as number];
+        return value == null ? null : TTFaceState[value as number];
       }
       case this.getByte(157): {
         let value: Object= super.readValue(buffer);
+        return value == null ? null : TTWaterMeterFeature[value as number];
+      }
+      case this.getByte(158): {
+        let value: Object= super.readValue(buffer);
+        return value == null ? null : TTElectricMeterFeature[value as number];
+      }
+      case this.getByte(159): {
+        let value: Object= super.readValue(buffer);
+        return value == null ? null : TTMeterPayMode[value as number];
+      }
+      case this.getByte(160): {
+        let value: Object= super.readValue(buffer);
         return value == null ? null : TTFaceErrorCode[value as number];
       }
-      case this.getByte(158):
-        return TTLockVersion.fromList(super.readValue(buffer) as Object[]);
-      case this.getByte(159):
-        return TTLockInitParams.fromList(super.readValue(buffer) as Object[]);
-      case this.getByte(160):
-        return TTGatewayInitParams.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(161):
-        return TTIpSetting.fromList(super.readValue(buffer) as Object[]);
+        return TTLockVersion.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(162):
-        return TTCycleModel.fromList(super.readValue(buffer) as Object[]);
+        return TTLockInitParams.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(163):
-        return TTLockScanWifiEventParam.fromList(super.readValue(buffer) as Object[]);
+        return TTGatewayInitParams.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(164):
-        return TTLockCredentialEventParam.fromList(super.readValue(buffer) as Object[]);
+        return TTIpSetting.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(165):
-        return TTKeypadCredentialEventParam.fromList(super.readValue(buffer) as Object[]);
+        return TTCycleModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(166):
-        return ControlLockResult.fromList(super.readValue(buffer) as Object[]);
+        return TTLockScanWifiEventParam.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(167):
-        return AutoLockingTime.fromList(super.readValue(buffer) as Object[]);
+        return TTLockCredentialEventParam.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(168):
-        return TTWifiInfoModel.fromList(super.readValue(buffer) as Object[]);
+        return TTKeypadCredentialEventParam.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(169):
-        return CameraLockWifiResult.fromList(super.readValue(buffer) as Object[]);
+        return ControlLockResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(170):
-        return TTLockSystemModel.fromList(super.readValue(buffer) as Object[]);
+        return AutoLockingTime.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(171):
-        return AccessoryElectricQuantityResult.fromList(super.readValue(buffer) as Object[]);
+        return TTWifiInfoModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(172):
-        return TTPassageModeModel.fromList(super.readValue(buffer) as Object[]);
+        return CameraLockWifiResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(173):
-        return TTLockScanModel.fromList(super.readValue(buffer) as Object[]);
+        return TTLockSystemModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(174):
-        return TTPasscodeModel.fromList(super.readValue(buffer) as Object[]);
+        return AccessoryElectricQuantityResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(175):
-        return TTICCardModel.fromList(super.readValue(buffer) as Object[]);
+        return TTPassageModeModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(176):
-        return TTFingerprintModel.fromList(super.readValue(buffer) as Object[]);
+        return TTLockScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(177):
-        return TTGatewayScanModel.fromList(super.readValue(buffer) as Object[]);
+        return TTPasscodeModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(178):
-        return GatewayDeviceInfo.fromList(super.readValue(buffer) as Object[]);
+        return TTICCardModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(179):
-        return TTRemoteAccessoryScanModel.fromList(super.readValue(buffer) as Object[]);
+        return TTFingerprintModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(180):
-        return TTStandaloneDoorSensorScanModel.fromList(super.readValue(buffer) as Object[]);
+        return TTGatewayScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(181):
-        return TTStandaloneDoorSensorInfo.fromList(super.readValue(buffer) as Object[]);
+        return GatewayDeviceInfo.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(182):
-        return TTMeterScanModel.fromList(super.readValue(buffer) as Object[]);
+        return TTRemoteAccessoryScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(183):
-        return TTWaterMeterInitResult.fromList(super.readValue(buffer) as Object[]);
+        return TTStandaloneDoorSensorScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(184):
-        return TTElectricMeterInitResult.fromList(super.readValue(buffer) as Object[]);
+        return TTStandaloneDoorSensorInfo.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(185):
-        return TTWifiScanResult.fromList(super.readValue(buffer) as Object[]);
+        return TTMeterScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(186):
-        return TTWifiScanEntry.fromList(super.readValue(buffer) as Object[]);
+        return TTWaterMeterInitResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(187):
-        return RemoteKeypadInitResult.fromList(super.readValue(buffer) as Object[]);
+        return TTElectricMeterInitResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(188):
-        return MultifunctionalKeypadInitResult.fromList(super.readValue(buffer) as Object[]);
+        return TTWifiScanResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(189):
-        return WaterMeterDeviceInfo.fromList(super.readValue(buffer) as Object[]);
+        return TTWifiScanEntry.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(190):
-        return ElectricMeterDeviceInfo.fromList(super.readValue(buffer) as Object[]);
+        return RemoteKeypadInitResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(191):
-        return TTWaterMeterInitParam.fromList(super.readValue(buffer) as Object[]);
+        return MultifunctionalKeypadInitResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(192):
-        return TTElectricMeterInitParam.fromList(super.readValue(buffer) as Object[]);
+        return WaterMeterDeviceInfo.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(193):
-        return AddCardEvent.fromList(super.readValue(buffer) as Object[]);
+        return ElectricMeterDeviceInfo.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(194):
-        return AddFingerprintEvent.fromList(super.readValue(buffer) as Object[]);
+        return TTWaterMeterInitParam.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(195):
+        return TTElectricMeterInitParam.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(196):
+        return AddCardEvent.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(197):
+        return AddFingerprintEvent.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(198):
         return AddFaceEvent.fromList(super.readValue(buffer) as Object[]);
       default:
         return super.readValueOfType(type, buffer);
@@ -4217,206 +4296,215 @@ export class PigeonCodec extends StandardMessageCodec {
   }
 
   writeValue(stream: ByteBuffer , value: ESObject): ESObject{
-    if (value instanceof TTBluetoothStateEnum) {
+    if (value instanceof TTAddCardPhaseEnum) {
       stream.writeUint8(this.getByte(129));
+      this.writeValue(stream, value == null ? null : TTAddCardPhase[value.index as string]);
+    } else if (value instanceof TTAddFingerprintPhaseEnum) {
+      stream.writeUint8(this.getByte(130));
+      this.writeValue(stream, value == null ? null : TTAddFingerprintPhase[value.index as string]);
+    } else if (value instanceof TTAddFacePhaseEnum) {
+      stream.writeUint8(this.getByte(131));
+      this.writeValue(stream, value == null ? null : TTAddFacePhase[value.index as string]);
+    } else if (value instanceof TTBluetoothStateEnum) {
+      stream.writeUint8(this.getByte(132));
       this.writeValue(stream, value == null ? null : TTBluetoothState[value.index as string]);
     } else if (value instanceof TTPasscodeTypeEnum) {
-      stream.writeUint8(this.getByte(130));
+      stream.writeUint8(this.getByte(133));
       this.writeValue(stream, value == null ? null : TTPasscodeType[value.index as string]);
     } else if (value instanceof TTOperateRecordTypeEnum) {
-      stream.writeUint8(this.getByte(131));
+      stream.writeUint8(this.getByte(134));
       this.writeValue(stream, value == null ? null : TTOperateRecordType[value.index as string]);
     } else if (value instanceof TTControlActionEnum) {
-      stream.writeUint8(this.getByte(132));
+      stream.writeUint8(this.getByte(135));
       this.writeValue(stream, value == null ? null : TTControlAction[value.index as string]);
     } else if (value instanceof TTLockSwitchStateEnum) {
-      stream.writeUint8(this.getByte(133));
+      stream.writeUint8(this.getByte(136));
       this.writeValue(stream, value == null ? null : TTLockSwitchState[value.index as string]);
     } else if (value instanceof TTPassageModeTypeEnum) {
-      stream.writeUint8(this.getByte(134));
+      stream.writeUint8(this.getByte(137));
       this.writeValue(stream, value == null ? null : TTPassageModeType[value.index as string]);
     } else if (value instanceof TTLockConfigEnum) {
-      stream.writeUint8(this.getByte(135));
+      stream.writeUint8(this.getByte(138));
       this.writeValue(stream, value == null ? null : TTLockConfig[value.index as string]);
     } else if (value instanceof TTLockDirectionEnum) {
-      stream.writeUint8(this.getByte(136));
+      stream.writeUint8(this.getByte(139));
       this.writeValue(stream, value == null ? null : TTLockDirection[value.index as string]);
     } else if (value instanceof TTSoundVolumeTypeEnum) {
-      stream.writeUint8(this.getByte(137));
+      stream.writeUint8(this.getByte(140));
       this.writeValue(stream, value == null ? null : TTSoundVolumeType[value.index as string]);
     } else if (value instanceof TTSensitivityValueEnum) {
-      stream.writeUint8(this.getByte(138));
+      stream.writeUint8(this.getByte(141));
       this.writeValue(stream, value == null ? null : TTSensitivityValue[value.index as string]);
     } else if (value instanceof TTLockErrorEnum) {
-      stream.writeUint8(this.getByte(139));
+      stream.writeUint8(this.getByte(142));
       this.writeValue(stream, value == null ? null : TTLockError[value.index as string]);
     } else if (value instanceof TTErrorDeviceEnum) {
-      stream.writeUint8(this.getByte(140));
+      stream.writeUint8(this.getByte(143));
       this.writeValue(stream, value == null ? null : TTErrorDevice[value.index as string]);
     } else if (value instanceof TTLiftWorkActivateTypeEnum) {
-      stream.writeUint8(this.getByte(141));
+      stream.writeUint8(this.getByte(144));
       this.writeValue(stream, value == null ? null : TTLiftWorkActivateType[value.index as string]);
     } else if (value instanceof TTPowerSaverWorkTypeEnum) {
-      stream.writeUint8(this.getByte(142));
+      stream.writeUint8(this.getByte(145));
       this.writeValue(stream, value == null ? null : TTPowerSaverWorkType[value.index as string]);
     } else if (value instanceof TTGatewayTypeEnum) {
-      stream.writeUint8(this.getByte(143));
+      stream.writeUint8(this.getByte(146));
       this.writeValue(stream, value == null ? null : TTGatewayType[value.index as string]);
     } else if (value instanceof TTGatewayConnectStatusEnum) {
-      stream.writeUint8(this.getByte(144));
+      stream.writeUint8(this.getByte(147));
       this.writeValue(stream, value == null ? null : TTGatewayConnectStatus[value.index as string]);
     } else if (value instanceof TTGatewayErrorEnum) {
-      stream.writeUint8(this.getByte(145));
+      stream.writeUint8(this.getByte(148));
       this.writeValue(stream, value == null ? null : TTGatewayError[value.index as string]);
     } else if (value instanceof TTRemoteAccessoryErrorEnum) {
-      stream.writeUint8(this.getByte(146));
+      stream.writeUint8(this.getByte(149));
       this.writeValue(stream, value == null ? null : TTRemoteAccessoryError[value.index as string]);
     } else if (value instanceof TTMultifunctionalKeypadErrorEnum) {
-      stream.writeUint8(this.getByte(147));
+      stream.writeUint8(this.getByte(150));
       this.writeValue(stream, value == null ? null : TTMultifunctionalKeypadError[value.index as string]);
     } else if (value instanceof TTRemoteAccessoryEnum) {
-      stream.writeUint8(this.getByte(148));
+      stream.writeUint8(this.getByte(151));
       this.writeValue(stream, value == null ? null : TTRemoteAccessory[value.index as string]);
     } else if (value instanceof TTIpSettingTypeEnum) {
-      stream.writeUint8(this.getByte(149));
+      stream.writeUint8(this.getByte(152));
       this.writeValue(stream, value == null ? null : TTIpSettingType[value.index as string]);
     } else if (value instanceof TTNbAwakeModeEnum) {
-      stream.writeUint8(this.getByte(150));
+      stream.writeUint8(this.getByte(153));
       this.writeValue(stream, value == null ? null : TTNbAwakeMode[value.index as string]);
     } else if (value instanceof TTNbAwakeTimeTypeEnum) {
-      stream.writeUint8(this.getByte(151));
+      stream.writeUint8(this.getByte(154));
       this.writeValue(stream, value == null ? null : TTNbAwakeTimeType[value.index as string]);
     } else if (value instanceof TTLockFunctionEnum) {
-      stream.writeUint8(this.getByte(152));
+      stream.writeUint8(this.getByte(155));
       this.writeValue(stream, value == null ? null : TTLockFunction[value.index as string]);
     } else if (value instanceof TTFaceStateEnum) {
-      stream.writeUint8(this.getByte(153));
+      stream.writeUint8(this.getByte(156));
       this.writeValue(stream, value == null ? null : TTFaceState[value.index as string]);
     } else if (value instanceof TTWaterMeterFeatureEnum) {
-      stream.writeUint8(this.getByte(154));
+      stream.writeUint8(this.getByte(157));
       this.writeValue(stream, value == null ? null : TTWaterMeterFeature[value.index as string]);
     } else if (value instanceof TTElectricMeterFeatureEnum) {
-      stream.writeUint8(this.getByte(155));
+      stream.writeUint8(this.getByte(158));
       this.writeValue(stream, value == null ? null : TTElectricMeterFeature[value.index as string]);
     } else if (value instanceof TTMeterPayModeEnum) {
-      stream.writeUint8(this.getByte(156));
+      stream.writeUint8(this.getByte(159));
       this.writeValue(stream, value == null ? null : TTMeterPayMode[value.index as string]);
     } else if (value instanceof TTFaceErrorCodeEnum) {
-      stream.writeUint8(this.getByte(157));
+      stream.writeUint8(this.getByte(160));
       this.writeValue(stream, value == null ? null : TTFaceErrorCode[value.index as string]);
     } else if (value instanceof TTLockVersion) {
-      stream.writeUint8(this.getByte(158));
+      stream.writeUint8(this.getByte(161));
       this.writeValue(stream, (value as TTLockVersion).toList());
     } else if (value instanceof TTLockInitParams) {
-      stream.writeUint8(this.getByte(159));
+      stream.writeUint8(this.getByte(162));
       this.writeValue(stream, (value as TTLockInitParams).toList());
     } else if (value instanceof TTGatewayInitParams) {
-      stream.writeUint8(this.getByte(160));
+      stream.writeUint8(this.getByte(163));
       this.writeValue(stream, (value as TTGatewayInitParams).toList());
     } else if (value instanceof TTIpSetting) {
-      stream.writeUint8(this.getByte(161));
+      stream.writeUint8(this.getByte(164));
       this.writeValue(stream, (value as TTIpSetting).toList());
     } else if (value instanceof TTCycleModel) {
-      stream.writeUint8(this.getByte(162));
+      stream.writeUint8(this.getByte(165));
       this.writeValue(stream, (value as TTCycleModel).toList());
     } else if (value instanceof TTLockScanWifiEventParam) {
-      stream.writeUint8(this.getByte(163));
+      stream.writeUint8(this.getByte(166));
       this.writeValue(stream, (value as TTLockScanWifiEventParam).toList());
     } else if (value instanceof TTLockCredentialEventParam) {
-      stream.writeUint8(this.getByte(164));
+      stream.writeUint8(this.getByte(167));
       this.writeValue(stream, (value as TTLockCredentialEventParam).toList());
     } else if (value instanceof TTKeypadCredentialEventParam) {
-      stream.writeUint8(this.getByte(165));
+      stream.writeUint8(this.getByte(168));
       this.writeValue(stream, (value as TTKeypadCredentialEventParam).toList());
     } else if (value instanceof ControlLockResult) {
-      stream.writeUint8(this.getByte(166));
+      stream.writeUint8(this.getByte(169));
       this.writeValue(stream, (value as ControlLockResult).toList());
     } else if (value instanceof AutoLockingTime) {
-      stream.writeUint8(this.getByte(167));
+      stream.writeUint8(this.getByte(170));
       this.writeValue(stream, (value as AutoLockingTime).toList());
     } else if (value instanceof TTWifiInfoModel) {
-      stream.writeUint8(this.getByte(168));
+      stream.writeUint8(this.getByte(171));
       this.writeValue(stream, (value as TTWifiInfoModel).toList());
     } else if (value instanceof CameraLockWifiResult) {
-      stream.writeUint8(this.getByte(169));
+      stream.writeUint8(this.getByte(172));
       this.writeValue(stream, (value as CameraLockWifiResult).toList());
     } else if (value instanceof TTLockSystemModel) {
-      stream.writeUint8(this.getByte(170));
+      stream.writeUint8(this.getByte(173));
       this.writeValue(stream, (value as TTLockSystemModel).toList());
     } else if (value instanceof AccessoryElectricQuantityResult) {
-      stream.writeUint8(this.getByte(171));
+      stream.writeUint8(this.getByte(174));
       this.writeValue(stream, (value as AccessoryElectricQuantityResult).toList());
     } else if (value instanceof TTPassageModeModel) {
-      stream.writeUint8(this.getByte(172));
+      stream.writeUint8(this.getByte(175));
       this.writeValue(stream, (value as TTPassageModeModel).toList());
     } else if (value instanceof TTLockScanModel) {
-      stream.writeUint8(this.getByte(173));
+      stream.writeUint8(this.getByte(176));
       this.writeValue(stream, (value as TTLockScanModel).toList());
     } else if (value instanceof TTPasscodeModel) {
-      stream.writeUint8(this.getByte(174));
+      stream.writeUint8(this.getByte(177));
       this.writeValue(stream, (value as TTPasscodeModel).toList());
     } else if (value instanceof TTICCardModel) {
-      stream.writeUint8(this.getByte(175));
+      stream.writeUint8(this.getByte(178));
       this.writeValue(stream, (value as TTICCardModel).toList());
     } else if (value instanceof TTFingerprintModel) {
-      stream.writeUint8(this.getByte(176));
+      stream.writeUint8(this.getByte(179));
       this.writeValue(stream, (value as TTFingerprintModel).toList());
     } else if (value instanceof TTGatewayScanModel) {
-      stream.writeUint8(this.getByte(177));
+      stream.writeUint8(this.getByte(180));
       this.writeValue(stream, (value as TTGatewayScanModel).toList());
     } else if (value instanceof GatewayDeviceInfo) {
-      stream.writeUint8(this.getByte(178));
+      stream.writeUint8(this.getByte(181));
       this.writeValue(stream, (value as GatewayDeviceInfo).toList());
     } else if (value instanceof TTRemoteAccessoryScanModel) {
-      stream.writeUint8(this.getByte(179));
+      stream.writeUint8(this.getByte(182));
       this.writeValue(stream, (value as TTRemoteAccessoryScanModel).toList());
     } else if (value instanceof TTStandaloneDoorSensorScanModel) {
-      stream.writeUint8(this.getByte(180));
+      stream.writeUint8(this.getByte(183));
       this.writeValue(stream, (value as TTStandaloneDoorSensorScanModel).toList());
     } else if (value instanceof TTStandaloneDoorSensorInfo) {
-      stream.writeUint8(this.getByte(181));
+      stream.writeUint8(this.getByte(184));
       this.writeValue(stream, (value as TTStandaloneDoorSensorInfo).toList());
     } else if (value instanceof TTMeterScanModel) {
-      stream.writeUint8(this.getByte(182));
+      stream.writeUint8(this.getByte(185));
       this.writeValue(stream, (value as TTMeterScanModel).toList());
     } else if (value instanceof TTWaterMeterInitResult) {
-      stream.writeUint8(this.getByte(183));
+      stream.writeUint8(this.getByte(186));
       this.writeValue(stream, (value as TTWaterMeterInitResult).toList());
     } else if (value instanceof TTElectricMeterInitResult) {
-      stream.writeUint8(this.getByte(184));
+      stream.writeUint8(this.getByte(187));
       this.writeValue(stream, (value as TTElectricMeterInitResult).toList());
     } else if (value instanceof TTWifiScanResult) {
-      stream.writeUint8(this.getByte(185));
+      stream.writeUint8(this.getByte(188));
       this.writeValue(stream, (value as TTWifiScanResult).toList());
     } else if (value instanceof TTWifiScanEntry) {
-      stream.writeUint8(this.getByte(186));
+      stream.writeUint8(this.getByte(189));
       this.writeValue(stream, (value as TTWifiScanEntry).toList());
     } else if (value instanceof RemoteKeypadInitResult) {
-      stream.writeUint8(this.getByte(187));
+      stream.writeUint8(this.getByte(190));
       this.writeValue(stream, (value as RemoteKeypadInitResult).toList());
     } else if (value instanceof MultifunctionalKeypadInitResult) {
-      stream.writeUint8(this.getByte(188));
+      stream.writeUint8(this.getByte(191));
       this.writeValue(stream, (value as MultifunctionalKeypadInitResult).toList());
     } else if (value instanceof WaterMeterDeviceInfo) {
-      stream.writeUint8(this.getByte(189));
+      stream.writeUint8(this.getByte(192));
       this.writeValue(stream, (value as WaterMeterDeviceInfo).toList());
     } else if (value instanceof ElectricMeterDeviceInfo) {
-      stream.writeUint8(this.getByte(190));
+      stream.writeUint8(this.getByte(193));
       this.writeValue(stream, (value as ElectricMeterDeviceInfo).toList());
     } else if (value instanceof TTWaterMeterInitParam) {
-      stream.writeUint8(this.getByte(191));
+      stream.writeUint8(this.getByte(194));
       this.writeValue(stream, (value as TTWaterMeterInitParam).toList());
     } else if (value instanceof TTElectricMeterInitParam) {
-      stream.writeUint8(this.getByte(192));
+      stream.writeUint8(this.getByte(195));
       this.writeValue(stream, (value as TTElectricMeterInitParam).toList());
     } else if (value instanceof AddCardEvent) {
-      stream.writeUint8(this.getByte(193));
+      stream.writeUint8(this.getByte(196));
       this.writeValue(stream, (value as AddCardEvent).toList());
     } else if (value instanceof AddFingerprintEvent) {
-      stream.writeUint8(this.getByte(194));
+      stream.writeUint8(this.getByte(197));
       this.writeValue(stream, (value as AddFingerprintEvent).toList());
     } else if (value instanceof AddFaceEvent) {
-      stream.writeUint8(this.getByte(195));
+      stream.writeUint8(this.getByte(198));
       this.writeValue(stream, (value as AddFaceEvent).toList());
     } else {
       super.writeValue(stream, value);

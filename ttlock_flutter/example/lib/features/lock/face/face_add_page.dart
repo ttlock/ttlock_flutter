@@ -50,31 +50,40 @@ class _FaceAddPageState extends ConsumerState<FaceAddPage> {
         .listen(
       (event) {
         if (!mounted) return;
-        if (event.isProgress) {
-          if (event.errorCode != null) {
-            toastification.show(
-              title: Text(faceErrorMessage(event.errorCode)),
-              type: ToastificationType.error,
-            );
-            setState(() => _adding = false);
-            return;
-          }
-          setState(() {
-            _message = event.state?.name ?? 'Follow lock instructions…';
-          });
-        }
-        if (event.faceNumber != null) {
-          ref.read(faceListProvider(widget.lockMac).notifier).addFace(
-                widget.lockMac,
-                faceNumber: event.faceNumber!,
-                startDate: range.startDate,
-                endDate: range.endDate,
+        switch (event.phase) {
+          case TTAddFacePhase.canStartAdd:
+            setState(() => _message = 'Follow lock instructions…');
+          case TTAddFacePhase.collecting:
+            setState(() {
+              _message = event.errorCode == null ||
+                      event.errorCode == TTFaceErrorCode.normal
+                  ? 'Enrolling face…'
+                  : faceErrorMessage(event.errorCode);
+            });
+          case TTAddFacePhase.error:
+            if (event.errorCode != null &&
+                event.errorCode != TTFaceErrorCode.normal) {
+              toastification.show(
+                title: Text(faceErrorMessage(event.errorCode)),
+                type: ToastificationType.error,
               );
-          toastification.show(
-            title: Text('Face added: ${event.faceNumber}'),
-            type: ToastificationType.success,
-          );
-          Navigator.pop(context);
+              setState(() => _adding = false);
+              return;
+            }
+            setState(() => _message = 'Follow lock instructions…');
+          case TTAddFacePhase.success:
+            final faceNumber = event.credentialNumber!;
+            ref.read(faceListProvider(widget.lockMac).notifier).addFace(
+                  widget.lockMac,
+                  faceNumber: faceNumber,
+                  startDate: range.startDate,
+                  endDate: range.endDate,
+                );
+            toastification.show(
+              title: Text('Face added: $faceNumber'),
+              type: ToastificationType.success,
+            );
+            Navigator.pop(context);
         }
       },
       onError: (e) {

@@ -37,6 +37,7 @@ import {
   AddCardEvent,
   AddFaceEvent,
   AddFingerprintEvent,
+  TTAddFacePhase,
   PigeonCodec,
   TTGatewayScanModel,
   TTGatewayType,
@@ -59,7 +60,7 @@ import {
 
 import {
   faceErrorRevert,
-  faceStateRevert,
+  facePhaseRevert,
   gatewayErrorRevert,
   keypadErrorRevert,
   lockErrorRevert,
@@ -315,11 +316,10 @@ class LockAddFaceHandler implements StreamHandler {
     TTLock.addFace(lockData, range.start, range.end, cyclic, {
       success: (model: IFaceModel): void => {
         if (model.addState === SdkTTAddState.success) {
-          events.success(new AddFaceEvent(false, undefined, undefined, model.faceNumber));
+          events.success(new AddFaceEvent(TTAddFacePhase.SUCCESS, undefined, model.faceNumber));
         } else {
           events.success(new AddFaceEvent(
-            true,
-            faceStateRevert(model.addState),
+            facePhaseRevert(model.addState),
             faceErrorRevert(model.errorCode),
             undefined,
           ));

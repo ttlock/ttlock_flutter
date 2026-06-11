@@ -15,6 +15,7 @@
 /// ```
 library ttlock_flutter;
 
+export 'package:ttlock_flutter/src/add_credential_event.dart';
 export 'package:ttlock_flutter/src/tt_door_sensor_api.dart';
 export 'package:ttlock_flutter/src/tt_electric_meter_api.dart';
 export 'package:ttlock_flutter/src/tt_gateway_api.dart';

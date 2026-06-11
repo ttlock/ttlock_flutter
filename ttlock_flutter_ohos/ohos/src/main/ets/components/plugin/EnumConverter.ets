@@ -19,8 +19,8 @@ import {
 import {
   TTBluetoothState,
   TTControlAction,
+  TTAddFacePhase,
   TTFaceErrorCode,
-  TTFaceState,
   TTGatewayError,
   TTLockConfig,
   TTLockDirection,
@@ -636,14 +636,14 @@ export function faceErrorRevert(code: SdkTTFaceErrorCode): TTFaceErrorCode {
   }
 }
 
-export function faceStateRevert(state: SdkTTAddState): TTFaceState {
+export function facePhaseRevert(state: SdkTTAddState): TTAddFacePhase {
   switch (state) {
     case SdkTTAddState.canStartAdd:
-      return TTFaceState.CAN_START_ADD;
+      return TTAddFacePhase.CAN_START_ADD;
     case SdkTTAddState.error:
-      return TTFaceState.ERROR;
+      return TTAddFacePhase.ERROR;
     default:
-      return TTFaceState.ERROR;
+      return TTAddFacePhase.COLLECTING;
   }
 }
 
