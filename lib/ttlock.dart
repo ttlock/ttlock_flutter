@@ -786,7 +786,7 @@ class TTLock {
     invoke(COMMAND_SET_LOCK_MOTOR_TORQUE_LEVEL, map, callback, fail: failedCallback);
   }
 
-  static void setLockLatchBolt(bool keepTime, String lockData,
+  static void setLockLatchBolt(int keepTime, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     Map map = Map();
     map[TTResponse.latchBoltKeepTime] = keepTime;
