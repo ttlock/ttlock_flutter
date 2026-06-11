@@ -1,6 +1,6 @@
 PODS:
   - Flutter (1.0.0)
-  - permission_handler_apple (9.3.0):
+  - permission_handler_apple (9.4.8):
     - Flutter
   - shared_preferences_foundation (0.0.1):
     - Flutter
@@ -32,7 +32,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
+  permission_handler_apple: ee2fe0fd04551b304eb002714ff067c371c822ed
   shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
   ttlock_flutter_ios: ae9e765981e906c00867a9f47e82695cc7fac320
   TTLockOnPremise: d232e24622a05cb4b42cc218ec5fa9a886a8baa5

@@ -49,99 +49,111 @@ class WaterMeterNotifier extends _$WaterMeterNotifier {
     }
   }
 
-  Future<void> init(Map<String, Object?> params) async {
+  Future<void> init({
+    required String mac,
+    String name = '',
+    TTMeterPayMode payMode = TTMeterPayMode.postpaid,
+    double price = 0,
+  }) async {
     final api = ref.read(waterMeterApiProvider);
     state = WaterMeterState(isLoading: true, error: null);
     try {
-      final result = await runRemoteAccessoryApi(() => api.waterMeterInit(params));
-      state = WaterMeterState(result: 'Init: id=${result.waterMeterId}');
+      final result = await api.waterMeterInit(TTWaterMeterInitParam(
+        mac: mac,
+        name: name,
+        payMode: payMode,
+        price: price,
+      ));
+      state = WaterMeterState(
+        result: 'Init: id=${result.waterMeterId}, feature=${result.featureValue}',
+      );
     } on TTRemoteAccessoryException catch (e) {
       state = WaterMeterState(error: e.toString());
     }
   }
 
-  Future<void> readData(String id) async {
+  Future<void> readData(String mac) async {
     final api = ref.read(waterMeterApiProvider);
     state = WaterMeterState(isLoading: true, error: null);
     try {
-      final data = await runRemoteAccessoryApi(() => api.waterMeterReadData(id));
-      state = WaterMeterState(result: 'Data: $data');
+      await api.waterMeterReadData(mac);
+      state = WaterMeterState(result: 'Read data requested');
     } on TTRemoteAccessoryException catch (e) {
       state = WaterMeterState(error: e.toString());
     }
   }
 
-  Future<void> setPowerOnOff(String id, bool isOn) async {
+  Future<void> setPowerOnOff(String mac, bool isOn) async {
     final api = ref.read(waterMeterApiProvider);
     state = WaterMeterState(isLoading: true, error: null);
     try {
-      await runRemoteAccessoryApi(() => api.waterMeterSetPowerOnOff(id, isOn));
+      await api.waterMeterSetPowerOnOff(mac, isOn);
       state = WaterMeterState(result: 'Power ${isOn ? "ON" : "OFF"}');
     } on TTRemoteAccessoryException catch (e) {
       state = WaterMeterState(error: e.toString());
     }
   }
 
-  Future<void> setPayMode(String id, int mode) async {
+  Future<void> setPayMode(String mac, TTMeterPayMode mode, {double price = 0}) async {
     final api = ref.read(waterMeterApiProvider);
     state = WaterMeterState(isLoading: true, error: null);
     try {
-      await runRemoteAccessoryApi(() => api.waterMeterSetPayMode(id, mode));
+      await api.waterMeterSetPayMode(mac, mode, price);
       state = WaterMeterState(result: 'Pay mode set to $mode');
     } on TTRemoteAccessoryException catch (e) {
       state = WaterMeterState(error: e.toString());
     }
   }
 
-  Future<void> charge(String id, double amount) async {
+  Future<void> charge(String mac, double amount, {double m3 = 0}) async {
     final api = ref.read(waterMeterApiProvider);
     state = WaterMeterState(isLoading: true, error: null);
     try {
-      await runRemoteAccessoryApi(() => api.waterMeterCharge(id, amount));
+      await api.waterMeterCharge(mac, amount, m3);
       state = WaterMeterState(result: 'Charged $amount');
     } on TTRemoteAccessoryException catch (e) {
       state = WaterMeterState(error: e.toString());
     }
   }
 
-  Future<void> getFeatureValue(String id) async {
+  Future<void> getFeatureValue(String mac) async {
     final api = ref.read(waterMeterApiProvider);
     state = WaterMeterState(isLoading: true, error: null);
     try {
-      final value = await runRemoteAccessoryApi(() => api.waterMeterGetFeatureValue(id));
+      final value = await api.waterMeterGetFeatureValue(mac);
       state = WaterMeterState(result: 'Feature value: $value');
     } on TTRemoteAccessoryException catch (e) {
       state = WaterMeterState(error: e.toString());
     }
   }
 
-  Future<void> getDeviceInfo(String id) async {
+  Future<void> getDeviceInfo(String mac) async {
     final api = ref.read(waterMeterApiProvider);
     state = WaterMeterState(isLoading: true, error: null);
     try {
-      final info = await runRemoteAccessoryApi(() => api.waterMeterGetDeviceInfo(id));
+      final info = await api.waterMeterGetDeviceInfo(mac);
       state = WaterMeterState(result: 'Device: card=${info.catOneCardNumber}, imsi=${info.catOneImsi}');
     } on TTRemoteAccessoryException catch (e) {
       state = WaterMeterState(error: e.toString());
     }
   }
 
-  Future<void> delete(String id) async {
+  Future<void> delete(String mac) async {
     final api = ref.read(waterMeterApiProvider);
     state = WaterMeterState(isLoading: true, error: null);
     try {
-      await runRemoteAccessoryApi(() => api.waterMeterDelete(id));
+      await api.waterMeterDelete(mac);
       state = WaterMeterState(result: 'Deleted');
     } on TTRemoteAccessoryException catch (e) {
       state = WaterMeterState(error: e.toString());
     }
   }
 
-  Future<void> reset(String id) async {
+  Future<void> reset(String mac) async {
     final api = ref.read(waterMeterApiProvider);
     state = WaterMeterState(isLoading: true, error: null);
     try {
-      await runRemoteAccessoryApi(() => api.waterMeterReset(id));
+      await api.waterMeterReset(mac);
       state = WaterMeterState(result: 'Reset');
     } on TTRemoteAccessoryException catch (e) {
       state = WaterMeterState(error: e.toString());

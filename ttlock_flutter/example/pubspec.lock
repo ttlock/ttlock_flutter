@@ -679,7 +679,7 @@ packages:
     description:
       path: "packages/shared_preferences/shared_preferences"
       ref: "br_shared_preferences-v2.5.3_ohos"
-      resolved-ref: "89ff69c7014e73b6393f77df12e3c6154b5aee83"
+      resolved-ref: "3813e9ff17a2aae8a98e262d771c1785ee0e8690"
       url: "https://gitcode.com/openharmony-tpc/flutter_packages.git"
     source: git
     version: "2.5.3"
@@ -712,7 +712,7 @@ packages:
     description:
       path: "packages/shared_preferences/shared_preferences_ohos"
       ref: "br_shared_preferences-v2.5.3_ohos"
-      resolved-ref: "89ff69c7014e73b6393f77df12e3c6154b5aee83"
+      resolved-ref: "3813e9ff17a2aae8a98e262d771c1785ee0e8690"
       url: "https://gitcode.com/openharmony-tpc/flutter_packages.git"
     source: git
     version: "2.5.3"
@@ -869,7 +869,7 @@ packages:
     description:
       path: "."
       ref: premise
-      resolved-ref: "69caff6a57cb176812b94af59dd2051c9fe3f4a2"
+      resolved-ref: "54bb07676c42eaa3afee77bb4802d7d89f369c9c"
       url: "https://github.com/2000Heart/ttlock_flutter_android.git"
     source: git
     version: "0.0.3"
@@ -878,7 +878,7 @@ packages:
     description:
       path: "."
       ref: premise
-      resolved-ref: "2337ae107c5c72ae0619fb89fab04fb6fbf0b2ef"
+      resolved-ref: "83b4264f00265a824e222230a76641665b585e98"
       url: "https://github.com/2000Heart/ttlock_flutter_ios.git"
     source: git
     version: "0.0.3"
@@ -887,7 +887,7 @@ packages:
     description:
       path: ttlock_flutter_ohos
       ref: mix
-      resolved-ref: "0baabf37ef9034e7e9ffda3e76bc904c398cf24f"
+      resolved-ref: eb22216ff88ae5cc3fbd0870ccfce336a7ad3f15
       url: "https://github.com/ttlock/ttlock_flutter.git"
     source: git
     version: "0.0.1"
@@ -896,7 +896,7 @@ packages:
     description:
       path: ttlock_flutter_platform_interface
       ref: mix
-      resolved-ref: "0baabf37ef9034e7e9ffda3e76bc904c398cf24f"
+      resolved-ref: eb22216ff88ae5cc3fbd0870ccfce336a7ad3f15
       url: "https://github.com/ttlock/ttlock_flutter.git"
     source: git
     version: "0.0.3"

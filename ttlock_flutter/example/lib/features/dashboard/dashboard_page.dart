@@ -78,7 +78,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage>
               icon: Icons.water_drop,
               title: (d) => d.name,
               mac: (d) => d.mac,
-              onTap: (d) => WaterMeterRoute(d.meterId).push(context),
+              onTap: (d) => WaterMeterRoute(d.mac).push(context),
             ),
             _DeviceList<SavedMeterDevice>(
               emptyMessage: 'No electric meters saved.',
@@ -86,7 +86,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage>
               icon: Icons.bolt,
               title: (d) => d.name,
               mac: (d) => d.mac,
-              onTap: (d) => ElectricMeterRoute(d.meterId).push(context),
+              onTap: (d) => ElectricMeterRoute(d.mac).push(context),
             ),
           ],
         ),

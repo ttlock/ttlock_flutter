@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ttlock_flutter/ttlock.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/widgets/section_header.dart';
@@ -18,27 +19,10 @@ class ElectricMeterPage extends ConsumerStatefulWidget {
 }
 
 class _ElectricMeterPageState extends ConsumerState<ElectricMeterPage> {
-  final _idCtrl = TextEditingController();
-  final _amountCtrl = TextEditingController(text: '10.0');
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.meterId != null) {
-      _idCtrl.text = widget.meterId!;
-    }
-  }
-
-  @override
-  void dispose() {
-    _idCtrl.dispose();
-    _amountCtrl.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(electricMeterNotifierProvider);
+    final mac = widget.mac;
     return Scaffold(
       appBar: AppBar(title: Text('Electric Meter')),
       body: state.isLoading
@@ -50,7 +34,10 @@ class _ElectricMeterPageState extends ConsumerState<ElectricMeterPage> {
                   child: ListTile(
                     leading: const Icon(Icons.bolt, color: AppColors.primary),
                     title: Text('Electric Meter', style: AppTextStyles.titleMedium),
-                    subtitle: Text('MAC: ${widget.mac}', style: AppTextStyles.bodySmall),
+                    subtitle: Text(
+                      widget.meterId != null ? 'MAC: $mac\nID: ${widget.meterId}' : 'MAC: $mac',
+                      style: AppTextStyles.bodySmall,
+                    ),
                   ),
                 ),
                 if (state.error != null)
@@ -67,32 +54,27 @@ class _ElectricMeterPageState extends ConsumerState<ElectricMeterPage> {
                     ),
                   ),
                 ],
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _idCtrl,
-                  decoration: const InputDecoration(labelText: 'Meter ID', hintText: 'Electric meter ID'),
-                ),
                 const SizedBox(height: 24),
                 SectionHeader(title: 'Lifecycle', icon: Icons.repeat),
                 const SizedBox(height: 8),
                 _ActionButton(icon: Icons.settings_ethernet, label: 'Config Server', onTap: () => ref.read(electricMeterNotifierProvider.notifier).configServer('https://example.com', 'client', 'token')),
-                _ActionButton(icon: Icons.bluetooth_connected, label: 'Connect', onTap: () => ref.read(electricMeterNotifierProvider.notifier).connect(widget.mac)),
-                _ActionButton(icon: Icons.power_settings_new, label: 'Init', onTap: () => ref.read(electricMeterNotifierProvider.notifier).init({'mac': widget.mac})),
-                _ActionButton(icon: Icons.bluetooth_disabled, label: 'Disconnect', onTap: () => ref.read(electricMeterNotifierProvider.notifier).disconnect(widget.mac)),
+                _ActionButton(icon: Icons.bluetooth_connected, label: 'Connect', onTap: () => ref.read(electricMeterNotifierProvider.notifier).connect(mac)),
+                _ActionButton(icon: Icons.start, label: 'Init', onTap: () => ref.read(electricMeterNotifierProvider.notifier).init(mac: mac)),
+                _ActionButton(icon: Icons.bluetooth_disabled, label: 'Disconnect', onTap: () => ref.read(electricMeterNotifierProvider.notifier).disconnect(mac)),
                 const SizedBox(height: 24),
                 SectionHeader(title: 'Operations', icon: Icons.tune),
                 const SizedBox(height: 8),
-                _ActionButton(icon: Icons.visibility, label: 'Read Data', onTap: () => ref.read(electricMeterNotifierProvider.notifier).readData(_idCtrl.text)),
-                _ActionButton(icon: Icons.power_settings_new, label: 'Power ON', onTap: () => ref.read(electricMeterNotifierProvider.notifier).setPowerOnOff(_idCtrl.text, true)),
-                _ActionButton(icon: Icons.power_off, label: 'Power OFF', onTap: () => ref.read(electricMeterNotifierProvider.notifier).setPowerOnOff(_idCtrl.text, false)),
-                _ActionButton(icon: Icons.payment, label: 'Set Pay Mode (0)', onTap: () => ref.read(electricMeterNotifierProvider.notifier).setPayMode(_idCtrl.text, 0)),
-                _ActionButton(icon: Icons.monetization_on, label: 'Charge 10.0', onTap: () => ref.read(electricMeterNotifierProvider.notifier).charge(_idCtrl.text, 10.0)),
-                _ActionButton(icon: Icons.speed, label: 'Set Max Power', onTap: () => ref.read(electricMeterNotifierProvider.notifier).setMaxPower(_idCtrl.text, 100.0)),
-                _ActionButton(icon: Icons.info_outline, label: 'Get Feature Value', onTap: () => ref.read(electricMeterNotifierProvider.notifier).getFeatureValue(_idCtrl.text)),
+                _ActionButton(icon: Icons.visibility, label: 'Read Data', onTap: () => ref.read(electricMeterNotifierProvider.notifier).readData(mac)),
+                _ActionButton(icon: Icons.power_settings_new, label: 'Power ON', onTap: () => ref.read(electricMeterNotifierProvider.notifier).setPowerOnOff(mac, true)),
+                _ActionButton(icon: Icons.power_off, label: 'Power OFF', onTap: () => ref.read(electricMeterNotifierProvider.notifier).setPowerOnOff(mac, false)),
+                _ActionButton(icon: Icons.payment, label: 'Set Pay Mode (postpaid)', onTap: () => ref.read(electricMeterNotifierProvider.notifier).setPayMode(mac, TTMeterPayMode.postpaid)),
+                _ActionButton(icon: Icons.monetization_on, label: 'Charge 10.0', onTap: () => ref.read(electricMeterNotifierProvider.notifier).charge(mac, 10.0)),
+                _ActionButton(icon: Icons.speed, label: 'Set Max Power', onTap: () => ref.read(electricMeterNotifierProvider.notifier).setMaxPower(mac, 100.0)),
+                _ActionButton(icon: Icons.info_outline, label: 'Get Feature Value', onTap: () => ref.read(electricMeterNotifierProvider.notifier).getFeatureValue(mac)),
                 const SizedBox(height: 24),
                 SectionHeader(title: 'Danger Zone', icon: Icons.warning, trailing: null),
                 const SizedBox(height: 8),
-                _ActionButton(icon: Icons.delete_forever, label: 'Delete', onTap: () => ref.read(electricMeterNotifierProvider.notifier).delete(_idCtrl.text)),
+                _ActionButton(icon: Icons.delete_forever, label: 'Delete', onTap: () => ref.read(electricMeterNotifierProvider.notifier).delete(mac)),
               ],
             ),
     );

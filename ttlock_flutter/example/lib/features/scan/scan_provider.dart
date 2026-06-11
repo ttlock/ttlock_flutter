@@ -342,34 +342,44 @@ class ScanNotifier extends _$ScanNotifier {
           return InitResult.keypad(device.mac);
 
         case DeviceType.waterMeter:
-          final result = await runRemoteAccessoryApi(() => ref
-              .read(waterMeterApiProvider)
-              .waterMeterInit({'mac': device.mac}));
+          final result = await ref.read(waterMeterApiProvider).waterMeterInit(
+                TTWaterMeterInitParam(
+                  mac: device.mac,
+                  name: device.name,
+                  payMode: TTMeterPayMode.postpaid,
+                  price: 0,
+                ),
+              );
           await ref.read(meterListNotifierProvider.notifier).addDevice(
                 SavedMeterDevice(
                   name: device.name,
                   mac: device.mac,
-                  meterId: result.waterMeterId,
+                  meterId: result.waterMeterId.toString(),
                   meterType: 'water',
                   initializedAt: now,
                 ),
               );
-          return InitResult.waterMeter(result.waterMeterId);
+          return InitResult.waterMeter(device.mac);
 
         case DeviceType.electricMeter:
-          final result = await runRemoteAccessoryApi(() => ref
-              .read(electricMeterApiProvider)
-              .electricMeterInit({'mac': device.mac}));
+          final result = await ref.read(electricMeterApiProvider).electricMeterInit(
+                TTElectricMeterInitParam(
+                  mac: device.mac,
+                  name: device.name,
+                  payMode: TTMeterPayMode.postpaid,
+                  price: 0,
+                ),
+              );
           await ref.read(meterListNotifierProvider.notifier).addDevice(
                 SavedMeterDevice(
                   name: device.name,
                   mac: device.mac,
-                  meterId: result.electricMeterId,
+                  meterId: result.electricMeterId.toString(),
                   meterType: 'electric',
                   initializedAt: now,
                 ),
               );
-          return InitResult.electricMeter(result.electricMeterId);
+          return InitResult.electricMeter(device.mac);
       }
     } catch (e) {
       toastification.show(

@@ -49,88 +49,100 @@ class ElectricMeterNotifier extends _$ElectricMeterNotifier {
     }
   }
 
-  Future<void> init(Map<String, Object?> params) async {
+  Future<void> init({
+    required String mac,
+    String name = '',
+    TTMeterPayMode payMode = TTMeterPayMode.postpaid,
+    double price = 0,
+  }) async {
     final api = ref.read(electricMeterApiProvider);
     state = ElectricMeterState(isLoading: true, error: null);
     try {
-      final result = await runRemoteAccessoryApi(() => api.electricMeterInit(params));
-      state = ElectricMeterState(result: 'Init: id=${result.electricMeterId}');
+      final result = await api.electricMeterInit(TTElectricMeterInitParam(
+        mac: mac,
+        name: name,
+        payMode: payMode,
+        price: price,
+      ));
+      state = ElectricMeterState(
+        result: 'Init: id=${result.electricMeterId}, feature=${result.featureValue}',
+      );
     } on TTRemoteAccessoryException catch (e) {
       state = ElectricMeterState(error: e.toString());
     }
   }
 
-  Future<void> readData(String id) async {
+  Future<void> readData(String mac) async {
     final api = ref.read(electricMeterApiProvider);
     state = ElectricMeterState(isLoading: true, error: null);
     try {
-      final data = await runRemoteAccessoryApi(() => api.electricMeterReadData(id));
-      state = ElectricMeterState(result: 'Data: $data');
+      await api.electricMeterReadData(mac);
+      state = ElectricMeterState(result: 'Read data requested');
     } on TTRemoteAccessoryException catch (e) {
       state = ElectricMeterState(error: e.toString());
     }
   }
 
-  Future<void> setPowerOnOff(String id, bool isOn) async {
+  Future<void> setPowerOnOff(String mac, bool isOn) async {
     final api = ref.read(electricMeterApiProvider);
     state = ElectricMeterState(isLoading: true, error: null);
     try {
-      await runRemoteAccessoryApi(() => api.electricMeterSetPowerOnOff(id, isOn));
+      await api.electricMeterSetPowerOnOff(mac, isOn);
       state = ElectricMeterState(result: 'Power ${isOn ? "ON" : "OFF"}');
     } on TTRemoteAccessoryException catch (e) {
       state = ElectricMeterState(error: e.toString());
     }
   }
 
-  Future<void> setPayMode(String id, int mode) async {
+  Future<void> setPayMode(String mac, TTMeterPayMode mode, {double price = 0}) async {
     final api = ref.read(electricMeterApiProvider);
     state = ElectricMeterState(isLoading: true, error: null);
     try {
-      await runRemoteAccessoryApi(() => api.electricMeterSetPayMode(id, mode));
+      await api.electricMeterSetPayMode(mac, mode, price);
       state = ElectricMeterState(result: 'Pay mode set to $mode');
     } on TTRemoteAccessoryException catch (e) {
       state = ElectricMeterState(error: e.toString());
     }
   }
 
-  Future<void> charge(String id, double amount) async {
+  Future<void> charge(String mac, double amount, {double kwh = 0}) async {
     final api = ref.read(electricMeterApiProvider);
     state = ElectricMeterState(isLoading: true, error: null);
     try {
-      await runRemoteAccessoryApi(() => api.electricMeterCharge(id, amount));
+      await api.electricMeterCharge(mac, amount, kwh);
       state = ElectricMeterState(result: 'Charged $amount');
     } on TTRemoteAccessoryException catch (e) {
       state = ElectricMeterState(error: e.toString());
     }
   }
 
-  Future<void> setMaxPower(String id, double maxPower) async {
+  Future<void> setMaxPower(String mac, double maxPower) async {
     final api = ref.read(electricMeterApiProvider);
     state = ElectricMeterState(isLoading: true, error: null);
     try {
-      await runRemoteAccessoryApi(() => api.electricMeterSetMaxPower(id, maxPower));
+      await api.electricMeterSetMaxPower(mac, maxPower);
       state = ElectricMeterState(result: 'Max power set to $maxPower');
     } on TTRemoteAccessoryException catch (e) {
       state = ElectricMeterState(error: e.toString());
     }
   }
 
-  Future<void> getFeatureValue(String id) async {
+  Future<void> getFeatureValue(String mac) async {
     final api = ref.read(electricMeterApiProvider);
     state = ElectricMeterState(isLoading: true, error: null);
     try {
-      final value = await runRemoteAccessoryApi(() => api.electricMeterGetFeatureValue(id));
+      final value = await api.electricMeterGetFeatureValue(mac);
       state = ElectricMeterState(result: 'Feature value: $value');
     } on TTRemoteAccessoryException catch (e) {
       state = ElectricMeterState(error: e.toString());
     }
   }
 
-  Future<void> delete(String id) async {
+  Future<void> delete(String mac) async {
     final api = ref.read(electricMeterApiProvider);
     state = ElectricMeterState(isLoading: true, error: null);
     try {
-      await runRemoteAccessoryApi(() => api.electricMeterDelete(id));
+      await api.electricMeterDelete(mac);
       state = ElectricMeterState(result: 'Deleted');
     } on TTRemoteAccessoryException catch (e) {
       state = ElectricMeterState(error: e.toString());

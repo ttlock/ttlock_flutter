@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ttlock_flutter/ttlock.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/widgets/section_header.dart';
@@ -18,27 +19,10 @@ class WaterMeterPage extends ConsumerStatefulWidget {
 }
 
 class _WaterMeterPageState extends ConsumerState<WaterMeterPage> {
-  final _idCtrl = TextEditingController();
-  final _amountCtrl = TextEditingController(text: '10.0');
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.meterId != null) {
-      _idCtrl.text = widget.meterId!;
-    }
-  }
-
-  @override
-  void dispose() {
-    _idCtrl.dispose();
-    _amountCtrl.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(waterMeterNotifierProvider);
+    final mac = widget.mac;
     return Scaffold(
       appBar: AppBar(title: Text('Water Meter')),
       body: state.isLoading
@@ -50,7 +34,10 @@ class _WaterMeterPageState extends ConsumerState<WaterMeterPage> {
                   child: ListTile(
                     leading: const Icon(Icons.water_drop, color: AppColors.primary),
                     title: Text('Water Meter', style: AppTextStyles.titleMedium),
-                    subtitle: Text('MAC: ${widget.mac}', style: AppTextStyles.bodySmall),
+                    subtitle: Text(
+                      widget.meterId != null ? 'MAC: $mac\nID: ${widget.meterId}' : 'MAC: $mac',
+                      style: AppTextStyles.bodySmall,
+                    ),
                   ),
                 ),
                 if (state.error != null)
@@ -67,33 +54,28 @@ class _WaterMeterPageState extends ConsumerState<WaterMeterPage> {
                     ),
                   ),
                 ],
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _idCtrl,
-                  decoration: const InputDecoration(labelText: 'Meter ID', hintText: 'Water meter ID'),
-                ),
                 const SizedBox(height: 24),
                 SectionHeader(title: 'Lifecycle', icon: Icons.repeat),
                 const SizedBox(height: 8),
                 _ActionButton(icon: Icons.settings_ethernet, label: 'Config Server', onTap: () => ref.read(waterMeterNotifierProvider.notifier).configServer('https://example.com', 'client', 'token')),
-                _ActionButton(icon: Icons.bluetooth_connected, label: 'Connect', onTap: () => ref.read(waterMeterNotifierProvider.notifier).connect(widget.mac)),
-                _ActionButton(icon: Icons.start, label: 'Init', onTap: () => ref.read(waterMeterNotifierProvider.notifier).init({'mac': widget.mac})),
-                _ActionButton(icon: Icons.bluetooth_disabled, label: 'Disconnect', onTap: () => ref.read(waterMeterNotifierProvider.notifier).disconnect(widget.mac)),
+                _ActionButton(icon: Icons.bluetooth_connected, label: 'Connect', onTap: () => ref.read(waterMeterNotifierProvider.notifier).connect(mac)),
+                _ActionButton(icon: Icons.start, label: 'Init', onTap: () => ref.read(waterMeterNotifierProvider.notifier).init(mac: mac)),
+                _ActionButton(icon: Icons.bluetooth_disabled, label: 'Disconnect', onTap: () => ref.read(waterMeterNotifierProvider.notifier).disconnect(mac)),
                 const SizedBox(height: 24),
                 SectionHeader(title: 'Operations', icon: Icons.tune),
                 const SizedBox(height: 8),
-                _ActionButton(icon: Icons.visibility, label: 'Read Data', onTap: () => ref.read(waterMeterNotifierProvider.notifier).readData(_idCtrl.text)),
-                _ActionButton(icon: Icons.power_settings_new, label: 'Power ON', onTap: () => ref.read(waterMeterNotifierProvider.notifier).setPowerOnOff(_idCtrl.text, true)),
-                _ActionButton(icon: Icons.power_off, label: 'Power OFF', onTap: () => ref.read(waterMeterNotifierProvider.notifier).setPowerOnOff(_idCtrl.text, false)),
-                _ActionButton(icon: Icons.payment, label: 'Set Pay Mode (0)', onTap: () => ref.read(waterMeterNotifierProvider.notifier).setPayMode(_idCtrl.text, 0)),
-                _ActionButton(icon: Icons.monetization_on, label: 'Charge 10.0', onTap: () => ref.read(waterMeterNotifierProvider.notifier).charge(_idCtrl.text, 10.0)),
-                _ActionButton(icon: Icons.info_outline, label: 'Get Feature Value', onTap: () => ref.read(waterMeterNotifierProvider.notifier).getFeatureValue(_idCtrl.text)),
-                _ActionButton(icon: Icons.devices, label: 'Get Device Info', onTap: () => ref.read(waterMeterNotifierProvider.notifier).getDeviceInfo(_idCtrl.text)),
+                _ActionButton(icon: Icons.visibility, label: 'Read Data', onTap: () => ref.read(waterMeterNotifierProvider.notifier).readData(mac)),
+                _ActionButton(icon: Icons.power_settings_new, label: 'Power ON', onTap: () => ref.read(waterMeterNotifierProvider.notifier).setPowerOnOff(mac, true)),
+                _ActionButton(icon: Icons.power_off, label: 'Power OFF', onTap: () => ref.read(waterMeterNotifierProvider.notifier).setPowerOnOff(mac, false)),
+                _ActionButton(icon: Icons.payment, label: 'Set Pay Mode (postpaid)', onTap: () => ref.read(waterMeterNotifierProvider.notifier).setPayMode(mac, TTMeterPayMode.postpaid)),
+                _ActionButton(icon: Icons.monetization_on, label: 'Charge 10.0', onTap: () => ref.read(waterMeterNotifierProvider.notifier).charge(mac, 10.0)),
+                _ActionButton(icon: Icons.info_outline, label: 'Get Feature Value', onTap: () => ref.read(waterMeterNotifierProvider.notifier).getFeatureValue(mac)),
+                _ActionButton(icon: Icons.devices, label: 'Get Device Info', onTap: () => ref.read(waterMeterNotifierProvider.notifier).getDeviceInfo(mac)),
                 const SizedBox(height: 24),
                 SectionHeader(title: 'Danger Zone', icon: Icons.warning, trailing: null),
                 const SizedBox(height: 8),
-                _ActionButton(icon: Icons.restart_alt, label: 'Reset', onTap: () => ref.read(waterMeterNotifierProvider.notifier).reset(_idCtrl.text)),
-                _ActionButton(icon: Icons.delete_forever, label: 'Delete', onTap: () => ref.read(waterMeterNotifierProvider.notifier).delete(_idCtrl.text)),
+                _ActionButton(icon: Icons.restart_alt, label: 'Reset', onTap: () => ref.read(waterMeterNotifierProvider.notifier).reset(mac)),
+                _ActionButton(icon: Icons.delete_forever, label: 'Delete', onTap: () => ref.read(waterMeterNotifierProvider.notifier).delete(mac)),
               ],
             ),
     );
