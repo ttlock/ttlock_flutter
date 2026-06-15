@@ -962,8 +962,8 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         gatewayInfoMap.put("hardwareRevision", deviceInfo.hardwareRevision);
         gatewayInfoMap.put("firmwareRevision", deviceInfo.firmwareRevision);
         gatewayInfoMap.put("networkMac", deviceInfo.networkMac);
-        // gatewayInfoMap.put("pinCode", deviceInfo.pinCode);
-        // gatewayInfoMap.put("mtCode", deviceInfo.mtCode);
+         gatewayInfoMap.put("pinCode", deviceInfo.pinCode);
+         gatewayInfoMap.put("mtCode", deviceInfo.mtCode);
         successCallbackCommand(GatewayCommand.COMMAND_INIT_GATEWAY, gatewayInfoMap);
       }
 
