@@ -32,7 +32,7 @@ class _GatewayPageState extends State<GatewayPage> {
     ProgressHud.of(_context!).showAndDismiss(type, text);
   }
 
-  void _initGateway_2(String? wifi, String? wifiPassword) {
+  void _initGateway_wifi(String? wifi, String? wifiPassword) {
     if (_wifi == null || _wifiPassword != null || _wifiPassword!.length == 0) {
       _showAndDismiss(ProgressHudType.error, '"wifi or password cant be empty');
     }
@@ -51,7 +51,7 @@ class _GatewayPageState extends State<GatewayPage> {
     _initGateway(paramMap);
   }
 
-  void _initGateway_3_4() {
+  void _initGateway_cellular() {
     Map paramMap = Map();
     paramMap["type"] = _type!.index;
     paramMap["gatewayName"] = Config.gatewayName;
@@ -124,16 +124,16 @@ class _GatewayPageState extends State<GatewayPage> {
       onPressed: () {
         FocusScope.of(_context!).requestFocus(FocusNode());
         //g2
-        if (_type == TTGatewayType.g2) {
-          _initGateway_2(_wifi, _wifiPassword);
+        if (_type == TTGatewayType.g2 || _type == TTGatewayType.g5 || _type == TTGatewayType.g6) {
+          _initGateway_wifi(_wifi, _wifiPassword);
         } else {
           //g3 g4
-          _initGateway_3_4();
+          _initGateway_cellular();
         }
       },
     );
 
-    if (_type == TTGatewayType.g2) {
+    if (_type == TTGatewayType.g2 || _type == TTGatewayType.g5 || _type == TTGatewayType.g6) {
       return Column(
         children: <Widget>[
           wifiTextField,

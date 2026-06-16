@@ -81,7 +81,7 @@ class _ScanPageState extends State<ScanPage> {
       _dismissLoading();
       if (status == TTGatewayConnectStatus.success) {
         StatefulWidget? widget;
-        if (type == TTGatewayType.g2) {
+        if (type == TTGatewayType.g2 || type == TTGatewayType.g5 || type == TTGatewayType.g6) {
           widget = WifiPage(mac: mac);
         } else if (type == TTGatewayType.g3 || type == TTGatewayType.g4) {
           widget = GatewayPage(type: type);
