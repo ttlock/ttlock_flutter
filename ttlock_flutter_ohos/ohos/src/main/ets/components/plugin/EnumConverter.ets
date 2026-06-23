@@ -65,6 +65,12 @@ export function lockConfigConvert(config: TTLockConfig): SdkTTLockConfigType {
       return SdkTTLockConfigType.tamperAlert;
     case TTLockConfig.LOW_BATTERY_AUTO_UNLOCK:
       return SdkTTLockConfigType.tamperAlert;
+    case TTLockConfig.SECURITY_M1CARD:
+      return SdkTTLockConfigType.tamperAlert;
+    case TTLockConfig.SEMI_AUTOMATIC_MODE_CONTROL:
+      return SdkTTLockConfigType.tamperAlert;
+    case TTLockConfig.LOCK_SUPERVISION:
+      return SdkTTLockConfigType.tamperAlert;
     default:
       return SdkTTLockConfigType.sound;
   }
@@ -353,6 +359,13 @@ export function featureValueConvert(lockFunction: TTLockFunction): SdkTTLockFeat
       return SdkTTLockFeatureValue.wifiPowerSavingTime;
     case TTLockFunction.MULTI_FUNCTION_KEYPAD:
       return SdkTTLockFeatureValue.multifunctionalKeypad;
+    case TTLockFunction.PICTURE_FACE_DELIVERY:
+    case TTLockFunction.SUPPORT_SET_ALIAS:
+    case TTLockFunction.HIDE_WIFI_CAT_ONE_SLEEP_MODE_SETTING:
+    case TTLockFunction.SEMI_AUTOMATIC_MODE_CONTROL:
+    case TTLockFunction.SUPPORT_SET_USER_ATTRIBUTES:
+    case TTLockFunction.SUPPORT_SUPERVISION:
+      return null;
     default:
       return null;
   }

@@ -124,6 +124,33 @@ export class TTAddFacePhaseEnum {
   }
 }
 
+/*
+*  掌静脉录入流阶段。
+* 
+*  Generated enum from Pigeon that represents data sent in messages.
+*/
+export enum TTAddPalmVeinPhase {
+  /* 可开始掌静脉采集。*/
+  CAN_START_ADD,
+  /* 采集异常，见 [AddPalmVeinEvent.errorCode]。*/
+  ERROR,
+  /* 录入成功，[AddPalmVeinEvent.palmVeinNumber] 有效。*/
+  SUCCESS
+}
+
+/*
+*  掌静脉录入流阶段。
+* 
+*  Generated enum Companion class from Pigeon that represents data sent 
+   in messages.Do not delete otherwise enum type data transfer will be failed
+*/
+export class TTAddPalmVeinPhaseEnum {
+  index: string|null = null;
+	constructor(index: string){
+    this.index = index;
+  }
+}
+
 /* Generated enum from Pigeon that represents data sent in messages.*/
 export enum TTBluetoothState {
   UNKNOW,
@@ -233,7 +260,10 @@ export enum TTLockConfig {
   WIFI_LOCK_POWER_SAVING_MODE,
   DOUBLE_AUTH,
   PUBLIC_MODE,
-  LOW_BATTERY_AUTO_UNLOCK
+  LOW_BATTERY_AUTO_UNLOCK,
+  SECURITY_M1CARD,
+  SEMI_AUTOMATIC_MODE_CONTROL,
+  LOCK_SUPERVISION
 }
 
 /* Generated enum Companion class from Pigeon that represents data sent 
@@ -666,7 +696,13 @@ export enum TTLockFunction {
   WORKING_TIME,
   CUSTOM_QRCODE,
   SECURITY_M1CARD,
-  YI_SHENG_PHOTO_FACE
+  YI_SHENG_PHOTO_FACE,
+  PICTURE_FACE_DELIVERY,
+  SUPPORT_SET_ALIAS,
+  HIDE_WIFI_CAT_ONE_SLEEP_MODE_SETTING,
+  SEMI_AUTOMATIC_MODE_CONTROL,
+  SUPPORT_SET_USER_ATTRIBUTES,
+  SUPPORT_SUPERVISION
 }
 
 /* Generated enum Companion class from Pigeon that represents data sent 
@@ -765,6 +801,28 @@ export enum TTFaceErrorCode {
 /* Generated enum Companion class from Pigeon that represents data sent 
    in messages.Do not delete otherwise enum type data transfer will be failed*/
 export class TTFaceErrorCodeEnum {
+  index: string|null = null;
+	constructor(index: string){
+    this.index = index;
+  }
+}
+
+/* Generated enum from Pigeon that represents data sent in messages.*/
+export enum TTPalmVeinErrorCode {
+  UNKNOWN_STATUS,
+  NO_PALM_VEIN_DETECTED,
+  PALM_RECT_CONF_LOW,
+  PALM_LANDMARK_CONF_LOW,
+  PALM_ANGLE_ROLL_ERROR,
+  PALM_ANGLE_LEAN_ERROR,
+  PALM_BLOCK,
+  PALM_BLUR,
+  PALM_BACK
+}
+
+/* Generated enum Companion class from Pigeon that represents data sent 
+   in messages.Do not delete otherwise enum type data transfer will be failed*/
+export class TTPalmVeinErrorCodeEnum {
   index: string|null = null;
 	constructor(index: string){
     this.index = index;
@@ -2546,6 +2604,70 @@ export class TTFingerprintModel {
 }
 
 /* Generated class from Pigeon that represents data sent in messages.*/
+export class TTPalmVeinModel {
+  private palmVeinNumber?: string;
+
+  public setPalmVeinNumber(palmVeinNumber:string):void {
+    this.palmVeinNumber = palmVeinNumber;
+  }
+
+  getPalmVeinNumber(): string | undefined{
+    return this.palmVeinNumber;
+  }
+
+  private startDate?: number;
+
+  public setStartDate(startDate:number):void {
+    this.startDate = startDate;
+  }
+
+  getStartDate(): number | undefined{
+    return this.startDate;
+  }
+
+  private endDate?: number;
+
+  public setEndDate(endDate:number):void {
+    this.endDate = endDate;
+  }
+
+  getEndDate(): number | undefined{
+    return this.endDate;
+  }
+
+  constructor(palmVeinNumber?: string, startDate?: number, endDate?: number) {
+    this.palmVeinNumber = palmVeinNumber;
+    this.startDate = startDate;
+    this.endDate = endDate;
+  }
+
+  toList(): Object[] {
+    let arr: Object[] = new Array();
+    if(this.palmVeinNumber !==undefined){
+      arr.push(this.palmVeinNumber);
+    }
+    if(this.startDate !==undefined){
+      arr.push(this.startDate);
+    }
+    if(this.endDate !==undefined){
+      arr.push(this.endDate);
+    }
+    return arr;
+  }
+
+  static fromList(arr: Object[]): TTPalmVeinModel {
+    let pigeonResult: TTPalmVeinModel = new TTPalmVeinModel();
+    let palmVeinNumber: Object = arr[0];
+    pigeonResult.setPalmVeinNumber(palmVeinNumber as string);
+    let startDate: Object = arr[1];
+    pigeonResult.setStartDate(startDate as number);
+    let endDate: Object = arr[2];
+    pigeonResult.setEndDate(endDate as number);
+    return pigeonResult;
+  }
+}
+
+/* Generated class from Pigeon that represents data sent in messages.*/
 export class TTGatewayScanModel {
   private gatewayName?: string;
 
@@ -4072,6 +4194,72 @@ export class AddFaceEvent {
   }
 }
 
+/* Generated class from Pigeon that represents data sent in messages.*/
+export class AddPalmVeinEvent {
+  private phase?: TTAddPalmVeinPhase;
+
+  public setPhase(phase:TTAddPalmVeinPhase):void {
+    this.phase = phase;
+  }
+
+  getPhase(): TTAddPalmVeinPhase | undefined{
+    return this.phase;
+  }
+
+  private errorCode?: TTPalmVeinErrorCode;
+
+  public setErrorCode(errorCode:TTPalmVeinErrorCode):void {
+    this.errorCode = errorCode;
+  }
+
+  getErrorCode(): TTPalmVeinErrorCode | undefined{
+    return this.errorCode;
+  }
+
+  private palmVeinNumber?: string;
+
+  public setPalmVeinNumber(palmVeinNumber:string):void {
+    this.palmVeinNumber = palmVeinNumber;
+  }
+
+  getPalmVeinNumber(): string | undefined{
+    return this.palmVeinNumber;
+  }
+
+  constructor(phase?: TTAddPalmVeinPhase, errorCode?: TTPalmVeinErrorCode, palmVeinNumber?: string) {
+    this.phase = phase;
+    this.errorCode = errorCode;
+    this.palmVeinNumber = palmVeinNumber;
+  }
+
+  toList(): Object[] {
+    let arr: Object[] = new Array();
+    if(this.phase !==undefined){
+      const phaseStr = TTAddPalmVeinPhase[this.phase as number];
+      arr.push(new TTAddPalmVeinPhaseEnum(phaseStr));
+    }
+    if(this.errorCode !==undefined){
+      const errorCodeStr = TTPalmVeinErrorCode[this.errorCode as number];
+      arr.push(new TTPalmVeinErrorCodeEnum(errorCodeStr));
+    }
+    if(this.palmVeinNumber !==undefined){
+      arr.push(this.palmVeinNumber);
+    }
+    return arr;
+  }
+
+  static fromList(arr: Object[]): AddPalmVeinEvent {
+    let pigeonResult: AddPalmVeinEvent = new AddPalmVeinEvent();
+    const phaseStr: string = arr[0]! as string;
+    pigeonResult.setPhase(TTAddPalmVeinPhase[phaseStr]);
+    const errorCodeStr: string = arr[1]! as string;
+    pigeonResult.setErrorCode(TTPalmVeinErrorCode[errorCodeStr]);
+    let palmVeinNumber: Object = arr[2];
+    pigeonResult.setPalmVeinNumber(palmVeinNumber as string);
+    return pigeonResult;
+  }
+}
+
 export class PigeonCodec extends StandardMessageCodec {
   static readonly INSTANCE: PigeonCodec  = new PigeonCodec();
 
@@ -4100,196 +4288,208 @@ export class PigeonCodec extends StandardMessageCodec {
       }
       case this.getByte(132): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTBluetoothState[value as number];
+        return value == null ? null : TTAddPalmVeinPhase[value as number];
       }
       case this.getByte(133): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTPasscodeType[value as number];
+        return value == null ? null : TTBluetoothState[value as number];
       }
       case this.getByte(134): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTOperateRecordType[value as number];
+        return value == null ? null : TTPasscodeType[value as number];
       }
       case this.getByte(135): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTControlAction[value as number];
+        return value == null ? null : TTOperateRecordType[value as number];
       }
       case this.getByte(136): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTLockSwitchState[value as number];
+        return value == null ? null : TTControlAction[value as number];
       }
       case this.getByte(137): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTPassageModeType[value as number];
+        return value == null ? null : TTLockSwitchState[value as number];
       }
       case this.getByte(138): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTLockConfig[value as number];
+        return value == null ? null : TTPassageModeType[value as number];
       }
       case this.getByte(139): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTLockDirection[value as number];
+        return value == null ? null : TTLockConfig[value as number];
       }
       case this.getByte(140): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTSoundVolumeType[value as number];
+        return value == null ? null : TTLockDirection[value as number];
       }
       case this.getByte(141): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTSensitivityValue[value as number];
+        return value == null ? null : TTSoundVolumeType[value as number];
       }
       case this.getByte(142): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTLockError[value as number];
+        return value == null ? null : TTSensitivityValue[value as number];
       }
       case this.getByte(143): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTErrorDevice[value as number];
+        return value == null ? null : TTLockError[value as number];
       }
       case this.getByte(144): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTLiftWorkActivateType[value as number];
+        return value == null ? null : TTErrorDevice[value as number];
       }
       case this.getByte(145): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTPowerSaverWorkType[value as number];
+        return value == null ? null : TTLiftWorkActivateType[value as number];
       }
       case this.getByte(146): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTGatewayType[value as number];
+        return value == null ? null : TTPowerSaverWorkType[value as number];
       }
       case this.getByte(147): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTGatewayConnectStatus[value as number];
+        return value == null ? null : TTGatewayType[value as number];
       }
       case this.getByte(148): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTGatewayError[value as number];
+        return value == null ? null : TTGatewayConnectStatus[value as number];
       }
       case this.getByte(149): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTRemoteAccessoryError[value as number];
+        return value == null ? null : TTGatewayError[value as number];
       }
       case this.getByte(150): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTMultifunctionalKeypadError[value as number];
+        return value == null ? null : TTRemoteAccessoryError[value as number];
       }
       case this.getByte(151): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTRemoteAccessory[value as number];
+        return value == null ? null : TTMultifunctionalKeypadError[value as number];
       }
       case this.getByte(152): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTIpSettingType[value as number];
+        return value == null ? null : TTRemoteAccessory[value as number];
       }
       case this.getByte(153): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTNbAwakeMode[value as number];
+        return value == null ? null : TTIpSettingType[value as number];
       }
       case this.getByte(154): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTNbAwakeTimeType[value as number];
+        return value == null ? null : TTNbAwakeMode[value as number];
       }
       case this.getByte(155): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTLockFunction[value as number];
+        return value == null ? null : TTNbAwakeTimeType[value as number];
       }
       case this.getByte(156): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTFaceState[value as number];
+        return value == null ? null : TTLockFunction[value as number];
       }
       case this.getByte(157): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTWaterMeterFeature[value as number];
+        return value == null ? null : TTFaceState[value as number];
       }
       case this.getByte(158): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTElectricMeterFeature[value as number];
+        return value == null ? null : TTWaterMeterFeature[value as number];
       }
       case this.getByte(159): {
         let value: Object= super.readValue(buffer);
-        return value == null ? null : TTMeterPayMode[value as number];
+        return value == null ? null : TTElectricMeterFeature[value as number];
       }
       case this.getByte(160): {
         let value: Object= super.readValue(buffer);
+        return value == null ? null : TTMeterPayMode[value as number];
+      }
+      case this.getByte(161): {
+        let value: Object= super.readValue(buffer);
         return value == null ? null : TTFaceErrorCode[value as number];
       }
-      case this.getByte(161):
-        return TTLockVersion.fromList(super.readValue(buffer) as Object[]);
-      case this.getByte(162):
-        return TTLockInitParams.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(162): {
+        let value: Object= super.readValue(buffer);
+        return value == null ? null : TTPalmVeinErrorCode[value as number];
+      }
       case this.getByte(163):
-        return TTGatewayInitParams.fromList(super.readValue(buffer) as Object[]);
+        return TTLockVersion.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(164):
-        return TTIpSetting.fromList(super.readValue(buffer) as Object[]);
+        return TTLockInitParams.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(165):
-        return TTCycleModel.fromList(super.readValue(buffer) as Object[]);
+        return TTGatewayInitParams.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(166):
-        return TTLockScanWifiEventParam.fromList(super.readValue(buffer) as Object[]);
+        return TTIpSetting.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(167):
-        return TTLockCredentialEventParam.fromList(super.readValue(buffer) as Object[]);
+        return TTCycleModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(168):
-        return TTKeypadCredentialEventParam.fromList(super.readValue(buffer) as Object[]);
+        return TTLockScanWifiEventParam.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(169):
-        return ControlLockResult.fromList(super.readValue(buffer) as Object[]);
+        return TTLockCredentialEventParam.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(170):
-        return AutoLockingTime.fromList(super.readValue(buffer) as Object[]);
+        return TTKeypadCredentialEventParam.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(171):
-        return TTWifiInfoModel.fromList(super.readValue(buffer) as Object[]);
+        return ControlLockResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(172):
-        return CameraLockWifiResult.fromList(super.readValue(buffer) as Object[]);
+        return AutoLockingTime.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(173):
-        return TTLockSystemModel.fromList(super.readValue(buffer) as Object[]);
+        return TTWifiInfoModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(174):
-        return AccessoryElectricQuantityResult.fromList(super.readValue(buffer) as Object[]);
+        return CameraLockWifiResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(175):
-        return TTPassageModeModel.fromList(super.readValue(buffer) as Object[]);
+        return TTLockSystemModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(176):
-        return TTLockScanModel.fromList(super.readValue(buffer) as Object[]);
+        return AccessoryElectricQuantityResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(177):
-        return TTPasscodeModel.fromList(super.readValue(buffer) as Object[]);
+        return TTPassageModeModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(178):
-        return TTICCardModel.fromList(super.readValue(buffer) as Object[]);
+        return TTLockScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(179):
-        return TTFingerprintModel.fromList(super.readValue(buffer) as Object[]);
+        return TTPasscodeModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(180):
-        return TTGatewayScanModel.fromList(super.readValue(buffer) as Object[]);
+        return TTICCardModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(181):
-        return GatewayDeviceInfo.fromList(super.readValue(buffer) as Object[]);
+        return TTFingerprintModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(182):
-        return TTRemoteAccessoryScanModel.fromList(super.readValue(buffer) as Object[]);
+        return TTPalmVeinModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(183):
-        return TTStandaloneDoorSensorScanModel.fromList(super.readValue(buffer) as Object[]);
+        return TTGatewayScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(184):
-        return TTStandaloneDoorSensorInfo.fromList(super.readValue(buffer) as Object[]);
+        return GatewayDeviceInfo.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(185):
-        return TTMeterScanModel.fromList(super.readValue(buffer) as Object[]);
+        return TTRemoteAccessoryScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(186):
-        return TTWaterMeterInitResult.fromList(super.readValue(buffer) as Object[]);
+        return TTStandaloneDoorSensorScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(187):
-        return TTElectricMeterInitResult.fromList(super.readValue(buffer) as Object[]);
+        return TTStandaloneDoorSensorInfo.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(188):
-        return TTWifiScanResult.fromList(super.readValue(buffer) as Object[]);
+        return TTMeterScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(189):
-        return TTWifiScanEntry.fromList(super.readValue(buffer) as Object[]);
+        return TTWaterMeterInitResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(190):
-        return RemoteKeypadInitResult.fromList(super.readValue(buffer) as Object[]);
+        return TTElectricMeterInitResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(191):
-        return MultifunctionalKeypadInitResult.fromList(super.readValue(buffer) as Object[]);
+        return TTWifiScanResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(192):
-        return WaterMeterDeviceInfo.fromList(super.readValue(buffer) as Object[]);
+        return TTWifiScanEntry.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(193):
-        return ElectricMeterDeviceInfo.fromList(super.readValue(buffer) as Object[]);
+        return RemoteKeypadInitResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(194):
-        return TTWaterMeterInitParam.fromList(super.readValue(buffer) as Object[]);
+        return MultifunctionalKeypadInitResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(195):
-        return TTElectricMeterInitParam.fromList(super.readValue(buffer) as Object[]);
+        return WaterMeterDeviceInfo.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(196):
-        return AddCardEvent.fromList(super.readValue(buffer) as Object[]);
+        return ElectricMeterDeviceInfo.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(197):
-        return AddFingerprintEvent.fromList(super.readValue(buffer) as Object[]);
+        return TTWaterMeterInitParam.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(198):
+        return TTElectricMeterInitParam.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(199):
+        return AddCardEvent.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(200):
+        return AddFingerprintEvent.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(201):
         return AddFaceEvent.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(202):
+        return AddPalmVeinEvent.fromList(super.readValue(buffer) as Object[]);
       default:
         return super.readValueOfType(type, buffer);
     }
@@ -4305,207 +4505,219 @@ export class PigeonCodec extends StandardMessageCodec {
     } else if (value instanceof TTAddFacePhaseEnum) {
       stream.writeUint8(this.getByte(131));
       this.writeValue(stream, value == null ? null : TTAddFacePhase[value.index as string]);
-    } else if (value instanceof TTBluetoothStateEnum) {
+    } else if (value instanceof TTAddPalmVeinPhaseEnum) {
       stream.writeUint8(this.getByte(132));
+      this.writeValue(stream, value == null ? null : TTAddPalmVeinPhase[value.index as string]);
+    } else if (value instanceof TTBluetoothStateEnum) {
+      stream.writeUint8(this.getByte(133));
       this.writeValue(stream, value == null ? null : TTBluetoothState[value.index as string]);
     } else if (value instanceof TTPasscodeTypeEnum) {
-      stream.writeUint8(this.getByte(133));
+      stream.writeUint8(this.getByte(134));
       this.writeValue(stream, value == null ? null : TTPasscodeType[value.index as string]);
     } else if (value instanceof TTOperateRecordTypeEnum) {
-      stream.writeUint8(this.getByte(134));
+      stream.writeUint8(this.getByte(135));
       this.writeValue(stream, value == null ? null : TTOperateRecordType[value.index as string]);
     } else if (value instanceof TTControlActionEnum) {
-      stream.writeUint8(this.getByte(135));
+      stream.writeUint8(this.getByte(136));
       this.writeValue(stream, value == null ? null : TTControlAction[value.index as string]);
     } else if (value instanceof TTLockSwitchStateEnum) {
-      stream.writeUint8(this.getByte(136));
+      stream.writeUint8(this.getByte(137));
       this.writeValue(stream, value == null ? null : TTLockSwitchState[value.index as string]);
     } else if (value instanceof TTPassageModeTypeEnum) {
-      stream.writeUint8(this.getByte(137));
+      stream.writeUint8(this.getByte(138));
       this.writeValue(stream, value == null ? null : TTPassageModeType[value.index as string]);
     } else if (value instanceof TTLockConfigEnum) {
-      stream.writeUint8(this.getByte(138));
+      stream.writeUint8(this.getByte(139));
       this.writeValue(stream, value == null ? null : TTLockConfig[value.index as string]);
     } else if (value instanceof TTLockDirectionEnum) {
-      stream.writeUint8(this.getByte(139));
+      stream.writeUint8(this.getByte(140));
       this.writeValue(stream, value == null ? null : TTLockDirection[value.index as string]);
     } else if (value instanceof TTSoundVolumeTypeEnum) {
-      stream.writeUint8(this.getByte(140));
+      stream.writeUint8(this.getByte(141));
       this.writeValue(stream, value == null ? null : TTSoundVolumeType[value.index as string]);
     } else if (value instanceof TTSensitivityValueEnum) {
-      stream.writeUint8(this.getByte(141));
+      stream.writeUint8(this.getByte(142));
       this.writeValue(stream, value == null ? null : TTSensitivityValue[value.index as string]);
     } else if (value instanceof TTLockErrorEnum) {
-      stream.writeUint8(this.getByte(142));
+      stream.writeUint8(this.getByte(143));
       this.writeValue(stream, value == null ? null : TTLockError[value.index as string]);
     } else if (value instanceof TTErrorDeviceEnum) {
-      stream.writeUint8(this.getByte(143));
+      stream.writeUint8(this.getByte(144));
       this.writeValue(stream, value == null ? null : TTErrorDevice[value.index as string]);
     } else if (value instanceof TTLiftWorkActivateTypeEnum) {
-      stream.writeUint8(this.getByte(144));
+      stream.writeUint8(this.getByte(145));
       this.writeValue(stream, value == null ? null : TTLiftWorkActivateType[value.index as string]);
     } else if (value instanceof TTPowerSaverWorkTypeEnum) {
-      stream.writeUint8(this.getByte(145));
+      stream.writeUint8(this.getByte(146));
       this.writeValue(stream, value == null ? null : TTPowerSaverWorkType[value.index as string]);
     } else if (value instanceof TTGatewayTypeEnum) {
-      stream.writeUint8(this.getByte(146));
+      stream.writeUint8(this.getByte(147));
       this.writeValue(stream, value == null ? null : TTGatewayType[value.index as string]);
     } else if (value instanceof TTGatewayConnectStatusEnum) {
-      stream.writeUint8(this.getByte(147));
+      stream.writeUint8(this.getByte(148));
       this.writeValue(stream, value == null ? null : TTGatewayConnectStatus[value.index as string]);
     } else if (value instanceof TTGatewayErrorEnum) {
-      stream.writeUint8(this.getByte(148));
+      stream.writeUint8(this.getByte(149));
       this.writeValue(stream, value == null ? null : TTGatewayError[value.index as string]);
     } else if (value instanceof TTRemoteAccessoryErrorEnum) {
-      stream.writeUint8(this.getByte(149));
+      stream.writeUint8(this.getByte(150));
       this.writeValue(stream, value == null ? null : TTRemoteAccessoryError[value.index as string]);
     } else if (value instanceof TTMultifunctionalKeypadErrorEnum) {
-      stream.writeUint8(this.getByte(150));
+      stream.writeUint8(this.getByte(151));
       this.writeValue(stream, value == null ? null : TTMultifunctionalKeypadError[value.index as string]);
     } else if (value instanceof TTRemoteAccessoryEnum) {
-      stream.writeUint8(this.getByte(151));
+      stream.writeUint8(this.getByte(152));
       this.writeValue(stream, value == null ? null : TTRemoteAccessory[value.index as string]);
     } else if (value instanceof TTIpSettingTypeEnum) {
-      stream.writeUint8(this.getByte(152));
+      stream.writeUint8(this.getByte(153));
       this.writeValue(stream, value == null ? null : TTIpSettingType[value.index as string]);
     } else if (value instanceof TTNbAwakeModeEnum) {
-      stream.writeUint8(this.getByte(153));
+      stream.writeUint8(this.getByte(154));
       this.writeValue(stream, value == null ? null : TTNbAwakeMode[value.index as string]);
     } else if (value instanceof TTNbAwakeTimeTypeEnum) {
-      stream.writeUint8(this.getByte(154));
+      stream.writeUint8(this.getByte(155));
       this.writeValue(stream, value == null ? null : TTNbAwakeTimeType[value.index as string]);
     } else if (value instanceof TTLockFunctionEnum) {
-      stream.writeUint8(this.getByte(155));
+      stream.writeUint8(this.getByte(156));
       this.writeValue(stream, value == null ? null : TTLockFunction[value.index as string]);
     } else if (value instanceof TTFaceStateEnum) {
-      stream.writeUint8(this.getByte(156));
+      stream.writeUint8(this.getByte(157));
       this.writeValue(stream, value == null ? null : TTFaceState[value.index as string]);
     } else if (value instanceof TTWaterMeterFeatureEnum) {
-      stream.writeUint8(this.getByte(157));
+      stream.writeUint8(this.getByte(158));
       this.writeValue(stream, value == null ? null : TTWaterMeterFeature[value.index as string]);
     } else if (value instanceof TTElectricMeterFeatureEnum) {
-      stream.writeUint8(this.getByte(158));
+      stream.writeUint8(this.getByte(159));
       this.writeValue(stream, value == null ? null : TTElectricMeterFeature[value.index as string]);
     } else if (value instanceof TTMeterPayModeEnum) {
-      stream.writeUint8(this.getByte(159));
+      stream.writeUint8(this.getByte(160));
       this.writeValue(stream, value == null ? null : TTMeterPayMode[value.index as string]);
     } else if (value instanceof TTFaceErrorCodeEnum) {
-      stream.writeUint8(this.getByte(160));
-      this.writeValue(stream, value == null ? null : TTFaceErrorCode[value.index as string]);
-    } else if (value instanceof TTLockVersion) {
       stream.writeUint8(this.getByte(161));
+      this.writeValue(stream, value == null ? null : TTFaceErrorCode[value.index as string]);
+    } else if (value instanceof TTPalmVeinErrorCodeEnum) {
+      stream.writeUint8(this.getByte(162));
+      this.writeValue(stream, value == null ? null : TTPalmVeinErrorCode[value.index as string]);
+    } else if (value instanceof TTLockVersion) {
+      stream.writeUint8(this.getByte(163));
       this.writeValue(stream, (value as TTLockVersion).toList());
     } else if (value instanceof TTLockInitParams) {
-      stream.writeUint8(this.getByte(162));
+      stream.writeUint8(this.getByte(164));
       this.writeValue(stream, (value as TTLockInitParams).toList());
     } else if (value instanceof TTGatewayInitParams) {
-      stream.writeUint8(this.getByte(163));
+      stream.writeUint8(this.getByte(165));
       this.writeValue(stream, (value as TTGatewayInitParams).toList());
     } else if (value instanceof TTIpSetting) {
-      stream.writeUint8(this.getByte(164));
+      stream.writeUint8(this.getByte(166));
       this.writeValue(stream, (value as TTIpSetting).toList());
     } else if (value instanceof TTCycleModel) {
-      stream.writeUint8(this.getByte(165));
+      stream.writeUint8(this.getByte(167));
       this.writeValue(stream, (value as TTCycleModel).toList());
     } else if (value instanceof TTLockScanWifiEventParam) {
-      stream.writeUint8(this.getByte(166));
+      stream.writeUint8(this.getByte(168));
       this.writeValue(stream, (value as TTLockScanWifiEventParam).toList());
     } else if (value instanceof TTLockCredentialEventParam) {
-      stream.writeUint8(this.getByte(167));
+      stream.writeUint8(this.getByte(169));
       this.writeValue(stream, (value as TTLockCredentialEventParam).toList());
     } else if (value instanceof TTKeypadCredentialEventParam) {
-      stream.writeUint8(this.getByte(168));
+      stream.writeUint8(this.getByte(170));
       this.writeValue(stream, (value as TTKeypadCredentialEventParam).toList());
     } else if (value instanceof ControlLockResult) {
-      stream.writeUint8(this.getByte(169));
+      stream.writeUint8(this.getByte(171));
       this.writeValue(stream, (value as ControlLockResult).toList());
     } else if (value instanceof AutoLockingTime) {
-      stream.writeUint8(this.getByte(170));
+      stream.writeUint8(this.getByte(172));
       this.writeValue(stream, (value as AutoLockingTime).toList());
     } else if (value instanceof TTWifiInfoModel) {
-      stream.writeUint8(this.getByte(171));
+      stream.writeUint8(this.getByte(173));
       this.writeValue(stream, (value as TTWifiInfoModel).toList());
     } else if (value instanceof CameraLockWifiResult) {
-      stream.writeUint8(this.getByte(172));
+      stream.writeUint8(this.getByte(174));
       this.writeValue(stream, (value as CameraLockWifiResult).toList());
     } else if (value instanceof TTLockSystemModel) {
-      stream.writeUint8(this.getByte(173));
+      stream.writeUint8(this.getByte(175));
       this.writeValue(stream, (value as TTLockSystemModel).toList());
     } else if (value instanceof AccessoryElectricQuantityResult) {
-      stream.writeUint8(this.getByte(174));
+      stream.writeUint8(this.getByte(176));
       this.writeValue(stream, (value as AccessoryElectricQuantityResult).toList());
     } else if (value instanceof TTPassageModeModel) {
-      stream.writeUint8(this.getByte(175));
+      stream.writeUint8(this.getByte(177));
       this.writeValue(stream, (value as TTPassageModeModel).toList());
     } else if (value instanceof TTLockScanModel) {
-      stream.writeUint8(this.getByte(176));
+      stream.writeUint8(this.getByte(178));
       this.writeValue(stream, (value as TTLockScanModel).toList());
     } else if (value instanceof TTPasscodeModel) {
-      stream.writeUint8(this.getByte(177));
+      stream.writeUint8(this.getByte(179));
       this.writeValue(stream, (value as TTPasscodeModel).toList());
     } else if (value instanceof TTICCardModel) {
-      stream.writeUint8(this.getByte(178));
+      stream.writeUint8(this.getByte(180));
       this.writeValue(stream, (value as TTICCardModel).toList());
     } else if (value instanceof TTFingerprintModel) {
-      stream.writeUint8(this.getByte(179));
+      stream.writeUint8(this.getByte(181));
       this.writeValue(stream, (value as TTFingerprintModel).toList());
+    } else if (value instanceof TTPalmVeinModel) {
+      stream.writeUint8(this.getByte(182));
+      this.writeValue(stream, (value as TTPalmVeinModel).toList());
     } else if (value instanceof TTGatewayScanModel) {
-      stream.writeUint8(this.getByte(180));
+      stream.writeUint8(this.getByte(183));
       this.writeValue(stream, (value as TTGatewayScanModel).toList());
     } else if (value instanceof GatewayDeviceInfo) {
-      stream.writeUint8(this.getByte(181));
+      stream.writeUint8(this.getByte(184));
       this.writeValue(stream, (value as GatewayDeviceInfo).toList());
     } else if (value instanceof TTRemoteAccessoryScanModel) {
-      stream.writeUint8(this.getByte(182));
+      stream.writeUint8(this.getByte(185));
       this.writeValue(stream, (value as TTRemoteAccessoryScanModel).toList());
     } else if (value instanceof TTStandaloneDoorSensorScanModel) {
-      stream.writeUint8(this.getByte(183));
+      stream.writeUint8(this.getByte(186));
       this.writeValue(stream, (value as TTStandaloneDoorSensorScanModel).toList());
     } else if (value instanceof TTStandaloneDoorSensorInfo) {
-      stream.writeUint8(this.getByte(184));
+      stream.writeUint8(this.getByte(187));
       this.writeValue(stream, (value as TTStandaloneDoorSensorInfo).toList());
     } else if (value instanceof TTMeterScanModel) {
-      stream.writeUint8(this.getByte(185));
+      stream.writeUint8(this.getByte(188));
       this.writeValue(stream, (value as TTMeterScanModel).toList());
     } else if (value instanceof TTWaterMeterInitResult) {
-      stream.writeUint8(this.getByte(186));
+      stream.writeUint8(this.getByte(189));
       this.writeValue(stream, (value as TTWaterMeterInitResult).toList());
     } else if (value instanceof TTElectricMeterInitResult) {
-      stream.writeUint8(this.getByte(187));
+      stream.writeUint8(this.getByte(190));
       this.writeValue(stream, (value as TTElectricMeterInitResult).toList());
     } else if (value instanceof TTWifiScanResult) {
-      stream.writeUint8(this.getByte(188));
+      stream.writeUint8(this.getByte(191));
       this.writeValue(stream, (value as TTWifiScanResult).toList());
     } else if (value instanceof TTWifiScanEntry) {
-      stream.writeUint8(this.getByte(189));
+      stream.writeUint8(this.getByte(192));
       this.writeValue(stream, (value as TTWifiScanEntry).toList());
     } else if (value instanceof RemoteKeypadInitResult) {
-      stream.writeUint8(this.getByte(190));
+      stream.writeUint8(this.getByte(193));
       this.writeValue(stream, (value as RemoteKeypadInitResult).toList());
     } else if (value instanceof MultifunctionalKeypadInitResult) {
-      stream.writeUint8(this.getByte(191));
+      stream.writeUint8(this.getByte(194));
       this.writeValue(stream, (value as MultifunctionalKeypadInitResult).toList());
     } else if (value instanceof WaterMeterDeviceInfo) {
-      stream.writeUint8(this.getByte(192));
+      stream.writeUint8(this.getByte(195));
       this.writeValue(stream, (value as WaterMeterDeviceInfo).toList());
     } else if (value instanceof ElectricMeterDeviceInfo) {
-      stream.writeUint8(this.getByte(193));
+      stream.writeUint8(this.getByte(196));
       this.writeValue(stream, (value as ElectricMeterDeviceInfo).toList());
     } else if (value instanceof TTWaterMeterInitParam) {
-      stream.writeUint8(this.getByte(194));
+      stream.writeUint8(this.getByte(197));
       this.writeValue(stream, (value as TTWaterMeterInitParam).toList());
     } else if (value instanceof TTElectricMeterInitParam) {
-      stream.writeUint8(this.getByte(195));
+      stream.writeUint8(this.getByte(198));
       this.writeValue(stream, (value as TTElectricMeterInitParam).toList());
     } else if (value instanceof AddCardEvent) {
-      stream.writeUint8(this.getByte(196));
+      stream.writeUint8(this.getByte(199));
       this.writeValue(stream, (value as AddCardEvent).toList());
     } else if (value instanceof AddFingerprintEvent) {
-      stream.writeUint8(this.getByte(197));
+      stream.writeUint8(this.getByte(200));
       this.writeValue(stream, (value as AddFingerprintEvent).toList());
     } else if (value instanceof AddFaceEvent) {
-      stream.writeUint8(this.getByte(198));
+      stream.writeUint8(this.getByte(201));
       this.writeValue(stream, (value as AddFaceEvent).toList());
+    } else if (value instanceof AddPalmVeinEvent) {
+      stream.writeUint8(this.getByte(202));
+      this.writeValue(stream, (value as AddPalmVeinEvent).toList());
     } else {
       super.writeValue(stream, value);
     }
@@ -4528,6 +4740,8 @@ export abstract class TTLockHostApi {
   abstract setLockAddFingerprintParam(param: TTLockCredentialEventParam ): void;
   /* 订阅 [TTEventChannelApi.lockAddFace] 前调用。*/
   abstract setLockAddFaceParam(param: TTLockCredentialEventParam ): void;
+  /* 订阅 [TTEventChannelApi.lockAddPalmVein] 前调用。*/
+  abstract setLockAddPalmVeinParam(param: TTLockCredentialEventParam ): void;
 
   abstract getBluetoothState(): TTBluetoothState;
 
@@ -4594,6 +4808,18 @@ export abstract class TTLockHostApi {
   abstract deleteFace(faceNumber: string , lockData: string , result: Result<void>): void;
 
   abstract clearFace(lockData: string , result: Result<void>): void;
+
+  abstract modifyPalmVein(palmVeinNumber: string , cycleList: Array<TTCycleModel> , startDate: number , endDate: number , lockData: string , result: Result<void>): void;
+
+  abstract deletePalmVein(palmVeinNumber: string , lockData: string , result: Result<void>): void;
+
+  abstract clearPalmVein(lockData: string , result: Result<void>): void;
+
+  abstract getAllValidPalmVeins(lockData: string , result: Result<Array<TTPalmVeinModel>>): void;
+
+  abstract setMotorTorqueLevel(torqueLevel: number , lockData: string , result: Result<void>): void;
+
+  abstract setLockLatchBolt(keepTime: number , lockData: string , result: Result<void>): void;
 
   abstract setLockTime(timestamp: number , lockData: string , result: Result<void>): void;
 
@@ -4772,6 +4998,29 @@ export abstract class TTLockHostApi {
               let res: Array<Object> = [];
               try {
                 api!.setLockAddFaceParam(args[0] as TTLockCredentialEventParam);
+                res.push(null);
+              }
+ catch (error) {
+                let wrappedError: Array<Object> = wrapError(error);
+                res = wrappedError;
+              }
+              reply.reply(res);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.setLockAddPalmVeinParam", TTLockHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              let res: Array<Object> = [];
+              try {
+                api!.setLockAddPalmVeinParam(args[0] as TTLockCredentialEventParam);
                 res.push(null);
               }
  catch (error) {
@@ -5687,6 +5936,174 @@ export abstract class TTLockHostApi {
               let resultCallback: Result<void> = new ResultImp();
 
               api!.clearFace(args[0] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.modifyPalmVein", TTLockHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<void>{
+                    success(result: void): void {
+                      let res: Array<Object> = [];
+                      res.push(null);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<void> = new ResultImp();
+
+              api!.modifyPalmVein(args[0] as string, args[1] as Array<TTCycleModel>, args[2] as number, args[3] as number, args[4] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.deletePalmVein", TTLockHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<void>{
+                    success(result: void): void {
+                      let res: Array<Object> = [];
+                      res.push(null);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<void> = new ResultImp();
+
+              api!.deletePalmVein(args[0] as string, args[1] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.clearPalmVein", TTLockHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<void>{
+                    success(result: void): void {
+                      let res: Array<Object> = [];
+                      res.push(null);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<void> = new ResultImp();
+
+              api!.clearPalmVein(args[0] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.getAllValidPalmVeins", TTLockHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<Array<TTPalmVeinModel>>{
+                    success(result: Array<TTPalmVeinModel>): void {
+                      let res: Array<Object> = [];
+                      res.push(result);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<Array<TTPalmVeinModel>> = new ResultImp();
+
+              api!.getAllValidPalmVeins(args[0] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.setMotorTorqueLevel", TTLockHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<void>{
+                    success(result: void): void {
+                      let res: Array<Object> = [];
+                      res.push(null);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<void> = new ResultImp();
+
+              api!.setMotorTorqueLevel(args[0] as number, args[1] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, "dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.setLockLatchBolt", TTLockHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let args: Array<Object> = message as Array<Object>;
+              class ResultImp implements Result<void>{
+                    success(result: void): void {
+                      let res: Array<Object> = [];
+                      res.push(null);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<void> = new ResultImp();
+
+              api!.setLockLatchBolt(args[0] as number, args[1] as string, resultCallback);
             } });
       } else {
         channel.setMessageHandler(null);

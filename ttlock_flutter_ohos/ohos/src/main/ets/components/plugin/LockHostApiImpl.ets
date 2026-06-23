@@ -36,6 +36,7 @@ import {
   TTOperateRecordType,
   TTPasscodeModel,
   TTPasscodeType,
+  TTPalmVeinModel,
   TTPassageModeType,
   TTPowerSaverWorkType,
   TTRemoteAccessory,
@@ -130,6 +131,10 @@ export class LockHostApiImpl extends TTLockHostApi {
 
   setLockAddFaceParam(param: TTLockCredentialEventParam): void {
     EventContextStore.shared.lockAddFace.apply(param);
+  }
+
+  setLockAddPalmVeinParam(param: TTLockCredentialEventParam): void {
+    EventContextStore.shared.lockAddPalmVein.apply(param);
   }
 
   getBluetoothState(): TTBluetoothState {
@@ -564,6 +569,37 @@ export class LockHostApiImpl extends TTLockHostApi {
         result.error(makeLockApiError('clearFace', err));
       },
     });
+  }
+
+  modifyPalmVein(
+    _palmVeinNumber: string,
+    _cycleList: Array<TTCycleModel>,
+    _startDate: number,
+    _endDate: number,
+    _lockData: string,
+    result: Result<void>,
+  ): void {
+    result.error(makeNotImplementedError('modifyPalmVein'));
+  }
+
+  deletePalmVein(_palmVeinNumber: string, _lockData: string, result: Result<void>): void {
+    result.error(makeNotImplementedError('deletePalmVein'));
+  }
+
+  clearPalmVein(_lockData: string, result: Result<void>): void {
+    result.error(makeNotImplementedError('clearPalmVein'));
+  }
+
+  getAllValidPalmVeins(_lockData: string, result: Result<Array<TTPalmVeinModel>>): void {
+    result.error(makeNotImplementedError('getAllValidPalmVeins'));
+  }
+
+  setMotorTorqueLevel(_torqueLevel: number, _lockData: string, result: Result<void>): void {
+    result.error(makeNotImplementedError('setMotorTorqueLevel'));
+  }
+
+  setLockLatchBolt(_keepTime: number, _lockData: string, result: Result<void>): void {
+    result.error(makeNotImplementedError('setLockLatchBolt'));
   }
 
   setLockTime(timestamp: number, lockData: string, result: Result<void>): void {

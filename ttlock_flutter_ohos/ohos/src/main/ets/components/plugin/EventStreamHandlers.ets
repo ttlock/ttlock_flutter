@@ -335,6 +335,19 @@ class LockAddFaceHandler implements StreamHandler {
   }
 }
 
+class LockAddPalmVeinHandler implements StreamHandler {
+  onListen(_args: Object, events: EventSink): void {
+    events.error(
+      'NOT_IMPLEMENTED',
+      'lockAddPalmVein is not implemented on OpenHarmony',
+      null,
+    );
+  }
+
+  onCancel(_args: Object): void {
+  }
+}
+
 class GatewayStartScanHandler implements StreamHandler {
   onListen(_args: Object, events: EventSink): void {
     TTLock.startScanGateway((m: SdkTTGatewayScanModel): void => {
@@ -562,6 +575,7 @@ export class EventStreamHandlers {
       { method: 'lockAddCard', handler: new LockAddCardHandler() },
       { method: 'lockAddFingerprint', handler: new LockAddFingerprintHandler() },
       { method: 'lockAddFace', handler: new LockAddFaceHandler() },
+      { method: 'lockAddPalmVein', handler: new LockAddPalmVeinHandler() },
       { method: 'gatewayStartScan', handler: new GatewayStartScanHandler() },
       { method: 'gatewayGetNearbyWifi', handler: new GatewayGetNearbyWifiHandler() },
       { method: 'accessoryStartScanRemoteKey', handler: new AccessoryStartScanRemoteKeyHandler() },

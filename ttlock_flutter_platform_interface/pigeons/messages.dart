@@ -331,6 +331,18 @@ class TTFingerprintModel {
     });
 }
 
+class TTPalmVeinModel {
+  final String palmVeinNumber;
+  final int startDate;
+  final int endDate;
+
+  TTPalmVeinModel({
+    required this.palmVeinNumber,
+    required this.startDate,
+    required this.endDate,
+  });
+}
+
 class TTGatewayScanModel {
   final String gatewayName;
   final String gatewayMac;
@@ -637,6 +649,30 @@ class AddFaceEvent {
   });
 }
 
+/// 掌静脉录入流阶段。
+enum TTAddPalmVeinPhase {
+  /// 可开始掌静脉采集。
+  canStartAdd,
+
+  /// 采集异常，见 [AddPalmVeinEvent.errorCode]。
+  error,
+
+  /// 录入成功，[AddPalmVeinEvent.palmVeinNumber] 有效。
+  success,
+}
+
+class AddPalmVeinEvent {
+  final TTAddPalmVeinPhase phase;
+  final TTPalmVeinErrorCode? errorCode;
+  final String? palmVeinNumber;
+
+  AddPalmVeinEvent({
+    required this.phase,
+    this.errorCode,
+    this.palmVeinNumber,
+  });
+}
+
 // -----------------------------
 // Enums
 // -----------------------------
@@ -690,6 +726,9 @@ enum TTLockConfig {
   doubleAuth,
   publicMode,
   lowBatteryAutoUnlock,
+  securityM1Card,
+  semiAutomaticModeControl,
+  lockSupervision,
 }
 
 enum TTLockDirection {
@@ -954,6 +993,12 @@ enum TTLockFunction {
   customQRCode,
   securityM1Card,
   yiShengPhotoFace,
+  pictureFaceDelivery,
+  supportSetAlias,
+  hideWifiCatOneSleepModeSetting,
+  semiAutomaticModeControl,
+  supportSetUserAttributes,
+  supportSupervision,
 }
 
 enum TTFaceState {
@@ -999,6 +1044,18 @@ enum TTFaceErrorCode {
   needTiltHeadToRight,
 }
 
+enum TTPalmVeinErrorCode {
+  unknownStatus,
+  noPalmVeinDetected,
+  palmRectConfLow,
+  palmLandmarkConfLow,
+  palmAngleRollError,
+  palmAngleLeanError,
+  palmBlock,
+  palmBlur,
+  palmBack,
+}
+
 // -----------------------------
 // Host APIs (called from Flutter)
 // -----------------------------
@@ -1015,6 +1072,9 @@ abstract class TTLockHostApi {
 
   /// 订阅 [TTEventChannelApi.lockAddFace] 前调用。
   void setLockAddFaceParam(TTLockCredentialEventParam param);
+
+  /// 订阅 [TTEventChannelApi.lockAddPalmVein] 前调用。
+  void setLockAddPalmVeinParam(TTLockCredentialEventParam param);
 
   // One-shot lock operations (subset; extend as needed)
   TTBluetoothState getBluetoothState();
@@ -1110,6 +1170,26 @@ abstract class TTLockHostApi {
   void deleteFace(String faceNumber, String lockData);
   @async
   void clearFace(String lockData);
+
+  @async
+  void modifyPalmVein(
+    String palmVeinNumber,
+    List<TTCycleModel>? cycleList,
+    int startDate,
+    int endDate,
+    String lockData,
+  );
+  @async
+  void deletePalmVein(String palmVeinNumber, String lockData);
+  @async
+  void clearPalmVein(String lockData);
+  @async
+  List<TTPalmVeinModel> getAllValidPalmVeins(String lockData);
+
+  @async
+  void setMotorTorqueLevel(int torqueLevel, String lockData);
+  @async
+  void setLockLatchBolt(int keepTime, String lockData);
 
   @async
   void setLockTime(int timestamp, String lockData);
@@ -1374,6 +1454,8 @@ abstract class TTEventChannelApi {
   AddFingerprintEvent lockAddFingerprint();
 
   AddFaceEvent lockAddFace();
+
+  AddPalmVeinEvent lockAddPalmVein();
 
   TTGatewayScanModel gatewayStartScan();
 

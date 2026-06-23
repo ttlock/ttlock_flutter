@@ -234,6 +234,7 @@ export class EventContextStore {
   lockAddCard: LockCredentialSlot = new LockCredentialSlot();
   lockAddFingerprint: LockCredentialSlot = new LockCredentialSlot();
   lockAddFace: LockCredentialSlot = new LockCredentialSlot();
+  lockAddPalmVein: LockCredentialSlot = new LockCredentialSlot();
   gatewayGetNearbyWifi: GatewayNearbyWifiSlot = new GatewayNearbyWifiSlot();
   accessoryAddKeypadFingerprint: KeypadCredentialSlot = new KeypadCredentialSlot();
   accessoryAddKeypadCard: KeypadCredentialSlot = new KeypadCredentialSlot();
@@ -250,6 +251,7 @@ export class EventContextStore {
     this.lockAddCard = new LockCredentialSlot();
     this.lockAddFingerprint = new LockCredentialSlot();
     this.lockAddFace = new LockCredentialSlot();
+    this.lockAddPalmVein = new LockCredentialSlot();
     this.gatewayGetNearbyWifi = new GatewayNearbyWifiSlot();
     this.accessoryAddKeypadFingerprint = new KeypadCredentialSlot();
     this.accessoryAddKeypadCard = new KeypadCredentialSlot();

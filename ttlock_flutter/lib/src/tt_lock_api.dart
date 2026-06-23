@@ -98,6 +98,27 @@ class TTLockApi {
     ).asyncExpand((_) => pigeon.lockAddFace());
   }
 
+  /// 订阅前调用 [setLockAddPalmVeinParam]。
+  Stream<pigeon.AddPalmVeinEvent> lockAddPalmVein(
+    String lockData, {
+    List<pigeon.TTCycleModel>? cycleList,
+    int? startDate,
+    int? endDate,
+  }) {
+    if (lockData.isEmpty) {
+      throw ArgumentError.value(lockData, 'lockData', 'must not be empty');
+    }
+    final param = buildLockCredentialParam(
+      lockData: lockData,
+      cycleList: cycleList,
+      startDate: startDate,
+      endDate: endDate,
+    );
+    return Stream<void>.fromFuture(
+      runLockApi(() => _host.setLockAddPalmVeinParam(param)),
+    ).asyncExpand((_) => pigeon.lockAddPalmVein());
+  }
+
   Future<pigeon.TTBluetoothState> getBluetoothState() =>
       runLockApi(() => _host.getBluetoothState());
 
@@ -274,6 +295,38 @@ class TTLockApi {
 
   Future<void> clearFace(String lockData) =>
       runLockApi(() => _host.clearFace(lockData));
+
+  Future<void> modifyPalmVein(
+    String palmVeinNumber,
+    String lockData, {
+    List<pigeon.TTCycleModel>? cycleList,
+    int? startDate,
+    int? endDate,
+  }) =>
+      runLockApi(
+        () => _host.modifyPalmVein(
+          palmVeinNumber,
+          cycleList,
+          startDate ?? 0,
+          endDate ?? 0,
+          lockData,
+        ),
+      );
+
+  Future<void> deletePalmVein(String palmVeinNumber, String lockData) =>
+      runLockApi(() => _host.deletePalmVein(palmVeinNumber, lockData));
+
+  Future<void> clearPalmVein(String lockData) =>
+      runLockApi(() => _host.clearPalmVein(lockData));
+
+  Future<List<pigeon.TTPalmVeinModel>> getAllValidPalmVeins(String lockData) =>
+      runLockApi(() => _host.getAllValidPalmVeins(lockData));
+
+  Future<void> setMotorTorqueLevel(int torqueLevel, String lockData) =>
+      runLockApi(() => _host.setMotorTorqueLevel(torqueLevel, lockData));
+
+  Future<void> setLockLatchBolt(int keepTime, String lockData) =>
+      runLockApi(() => _host.setLockLatchBolt(keepTime, lockData));
 
   Future<void> setLockTime(int timestamp, String lockData) =>
       runLockApi(() => _host.setLockTime(timestamp, lockData));
