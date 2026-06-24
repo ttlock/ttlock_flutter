@@ -18,7 +18,7 @@ class TTRemoteKeyApi {
   pigeon.TTAccessoryHostApi get host => _host;
 
   Stream<pigeon.TTRemoteAccessoryScanModel> accessoryStartScanRemoteKey() =>
-      pigeon.accessoryStartScanRemoteKey();
+      mapRemoteAccessoryStreamErrors(pigeon.accessoryStartScanRemoteKey());
 
   Future<pigeon.TTLockSystemModel> initRemoteKey(String mac, String lockData) =>
       runRemoteAccessoryApi(() => _host.initRemoteKey(mac, lockData));

@@ -18,10 +18,10 @@ class TTDoorSensorApi {
   pigeon.TTAccessoryHostApi get host => _host;
 
   Stream<pigeon.TTRemoteAccessoryScanModel> accessoryStartScanDoorSensor() =>
-      pigeon.accessoryStartScanDoorSensor();
+      mapRemoteAccessoryStreamErrors(pigeon.accessoryStartScanDoorSensor());
 
   Stream<pigeon.TTStandaloneDoorSensorScanModel> accessoryStandaloneDoorSensorStartScan() =>
-      pigeon.accessoryStandaloneDoorSensorStartScan();
+      mapRemoteAccessoryStreamErrors(pigeon.accessoryStandaloneDoorSensorStartScan());
 
   Future<pigeon.TTLockSystemModel> initDoorSensor(String mac, String lockData) =>
       runRemoteAccessoryApi(() => _host.initDoorSensor(mac, lockData));

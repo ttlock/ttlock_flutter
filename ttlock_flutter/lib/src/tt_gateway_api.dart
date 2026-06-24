@@ -20,7 +20,8 @@ class TTGatewayApi {
   // Future<void> setEventGatewayMac(String mac) =>
   //     runGatewayApi(() => _host.setEventGatewayMac(mac));
 
-  Stream<pigeon.TTGatewayScanModel> gatewayStartScan() => pigeon.gatewayStartScan();
+  Stream<pigeon.TTGatewayScanModel> gatewayStartScan() =>
+      mapGatewayStreamErrors(pigeon.gatewayStartScan());
 
   /// 订阅前会先调用 [setGatewayGetNearbyWifiParam]；[gatewayMac] 不能为空字符串。
   Stream<pigeon.TTWifiScanResult> gatewayGetNearbyWifi({required String gatewayMac}) {
@@ -29,7 +30,7 @@ class TTGatewayApi {
     }
     return Stream<void>.fromFuture(
       runGatewayApi(() => _host.setGatewayGetNearbyWifiParam(gatewayMac)),
-    ).asyncExpand((_) => pigeon.gatewayGetNearbyWifi());
+    ).asyncExpand((_) => mapGatewayStreamErrors(pigeon.gatewayGetNearbyWifi()));
   }
 
   Future<pigeon.TTGatewayConnectStatus> connect(String mac) =>

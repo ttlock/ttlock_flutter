@@ -19,7 +19,7 @@ class TTRemoteKeypadApi {
   pigeon.TTAccessoryHostApi get host => _host;
 
   Stream<pigeon.TTRemoteAccessoryScanModel> accessoryStartScanRemoteKeypad() =>
-      pigeon.accessoryStartScanRemoteKeypad();
+      mapRemoteAccessoryStreamErrors(pigeon.accessoryStartScanRemoteKeypad());
 
   /// 订阅前调用 [setAccessoryAddKeypadFingerprintParam]。
   Stream<pigeon.AddFingerprintEvent> accessoryAddKeypadFingerprint({
@@ -46,7 +46,7 @@ class TTRemoteKeypadApi {
     );
     return Stream<void>.fromFuture(
       runRemoteAccessoryApi(() => _host.setAccessoryAddKeypadFingerprintParam(param)),
-    ).asyncExpand((_) => pigeon.accessoryAddKeypadFingerprint());
+    ).asyncExpand((_) => mapKeypadCredentialStreamErrors(pigeon.accessoryAddKeypadFingerprint()));
   }
 
   /// 订阅前调用 [setAccessoryAddKeypadCardParam]。
@@ -74,7 +74,7 @@ class TTRemoteKeypadApi {
     );
     return Stream<void>.fromFuture(
       runRemoteAccessoryApi(() => _host.setAccessoryAddKeypadCardParam(param)),
-    ).asyncExpand((_) => pigeon.accessoryAddKeypadCard());
+    ).asyncExpand((_) => mapKeypadCredentialStreamErrors(pigeon.accessoryAddKeypadCard()));
   }
 
   Future<pigeon.RemoteKeypadInitResult> initRemoteKeypad(String mac, String lockMac) =>

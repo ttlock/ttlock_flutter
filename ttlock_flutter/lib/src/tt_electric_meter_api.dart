@@ -18,7 +18,7 @@ class TTElectricMeterApi {
   pigeon.TTAccessoryHostApi get host => _host;
 
   Stream<pigeon.TTMeterScanModel> accessoryElectricMeterStartScan() =>
-      pigeon.accessoryElectricMeterStartScan();
+      mapRemoteAccessoryStreamErrors(pigeon.accessoryElectricMeterStartScan());
 
   Future<void> electricMeterConfigServer(
     String url,

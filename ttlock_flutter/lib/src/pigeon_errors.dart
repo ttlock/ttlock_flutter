@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:ttlock_flutter/errors/errors.dart';
 import 'package:ttlock_flutter_platform_interface/pigeon/messages.g.dart';
@@ -99,3 +101,58 @@ Future<T> runMultifunctionalKeypadApi<T>(Future<T> Function() fn) async {
     throwMultifunctionalKeypadError(e);
   }
 }
+
+Object _mapPlatformException(PlatformException e, Never Function(PlatformException) convert) {
+  try {
+    convert(e);
+  } on Object catch (mapped) {
+    return mapped;
+  }
+}
+
+Stream<T> _mapStreamErrors<T>(
+  Stream<T> stream,
+  Never Function(PlatformException) convert,
+) {
+  return stream.transform<T>(
+    StreamTransformer<T, T>.fromHandlers(
+      handleData: (data, sink) => sink.add(data),
+      handleError: (error, stackTrace, sink) {
+        if (error is PlatformException) {
+          sink.addError(_mapPlatformException(error, convert), stackTrace);
+        } else {
+          sink.addError(error, stackTrace);
+        }
+      },
+      handleDone: (sink) => sink.close(),
+    ),
+  );
+}
+
+/// EventChannel 流上的 [PlatformException] → [TTLockException] / [TTPigeonException]。
+Stream<T> mapLockStreamErrors<T>(Stream<T> stream) =>
+    _mapStreamErrors(stream, throwLockError);
+
+/// EventChannel 流上的 [PlatformException] → [TTGatewayException] / [TTPigeonException]。
+Stream<T> mapGatewayStreamErrors<T>(Stream<T> stream) =>
+    _mapStreamErrors(stream, throwGatewayError);
+
+/// EventChannel 流上的 [PlatformException] → [TTRemoteAccessoryException] / [TTPigeonException]。
+Stream<T> mapRemoteAccessoryStreamErrors<T>(Stream<T> stream) =>
+    _mapStreamErrors(stream, throwRemoteAccessoryError);
+
+/// EventChannel 流上的 [PlatformException] → [TTMultifunctionalKeypadException] / [TTPigeonException]。
+Stream<T> mapMultifunctionalKeypadStreamErrors<T>(Stream<T> stream) =>
+    _mapStreamErrors(stream, throwMultifunctionalKeypadError);
+
+/// 键盘录入类 EventChannel：原生可能回调锁错误或键盘错误（见 [runMultifunctionalKeypadInit]）。
+Never throwKeypadCredentialStreamError(PlatformException e) {
+  final i = int.tryParse(e.code);
+  if (i != null && i >= TTMultifunctionalKeypadError.values.length) {
+    throwLockError(e);
+  }
+  throwMultifunctionalKeypadError(e);
+}
+
+Stream<T> mapKeypadCredentialStreamErrors<T>(Stream<T> stream) =>
+    _mapStreamErrors(stream, throwKeypadCredentialStreamError);

@@ -19,7 +19,8 @@ class TTLockApi {
 
   pigeon.TTLockHostApi get host => _host;
 
-  Stream<pigeon.TTLockScanModel> lockScanLock() => pigeon.lockScanLock();
+  Stream<pigeon.TTLockScanModel> lockScanLock() =>
+      mapLockStreamErrors(pigeon.lockScanLock());
 
   /// 订阅前调用 [setLockScanWifiParam]；[lockData] 不能为空字符串。
   Stream<TTWifiScanResult> lockScanWifi(String lockData) {
@@ -32,7 +33,7 @@ class TTLockApi {
           pigeon.TTLockScanWifiEventParam(lockData: lockData),
         ),
       ),
-    ).asyncExpand((_) => pigeon.lockScanWifi());
+    ).asyncExpand((_) => mapLockStreamErrors(pigeon.lockScanWifi()));
   }
 
   /// 订阅前调用 [setLockAddCardParam]。
@@ -53,7 +54,7 @@ class TTLockApi {
     );
     return Stream<void>.fromFuture(
       runLockApi(() => _host.setLockAddCardParam(param)),
-    ).asyncExpand((_) => pigeon.lockAddCard());
+    ).asyncExpand((_) => mapLockStreamErrors(pigeon.lockAddCard()));
   }
 
   /// 订阅前调用 [setLockAddFingerprintParam]。
@@ -74,7 +75,7 @@ class TTLockApi {
     );
     return Stream<void>.fromFuture(
       runLockApi(() => _host.setLockAddFingerprintParam(param)),
-    ).asyncExpand((_) => pigeon.lockAddFingerprint());
+    ).asyncExpand((_) => mapLockStreamErrors(pigeon.lockAddFingerprint()));
   }
 
   /// 订阅前调用 [setLockAddFaceParam]。
@@ -95,7 +96,7 @@ class TTLockApi {
     );
     return Stream<void>.fromFuture(
       runLockApi(() => _host.setLockAddFaceParam(param)),
-    ).asyncExpand((_) => pigeon.lockAddFace());
+    ).asyncExpand((_) => mapLockStreamErrors(pigeon.lockAddFace()));
   }
 
   /// 订阅前调用 [setLockAddPalmVeinParam]。
@@ -116,7 +117,7 @@ class TTLockApi {
     );
     return Stream<void>.fromFuture(
       runLockApi(() => _host.setLockAddPalmVeinParam(param)),
-    ).asyncExpand((_) => pigeon.lockAddPalmVein());
+    ).asyncExpand((_) => mapLockStreamErrors(pigeon.lockAddPalmVein()));
   }
 
   Future<pigeon.TTBluetoothState> getBluetoothState() =>

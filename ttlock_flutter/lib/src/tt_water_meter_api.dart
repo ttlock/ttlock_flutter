@@ -18,7 +18,7 @@ class TTWaterMeterApi {
   pigeon.TTAccessoryHostApi get host => _host;
 
   Stream<pigeon.TTMeterScanModel> accessoryWaterMeterStartScan() =>
-      pigeon.accessoryWaterMeterStartScan();
+      mapRemoteAccessoryStreamErrors(pigeon.accessoryWaterMeterStartScan());
 
   Future<void> waterMeterConfigServer(
     String url,
