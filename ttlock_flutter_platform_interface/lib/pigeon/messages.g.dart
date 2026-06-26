@@ -218,11 +218,11 @@ enum TTPowerSaverWorkType {
 }
 
 enum TTGatewayType {
-  g1,
   g2,
   g3,
   g4,
   g5,
+  g6,
 }
 
 enum TTGatewayConnectStatus {
@@ -594,7 +594,7 @@ class TTGatewayInitParams {
     this.branchId,
   });
 
-  int type;
+  TTGatewayType type;
 
   int ttlockUid;
 
@@ -635,7 +635,7 @@ class TTGatewayInitParams {
   static TTGatewayInitParams decode(Object result) {
     result as List<Object?>;
     return TTGatewayInitParams(
-      type: result[0]! as int,
+      type: result[0]! as TTGatewayType,
       ttlockUid: result[1]! as int,
       gatewayName: result[2] as String?,
       ttlockLoginPassword: result[3] as String?,

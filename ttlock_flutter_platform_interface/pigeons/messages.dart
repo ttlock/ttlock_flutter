@@ -69,7 +69,7 @@ class TTLockInitParams {
 }
 
 class TTGatewayInitParams {
-  final int type;
+  final TTGatewayType type;
   final int ttlockUid;
   final String? gatewayName;
   final String? ttlockLoginPassword;
@@ -825,11 +825,11 @@ enum TTPowerSaverWorkType {
 }
 
 enum TTGatewayType {
-  g1,
   g2,
   g3,
   g4,
   g5,
+  g6,
 }
 
 enum TTGatewayConnectStatus {

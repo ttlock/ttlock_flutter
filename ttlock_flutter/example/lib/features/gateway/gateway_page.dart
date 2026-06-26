@@ -11,10 +11,15 @@ import 'gateway_provider.dart';
 
 class GatewayPage extends ConsumerStatefulWidget {
   final String mac;
+  final TTGatewayType gatewayType;
   final bool needsWifiConfig;
 
-  const GatewayPage(
-      {super.key, required this.mac, this.needsWifiConfig = false});
+  const GatewayPage({
+    super.key,
+    required this.mac,
+    this.gatewayType = TTGatewayType.g2,
+    this.needsWifiConfig = false,
+  });
 
   @override
   ConsumerState<GatewayPage> createState() => _GatewayPageState();
@@ -135,7 +140,7 @@ class _GatewayPageState extends ConsumerState<GatewayPage> {
   void _initGateway() {
     final config = ref.read(configNotifierProvider).valueOrNull;
     ref.read(gatewayNotifierProvider.notifier).init(TTGatewayInitParams(
-      type: 0,
+      type: widget.gatewayType,
       ttlockUid: config?.uid ?? 0,
       gatewayName: config?.gatewayName ?? 'Gateway',
       serverIp: config?.serverIp,

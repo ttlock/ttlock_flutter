@@ -21,6 +21,12 @@ import 'scan_config.dart';
 
 part 'scan_provider.g.dart';
 
+bool gatewayNeedsWifi(TTGatewayType type) {
+  return type == TTGatewayType.g2 ||
+      type == TTGatewayType.g5 ||
+      type == TTGatewayType.g6;
+}
+
 class DiscoveredDevice {
   final DeviceType type;
   final String name;
@@ -29,6 +35,7 @@ class DiscoveredDevice {
   final bool isInited;
   final TTLockVersion? lockVersion;
   final bool isMultifunctionalKeypad;
+  final TTGatewayType? gatewayType;
 
   DiscoveredDevice({
     required this.type,
@@ -38,6 +45,7 @@ class DiscoveredDevice {
     this.isInited = false,
     this.lockVersion,
     this.isMultifunctionalKeypad = false,
+    this.gatewayType,
   });
 }
 
@@ -138,6 +146,7 @@ class ScanNotifier extends _$ScanNotifier {
               name: m.gatewayName,
               mac: m.gatewayMac,
               rssi: m.rssi,
+              gatewayType: m.type,
             ));
             update();
           },
@@ -273,6 +282,7 @@ class ScanNotifier extends _$ScanNotifier {
 
         case DeviceType.gateway:
           final api = ref.read(gatewayApiProvider);
+          final gatewayType = device.gatewayType ?? TTGatewayType.g2;
           final status = await runGatewayApi(() => api.connect(device.mac));
           if (status != TTGatewayConnectStatus.success) {
             return InitResult.failure('Gateway connect failed');
@@ -284,7 +294,11 @@ class ScanNotifier extends _$ScanNotifier {
                   initializedAt: now,
                 ),
               );
-          return InitResult.gateway(device.mac, needsWifi: true);
+          return InitResult.gateway(
+            device.mac,
+            gatewayType: gatewayType,
+            needsWifi: gatewayNeedsWifi(gatewayType),
+          );
 
         case DeviceType.doorSensor:
           final lockData = state.config.lockData!;
@@ -398,7 +412,11 @@ sealed class InitResult {
   factory InitResult.failure(String message) = InitFailure;
 
   factory InitResult.lock(String mac) = InitLock;
-  factory InitResult.gateway(String mac, {required bool needsWifi}) = InitGateway;
+  factory InitResult.gateway(
+    String mac, {
+    required TTGatewayType gatewayType,
+    required bool needsWifi,
+  }) = InitGateway;
   factory InitResult.doorSensor(String mac) = InitDoorSensor;
   factory InitResult.remoteKey(String mac) = InitRemoteKey;
   factory InitResult.keypad(String mac) = InitKeypad;
@@ -418,8 +436,13 @@ class InitLock extends InitResult {
 
 class InitGateway extends InitResult {
   final String mac;
+  final TTGatewayType gatewayType;
   final bool needsWifi;
-  const InitGateway(this.mac, {required this.needsWifi});
+  const InitGateway(
+    this.mac, {
+    required this.gatewayType,
+    required this.needsWifi,
+  });
 }
 
 class InitDoorSensor extends InitResult {

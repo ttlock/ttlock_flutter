@@ -6,7 +6,7 @@ part of 'lock_capabilities_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$lockCapabilitiesHash() => r'c9e9f95d68be9e340b9cabb2b494d94028567bb4';
+String _$lockCapabilitiesHash() => r'2e365deefdb089c26f2d7d3301de8d267971d2ac';
 
 /// Copied from Dart SDK
 class _SystemHash {

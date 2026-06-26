@@ -46,14 +46,14 @@ dependency_overrides:
       url: https://gitcode.com/openharmony-tpc/flutter_packages.git
       path: packages/shared_preferences/shared_preferences
       ref: br_shared_preferences-v2.5.3_ohos
-  ttlock_flutter_android:
-    git:
-      url: https://github.com/2000Heart/ttlock_flutter_android.git
-      ref: premise
-  ttlock_flutter_ios:
-    git:
-      url: https://github.com/2000Heart/ttlock_flutter_ios.git
-      ref: premise
+  # ttlock_flutter_android:
+  #   git:
+  #     url: https://github.com/2000Heart/ttlock_flutter_android.git
+  #     ref: premise
+  # ttlock_flutter_ios:
+  #   git:
+  #     url: https://github.com/2000Heart/ttlock_flutter_ios.git
+  #     ref: premise
 
 flutter:
   uses-material-design: true

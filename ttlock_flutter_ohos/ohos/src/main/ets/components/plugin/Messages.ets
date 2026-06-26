@@ -440,11 +440,11 @@ export class TTPowerSaverWorkTypeEnum {
 
 /* Generated enum from Pigeon that represents data sent in messages.*/
 export enum TTGatewayType {
-  G1,
   G2,
   G3,
   G4,
-  G5
+  G5,
+  G6
 }
 
 /* Generated enum Companion class from Pigeon that represents data sent 
@@ -1055,13 +1055,13 @@ export class TTLockInitParams {
 
 /* Generated class from Pigeon that represents data sent in messages.*/
 export class TTGatewayInitParams {
-  private type?: number;
+  private type?: TTGatewayType;
 
-  public setType(type:number):void {
+  public setType(type:TTGatewayType):void {
     this.type = type;
   }
 
-  getType(): number | undefined{
+  getType(): TTGatewayType | undefined{
     return this.type;
   }
 
@@ -1155,7 +1155,7 @@ export class TTGatewayInitParams {
     return this.branchId;
   }
 
-  constructor(type?: number, ttlockUid?: number, gatewayName?: string, ttlockLoginPassword?: string, wifi?: string, wifiPassword?: string, serverIp?: string, serverPort?: string, companyId?: number, branchId?: number) {
+  constructor(type?: TTGatewayType, ttlockUid?: number, gatewayName?: string, ttlockLoginPassword?: string, wifi?: string, wifiPassword?: string, serverIp?: string, serverPort?: string, companyId?: number, branchId?: number) {
     this.type = type;
     this.ttlockUid = ttlockUid;
     this.gatewayName = gatewayName;
@@ -1171,7 +1171,8 @@ export class TTGatewayInitParams {
   toList(): Object[] {
     let arr: Object[] = new Array();
     if(this.type !==undefined){
-      arr.push(this.type);
+      const typeStr = TTGatewayType[this.type as number];
+      arr.push(new TTGatewayTypeEnum(typeStr));
     }
     if(this.ttlockUid !==undefined){
       arr.push(this.ttlockUid);
@@ -1205,8 +1206,8 @@ export class TTGatewayInitParams {
 
   static fromList(arr: Object[]): TTGatewayInitParams {
     let pigeonResult: TTGatewayInitParams = new TTGatewayInitParams();
-    let type: Object = arr[0];
-    pigeonResult.setType(type as number);
+    const typeStr: string = arr[0]! as string;
+    pigeonResult.setType(TTGatewayType[typeStr]);
     let ttlockUid: Object = arr[1];
     pigeonResult.setTtlockUid(ttlockUid as number);
     let gatewayName: Object = arr[2];

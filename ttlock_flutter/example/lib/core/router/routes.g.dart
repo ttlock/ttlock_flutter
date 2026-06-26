@@ -661,6 +661,9 @@ RouteBase get $gatewayRoute => GoRouteData.$route(
 mixin _$GatewayRoute on GoRouteData {
   static GatewayRoute _fromState(GoRouterState state) => GatewayRoute(
         state.pathParameters['mac']!,
+        gatewayType: _$convertMapValue('gateway-type',
+                state.uri.queryParameters, _$TTGatewayTypeEnumMap._$fromName) ??
+            TTGatewayType.g2,
         needsWifiConfig: _$convertMapValue('needs-wifi-config',
                 state.uri.queryParameters, _$boolConverter) ??
             false,
@@ -672,6 +675,8 @@ mixin _$GatewayRoute on GoRouteData {
   String get location => GoRouteData.$location(
         '/gateway/${Uri.encodeComponent(_self.mac)}',
         queryParams: {
+          if (_self.gatewayType != TTGatewayType.g2)
+            'gateway-type': _$TTGatewayTypeEnumMap[_self.gatewayType],
           if (_self.needsWifiConfig != false)
             'needs-wifi-config': _self.needsWifiConfig.toString(),
         },
@@ -691,6 +696,15 @@ mixin _$GatewayRoute on GoRouteData {
   void replace(BuildContext context) => context.replace(location);
 }
 
+const _$TTGatewayTypeEnumMap = {
+  TTGatewayType.g1: 'g1',
+  TTGatewayType.g2: 'g2',
+  TTGatewayType.g3: 'g3',
+  TTGatewayType.g4: 'g4',
+  TTGatewayType.g5: 'g5',
+  TTGatewayType.g6: 'g6',
+};
+
 T? _$convertMapValue<T>(
   String key,
   Map<String, String> map,
@@ -709,6 +723,11 @@ bool _$boolConverter(String value) {
     default:
       throw UnsupportedError('Cannot convert "$value" into a bool.');
   }
+}
+
+extension<T extends Enum> on Map<T, String> {
+  T? _$fromName(String? value) =>
+      entries.where((element) => element.value == value).firstOrNull?.key;
 }
 
 RouteBase get $doorSensorInfoRoute => GoRouteData.$route(

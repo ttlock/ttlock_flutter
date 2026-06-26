@@ -126,8 +126,11 @@ class TTGateway {
     if (map['ttlockLoginPassword'] == null) {
       map['ttlockLoginPassword'] = '123456';
     }
+    final typeIndex = map['type'] as int;
     final params = TTGatewayInitParams(
-      type: map['type'] as int,
+      type: typeIndex >= 0 && typeIndex < TTGatewayType.values.length
+          ? TTGatewayType.values[typeIndex]
+          : TTGatewayType.g2,
       ttlockUid: map['ttlockUid'] as int,
       gatewayName: map['gatewayName'] as String?,
       ttlockLoginPassword: (map['ttlockLoginPassword'] as String?) ?? '123456',

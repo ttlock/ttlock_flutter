@@ -112,7 +112,7 @@ function gatewayTypeRevert(t: SdkTTGatewayType): TTGatewayType {
     case SdkTTGatewayType.g5:
       return TTGatewayType.G5;
     case SdkTTGatewayType.g6:
-      return TTGatewayType.G5;
+      return TTGatewayType.G6;
     default:
       return TTGatewayType.G2;
   }

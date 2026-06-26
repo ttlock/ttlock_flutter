@@ -161,8 +161,12 @@ class _ScanPageState extends ConsumerState<ScanPage> {
         } else {
           LockRoute(mac).go(context);
         }
-      case InitGateway(:final mac, :final needsWifi):
-        GatewayRoute(mac, needsWifiConfig: needsWifi).push(context);
+      case InitGateway(:final mac, :final gatewayType, :final needsWifi):
+        GatewayRoute(
+          mac,
+          gatewayType: gatewayType,
+          needsWifiConfig: needsWifi,
+        ).push(context);
       case InitDoorSensor():
       case InitRemoteKey():
       case InitKeypad():

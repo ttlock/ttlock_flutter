@@ -547,12 +547,11 @@ packages:
   permission_handler:
     dependency: "direct main"
     description:
-      path: permission_handler
-      ref: "br_permission_handler_v11.3.1_ohos"
-      resolved-ref: "480f223c9c4be6416049c7d7b517e494e2ab1437"
-      url: "https://gitcode.com/openharmony-sig/flutter_permission_handler.git"
-    source: git
-    version: "11.3.1"
+      name: permission_handler
+      sha256: "59adad729136f01ea9e35a48f5d1395e25cba6cea552249ddbe9cf950f5d7849"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "11.4.0"
   permission_handler_android:
     dependency: transitive
     description:
@@ -577,15 +576,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.1.3+5"
-  permission_handler_ohos:
-    dependency: transitive
-    description:
-      path: permission_handler_ohos
-      ref: "br_permission_handler_v11.3.1_ohos"
-      resolved-ref: "480f223c9c4be6416049c7d7b517e494e2ab1437"
-      url: "https://gitcode.com/openharmony-sig/flutter_permission_handler.git"
-    source: git
-    version: "11.3.1"
   permission_handler_platform_interface:
     dependency: transitive
     description:
@@ -677,11 +667,10 @@ packages:
   shared_preferences:
     dependency: "direct main"
     description:
-      path: "packages/shared_preferences/shared_preferences"
-      ref: "br_shared_preferences-v2.5.3_ohos"
-      resolved-ref: "3813e9ff17a2aae8a98e262d771c1785ee0e8690"
-      url: "https://gitcode.com/openharmony-tpc/flutter_packages.git"
-    source: git
+      name: shared_preferences
+      sha256: "6e8bf70b7fef813df4e9a36f658ac46d107db4b4cfe1048b477d4e453a8159f5"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
     version: "2.5.3"
   shared_preferences_android:
     dependency: transitive
@@ -707,15 +696,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.4.1"
-  shared_preferences_ohos:
-    dependency: transitive
-    description:
-      path: "packages/shared_preferences/shared_preferences_ohos"
-      ref: "br_shared_preferences-v2.5.3_ohos"
-      resolved-ref: "3813e9ff17a2aae8a98e262d771c1785ee0e8690"
-      url: "https://gitcode.com/openharmony-tpc/flutter_packages.git"
-    source: git
-    version: "2.5.3"
   shared_preferences_platform_interface:
     dependency: transitive
     description:
@@ -867,38 +847,30 @@ packages:
   ttlock_flutter_android:
     dependency: "direct overridden"
     description:
-      path: "."
-      ref: premise
-      resolved-ref: "54bb07676c42eaa3afee77bb4802d7d89f369c9c"
-      url: "https://github.com/2000Heart/ttlock_flutter_android.git"
-    source: git
+      path: "../../ttlock_flutter_android"
+      relative: true
+    source: path
     version: "0.0.3"
   ttlock_flutter_ios:
     dependency: "direct overridden"
     description:
-      path: "."
-      ref: premise
-      resolved-ref: "83b4264f00265a824e222230a76641665b585e98"
-      url: "https://github.com/2000Heart/ttlock_flutter_ios.git"
-    source: git
+      path: "../../ttlock_flutter_ios"
+      relative: true
+    source: path
     version: "0.0.3"
   ttlock_flutter_ohos:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      path: ttlock_flutter_ohos
-      ref: mix
-      resolved-ref: eb22216ff88ae5cc3fbd0870ccfce336a7ad3f15
-      url: "https://github.com/ttlock/ttlock_flutter.git"
-    source: git
+      path: "../../ttlock_flutter_ohos"
+      relative: true
+    source: path
     version: "0.0.1"
   ttlock_flutter_platform_interface:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      path: ttlock_flutter_platform_interface
-      ref: mix
-      resolved-ref: eb22216ff88ae5cc3fbd0870ccfce336a7ad3f15
-      url: "https://github.com/ttlock/ttlock_flutter.git"
-    source: git
+      path: "../../ttlock_flutter_platform_interface"
+      relative: true
+    source: path
     version: "0.0.3"
   typed_data:
     dependency: transitive
@@ -981,5 +953,5 @@ packages:
     source: hosted
     version: "3.1.3"
 sdks:
-  dart: ">=3.6.2 <4.0.0"
+  dart: ">=3.6.0 <4.0.0"
   flutter: ">=3.27.0"

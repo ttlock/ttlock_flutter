@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ttlock_flutter/ttlock.dart';
 import '../../app.dart';
 import '../../features/dashboard/dashboard_page.dart';
 import '../../features/door_sensor/door_sensor_info_page.dart';
@@ -313,14 +314,23 @@ class KeypadListRoute extends GoRouteData with _$KeypadListRoute {
 // ─── Gateway Detail ───
 @TypedGoRoute<GatewayRoute>(path: '/gateway/:mac')
 class GatewayRoute extends GoRouteData with _$GatewayRoute {
-  const GatewayRoute(this.mac, {this.needsWifiConfig = false});
+  const GatewayRoute(
+    this.mac, {
+    this.gatewayType = TTGatewayType.g2,
+    this.needsWifiConfig = false,
+  });
 
   final String mac;
+  final TTGatewayType gatewayType;
   final bool needsWifiConfig;
 
   @override
   Widget build(BuildContext context, GoRouterState state) =>
-      GatewayPage(mac: mac, needsWifiConfig: needsWifiConfig);
+      GatewayPage(
+        mac: mac,
+        gatewayType: gatewayType,
+        needsWifiConfig: needsWifiConfig,
+      );
 }
 
 // ─── Accessory Detail ───

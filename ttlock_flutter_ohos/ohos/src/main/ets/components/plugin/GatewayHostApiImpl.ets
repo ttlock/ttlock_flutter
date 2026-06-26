@@ -14,6 +14,7 @@ import {
   TTGatewayConnectStatus,
   TTGatewayHostApi,
   TTGatewayInitParams,
+  TTGatewayType,
   TTIpSetting,
   TTIpSettingType,
 } from './Messages';
@@ -59,28 +60,31 @@ export class GatewayHostApiImpl extends TTGatewayHostApi {
     const uid: number | undefined = params.getTtlockUid();
     const userPwd: string | undefined = params.getTtlockLoginPassword();
     const gatewayName: string | undefined = params.getGatewayName();
-    const gatewayVersion: number | undefined = params.getType();
+    const gatewayType: TTGatewayType | undefined = params.getType();
     const portNumber: string | undefined = params.getServerPort();
-    if (wifi === undefined || wifiPwd === undefined || uid === undefined ||
-      userPwd === undefined || gatewayName === undefined ||
-      gatewayVersion === undefined || portNumber === undefined) {
+    if (uid === undefined || userPwd === undefined || gatewayName === undefined ||
+      gatewayType === undefined || portNumber === undefined) {
       result.error(makeGatewayApiError('initGateway', SNError.invalidParam(),
-        '`wifi`, `wifiPassword`, `ttlockUid`, `ttlockLoginPassword`, `gatewayName`, `type`, `serverPort` are required'));
+        '`ttlockUid`, `ttlockLoginPassword`, `gatewayName`, `type`, `serverPort` are required'));
       return;
     }
 
     const companyId: number | undefined = params.getCompanyId();
     const branchId: number | undefined = params.getBranchId();
+    const plugVersion = (gatewayType as number) + 1;
+    const needsWifi = gatewayType === TTGatewayType.G2 ||
+      gatewayType === TTGatewayType.G5 ||
+      gatewayType === TTGatewayType.G6;
 
     const model: InitGatewayParameters = {
-      SSID: wifi,
-      wifiPwd: wifiPwd,
+      SSID: needsWifi ? (wifi ?? '1') : '1',
+      wifiPwd: needsWifi ? (wifiPwd ?? '1') : '1',
       uid: `${uid}`,
       userPwd: userPwd,
       companyId: companyId !== undefined ? `${companyId}` : undefined,
       branchId: branchId !== undefined ? `${branchId}` : undefined,
       gatewayName: gatewayName,
-      gatewayVersion: gatewayVersion,
+      gatewayVersion: plugVersion,
       serverAddress: params.getServerIp(),
       portNumber: portNumber,
     };
