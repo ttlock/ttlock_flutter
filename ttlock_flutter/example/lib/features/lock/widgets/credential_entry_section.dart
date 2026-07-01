@@ -56,6 +56,15 @@ class CredentialEntrySection extends ConsumerWidget {
             count: faceCount,
             onTap: () => FaceManageRoute(lockMac).push(context),
           ),
+        if (caps.has(TTLockFunction.palmVein))
+          _EntryTile(
+            icon: Icons.pan_tool_alt,
+            label: 'Palm Veins',
+            count: null,
+            onTap: () {
+              // 暂没有 PalmVeinListRoute，后续 Task 3.2 会添加
+            },
+          ),
         if (caps.isEmpty)
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),

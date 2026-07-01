@@ -4,20 +4,25 @@ import 'package:loader_overlay/loader_overlay.dart';
 import 'package:toastification/toastification.dart';
 import 'package:ttlock_flutter/ttlock.dart';
 
+import '../../command/lock_commands.dart';
+import '../../command/operation_record.dart';
 import '../../core/router/routes.dart';
 import '../../core/storage/lock_list_provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../core/widgets/device_info_section.dart';
 import '../../core/widgets/error_display.dart';
 import '../../core/widgets/loading_overlay.dart';
+import '../../core/widgets/operation_log_panel.dart';
+import 'capabilities/lock_capabilities_provider.dart';
 import 'lock_provider.dart';
 import 'lock_status_provider.dart';
-import 'widgets/accessory_entry_section.dart';
 import 'widgets/credential_entry_section.dart';
+import 'widgets/accessory_entry_section.dart';
+import 'widgets/quick_actions_section.dart';
 
 class LockPage extends ConsumerStatefulWidget {
   final String mac;
-
   const LockPage({super.key, required this.mac});
 
   @override
@@ -25,6 +30,8 @@ class LockPage extends ConsumerStatefulWidget {
 }
 
 class _LockPageState extends ConsumerState<LockPage> {
+  final List<OperationRecord> _operationLog = [];
+
   @override
   void initState() {
     super.initState();
@@ -44,13 +51,21 @@ class _LockPageState extends ConsumerState<LockPage> {
   Future<void> _quickControl(TTControlAction action) async {
     final lockState = ref.read(lockNotifierProvider);
     if (lockState.lockData == null) return;
+    final start = DateTime.now();
     try {
       context.loaderOverlay.show();
       await ref
           .read(lockNotifierProvider.notifier)
           .controlLock(lockState.lockData!, action);
+      if (mounted) context.loaderOverlay.hide();
+      _addLog(OperationRecord(
+        methodName: 'controlLock(${action.name})',
+        duration: DateTime.now().difference(start),
+        isSuccess: true,
+        data: {'action': action.name},
+        timestamp: DateTime.now(),
+      ));
       if (mounted) {
-        context.loaderOverlay.hide();
         toastification.show(
           title: Text(action == TTControlAction.unlock ? 'Unlocked' : 'Locked'),
           type: ToastificationType.success,
@@ -59,8 +74,15 @@ class _LockPageState extends ConsumerState<LockPage> {
         ref.invalidate(lockStatusProvider(widget.mac));
       }
     } catch (e) {
+      if (mounted) context.loaderOverlay.hide();
+      _addLog(OperationRecord(
+        methodName: 'controlLock(${action.name})',
+        duration: DateTime.now().difference(start),
+        isSuccess: false,
+        errorMessage: e.toString(),
+        timestamp: DateTime.now(),
+      ));
       if (mounted) {
-        context.loaderOverlay.hide();
         toastification.show(
           title: Text('$e'),
           type: ToastificationType.error,
@@ -70,11 +92,16 @@ class _LockPageState extends ConsumerState<LockPage> {
     }
   }
 
+  void _addLog(OperationRecord record) {
+    setState(() => _operationLog.add(record));
+  }
+
   @override
   Widget build(BuildContext context) {
     final lockState = ref.watch(lockNotifierProvider);
     final lockAsync = ref.watch(lockByMacProvider(widget.mac));
     final statusAsync = ref.watch(lockStatusProvider(widget.mac));
+    final caps = ref.watch(lockCapabilitiesProvider(widget.mac)).valueOrNull ?? {};
 
     if (lockAsync.isLoading) {
       return const Scaffold(body: LoadingOverlay(message: 'Loading lock…'));
@@ -87,6 +114,8 @@ class _LockPageState extends ConsumerState<LockPage> {
         body: const ErrorDisplay(message: 'Lock not found or missing lock data'),
       );
     }
+
+    final status = statusAsync.valueOrNull;
 
     return Scaffold(
       appBar: AppBar(
@@ -105,8 +134,16 @@ class _LockPageState extends ConsumerState<LockPage> {
                   ref.read(lockStatusProvider(widget.mac).notifier).refreshFromLock(),
               child: ListView(
                 children: [
+                  // Section 1: 设备信息
+                  DeviceInfoSection(
+                    mac: device.mac,
+                    batteryLevel: status?.power,
+                    switchState: status?.switchState?.name,
+                  ),
+
+                  // Section 2: 开关锁控制
                   Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                     child: Row(
                       children: [
                         Expanded(
@@ -130,66 +167,61 @@ class _LockPageState extends ConsumerState<LockPage> {
                       ],
                     ),
                   ),
-                  Card(
-                    margin: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: statusAsync.when(
-                        loading: () => const Text('Loading status…'),
-                        error: (e, _) => Text('Status error: $e'),
-                        data: (s) => Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              device.mac,
-                              style: AppTextStyles.codeMedium,
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.battery_std,
-                                  size: 18,
-                                  color: AppColors.primary,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  s.power != null ? 'Battery ${s.power}%' : 'Battery —',
-                                  style: AppTextStyles.bodyMedium,
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'State: ${s.switchState?.name ?? '—'}',
-                              style: AppTextStyles.bodySmall,
-                            ),
-                            if (s.lockTimeSeconds != null) ...[
-                              const SizedBox(height: 4),
-                              Text(
-                                'Lock time: ${DateTime.fromMillisecondsSinceEpoch(s.lockTimeSeconds! * 1000).toLocal()}',
-                                style: AppTextStyles.bodySmall,
-                              ),
-                            ],
-                            if (lockState.lastResult.isNotEmpty) ...[
-                              const SizedBox(height: 8),
-                              Text(
-                                'Last: ${lockState.lastResult}',
-                                style: AppTextStyles.bodySmall,
-                              ),
-                            ],
-                          ],
-                        ),
+                  if (lockState.lastResult.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        'Last: ${lockState.lastResult}',
+                        style: AppTextStyles.bodySmall,
                       ),
                     ),
-                  ),
+
                   if (lockState.errorMessage != null)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: ErrorDisplay(message: lockState.errorMessage),
                     ),
-                  CredentialEntrySection(lockMac: widget.mac),
-                  AccessoryEntrySection(lockMac: widget.mac),
+
+                  // Section 3: 快捷操作（能力门控）
+                  QuickActionsSection(
+                    lockMac: widget.mac,
+                    caps: caps,
+                    onLog: _addLog,
+                  ),
+
+                  // Section 4: 凭据管理（能力门控）
+                  if (LockCommand.createPasscode.isVisibleFor(caps) ||
+                      LockCommand.addCard.isVisibleFor(caps) ||
+                      LockCommand.addFingerprint.isVisibleFor(caps) ||
+                      LockCommand.addFace.isVisibleFor(caps) ||
+                      LockCommand.addPalmVein.isVisibleFor(caps))
+                    CredentialEntrySection(lockMac: widget.mac),
+
+                  // Section 5: 配件入口（能力门控）
+                  if (LockCommand.addDoorSensor.isVisibleFor(caps) ||
+                      LockCommand.addRemoteKey.isVisibleFor(caps))
+                    AccessoryEntrySection(lockMac: widget.mac),
+
+                  // Section 6: 设置入口
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                    child: Card(
+                      child: ListTile(
+                        leading: const Icon(Icons.settings),
+                        title: const Text('Settings'),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => LockSettingsRoute(widget.mac).push(context),
+                      ),
+                    ),
+                  ),
+
+                  // Section 7: 操作记录面板（Developer Mode only）
+                  OperationLogPanel(
+                    records: _operationLog,
+                    onClear: () => setState(() => _operationLog.clear()),
+                  ),
+
+                  const SizedBox(height: 32),
                 ],
               ),
             ),
