@@ -1,43 +1,46 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-import '../../core/storage/config_provider.dart';
-import '../../core/storage/gateway_list_provider.dart';
 import '../../core/storage/lock_list_provider.dart';
+import '../../core/storage/gateway_list_provider.dart';
 import '../../core/storage/meter_list_provider.dart';
-import '../../features/settings/model/saved_gateway_device.dart';
 import '../../features/settings/model/saved_lock_device.dart';
+import '../../features/settings/model/saved_gateway_device.dart';
 import '../../features/settings/model/saved_meter_device.dart';
 
 part 'dashboard_provider.freezed.dart';
 part 'dashboard_provider.g.dart';
 
 @freezed
-abstract class DashboardData with _$DashboardData {
-  const factory DashboardData({
-    @Default(false) bool hasConfig,
-    @Default([]) List<SavedLockDevice> locks,
-    @Default([]) List<SavedGatewayDevice> gateways,
-    @Default([]) List<SavedMeterDevice> waterMeters,
-    @Default([]) List<SavedMeterDevice> electricMeters,
-  }) = _DashboardData;
+class DashboardState with _$DashboardState {
+  const factory DashboardState({
+    required List<SavedLockDevice> locks,
+    required List<SavedGatewayDevice> gateways,
+    required List<SavedMeterDevice> waterMeters,
+    required List<SavedMeterDevice> electricMeters,
+    @Default(false) bool isLoading,
+  }) = _DashboardState;
+
+  factory DashboardState.empty() => const DashboardState(
+    locks: [],
+    gateways: [],
+    waterMeters: [],
+    electricMeters: [],
+  );
 }
 
 @riverpod
 class DashboardNotifier extends _$DashboardNotifier {
   @override
-  Future<DashboardData> build() async {
-    final config = await ref.watch(configNotifierProvider.future);
+  Future<DashboardState> build() async {
     final locks = await ref.watch(lockListNotifierProvider.future);
     final gateways = await ref.watch(gatewayListNotifierProvider.future);
-    final waterMeters = await ref.watch(waterMeterListProvider.future);
-    final electricMeters = await ref.watch(electricMeterListProvider.future);
-    return DashboardData(
-      hasConfig: config.isValid,
+    final allMeters = await ref.watch(meterListNotifierProvider.future);
+    return DashboardState(
       locks: locks,
       gateways: gateways,
-      waterMeters: waterMeters,
-      electricMeters: electricMeters,
+      waterMeters: allMeters.where((m) => m.isWater).toList(),
+      electricMeters: allMeters.where((m) => m.isElectric).toList(),
     );
   }
 }

@@ -14,89 +14,85 @@ part of 'dashboard_provider.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
-mixin _$DashboardData {
-  bool get hasConfig;
+mixin _$DashboardState {
   List<SavedLockDevice> get locks;
   List<SavedGatewayDevice> get gateways;
   List<SavedMeterDevice> get waterMeters;
   List<SavedMeterDevice> get electricMeters;
+  bool get isLoading;
 
-  /// Create a copy of DashboardData
+  /// Create a copy of DashboardState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  $DashboardDataCopyWith<DashboardData> get copyWith =>
-      _$DashboardDataCopyWithImpl<DashboardData>(
-          this as DashboardData, _$identity);
+  $DashboardStateCopyWith<DashboardState> get copyWith =>
+      _$DashboardStateCopyWithImpl<DashboardState>(
+          this as DashboardState, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is DashboardData &&
-            (identical(other.hasConfig, hasConfig) ||
-                other.hasConfig == hasConfig) &&
+            other is DashboardState &&
             const DeepCollectionEquality().equals(other.locks, locks) &&
             const DeepCollectionEquality().equals(other.gateways, gateways) &&
             const DeepCollectionEquality()
                 .equals(other.waterMeters, waterMeters) &&
             const DeepCollectionEquality()
-                .equals(other.electricMeters, electricMeters));
+                .equals(other.electricMeters, electricMeters) &&
+            (identical(other.isLoading, isLoading) ||
+                other.isLoading == isLoading));
   }
 
   @override
   int get hashCode => Object.hash(
       runtimeType,
-      hasConfig,
       const DeepCollectionEquality().hash(locks),
       const DeepCollectionEquality().hash(gateways),
       const DeepCollectionEquality().hash(waterMeters),
-      const DeepCollectionEquality().hash(electricMeters));
+      const DeepCollectionEquality().hash(electricMeters),
+      isLoading);
 
   @override
   String toString() {
-    return 'DashboardData(hasConfig: $hasConfig, locks: $locks, gateways: $gateways, waterMeters: $waterMeters, electricMeters: $electricMeters)';
+    return 'DashboardState(locks: $locks, gateways: $gateways, waterMeters: $waterMeters, electricMeters: $electricMeters, isLoading: $isLoading)';
   }
 }
 
 /// @nodoc
-abstract mixin class $DashboardDataCopyWith<$Res> {
-  factory $DashboardDataCopyWith(
-          DashboardData value, $Res Function(DashboardData) _then) =
-      _$DashboardDataCopyWithImpl;
+abstract mixin class $DashboardStateCopyWith<$Res> {
+  factory $DashboardStateCopyWith(
+          DashboardState value, $Res Function(DashboardState) _then) =
+      _$DashboardStateCopyWithImpl;
   @useResult
   $Res call(
-      {bool hasConfig,
-      List<SavedLockDevice> locks,
+      {List<SavedLockDevice> locks,
       List<SavedGatewayDevice> gateways,
       List<SavedMeterDevice> waterMeters,
-      List<SavedMeterDevice> electricMeters});
+      List<SavedMeterDevice> electricMeters,
+      bool isLoading});
 }
 
 /// @nodoc
-class _$DashboardDataCopyWithImpl<$Res>
-    implements $DashboardDataCopyWith<$Res> {
-  _$DashboardDataCopyWithImpl(this._self, this._then);
+class _$DashboardStateCopyWithImpl<$Res>
+    implements $DashboardStateCopyWith<$Res> {
+  _$DashboardStateCopyWithImpl(this._self, this._then);
 
-  final DashboardData _self;
-  final $Res Function(DashboardData) _then;
+  final DashboardState _self;
+  final $Res Function(DashboardState) _then;
 
-  /// Create a copy of DashboardData
+  /// Create a copy of DashboardState
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? hasConfig = null,
     Object? locks = null,
     Object? gateways = null,
     Object? waterMeters = null,
     Object? electricMeters = null,
+    Object? isLoading = null,
   }) {
     return _then(_self.copyWith(
-      hasConfig: null == hasConfig
-          ? _self.hasConfig
-          : hasConfig // ignore: cast_nullable_to_non_nullable
-              as bool,
       locks: null == locks
           ? _self.locks
           : locks // ignore: cast_nullable_to_non_nullable
@@ -113,30 +109,30 @@ class _$DashboardDataCopyWithImpl<$Res>
           ? _self.electricMeters
           : electricMeters // ignore: cast_nullable_to_non_nullable
               as List<SavedMeterDevice>,
+      isLoading: null == isLoading
+          ? _self.isLoading
+          : isLoading // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
 
 /// @nodoc
 
-class _DashboardData implements DashboardData {
-  const _DashboardData(
-      {this.hasConfig = false,
-      final List<SavedLockDevice> locks = const [],
-      final List<SavedGatewayDevice> gateways = const [],
-      final List<SavedMeterDevice> waterMeters = const [],
-      final List<SavedMeterDevice> electricMeters = const []})
+class _DashboardState implements DashboardState {
+  const _DashboardState(
+      {required final List<SavedLockDevice> locks,
+      required final List<SavedGatewayDevice> gateways,
+      required final List<SavedMeterDevice> waterMeters,
+      required final List<SavedMeterDevice> electricMeters,
+      this.isLoading = false})
       : _locks = locks,
         _gateways = gateways,
         _waterMeters = waterMeters,
         _electricMeters = electricMeters;
 
-  @override
-  @JsonKey()
-  final bool hasConfig;
   final List<SavedLockDevice> _locks;
   @override
-  @JsonKey()
   List<SavedLockDevice> get locks {
     if (_locks is EqualUnmodifiableListView) return _locks;
     // ignore: implicit_dynamic_type
@@ -145,7 +141,6 @@ class _DashboardData implements DashboardData {
 
   final List<SavedGatewayDevice> _gateways;
   @override
-  @JsonKey()
   List<SavedGatewayDevice> get gateways {
     if (_gateways is EqualUnmodifiableListView) return _gateways;
     // ignore: implicit_dynamic_type
@@ -154,7 +149,6 @@ class _DashboardData implements DashboardData {
 
   final List<SavedMeterDevice> _waterMeters;
   @override
-  @JsonKey()
   List<SavedMeterDevice> get waterMeters {
     if (_waterMeters is EqualUnmodifiableListView) return _waterMeters;
     // ignore: implicit_dynamic_type
@@ -163,91 +157,90 @@ class _DashboardData implements DashboardData {
 
   final List<SavedMeterDevice> _electricMeters;
   @override
-  @JsonKey()
   List<SavedMeterDevice> get electricMeters {
     if (_electricMeters is EqualUnmodifiableListView) return _electricMeters;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_electricMeters);
   }
 
-  /// Create a copy of DashboardData
+  @override
+  @JsonKey()
+  final bool isLoading;
+
+  /// Create a copy of DashboardState
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  _$DashboardDataCopyWith<_DashboardData> get copyWith =>
-      __$DashboardDataCopyWithImpl<_DashboardData>(this, _$identity);
+  _$DashboardStateCopyWith<_DashboardState> get copyWith =>
+      __$DashboardStateCopyWithImpl<_DashboardState>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _DashboardData &&
-            (identical(other.hasConfig, hasConfig) ||
-                other.hasConfig == hasConfig) &&
+            other is _DashboardState &&
             const DeepCollectionEquality().equals(other._locks, _locks) &&
             const DeepCollectionEquality().equals(other._gateways, _gateways) &&
             const DeepCollectionEquality()
                 .equals(other._waterMeters, _waterMeters) &&
             const DeepCollectionEquality()
-                .equals(other._electricMeters, _electricMeters));
+                .equals(other._electricMeters, _electricMeters) &&
+            (identical(other.isLoading, isLoading) ||
+                other.isLoading == isLoading));
   }
 
   @override
   int get hashCode => Object.hash(
       runtimeType,
-      hasConfig,
       const DeepCollectionEquality().hash(_locks),
       const DeepCollectionEquality().hash(_gateways),
       const DeepCollectionEquality().hash(_waterMeters),
-      const DeepCollectionEquality().hash(_electricMeters));
+      const DeepCollectionEquality().hash(_electricMeters),
+      isLoading);
 
   @override
   String toString() {
-    return 'DashboardData(hasConfig: $hasConfig, locks: $locks, gateways: $gateways, waterMeters: $waterMeters, electricMeters: $electricMeters)';
+    return 'DashboardState(locks: $locks, gateways: $gateways, waterMeters: $waterMeters, electricMeters: $electricMeters, isLoading: $isLoading)';
   }
 }
 
 /// @nodoc
-abstract mixin class _$DashboardDataCopyWith<$Res>
-    implements $DashboardDataCopyWith<$Res> {
-  factory _$DashboardDataCopyWith(
-          _DashboardData value, $Res Function(_DashboardData) _then) =
-      __$DashboardDataCopyWithImpl;
+abstract mixin class _$DashboardStateCopyWith<$Res>
+    implements $DashboardStateCopyWith<$Res> {
+  factory _$DashboardStateCopyWith(
+          _DashboardState value, $Res Function(_DashboardState) _then) =
+      __$DashboardStateCopyWithImpl;
   @override
   @useResult
   $Res call(
-      {bool hasConfig,
-      List<SavedLockDevice> locks,
+      {List<SavedLockDevice> locks,
       List<SavedGatewayDevice> gateways,
       List<SavedMeterDevice> waterMeters,
-      List<SavedMeterDevice> electricMeters});
+      List<SavedMeterDevice> electricMeters,
+      bool isLoading});
 }
 
 /// @nodoc
-class __$DashboardDataCopyWithImpl<$Res>
-    implements _$DashboardDataCopyWith<$Res> {
-  __$DashboardDataCopyWithImpl(this._self, this._then);
+class __$DashboardStateCopyWithImpl<$Res>
+    implements _$DashboardStateCopyWith<$Res> {
+  __$DashboardStateCopyWithImpl(this._self, this._then);
 
-  final _DashboardData _self;
-  final $Res Function(_DashboardData) _then;
+  final _DashboardState _self;
+  final $Res Function(_DashboardState) _then;
 
-  /// Create a copy of DashboardData
+  /// Create a copy of DashboardState
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? hasConfig = null,
     Object? locks = null,
     Object? gateways = null,
     Object? waterMeters = null,
     Object? electricMeters = null,
+    Object? isLoading = null,
   }) {
-    return _then(_DashboardData(
-      hasConfig: null == hasConfig
-          ? _self.hasConfig
-          : hasConfig // ignore: cast_nullable_to_non_nullable
-              as bool,
+    return _then(_DashboardState(
       locks: null == locks
           ? _self._locks
           : locks // ignore: cast_nullable_to_non_nullable
@@ -264,6 +257,10 @@ class __$DashboardDataCopyWithImpl<$Res>
           ? _self._electricMeters
           : electricMeters // ignore: cast_nullable_to_non_nullable
               as List<SavedMeterDevice>,
+      isLoading: null == isLoading
+          ? _self.isLoading
+          : isLoading // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
