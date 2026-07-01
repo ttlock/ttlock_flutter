@@ -11,8 +11,15 @@ class KeypadPage extends ConsumerStatefulWidget {
   final String mac;
   final String lockData;
   final String lockMac;
+  final bool? isMultifunctional;
 
-  const KeypadPage({super.key, required this.mac, required this.lockData, required this.lockMac});
+  const KeypadPage({
+    super.key,
+    required this.mac,
+    required this.lockData,
+    required this.lockMac,
+    this.isMultifunctional,
+  });
 
   @override
   ConsumerState<KeypadPage> createState() => _KeypadPageState();
@@ -37,11 +44,34 @@ class _KeypadPageState extends ConsumerState<KeypadPage> {
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
+                // ── Device Info Card ──
                 Card(
                   child: ListTile(
-                    leading: const Icon(Icons.keyboard, color: AppColors.primary),
-                    title: Text('Wireless Keypad', style: AppTextStyles.titleMedium),
-                    subtitle: Text('MAC: ${widget.mac}', style: AppTextStyles.bodySmall),
+                    leading: const Icon(Icons.keyboard,
+                        color: AppColors.primary),
+                    title: Row(
+                      children: [
+                        Text('Wireless Keypad',
+                            style: AppTextStyles.titleMedium),
+                        if (widget.isMultifunctional == true) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: AppColors.warning.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text('Multifunctional',
+                                style: AppTextStyles.labelSmall.copyWith(
+                                  color: AppColors.warning,
+                                )),
+                          ),
+                        ],
+                      ],
+                    ),
+                    subtitle: Text('MAC: ${widget.mac}',
+                        style: AppTextStyles.bodySmall),
                   ),
                 ),
                 if (state.error != null)
@@ -54,22 +84,29 @@ class _KeypadPageState extends ConsumerState<KeypadPage> {
                   Card(
                     child: Padding(
                       padding: const EdgeInsets.all(12),
-                      child: Text(state.result!, style: AppTextStyles.codeMedium),
+                      child: Text(state.result!,
+                          style: AppTextStyles.codeMedium),
                     ),
                   ),
                 ],
+
+                // ── Operation Area ──
                 const SizedBox(height: 24),
-                SectionHeader(title: 'Actions', icon: Icons.play_arrow),
+                SectionHeader(title: 'Operations', icon: Icons.play_arrow),
                 const SizedBox(height: 8),
                 _ActionButton(
                   icon: Icons.power_settings_new,
                   label: 'Init Keypad',
-                  onTap: () => ref.read(keypadNotifierProvider.notifier).initKeypad(widget.mac, widget.lockMac),
+                  onTap: () => ref
+                      .read(keypadNotifierProvider.notifier)
+                      .initKeypad(widget.mac, widget.lockMac),
                 ),
                 _ActionButton(
                   icon: Icons.settings,
                   label: 'Init Multifunctional Keypad',
-                  onTap: () => ref.read(keypadNotifierProvider.notifier).initMultifunctional(widget.mac, widget.lockData),
+                  onTap: () => ref
+                      .read(keypadNotifierProvider.notifier)
+                      .initMultifunctional(widget.mac, widget.lockData),
                 ),
                 const SizedBox(height: 16),
                 Row(
@@ -78,7 +115,8 @@ class _KeypadPageState extends ConsumerState<KeypadPage> {
                       width: 100,
                       child: TextField(
                         controller: _slotCtrl,
-                        decoration: const InputDecoration(labelText: 'Slot #', isDense: true),
+                        decoration: const InputDecoration(
+                            labelText: 'Slot #', isDense: true),
                         keyboardType: TextInputType.number,
                       ),
                     ),
@@ -89,15 +127,62 @@ class _KeypadPageState extends ConsumerState<KeypadPage> {
                         label: 'Delete Stored Lock',
                         onTap: () {
                           final slot = int.tryParse(_slotCtrl.text) ?? 1;
-                          ref.read(keypadNotifierProvider.notifier).deleteStoredLock(widget.mac, slot);
+                          ref
+                              .read(keypadNotifierProvider.notifier)
+                              .deleteStoredLock(widget.mac, slot);
                         },
                       ),
                     ),
                   ],
                 ),
+
+                // ── Danger Zone ──
+                const SizedBox(height: 24),
+                const SectionHeader(
+                  title: 'Danger Zone',
+                  icon: Icons.warning_amber_rounded,
+                ),
+                const SizedBox(height: 8),
+                Card(
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                  child: ListTile(
+                    leading: const Icon(Icons.delete_forever,
+                        color: AppColors.error),
+                    title: Text('Delete device',
+                        style: AppTextStyles.bodyMedium
+                            .copyWith(color: AppColors.error)),
+                    trailing: const Icon(Icons.chevron_right,
+                        size: 18, color: AppColors.error),
+                    onTap: () => _deleteDevice(),
+                    dense: true,
+                  ),
+                ),
               ],
             ),
     );
+  }
+
+  Future<void> _deleteDevice() async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Remove keypad?'),
+        content: const Text('This cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Remove'),
+          ),
+        ],
+      ),
+    );
+    if (ok == true && mounted) {
+      Navigator.pop(context);
+    }
   }
 }
 
@@ -106,7 +191,8 @@ class _ActionButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const _ActionButton({required this.icon, required this.label, required this.onTap});
+  const _ActionButton(
+      {required this.icon, required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {

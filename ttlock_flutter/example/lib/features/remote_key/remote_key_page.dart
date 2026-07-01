@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../command/accessory_commands.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/widgets/section_header.dart';
@@ -36,11 +37,13 @@ class _RemoteKeyPageState extends ConsumerState<RemoteKeyPage> {
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
+                // ── Device Info Card ──
                 Card(
                   child: ListTile(
                     leading: const Icon(Icons.key, color: AppColors.primary),
                     title: Text('Remote Key', style: AppTextStyles.titleMedium),
-                    subtitle: Text('MAC: ${widget.mac}', style: AppTextStyles.bodySmall),
+                    subtitle: Text('MAC: ${widget.mac}',
+                        style: AppTextStyles.bodySmall),
                   ),
                 ),
                 if (state.error != null)
@@ -53,22 +56,32 @@ class _RemoteKeyPageState extends ConsumerState<RemoteKeyPage> {
                   Card(
                     child: Padding(
                       padding: const EdgeInsets.all(12),
-                      child: Text(state.result!, style: AppTextStyles.codeMedium),
+                      child: Text(state.result!,
+                          style: AppTextStyles.codeMedium),
                     ),
                   ),
                 ],
+
+                // ── Operation Area ──
                 const SizedBox(height: 24),
-                SectionHeader(title: 'Actions', icon: Icons.play_arrow),
+                SectionHeader(
+                  title: 'Operations',
+                  icon: AccessoryCommand.init.category.icon,
+                ),
                 const SizedBox(height: 8),
                 _ActionButton(
                   icon: Icons.power_settings_new,
                   label: 'Init Remote Key',
-                  onTap: () => ref.read(remoteKeyNotifierProvider.notifier).initRemoteKey(widget.mac, widget.lockData),
+                  onTap: () => ref
+                      .read(remoteKeyNotifierProvider.notifier)
+                      .initRemoteKey(widget.mac, widget.lockData),
                 ),
                 _ActionButton(
                   icon: Icons.list,
                   label: 'Get Stored Locks',
-                  onTap: () => ref.read(remoteKeyNotifierProvider.notifier).getStoredLocks(widget.mac),
+                  onTap: () => ref
+                      .read(remoteKeyNotifierProvider.notifier)
+                      .getStoredLocks(widget.mac),
                 ),
                 const SizedBox(height: 16),
                 Row(
@@ -77,7 +90,8 @@ class _RemoteKeyPageState extends ConsumerState<RemoteKeyPage> {
                       width: 100,
                       child: TextField(
                         controller: _slotCtrl,
-                        decoration: const InputDecoration(labelText: 'Slot #', isDense: true),
+                        decoration: const InputDecoration(
+                            labelText: 'Slot #', isDense: true),
                         keyboardType: TextInputType.number,
                       ),
                     ),
@@ -88,15 +102,62 @@ class _RemoteKeyPageState extends ConsumerState<RemoteKeyPage> {
                         label: 'Delete Stored Lock',
                         onTap: () {
                           final slot = int.tryParse(_slotCtrl.text) ?? 1;
-                          ref.read(remoteKeyNotifierProvider.notifier).deleteStoredLock(widget.mac, slot);
+                          ref
+                              .read(remoteKeyNotifierProvider.notifier)
+                              .deleteStoredLock(widget.mac, slot);
                         },
                       ),
                     ),
                   ],
                 ),
+
+                // ── Danger Zone ──
+                const SizedBox(height: 24),
+                const SectionHeader(
+                  title: 'Danger Zone',
+                  icon: Icons.warning_amber_rounded,
+                ),
+                const SizedBox(height: 8),
+                Card(
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                  child: ListTile(
+                    leading: const Icon(Icons.delete_forever,
+                        color: AppColors.error),
+                    title: Text('Delete device',
+                        style: AppTextStyles.bodyMedium
+                            .copyWith(color: AppColors.error)),
+                    trailing: const Icon(Icons.chevron_right,
+                        size: 18, color: AppColors.error),
+                    onTap: () => _deleteDevice(),
+                    dense: true,
+                  ),
+                ),
               ],
             ),
     );
+  }
+
+  Future<void> _deleteDevice() async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Remove remote key?'),
+        content: const Text('This cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Remove'),
+          ),
+        ],
+      ),
+    );
+    if (ok == true && mounted) {
+      Navigator.pop(context);
+    }
   }
 }
 
@@ -105,7 +166,8 @@ class _ActionButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const _ActionButton({required this.icon, required this.label, required this.onTap});
+  const _ActionButton(
+      {required this.icon, required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
