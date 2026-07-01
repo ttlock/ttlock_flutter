@@ -19,6 +19,7 @@ class SettingsSwitchTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SwitchListTile(
+      dense: true,
       title: Text(title),
       subtitle: subtitle != null ? Text(subtitle!) : null,
       value: value,
