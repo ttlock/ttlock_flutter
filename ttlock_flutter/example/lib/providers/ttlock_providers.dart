@@ -24,3 +24,5 @@ TTWaterMeterApi waterMeterApi(Ref ref) => TTLock.waterMeter;
 
 @riverpod
 TTElectricMeterApi electricMeterApi(Ref ref) => TTLock.electricMeter;
+
+final developerModeProvider = StateProvider<bool>((ref) => false);
