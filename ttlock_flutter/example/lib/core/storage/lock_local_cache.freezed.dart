@@ -23,6 +23,7 @@ mixin _$LockLocalCache {
   List<CachedCard>? get cards;
   List<CachedFingerprint>? get fingerprints;
   List<CachedFace>? get faces;
+  List<CachedPalmVein> get palmVeins;
   DateTime? get credentialsFetchedAt;
 
   /// Create a copy of LockLocalCache
@@ -54,6 +55,7 @@ mixin _$LockLocalCache {
             const DeepCollectionEquality()
                 .equals(other.fingerprints, fingerprints) &&
             const DeepCollectionEquality().equals(other.faces, faces) &&
+            const DeepCollectionEquality().equals(other.palmVeins, palmVeins) &&
             (identical(other.credentialsFetchedAt, credentialsFetchedAt) ||
                 other.credentialsFetchedAt == credentialsFetchedAt));
   }
@@ -70,11 +72,12 @@ mixin _$LockLocalCache {
       const DeepCollectionEquality().hash(cards),
       const DeepCollectionEquality().hash(fingerprints),
       const DeepCollectionEquality().hash(faces),
+      const DeepCollectionEquality().hash(palmVeins),
       credentialsFetchedAt);
 
   @override
   String toString() {
-    return 'LockLocalCache(supportedFunctions: $supportedFunctions, capabilitiesProbedAt: $capabilitiesProbedAt, settings: $settings, settingsFetchedAt: $settingsFetchedAt, passcodes: $passcodes, cards: $cards, fingerprints: $fingerprints, faces: $faces, credentialsFetchedAt: $credentialsFetchedAt)';
+    return 'LockLocalCache(supportedFunctions: $supportedFunctions, capabilitiesProbedAt: $capabilitiesProbedAt, settings: $settings, settingsFetchedAt: $settingsFetchedAt, passcodes: $passcodes, cards: $cards, fingerprints: $fingerprints, faces: $faces, palmVeins: $palmVeins, credentialsFetchedAt: $credentialsFetchedAt)';
   }
 }
 
@@ -93,6 +96,7 @@ abstract mixin class $LockLocalCacheCopyWith<$Res> {
       List<CachedCard>? cards,
       List<CachedFingerprint>? fingerprints,
       List<CachedFace>? faces,
+      List<CachedPalmVein> palmVeins,
       DateTime? credentialsFetchedAt});
 
   $LockSettingsSnapshotCopyWith<$Res>? get settings;
@@ -119,6 +123,7 @@ class _$LockLocalCacheCopyWithImpl<$Res>
     Object? cards = freezed,
     Object? fingerprints = freezed,
     Object? faces = freezed,
+    Object? palmVeins = null,
     Object? credentialsFetchedAt = freezed,
   }) {
     return _then(_self.copyWith(
@@ -154,6 +159,10 @@ class _$LockLocalCacheCopyWithImpl<$Res>
           ? _self.faces
           : faces // ignore: cast_nullable_to_non_nullable
               as List<CachedFace>?,
+      palmVeins: null == palmVeins
+          ? _self.palmVeins
+          : palmVeins // ignore: cast_nullable_to_non_nullable
+              as List<CachedPalmVein>,
       credentialsFetchedAt: freezed == credentialsFetchedAt
           ? _self.credentialsFetchedAt
           : credentialsFetchedAt // ignore: cast_nullable_to_non_nullable
@@ -188,12 +197,14 @@ class _LockLocalCache extends LockLocalCache {
       final List<CachedCard>? cards,
       final List<CachedFingerprint>? fingerprints,
       final List<CachedFace>? faces,
+      final List<CachedPalmVein> palmVeins = const [],
       this.credentialsFetchedAt})
       : _supportedFunctions = supportedFunctions,
         _passcodes = passcodes,
         _cards = cards,
         _fingerprints = fingerprints,
         _faces = faces,
+        _palmVeins = palmVeins,
         super._();
   factory _LockLocalCache.fromJson(Map<String, dynamic> json) =>
       _$LockLocalCacheFromJson(json);
@@ -255,6 +266,15 @@ class _LockLocalCache extends LockLocalCache {
     return EqualUnmodifiableListView(value);
   }
 
+  final List<CachedPalmVein> _palmVeins;
+  @override
+  @JsonKey()
+  List<CachedPalmVein> get palmVeins {
+    if (_palmVeins is EqualUnmodifiableListView) return _palmVeins;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_palmVeins);
+  }
+
   @override
   final DateTime? credentialsFetchedAt;
 
@@ -292,6 +312,8 @@ class _LockLocalCache extends LockLocalCache {
             const DeepCollectionEquality()
                 .equals(other._fingerprints, _fingerprints) &&
             const DeepCollectionEquality().equals(other._faces, _faces) &&
+            const DeepCollectionEquality()
+                .equals(other._palmVeins, _palmVeins) &&
             (identical(other.credentialsFetchedAt, credentialsFetchedAt) ||
                 other.credentialsFetchedAt == credentialsFetchedAt));
   }
@@ -308,11 +330,12 @@ class _LockLocalCache extends LockLocalCache {
       const DeepCollectionEquality().hash(_cards),
       const DeepCollectionEquality().hash(_fingerprints),
       const DeepCollectionEquality().hash(_faces),
+      const DeepCollectionEquality().hash(_palmVeins),
       credentialsFetchedAt);
 
   @override
   String toString() {
-    return 'LockLocalCache(supportedFunctions: $supportedFunctions, capabilitiesProbedAt: $capabilitiesProbedAt, settings: $settings, settingsFetchedAt: $settingsFetchedAt, passcodes: $passcodes, cards: $cards, fingerprints: $fingerprints, faces: $faces, credentialsFetchedAt: $credentialsFetchedAt)';
+    return 'LockLocalCache(supportedFunctions: $supportedFunctions, capabilitiesProbedAt: $capabilitiesProbedAt, settings: $settings, settingsFetchedAt: $settingsFetchedAt, passcodes: $passcodes, cards: $cards, fingerprints: $fingerprints, faces: $faces, palmVeins: $palmVeins, credentialsFetchedAt: $credentialsFetchedAt)';
   }
 }
 
@@ -333,6 +356,7 @@ abstract mixin class _$LockLocalCacheCopyWith<$Res>
       List<CachedCard>? cards,
       List<CachedFingerprint>? fingerprints,
       List<CachedFace>? faces,
+      List<CachedPalmVein> palmVeins,
       DateTime? credentialsFetchedAt});
 
   @override
@@ -360,6 +384,7 @@ class __$LockLocalCacheCopyWithImpl<$Res>
     Object? cards = freezed,
     Object? fingerprints = freezed,
     Object? faces = freezed,
+    Object? palmVeins = null,
     Object? credentialsFetchedAt = freezed,
   }) {
     return _then(_LockLocalCache(
@@ -395,6 +420,10 @@ class __$LockLocalCacheCopyWithImpl<$Res>
           ? _self._faces
           : faces // ignore: cast_nullable_to_non_nullable
               as List<CachedFace>?,
+      palmVeins: null == palmVeins
+          ? _self._palmVeins
+          : palmVeins // ignore: cast_nullable_to_non_nullable
+              as List<CachedPalmVein>,
       credentialsFetchedAt: freezed == credentialsFetchedAt
           ? _self.credentialsFetchedAt
           : credentialsFetchedAt // ignore: cast_nullable_to_non_nullable

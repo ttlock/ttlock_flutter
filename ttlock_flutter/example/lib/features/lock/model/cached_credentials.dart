@@ -104,3 +104,15 @@ abstract class CachedFace with _$CachedFace {
 
   const CachedFace._();
 }
+
+@freezed
+abstract class CachedPalmVein with _$CachedPalmVein {
+  const factory CachedPalmVein({
+    required String palmVeinNumber,
+    required int startDate,
+    required int endDate,
+  }) = _CachedPalmVein;
+
+  factory CachedPalmVein.fromJson(Map<String, dynamic> json) =>
+      _$CachedPalmVeinFromJson(json);
+}

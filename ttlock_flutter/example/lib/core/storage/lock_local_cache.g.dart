@@ -33,6 +33,10 @@ _LockLocalCache _$LockLocalCacheFromJson(Map<String, dynamic> json) =>
       faces: (json['faces'] as List<dynamic>?)
           ?.map((e) => CachedFace.fromJson(e as Map<String, dynamic>))
           .toList(),
+      palmVeins: (json['palm_veins'] as List<dynamic>?)
+              ?.map((e) => CachedPalmVein.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
       credentialsFetchedAt: json['credentials_fetched_at'] == null
           ? null
           : DateTime.parse(json['credentials_fetched_at'] as String),
@@ -49,6 +53,7 @@ Map<String, dynamic> _$LockLocalCacheToJson(_LockLocalCache instance) =>
       'cards': instance.cards,
       'fingerprints': instance.fingerprints,
       'faces': instance.faces,
+      'palm_veins': instance.palmVeins,
       'credentials_fetched_at':
           instance.credentialsFetchedAt?.toIso8601String(),
     };

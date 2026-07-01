@@ -200,6 +200,10 @@ RouteBase get $lockRoute => GoRouteData.$route(
           path: 'keypads',
           factory: _$KeypadListRoute._fromState,
         ),
+        GoRouteData.$route(
+          path: 'palm-veins',
+          factory: _$PalmVeinListRoute._fromState,
+        ),
       ],
     );
 
@@ -653,6 +657,32 @@ mixin _$KeypadListRoute on GoRouteData {
   void replace(BuildContext context) => context.replace(location);
 }
 
+mixin _$PalmVeinListRoute on GoRouteData {
+  static PalmVeinListRoute _fromState(GoRouterState state) => PalmVeinListRoute(
+        state.pathParameters['mac']!,
+      );
+
+  PalmVeinListRoute get _self => this as PalmVeinListRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+        '/lock/${Uri.encodeComponent(_self.mac)}/palm-veins',
+      );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
 RouteBase get $gatewayRoute => GoRouteData.$route(
       path: '/gateway/:mac',
       factory: _$GatewayRoute._fromState,
@@ -697,7 +727,6 @@ mixin _$GatewayRoute on GoRouteData {
 }
 
 const _$TTGatewayTypeEnumMap = {
-  TTGatewayType.g1: 'g1',
   TTGatewayType.g2: 'g2',
   TTGatewayType.g3: 'g3',
   TTGatewayType.g4: 'g4',

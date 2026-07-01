@@ -65,3 +65,17 @@ Map<String, dynamic> _$CachedFaceToJson(_CachedFace instance) =>
       'start_date': instance.startDate,
       'end_date': instance.endDate,
     };
+
+_CachedPalmVein _$CachedPalmVeinFromJson(Map<String, dynamic> json) =>
+    _CachedPalmVein(
+      palmVeinNumber: json['palm_vein_number'] as String,
+      startDate: (json['start_date'] as num).toInt(),
+      endDate: (json['end_date'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$CachedPalmVeinToJson(_CachedPalmVein instance) =>
+    <String, dynamic>{
+      'palm_vein_number': instance.palmVeinNumber,
+      'start_date': instance.startDate,
+      'end_date': instance.endDate,
+    };

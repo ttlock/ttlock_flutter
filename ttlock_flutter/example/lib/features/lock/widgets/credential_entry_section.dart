@@ -23,6 +23,7 @@ class CredentialEntrySection extends ConsumerWidget {
     final cardCount = cache?.cards?.length;
     final fpCount = cache?.fingerprints?.length;
     final faceCount = cache?.faces?.length ?? 0;
+    final pvCount = cache?.palmVeins.length ?? 0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,10 +61,8 @@ class CredentialEntrySection extends ConsumerWidget {
           _EntryTile(
             icon: Icons.pan_tool_alt,
             label: 'Palm Veins',
-            count: null,
-            onTap: () {
-              // 暂没有 PalmVeinListRoute，后续 Task 3.2 会添加
-            },
+            count: pvCount,
+            onTap: () => PalmVeinListRoute(lockMac).push(context),
           ),
         if (caps.isEmpty)
           const Padding(

@@ -18,6 +18,7 @@ abstract class LockLocalCache with _$LockLocalCache {
     List<CachedCard>? cards,
     List<CachedFingerprint>? fingerprints,
     List<CachedFace>? faces,
+    @Default([]) List<CachedPalmVein> palmVeins,
     DateTime? credentialsFetchedAt,
   }) = _LockLocalCache;
 

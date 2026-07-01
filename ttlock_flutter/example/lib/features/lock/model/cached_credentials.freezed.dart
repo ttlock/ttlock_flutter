@@ -808,4 +808,187 @@ class __$CachedFaceCopyWithImpl<$Res> implements _$CachedFaceCopyWith<$Res> {
   }
 }
 
+/// @nodoc
+mixin _$CachedPalmVein {
+  String get palmVeinNumber;
+  int get startDate;
+  int get endDate;
+
+  /// Create a copy of CachedPalmVein
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $CachedPalmVeinCopyWith<CachedPalmVein> get copyWith =>
+      _$CachedPalmVeinCopyWithImpl<CachedPalmVein>(
+          this as CachedPalmVein, _$identity);
+
+  /// Serializes this CachedPalmVein to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is CachedPalmVein &&
+            (identical(other.palmVeinNumber, palmVeinNumber) ||
+                other.palmVeinNumber == palmVeinNumber) &&
+            (identical(other.startDate, startDate) ||
+                other.startDate == startDate) &&
+            (identical(other.endDate, endDate) || other.endDate == endDate));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, palmVeinNumber, startDate, endDate);
+
+  @override
+  String toString() {
+    return 'CachedPalmVein(palmVeinNumber: $palmVeinNumber, startDate: $startDate, endDate: $endDate)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $CachedPalmVeinCopyWith<$Res> {
+  factory $CachedPalmVeinCopyWith(
+          CachedPalmVein value, $Res Function(CachedPalmVein) _then) =
+      _$CachedPalmVeinCopyWithImpl;
+  @useResult
+  $Res call({String palmVeinNumber, int startDate, int endDate});
+}
+
+/// @nodoc
+class _$CachedPalmVeinCopyWithImpl<$Res>
+    implements $CachedPalmVeinCopyWith<$Res> {
+  _$CachedPalmVeinCopyWithImpl(this._self, this._then);
+
+  final CachedPalmVein _self;
+  final $Res Function(CachedPalmVein) _then;
+
+  /// Create a copy of CachedPalmVein
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? palmVeinNumber = null,
+    Object? startDate = null,
+    Object? endDate = null,
+  }) {
+    return _then(_self.copyWith(
+      palmVeinNumber: null == palmVeinNumber
+          ? _self.palmVeinNumber
+          : palmVeinNumber // ignore: cast_nullable_to_non_nullable
+              as String,
+      startDate: null == startDate
+          ? _self.startDate
+          : startDate // ignore: cast_nullable_to_non_nullable
+              as int,
+      endDate: null == endDate
+          ? _self.endDate
+          : endDate // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _CachedPalmVein implements CachedPalmVein {
+  const _CachedPalmVein(
+      {required this.palmVeinNumber,
+      required this.startDate,
+      required this.endDate});
+  factory _CachedPalmVein.fromJson(Map<String, dynamic> json) =>
+      _$CachedPalmVeinFromJson(json);
+
+  @override
+  final String palmVeinNumber;
+  @override
+  final int startDate;
+  @override
+  final int endDate;
+
+  /// Create a copy of CachedPalmVein
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$CachedPalmVeinCopyWith<_CachedPalmVein> get copyWith =>
+      __$CachedPalmVeinCopyWithImpl<_CachedPalmVein>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$CachedPalmVeinToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _CachedPalmVein &&
+            (identical(other.palmVeinNumber, palmVeinNumber) ||
+                other.palmVeinNumber == palmVeinNumber) &&
+            (identical(other.startDate, startDate) ||
+                other.startDate == startDate) &&
+            (identical(other.endDate, endDate) || other.endDate == endDate));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, palmVeinNumber, startDate, endDate);
+
+  @override
+  String toString() {
+    return 'CachedPalmVein(palmVeinNumber: $palmVeinNumber, startDate: $startDate, endDate: $endDate)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$CachedPalmVeinCopyWith<$Res>
+    implements $CachedPalmVeinCopyWith<$Res> {
+  factory _$CachedPalmVeinCopyWith(
+          _CachedPalmVein value, $Res Function(_CachedPalmVein) _then) =
+      __$CachedPalmVeinCopyWithImpl;
+  @override
+  @useResult
+  $Res call({String palmVeinNumber, int startDate, int endDate});
+}
+
+/// @nodoc
+class __$CachedPalmVeinCopyWithImpl<$Res>
+    implements _$CachedPalmVeinCopyWith<$Res> {
+  __$CachedPalmVeinCopyWithImpl(this._self, this._then);
+
+  final _CachedPalmVein _self;
+  final $Res Function(_CachedPalmVein) _then;
+
+  /// Create a copy of CachedPalmVein
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? palmVeinNumber = null,
+    Object? startDate = null,
+    Object? endDate = null,
+  }) {
+    return _then(_CachedPalmVein(
+      palmVeinNumber: null == palmVeinNumber
+          ? _self.palmVeinNumber
+          : palmVeinNumber // ignore: cast_nullable_to_non_nullable
+              as String,
+      startDate: null == startDate
+          ? _self.startDate
+          : startDate // ignore: cast_nullable_to_non_nullable
+              as int,
+      endDate: null == endDate
+          ? _self.endDate
+          : endDate // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
 // dart format on

@@ -14,6 +14,7 @@ import '../../features/lock/face/face_manage_page.dart';
 import '../../features/lock/fingerprint/fingerprint_add_page.dart';
 import '../../features/lock/fingerprint/fingerprint_list_page.dart';
 import '../../features/lock/lock_page.dart';
+import '../../features/lock/palm_vein/palm_vein_list_page.dart';
 import '../../features/lock/passcode/passcode_add_page.dart';
 import '../../features/lock/passcode/passcode_list_page.dart';
 import '../../features/lock/settings/lock_advanced_settings_page.dart';
@@ -139,6 +140,7 @@ class SettingsRoute extends GoRouteData with _$SettingsRoute {
     TypedGoRoute<DoorSensorListRoute>(path: 'door-sensors'),
     TypedGoRoute<RemoteKeyListRoute>(path: 'remote-keys'),
     TypedGoRoute<KeypadListRoute>(path: 'keypads'),
+    TypedGoRoute<PalmVeinListRoute>(path: 'palm-veins'),
   ],
 )
 class LockRoute extends GoRouteData with _$LockRoute {
@@ -309,6 +311,16 @@ class KeypadListRoute extends GoRouteData with _$KeypadListRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) =>
       KeypadListPage(lockMac: mac);
+}
+
+class PalmVeinListRoute extends GoRouteData with _$PalmVeinListRoute {
+  const PalmVeinListRoute(this.mac);
+
+  final String mac;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      PalmVeinListPage(lockMac: mac);
 }
 
 // ─── Gateway Detail ───
