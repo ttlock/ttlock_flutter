@@ -62,4 +62,54 @@ class GatewayNotifier extends _$GatewayNotifier {
     await api.disconnect(state.mac!);
     state = const GatewayState();
   }
+
+  Future<void> getNetworkMac() async {
+    final api = ref.read(gatewayApiProvider);
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      final mac = await runGatewayApi(() => api.getNetworkMac());
+      state = state.copyWith(isLoading: false, lastResult: 'Network MAC: $mac');
+    } on TTGatewayException catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+    }
+  }
+
+  Future<void> configIp(TTIpSetting ipSetting) async {
+    final mac = state.mac;
+    if (mac == null) return;
+    final api = ref.read(gatewayApiProvider);
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      await runGatewayApi(() => api.configIp(mac, ipSetting));
+      state = state.copyWith(isLoading: false, lastResult: 'IP configured');
+    } on TTGatewayException catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+    }
+  }
+
+  Future<void> configApn(String apn) async {
+    final mac = state.mac;
+    if (mac == null) return;
+    final api = ref.read(gatewayApiProvider);
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      await runGatewayApi(() => api.configApn(mac, apn));
+      state = state.copyWith(isLoading: false, lastResult: 'APN configured');
+    } on TTGatewayException catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+    }
+  }
+
+  Future<void> enterUpgradeMode() async {
+    final mac = state.mac;
+    if (mac == null) return;
+    final api = ref.read(gatewayApiProvider);
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      await runGatewayApi(() => api.enterUpgradeMode(mac));
+      state = state.copyWith(isLoading: false, lastResult: 'Upgrade mode entered');
+    } on TTGatewayException catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+    }
+  }
 }
