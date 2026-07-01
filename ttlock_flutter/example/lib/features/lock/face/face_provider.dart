@@ -10,7 +10,32 @@ import '../model/credential_validity.dart';
 
 part 'face_provider.g.dart';
 
-String faceErrorMessage(TTFaceErrorCode? code) => code?.name ?? 'Face error';
+String faceErrorMessage(TTFaceErrorCode? code) {
+  if (code == null || code == TTFaceErrorCode.normal) return 'Enrolling face...';
+  return switch (code) {
+    TTFaceErrorCode.normal => 'Enrolling face...',
+    TTFaceErrorCode.noFaceDetected => 'No face detected. Face the lock.',
+    TTFaceErrorCode.tooCloseToTheTop => 'Move face down.',
+    TTFaceErrorCode.tooCloseToTheBottom => 'Move face up.',
+    TTFaceErrorCode.tooCloseToTheLeft => 'Move face right.',
+    TTFaceErrorCode.tooCloseToTheRight => 'Move face left.',
+    TTFaceErrorCode.tooFarAway => 'Move closer to the lock.',
+    TTFaceErrorCode.tooClose => 'Move back slightly.',
+    TTFaceErrorCode.eyebrowsCovered => 'Show your eyebrows.',
+    TTFaceErrorCode.eyesCovered => 'Show your eyes.',
+    TTFaceErrorCode.faceCovered => 'Remove any face covering.',
+    TTFaceErrorCode.faceDirection => 'Face the lock directly.',
+    TTFaceErrorCode.eyeOpeningDetected => 'Keep your eyes open.',
+    TTFaceErrorCode.eyesClosedStatus => 'Open your eyes.',
+    TTFaceErrorCode.failedToDetectEye => 'Position your eyes in frame.',
+    TTFaceErrorCode.needTurnHeadToLeft => 'Turn your head to the left.',
+    TTFaceErrorCode.needTurnHeadToRight => 'Turn your head to the right.',
+    TTFaceErrorCode.needRaiseHead => 'Raise your head slightly.',
+    TTFaceErrorCode.needLowerHead => 'Lower your head slightly.',
+    TTFaceErrorCode.needTiltHeadToLeft => 'Tilt your head to the left.',
+    TTFaceErrorCode.needTiltHeadToRight => 'Tilt your head to the right.',
+  };
+}
 
 @riverpod
 class FaceList extends _$FaceList {
