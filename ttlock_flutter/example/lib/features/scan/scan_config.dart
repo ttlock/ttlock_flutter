@@ -4,6 +4,7 @@ enum DeviceType {
   lock,
   gateway,
   doorSensor,
+  standaloneDoorSensor,
   remoteKey,
   keypad,
   waterMeter,

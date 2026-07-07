@@ -6,7 +6,7 @@ part of 'palm_vein_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$palmVeinListHash() => r'e98a99e7d6d654802decb6d27a633f65fd8048f4';
+String _$palmVeinListHash() => r'60552f17189f9fa70e7257cd80dd4dcad8079e7a';
 
 /// Copied from Dart SDK
 class _SystemHash {

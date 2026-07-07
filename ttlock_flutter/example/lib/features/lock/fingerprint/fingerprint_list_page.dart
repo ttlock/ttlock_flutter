@@ -1,39 +1,99 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:toastification/toastification.dart';
 
 import '../../../core/router/routes.dart';
 import '../../../core/storage/lock_list_provider.dart';
 import '../../../core/theme/app_text_styles.dart';
-import '../../../core/widgets/error_display.dart';
+import '../../../core/widgets/async_value_view.dart';
 import '../model/credential_params.dart';
 import '../widgets/credential_validity_sheet.dart';
 import 'fingerprint_provider.dart';
 
-class FingerprintListPage extends ConsumerWidget {
-  const FingerprintListPage({super.key, required this.lockMac});
+Future<void> clearAllFingerprints(
+  BuildContext context,
+  WidgetRef ref,
+  String lockMac,
+) async {
+  final ok = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: const Text('Clear all fingerprints?'),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+        FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Clear')),
+      ],
+    ),
+  );
+  if (ok != true || !context.mounted) return;
+  try {
+    context.loaderOverlay.show();
+    await ref.read(fingerprintListProvider(lockMac).notifier).clearAll(lockMac);
+    if (context.mounted) {
+      context.loaderOverlay.hide();
+      toastification.show(title: const Text('Cleared'));
+    }
+  } catch (e) {
+    if (context.mounted) {
+      context.loaderOverlay.hide();
+      toastification.show(title: Text('$e'), type: ToastificationType.error);
+    }
+  }
+}
 
-  final String lockMac;
-
-  Future<void> _clearAll(BuildContext context, WidgetRef ref) async {
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Clear all fingerprints?'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Clear')),
+Future<void> showFingerprintActions(
+  BuildContext context,
+  WidgetRef ref,
+  String lockMac,
+  String number,
+) async {
+  final action = await showModalBottomSheet<String>(
+    context: context,
+    builder: (ctx) => SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Icon(Icons.edit),
+            title: const Text('Modify validity'),
+            onTap: () => Navigator.pop(ctx, 'modify'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.delete),
+            title: const Text('Delete'),
+            onTap: () => Navigator.pop(ctx, 'delete'),
+          ),
         ],
       ),
-    );
-    if (ok != true || !context.mounted) return;
+    ),
+  );
+  if (!context.mounted || action == null) return;
+  if (action == 'delete') {
     try {
       context.loaderOverlay.show();
-      await ref.read(fingerprintListProvider(lockMac).notifier).clearAll(lockMac);
+      await ref.read(fingerprintListProvider(lockMac).notifier).delete(lockMac, number);
       if (context.mounted) {
         context.loaderOverlay.hide();
-        toastification.show(title: const Text('Cleared'));
+        toastification.show(title: const Text('Deleted'));
+      }
+    } catch (e) {
+      if (context.mounted) {
+        context.loaderOverlay.hide();
+        toastification.show(title: Text('$e'), type: ToastificationType.error);
+      }
+    }
+    return;
+  }
+  if (action == 'modify') {
+    final validity = await CredentialValiditySheet.show(context);
+    if (validity == null || !context.mounted) return;
+    try {
+      context.loaderOverlay.show();
+      await ref.read(fingerprintListProvider(lockMac).notifier).modifyValidity(lockMac, number, validity);
+      if (context.mounted) {
+        context.loaderOverlay.hide();
+        toastification.show(title: const Text('Updated'));
       }
     } catch (e) {
       if (context.mounted) {
@@ -42,6 +102,12 @@ class FingerprintListPage extends ConsumerWidget {
       }
     }
   }
+}
+
+class FingerprintListPage extends HookConsumerWidget {
+  const FingerprintListPage({super.key, required this.lockMac});
+
+  final String lockMac;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -63,7 +129,7 @@ class FingerprintListPage extends ConsumerWidget {
                 ref.read(fingerprintListProvider(lockMac).notifier).refreshFromLock(),
           ),
           TextButton(
-            onPressed: () => _clearAll(context, ref),
+            onPressed: () => clearAllFingerprints(context, ref, lockMac),
             child: const Text('Clear All'),
           ),
           IconButton(
@@ -72,9 +138,9 @@ class FingerprintListPage extends ConsumerWidget {
           ),
         ],
       ),
-      body: listAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => ErrorDisplay(message: e.toString()),
+      body: AsyncValueView.when(
+        value: listAsync,
+        onRetry: (_, __) => ref.invalidate(fingerprintListProvider(lockMac)),
         data: (list) => RefreshIndicator(
           onRefresh: () => ref.read(fingerprintListProvider(lockMac).notifier).refresh(),
           child: list.isEmpty
@@ -100,7 +166,7 @@ class FingerprintListPage extends ConsumerWidget {
                       child: ListTile(
                         title: Text(fp.fingerprintNumber, style: AppTextStyles.codeMedium),
                         subtitle: Text(formatCardValidityLabel(fp.startDate, fp.endDate)),
-                        onTap: () => _actions(context, ref, fp.fingerprintNumber),
+                        onTap: () => showFingerprintActions(context, ref, lockMac, fp.fingerprintNumber),
                       ),
                     );
                   },
@@ -108,66 +174,5 @@ class FingerprintListPage extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  Future<void> _actions(
-    BuildContext context,
-    WidgetRef ref,
-    String number,
-  ) async {
-    final action = await showModalBottomSheet<String>(
-      context: context,
-      builder: (ctx) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.edit),
-              title: const Text('Modify validity'),
-              onTap: () => Navigator.pop(ctx, 'modify'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.delete),
-              title: const Text('Delete'),
-              onTap: () => Navigator.pop(ctx, 'delete'),
-            ),
-          ],
-        ),
-      ),
-    );
-    if (!context.mounted || action == null) return;
-    if (action == 'delete') {
-      try {
-        context.loaderOverlay.show();
-        await ref.read(fingerprintListProvider(lockMac).notifier).delete(lockMac, number);
-        if (context.mounted) {
-          context.loaderOverlay.hide();
-          toastification.show(title: const Text('Deleted'));
-        }
-      } catch (e) {
-        if (context.mounted) {
-          context.loaderOverlay.hide();
-          toastification.show(title: Text('$e'), type: ToastificationType.error);
-        }
-      }
-      return;
-    }
-    if (action == 'modify') {
-      final validity = await CredentialValiditySheet.show(context);
-      if (validity == null || !context.mounted) return;
-      try {
-        context.loaderOverlay.show();
-        await ref.read(fingerprintListProvider(lockMac).notifier).modifyValidity(lockMac, number, validity);
-        if (context.mounted) {
-          context.loaderOverlay.hide();
-          toastification.show(title: const Text('Updated'));
-        }
-      } catch (e) {
-        if (context.mounted) {
-          context.loaderOverlay.hide();
-          toastification.show(title: Text('$e'), type: ToastificationType.error);
-        }
-      }
-    }
   }
 }

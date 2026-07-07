@@ -20,4 +20,4 @@ dev_dependencies:
     git:
       url: "https://gitcode.com/openharmony-sig/flutter_packages.git"
       path: "packages/pigeon"
-      ref: "br_pigeon-v25.3.2_ohos"
+      ref: "br_pigeon-v26.3.4_ohos_dev"

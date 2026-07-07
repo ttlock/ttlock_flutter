@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../core/env/app_mode.dart';
 import '../../core/storage/config_provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../core/widgets/async_value_view.dart';
 import 'model/config_model.dart';
 
-class SettingsPage extends ConsumerWidget {
+class SettingsPage extends HookConsumerWidget {
   const SettingsPage({super.key});
 
   @override
@@ -15,58 +17,51 @@ class SettingsPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
       body: configAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
-        data: (config) => _SettingsForm(config: config),
+        loading: () => AsyncValueView.loading(),
+        error: (e, _) => AsyncValueView.error(
+          message: '$e',
+          onRetry: () => ref.invalidate(configNotifierProvider),
+        ),
+        data: (config) => _SettingsBody(config: config),
       ),
     );
   }
 }
 
-class _SettingsForm extends ConsumerStatefulWidget {
+class _SettingsBody extends HookConsumerWidget {
   final ConfigModel config;
-  const _SettingsForm({required this.config});
+  const _SettingsBody({required this.config});
 
   @override
-  ConsumerState<_SettingsForm> createState() => _SettingsFormState();
-}
-
-class _SettingsFormState extends ConsumerState<_SettingsForm> {
-  late final _uidCtrl = TextEditingController(text: widget.config.uid > 0 ? '${widget.config.uid}' : '');
-  late final _ipCtrl = TextEditingController(text: widget.config.serverIp ?? '');
-  late final _portCtrl = TextEditingController(text: widget.config.serverPort ?? '');
-  late final _nameCtrl = TextEditingController(text: widget.config.gatewayName);
-  final _formKey = GlobalKey<FormState>();
-
-  @override
-  void dispose() {
-    _uidCtrl.dispose();
-    _ipCtrl.dispose();
-    _portCtrl.dispose();
-    _nameCtrl.dispose();
-    super.dispose();
-  }
-
-  Future<void> _save() async {
-    if (!_formKey.currentState!.validate()) return;
-    final config = ConfigModel(
-      uid: int.tryParse(_uidCtrl.text) ?? 0,
-      serverIp: AppEnv.isOnPremise ? _ipCtrl.text : null,
-      serverPort: AppEnv.isOnPremise ? _portCtrl.text : null,
-      gatewayName: _nameCtrl.text,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final uidCtrl = useTextEditingController(
+      text: config.uid > 0 ? '${config.uid}' : '',
     );
-    await ref.read(configNotifierProvider.notifier).save(config);
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Configuration saved')),
-      );
-    }
-  }
+    final passwordCtrl = useTextEditingController(text: config.password ?? '');
+    final ipCtrl = useTextEditingController(text: config.serverIp ?? '');
+    final portCtrl = useTextEditingController(text: config.serverPort ?? '');
+    final formKey = useMemoized(GlobalKey<FormState>.new);
 
-  @override
-  Widget build(BuildContext context) {
+    Future<void> save() async {
+      if (!formKey.currentState!.validate()) return;
+      final newConfig = config.copyWith(
+        uid: int.tryParse(uidCtrl.text) ?? 0,
+        password: AppEnv.isOnline ? passwordCtrl.text : null,
+        serverIp: AppEnv.isOnPremise ? ipCtrl.text : null,
+        serverPort: AppEnv.isOnPremise && portCtrl.text.isNotEmpty
+            ? portCtrl.text
+            : null,
+      );
+      await ref.read(configNotifierProvider.notifier).save(newConfig);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Configuration saved')),
+        );
+      }
+    }
+
     return Form(
-      key: _formKey,
+      key: formKey,
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -85,41 +80,56 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
             ),
           ),
           const SizedBox(height: 24),
+          TextFormField(
+            controller: uidCtrl,
+            decoration: const InputDecoration(
+              labelText: 'UID',
+              hintText: 'Enter your TTLock user ID',
+            ),
+            keyboardType: TextInputType.number,
+            validator: (v) =>
+                (v == null || v.isEmpty) ? 'UID is required' : null,
+            onTapOutside: (event) => FocusScope.of(context).unfocus(),
+          ),
           if (AppEnv.isOnline) ...[
+            const SizedBox(height: 16),
             TextFormField(
-              controller: _uidCtrl,
-              decoration: const InputDecoration(labelText: 'UID', hintText: 'Enter your TTLock user ID'),
-              keyboardType: TextInputType.number,
-              validator: (v) => (v == null || v.isEmpty) ? 'UID is required' : null,
+              controller: passwordCtrl,
+              decoration: const InputDecoration(
+                labelText: 'Password',
+                hintText: 'Enter your TTLock login password',
+              ),
+              obscureText: true,
+              validator: (v) =>
+                  (v == null || v.isEmpty) ? 'Password is required' : null,
+              onTapOutside: (event) => FocusScope.of(context).unfocus(),
             ),
           ] else ...[
+            const SizedBox(height: 16),
             TextFormField(
-              controller: _ipCtrl,
-              decoration: const InputDecoration(labelText: 'Server IP', hintText: 'e.g. 192.168.1.100'),
-              validator: (v) => (v == null || v.isEmpty) ? 'Server IP is required' : null,
+              controller: ipCtrl,
+              decoration: const InputDecoration(
+                labelText: 'Server IP',
+                hintText: 'e.g. 192.168.1.100',
+              ),
+              validator: (v) =>
+                  (v == null || v.isEmpty) ? 'Server IP is required' : null,
+              onTapOutside: (event) => FocusScope.of(context).unfocus(),
             ),
             const SizedBox(height: 16),
             TextFormField(
-              controller: _portCtrl,
-              decoration: const InputDecoration(labelText: 'Server Port', hintText: 'e.g. 2229'),
+              controller: portCtrl,
+              decoration: const InputDecoration(
+                labelText: 'Server Port (optional)',
+                hintText: 'e.g. 2229',
+              ),
               keyboardType: TextInputType.number,
-              validator: (v) => (v == null || v.isEmpty) ? 'Server Port is required' : null,
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _uidCtrl,
-              decoration: const InputDecoration(labelText: 'UID (optional)', hintText: 'Enter your TTLock user ID'),
-              keyboardType: TextInputType.number,
+              onTapOutside: (event) => FocusScope.of(context).unfocus(),
             ),
           ],
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _nameCtrl,
-            decoration: const InputDecoration(labelText: 'Gateway Name', hintText: 'e.g. Gateway No 1'),
-          ),
           const SizedBox(height: 32),
           ElevatedButton(
-            onPressed: _save,
+            onPressed: save,
             child: const Text('Save Configuration'),
           ),
         ],

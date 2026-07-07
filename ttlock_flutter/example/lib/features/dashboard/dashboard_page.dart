@@ -1,88 +1,111 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+
 import '../../core/router/routes.dart';
 import '../../core/storage/accessory_list_provider.dart';
 import '../../core/storage/lock_list_provider.dart';
+import '../../core/widgets/async_value_view.dart';
 import '../../core/widgets/device_card.dart';
-import '../../core/widgets/error_display.dart';
+import '../../features/scan/scan_config.dart';
 import '../../features/lock/lock_status_provider.dart';
 import '../../features/settings/model/saved_gateway_device.dart';
 import '../../features/settings/model/saved_lock_device.dart';
 import '../../features/settings/model/saved_meter_device.dart';
+import '../../features/settings/model/saved_standalone_door_sensor.dart';
 import 'dashboard_provider.dart';
 
-class DashboardPage extends ConsumerStatefulWidget {
+class DashboardPage extends HookConsumerWidget {
   const DashboardPage({super.key});
 
   @override
-  ConsumerState<DashboardPage> createState() => _DashboardPageState();
-}
-
-class _DashboardPageState extends ConsumerState<DashboardPage>
-    with SingleTickerProviderStateMixin {
-  late final TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _deleteLock(String mac) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Remove device?'),
-        content: const Text('This will remove the lock and its local cache.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Remove', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
-    if (confirmed == true && mounted) {
-      await ref.read(lockListNotifierProvider.notifier).removeDevice(mac);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tabController = useTabController(initialLength: 4);
     final dataAsync = ref.watch(dashboardNotifierProvider);
+
+    Future<void> deleteLock(String mac) async {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Remove device?'),
+          content: const Text('This will remove the lock and its local cache.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Remove', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        ),
+      );
+      if (confirmed == true && context.mounted) {
+        await ref.read(lockListNotifierProvider.notifier).removeDevice(mac);
+      }
+    }
+
+    Future<void> openScanForCurrentTab() async {
+      switch (tabController.index) {
+        case 0:
+          ScanRoute(type: DeviceType.lock.name).push(context);
+        case 1:
+          ScanRoute(type: DeviceType.gateway.name).push(context);
+        case 2:
+          final type = await showModalBottomSheet<DeviceType>(
+            context: context,
+            builder: (ctx) => SafeArea(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.water_drop),
+                    title: const Text('Water Meter'),
+                    onTap: () =>
+                        Navigator.pop(ctx, DeviceType.waterMeter),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.bolt),
+                    title: const Text('Electric Meter'),
+                    onTap: () =>
+                        Navigator.pop(ctx, DeviceType.electricMeter),
+                  ),
+                ],
+              ),
+            ),
+          );
+          if (type != null && context.mounted) {
+            ScanRoute(type: type.name).push(context);
+          }
+        case 3:
+          ScanRoute(type: DeviceType.standaloneDoorSensor.name).push(context);
+      }
+    }
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('TTLock Devices'),
         bottom: TabBar(
-          controller: _tabController,
+          controller: tabController,
           tabs: const [
             Tab(icon: Icon(Icons.lock), text: 'My Locks'),
             Tab(icon: Icon(Icons.router), text: 'Gateways'),
             Tab(icon: Icon(Icons.water_drop), text: 'Meters'),
+            Tab(icon: Icon(Icons.sensors), text: 'Door Sensors'),
           ],
         ),
       ),
-      body: dataAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => ErrorDisplay(message: e.toString()),
+      body: AsyncValueView.when(
+        value: dataAsync,
+        onRetry: (_, __) => ref.invalidate(dashboardNotifierProvider),
         data: (data) => TabBarView(
-          controller: _tabController,
+          controller: tabController,
           children: [
             // Tab 0: My Locks
             _LockList(
               locks: data.locks,
-              onDelete: _deleteLock,
+              onDelete: deleteLock,
             ),
             // Tab 1: Gateways
             _GatewayList(gateways: data.gateways),
@@ -91,11 +114,15 @@ class _DashboardPageState extends ConsumerState<DashboardPage>
               waterMeters: data.waterMeters,
               electricMeters: data.electricMeters,
             ),
+            // Tab 3: Standalone door sensors
+            _StandaloneDoorSensorList(
+              sensors: data.standaloneDoorSensors,
+            ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => const ScanRoute().go(context),
+        onPressed: openScanForCurrentTab,
         child: const Icon(Icons.add),
       ),
     );
@@ -103,7 +130,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage>
 }
 
 // ─── Tab 0: My Locks ───
-class _LockList extends ConsumerWidget {
+class _LockList extends HookConsumerWidget {
   final List<SavedLockDevice> locks;
   final void Function(String mac) onDelete;
 
@@ -229,6 +256,37 @@ class _MeterItem {
   final SavedMeterDevice device;
   final bool isWater;
   const _MeterItem(this.device, {required this.isWater});
+}
+
+// ─── Tab 3: Standalone Door Sensors ───
+class _StandaloneDoorSensorList extends StatelessWidget {
+  final List<SavedStandaloneDoorSensor> sensors;
+  const _StandaloneDoorSensorList({required this.sensors});
+
+  @override
+  Widget build(BuildContext context) {
+    if (sensors.isEmpty) {
+      return _emptyState('No standalone door sensors yet. Tap + to scan.');
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      itemCount: sensors.length,
+      itemBuilder: (_, i) {
+        final sensor = sensors[i];
+        return DeviceCard(
+          title: sensor.name,
+          subtitle: sensor.modelNum != null ? 'Model: ${sensor.modelNum}' : null,
+          mac: sensor.mac,
+          icon: Icons.sensors,
+          power: sensor.electricQuantity,
+          isOnline: true,
+          isInited: true,
+          onTap: () => StandaloneDoorSensorRoute(sensor.mac).push(context),
+        );
+      },
+    );
+  }
 }
 
 Widget _emptyState(String message) {

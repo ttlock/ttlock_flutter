@@ -26,6 +26,9 @@ mixin _$LockSettingsState {
   bool get lowBatteryAutoUnlock;
   bool get privacyLock;
   bool get resetButton;
+  bool get securityM1Card;
+  bool get semiAutomaticModeControl;
+  bool get lockSupervision;
   bool get remoteUnlock;
   int get autoLockSeconds;
   int get autoLockMin;
@@ -67,6 +70,13 @@ mixin _$LockSettingsState {
                 other.privacyLock == privacyLock) &&
             (identical(other.resetButton, resetButton) ||
                 other.resetButton == resetButton) &&
+            (identical(other.securityM1Card, securityM1Card) ||
+                other.securityM1Card == securityM1Card) &&
+            (identical(
+                    other.semiAutomaticModeControl, semiAutomaticModeControl) ||
+                other.semiAutomaticModeControl == semiAutomaticModeControl) &&
+            (identical(other.lockSupervision, lockSupervision) ||
+                other.lockSupervision == lockSupervision) &&
             (identical(other.remoteUnlock, remoteUnlock) ||
                 other.remoteUnlock == remoteUnlock) &&
             (identical(other.autoLockSeconds, autoLockSeconds) ||
@@ -82,29 +92,33 @@ mixin _$LockSettingsState {
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      audio,
-      passcodeVisible,
-      freeze,
-      tamperAlert,
-      passageModeAutoUnlock,
-      wifiLockPowerSavingMode,
-      doubleAuth,
-      publicMode,
-      lowBatteryAutoUnlock,
-      privacyLock,
-      resetButton,
-      remoteUnlock,
-      autoLockSeconds,
-      autoLockMin,
-      autoLockMax,
-      direction,
-      soundVolume);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        audio,
+        passcodeVisible,
+        freeze,
+        tamperAlert,
+        passageModeAutoUnlock,
+        wifiLockPowerSavingMode,
+        doubleAuth,
+        publicMode,
+        lowBatteryAutoUnlock,
+        privacyLock,
+        resetButton,
+        securityM1Card,
+        semiAutomaticModeControl,
+        lockSupervision,
+        remoteUnlock,
+        autoLockSeconds,
+        autoLockMin,
+        autoLockMax,
+        direction,
+        soundVolume
+      ]);
 
   @override
   String toString() {
-    return 'LockSettingsState(audio: $audio, passcodeVisible: $passcodeVisible, freeze: $freeze, tamperAlert: $tamperAlert, passageModeAutoUnlock: $passageModeAutoUnlock, wifiLockPowerSavingMode: $wifiLockPowerSavingMode, doubleAuth: $doubleAuth, publicMode: $publicMode, lowBatteryAutoUnlock: $lowBatteryAutoUnlock, privacyLock: $privacyLock, resetButton: $resetButton, remoteUnlock: $remoteUnlock, autoLockSeconds: $autoLockSeconds, autoLockMin: $autoLockMin, autoLockMax: $autoLockMax, direction: $direction, soundVolume: $soundVolume)';
+    return 'LockSettingsState(audio: $audio, passcodeVisible: $passcodeVisible, freeze: $freeze, tamperAlert: $tamperAlert, passageModeAutoUnlock: $passageModeAutoUnlock, wifiLockPowerSavingMode: $wifiLockPowerSavingMode, doubleAuth: $doubleAuth, publicMode: $publicMode, lowBatteryAutoUnlock: $lowBatteryAutoUnlock, privacyLock: $privacyLock, resetButton: $resetButton, securityM1Card: $securityM1Card, semiAutomaticModeControl: $semiAutomaticModeControl, lockSupervision: $lockSupervision, remoteUnlock: $remoteUnlock, autoLockSeconds: $autoLockSeconds, autoLockMin: $autoLockMin, autoLockMax: $autoLockMax, direction: $direction, soundVolume: $soundVolume)';
   }
 }
 
@@ -126,6 +140,9 @@ abstract mixin class $LockSettingsStateCopyWith<$Res> {
       bool lowBatteryAutoUnlock,
       bool privacyLock,
       bool resetButton,
+      bool securityM1Card,
+      bool semiAutomaticModeControl,
+      bool lockSupervision,
       bool remoteUnlock,
       int autoLockSeconds,
       int autoLockMin,
@@ -158,6 +175,9 @@ class _$LockSettingsStateCopyWithImpl<$Res>
     Object? lowBatteryAutoUnlock = null,
     Object? privacyLock = null,
     Object? resetButton = null,
+    Object? securityM1Card = null,
+    Object? semiAutomaticModeControl = null,
+    Object? lockSupervision = null,
     Object? remoteUnlock = null,
     Object? autoLockSeconds = null,
     Object? autoLockMin = null,
@@ -210,6 +230,18 @@ class _$LockSettingsStateCopyWithImpl<$Res>
           ? _self.resetButton
           : resetButton // ignore: cast_nullable_to_non_nullable
               as bool,
+      securityM1Card: null == securityM1Card
+          ? _self.securityM1Card
+          : securityM1Card // ignore: cast_nullable_to_non_nullable
+              as bool,
+      semiAutomaticModeControl: null == semiAutomaticModeControl
+          ? _self.semiAutomaticModeControl
+          : semiAutomaticModeControl // ignore: cast_nullable_to_non_nullable
+              as bool,
+      lockSupervision: null == lockSupervision
+          ? _self.lockSupervision
+          : lockSupervision // ignore: cast_nullable_to_non_nullable
+              as bool,
       remoteUnlock: null == remoteUnlock
           ? _self.remoteUnlock
           : remoteUnlock // ignore: cast_nullable_to_non_nullable
@@ -253,6 +285,9 @@ class _LockSettingsState implements LockSettingsState {
       this.lowBatteryAutoUnlock = false,
       this.privacyLock = false,
       this.resetButton = false,
+      this.securityM1Card = false,
+      this.semiAutomaticModeControl = false,
+      this.lockSupervision = false,
       this.remoteUnlock = false,
       this.autoLockSeconds = 0,
       this.autoLockMin = 5,
@@ -293,6 +328,15 @@ class _LockSettingsState implements LockSettingsState {
   @override
   @JsonKey()
   final bool resetButton;
+  @override
+  @JsonKey()
+  final bool securityM1Card;
+  @override
+  @JsonKey()
+  final bool semiAutomaticModeControl;
+  @override
+  @JsonKey()
+  final bool lockSupervision;
   @override
   @JsonKey()
   final bool remoteUnlock;
@@ -344,6 +388,13 @@ class _LockSettingsState implements LockSettingsState {
                 other.privacyLock == privacyLock) &&
             (identical(other.resetButton, resetButton) ||
                 other.resetButton == resetButton) &&
+            (identical(other.securityM1Card, securityM1Card) ||
+                other.securityM1Card == securityM1Card) &&
+            (identical(
+                    other.semiAutomaticModeControl, semiAutomaticModeControl) ||
+                other.semiAutomaticModeControl == semiAutomaticModeControl) &&
+            (identical(other.lockSupervision, lockSupervision) ||
+                other.lockSupervision == lockSupervision) &&
             (identical(other.remoteUnlock, remoteUnlock) ||
                 other.remoteUnlock == remoteUnlock) &&
             (identical(other.autoLockSeconds, autoLockSeconds) ||
@@ -359,29 +410,33 @@ class _LockSettingsState implements LockSettingsState {
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      audio,
-      passcodeVisible,
-      freeze,
-      tamperAlert,
-      passageModeAutoUnlock,
-      wifiLockPowerSavingMode,
-      doubleAuth,
-      publicMode,
-      lowBatteryAutoUnlock,
-      privacyLock,
-      resetButton,
-      remoteUnlock,
-      autoLockSeconds,
-      autoLockMin,
-      autoLockMax,
-      direction,
-      soundVolume);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        audio,
+        passcodeVisible,
+        freeze,
+        tamperAlert,
+        passageModeAutoUnlock,
+        wifiLockPowerSavingMode,
+        doubleAuth,
+        publicMode,
+        lowBatteryAutoUnlock,
+        privacyLock,
+        resetButton,
+        securityM1Card,
+        semiAutomaticModeControl,
+        lockSupervision,
+        remoteUnlock,
+        autoLockSeconds,
+        autoLockMin,
+        autoLockMax,
+        direction,
+        soundVolume
+      ]);
 
   @override
   String toString() {
-    return 'LockSettingsState(audio: $audio, passcodeVisible: $passcodeVisible, freeze: $freeze, tamperAlert: $tamperAlert, passageModeAutoUnlock: $passageModeAutoUnlock, wifiLockPowerSavingMode: $wifiLockPowerSavingMode, doubleAuth: $doubleAuth, publicMode: $publicMode, lowBatteryAutoUnlock: $lowBatteryAutoUnlock, privacyLock: $privacyLock, resetButton: $resetButton, remoteUnlock: $remoteUnlock, autoLockSeconds: $autoLockSeconds, autoLockMin: $autoLockMin, autoLockMax: $autoLockMax, direction: $direction, soundVolume: $soundVolume)';
+    return 'LockSettingsState(audio: $audio, passcodeVisible: $passcodeVisible, freeze: $freeze, tamperAlert: $tamperAlert, passageModeAutoUnlock: $passageModeAutoUnlock, wifiLockPowerSavingMode: $wifiLockPowerSavingMode, doubleAuth: $doubleAuth, publicMode: $publicMode, lowBatteryAutoUnlock: $lowBatteryAutoUnlock, privacyLock: $privacyLock, resetButton: $resetButton, securityM1Card: $securityM1Card, semiAutomaticModeControl: $semiAutomaticModeControl, lockSupervision: $lockSupervision, remoteUnlock: $remoteUnlock, autoLockSeconds: $autoLockSeconds, autoLockMin: $autoLockMin, autoLockMax: $autoLockMax, direction: $direction, soundVolume: $soundVolume)';
   }
 }
 
@@ -405,6 +460,9 @@ abstract mixin class _$LockSettingsStateCopyWith<$Res>
       bool lowBatteryAutoUnlock,
       bool privacyLock,
       bool resetButton,
+      bool securityM1Card,
+      bool semiAutomaticModeControl,
+      bool lockSupervision,
       bool remoteUnlock,
       int autoLockSeconds,
       int autoLockMin,
@@ -437,6 +495,9 @@ class __$LockSettingsStateCopyWithImpl<$Res>
     Object? lowBatteryAutoUnlock = null,
     Object? privacyLock = null,
     Object? resetButton = null,
+    Object? securityM1Card = null,
+    Object? semiAutomaticModeControl = null,
+    Object? lockSupervision = null,
     Object? remoteUnlock = null,
     Object? autoLockSeconds = null,
     Object? autoLockMin = null,
@@ -488,6 +549,18 @@ class __$LockSettingsStateCopyWithImpl<$Res>
       resetButton: null == resetButton
           ? _self.resetButton
           : resetButton // ignore: cast_nullable_to_non_nullable
+              as bool,
+      securityM1Card: null == securityM1Card
+          ? _self.securityM1Card
+          : securityM1Card // ignore: cast_nullable_to_non_nullable
+              as bool,
+      semiAutomaticModeControl: null == semiAutomaticModeControl
+          ? _self.semiAutomaticModeControl
+          : semiAutomaticModeControl // ignore: cast_nullable_to_non_nullable
+              as bool,
+      lockSupervision: null == lockSupervision
+          ? _self.lockSupervision
+          : lockSupervision // ignore: cast_nullable_to_non_nullable
               as bool,
       remoteUnlock: null == remoteUnlock
           ? _self.remoteUnlock

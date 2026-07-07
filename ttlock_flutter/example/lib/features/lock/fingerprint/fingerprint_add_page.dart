@@ -1,7 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:toastification/toastification.dart';
 import 'package:ttlock_flutter/ttlock.dart';
 
@@ -11,79 +12,72 @@ import '../widgets/add_progress_overlay.dart';
 import '../widgets/credential_validity_sheet.dart';
 import 'fingerprint_provider.dart';
 
-class FingerprintAddPage extends ConsumerStatefulWidget {
+class FingerprintAddPage extends HookConsumerWidget {
   const FingerprintAddPage({super.key, required this.lockMac});
 
   final String lockMac;
 
   @override
-  ConsumerState<FingerprintAddPage> createState() => _FingerprintAddPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final subRef = useRef<StreamSubscription<AddFingerprintEvent>?>(null);
+    final validity = useState<CredentialValidity?>(null);
+    final adding = useState(false);
+    final message = useState('Place finger on sensor');
+    final progress = useState<double?>(null);
 
-class _FingerprintAddPageState extends ConsumerState<FingerprintAddPage> {
-  StreamSubscription<AddFingerprintEvent>? _sub;
-  CredentialValidity? _validity;
-  bool _adding = false;
-  String _message = 'Place finger on sensor';
-  double? _progress;
+    useEffect(() {
+      return () {
+        subRef.value?.cancel();
+      };
+    }, const []);
 
-  @override
-  void dispose() {
-    _sub?.cancel();
-    super.dispose();
-  }
+    Future<void> start() async {
+      final v = validity.value ?? await CredentialValiditySheet.show(context);
+      if (v == null || !context.mounted) return;
+      validity.value = v;
+      adding.value = true;
+      message.value = 'Enrolling fingerprint…';
 
-  Future<void> _start() async {
-    final validity = _validity ?? await CredentialValiditySheet.show(context);
-    if (validity == null || !mounted) return;
-    setState(() {
-      _validity = validity;
-      _adding = true;
-      _message = 'Enrolling fingerprint…';
-    });
+      final range = validityToDateRange(v);
+      subRef.value?.cancel();
+      subRef.value = ref
+          .read(fingerprintListProvider(lockMac).notifier)
+          .addFingerprintStream(lockMac, v)
+          .listen(
+        (event) async {
+          if (!context.mounted) return;
+          switch (event.phase) {
+            case TTAddFingerprintPhase.waiting:
+            case TTAddFingerprintPhase.collecting:
+              final total = event.totalCount ?? 1;
+              final current = event.currentCount ?? 0;
+              message.value = 'Scan $current / $total';
+              progress.value = event.collectionProgress;
+            case TTAddFingerprintPhase.success:
+              final fingerprintNumber = event.credentialNumber!;
+              await ref
+                  .read(fingerprintListProvider(lockMac).notifier)
+                  .onFingerprintAdded(
+                    lockMac,
+                    fingerprintNumber,
+                    range.startDate,
+                    range.endDate,
+                  );
+              toastification.show(
+                title: Text('Fingerprint added: $fingerprintNumber'),
+                type: ToastificationType.success,
+              );
+              Navigator.pop(context);
+          }
+        },
+        onError: (e) {
+          if (!context.mounted) return;
+          adding.value = false;
+          toastification.show(title: Text('$e'), type: ToastificationType.error);
+        },
+      );
+    }
 
-    final range = validityToDateRange(validity);
-    _sub?.cancel();
-    _sub = ref
-        .read(fingerprintListProvider(widget.lockMac).notifier)
-        .addFingerprintStream(widget.lockMac, validity)
-        .listen(
-      (event) async {
-        if (!mounted) return;
-        switch (event.phase) {
-          case TTAddFingerprintPhase.waiting:
-          case TTAddFingerprintPhase.collecting:
-            final total = event.totalCount ?? 1;
-            final current = event.currentCount ?? 0;
-            setState(() {
-              _message = 'Scan $current / $total';
-              _progress = event.collectionProgress;
-            });
-          case TTAddFingerprintPhase.success:
-            final fingerprintNumber = event.credentialNumber!;
-            await ref.read(fingerprintListProvider(widget.lockMac).notifier).onFingerprintAdded(
-                  widget.lockMac,
-                  fingerprintNumber,
-                  range.startDate,
-                  range.endDate,
-                );
-            toastification.show(
-              title: Text('Fingerprint added: $fingerprintNumber'),
-              type: ToastificationType.success,
-            );
-            Navigator.pop(context);
-        }
-      },
-      onError: (e) {
-        if (!mounted) return;
-        setState(() => _adding = false);
-        toastification.show(title: Text('$e'), type: ToastificationType.error);
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Add Fingerprint')),
       body: Stack(
@@ -96,22 +90,25 @@ class _FingerprintAddPageState extends ConsumerState<FingerprintAddPage> {
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 title: const Text('Validity'),
-                subtitle: Text(_validity == null ? 'Not set' : 'Configured'),
+                subtitle: Text(validity.value == null ? 'Not set' : 'Configured'),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () async {
-                  final v = await CredentialValiditySheet.show(context, initial: _validity);
-                  if (v != null) setState(() => _validity = v);
+                  final v = await CredentialValiditySheet.show(
+                    context,
+                    initial: validity.value,
+                  );
+                  if (v != null) validity.value = v;
                 },
               ),
               const SizedBox(height: 16),
               FilledButton(
-                onPressed: _adding ? null : _start,
-                child: Text(_adding ? 'Enrolling…' : 'Start'),
+                onPressed: adding.value ? null : start,
+                child: Text(adding.value ? 'Enrolling…' : 'Start'),
               ),
             ],
           ),
-          if (_adding)
-            AddProgressOverlay(message: _message, progress: _progress),
+          if (adding.value)
+            AddProgressOverlay(message: message.value, progress: progress.value),
         ],
       ),
     );

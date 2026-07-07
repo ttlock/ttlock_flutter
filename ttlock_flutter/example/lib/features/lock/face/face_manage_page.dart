@@ -1,15 +1,68 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:toastification/toastification.dart';
 
 import '../../../core/router/routes.dart';
 import '../../../core/storage/lock_list_provider.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/widgets/async_value_view.dart';
 import '../model/credential_params.dart';
 import 'face_provider.dart';
 
-class FaceManagePage extends ConsumerWidget {
+Future<void> clearAllFaces(
+  BuildContext context,
+  WidgetRef ref,
+  String lockMac,
+) async {
+  final ok = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: const Text('Clear all faces on lock?'),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+        FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Clear')),
+      ],
+    ),
+  );
+  if (ok != true || !context.mounted) return;
+  try {
+    context.loaderOverlay.show();
+    await ref.read(faceListProvider(lockMac).notifier).clearOnLock(lockMac);
+    if (context.mounted) {
+      context.loaderOverlay.hide();
+      toastification.show(title: const Text('Faces cleared'));
+    }
+  } catch (e) {
+    if (context.mounted) {
+      context.loaderOverlay.hide();
+      toastification.show(title: Text('$e'), type: ToastificationType.error);
+    }
+  }
+}
+
+Future<void> deleteFace(
+  BuildContext context,
+  WidgetRef ref,
+  String lockMac,
+  String faceNumber,
+) async {
+  try {
+    context.loaderOverlay.show();
+    await ref.read(faceListProvider(lockMac).notifier).deleteOnLock(lockMac, faceNumber);
+    if (context.mounted) {
+      context.loaderOverlay.hide();
+      toastification.show(title: const Text('Face deleted'));
+    }
+  } catch (e) {
+    if (context.mounted) {
+      context.loaderOverlay.hide();
+      toastification.show(title: Text('$e'), type: ToastificationType.error);
+    }
+  }
+}
+
+class FaceManagePage extends HookConsumerWidget {
   const FaceManagePage({super.key, required this.lockMac});
 
   final String lockMac;
@@ -28,32 +81,7 @@ class FaceManagePage extends ConsumerWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () async {
-              final ok = await showDialog<bool>(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                  title: const Text('Clear all faces on lock?'),
-                  actions: [
-                    TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-                    FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Clear')),
-                  ],
-                ),
-              );
-              if (ok != true || !context.mounted) return;
-              try {
-                context.loaderOverlay.show();
-                await ref.read(faceListProvider(lockMac).notifier).clearOnLock(lockMac);
-                if (context.mounted) {
-                  context.loaderOverlay.hide();
-                  toastification.show(title: const Text('Faces cleared'));
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  context.loaderOverlay.hide();
-                  toastification.show(title: Text('$e'), type: ToastificationType.error);
-                }
-              }
-            },
+            onPressed: () => clearAllFaces(context, ref, lockMac),
             child: const Text('Clear All'),
           ),
           IconButton(
@@ -62,9 +90,9 @@ class FaceManagePage extends ConsumerWidget {
           ),
         ],
       ),
-      body: facesAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('$e')),
+      body: AsyncValueView.when(
+        value: facesAsync,
+        onRetry: (_, __) => ref.invalidate(faceListProvider(lockMac)),
         data: (faces) {
           if (faces.isEmpty) {
             return Center(
@@ -89,23 +117,7 @@ class FaceManagePage extends ConsumerWidget {
                   subtitle: Text(formatCardValidityLabel(f.startDate, f.endDate)),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete_outline),
-                    onPressed: () async {
-                      try {
-                        context.loaderOverlay.show();
-                        await ref
-                            .read(faceListProvider(lockMac).notifier)
-                            .deleteOnLock(lockMac, f.faceNumber);
-                        if (context.mounted) {
-                          context.loaderOverlay.hide();
-                          toastification.show(title: const Text('Face deleted'));
-                        }
-                      } catch (e) {
-                        if (context.mounted) {
-                          context.loaderOverlay.hide();
-                          toastification.show(title: Text('$e'), type: ToastificationType.error);
-                        }
-                      }
-                    },
+                    onPressed: () => deleteFace(context, ref, lockMac, f.faceNumber),
                   ),
                 ),
               );

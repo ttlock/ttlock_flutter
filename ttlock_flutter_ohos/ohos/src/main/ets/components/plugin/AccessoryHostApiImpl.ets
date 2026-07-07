@@ -5,25 +5,39 @@ import {
   TTWiFiDoorMagnetic,
   TTDeviceInfoModel,
   ConfigWiFiParameters,
+  TTElectricMeterAddResult,
+  TTWaterMeterAddResult,
   ElectricMeterStatusModel,
   WaterMeterStatusModel,
-  TTWiFiDoorMagneticFeatureValue as SdkTTWiFiDoorMagneticFeatureValue,
+  TTElectricDeviceInfoModel,
+  TTWaterDeviceInfoModel,
+  TTElectricMeterFeature as SdkTTElectricMeterFeature,
+  TTWaterMeterFeature as SdkTTWaterMeterFeature,
   SNError,
 } from '@sciener/ttlock';
 import {
-  IMultifunctionalKeyModel,
   AddElectricMeterModel,
-} from '@sciener/ttlock/src/main/ets/e/f/i/i';
+  IMultifunctionalKeyModel,
+} from '@sciener/ttlock/src/main/ets/TTLock/d/g/g';
 
 import {
+  ElectricMeterDeviceInfo,
   MultifunctionalKeypadInitResult,
   RemoteKeypadInitResult,
   Result,
   TTAccessoryHostApi,
+  TTElectricMeterInitParam,
   TTElectricMeterInitResult,
+  TTKeypadCredentialEventParam,
   TTLockSystemModel,
   TTStandaloneDoorSensorInfo,
+  TTStandaloneDoorSensorFeature,
+  TTStandaloneDoorSensorInitParams,
+  TTWaterMeterInitParam,
   TTWaterMeterInitResult,
+  TTMeterPayMode,
+  TTElectricMeterFeature,
+  TTWaterMeterFeature,
   WaterMeterDeviceInfo,
 } from './Messages';
 
@@ -36,17 +50,25 @@ import {
   makeMultifunctionalKeypadApiError,
   makeNotImplementedError,
   makeRemoteAccessoryApiError,
+  makeStandaloneDoorSensorApiError,
   makeWaterMeterApiError,
-  mapOptionalString,
-  mapStringValue,
 } from './TtlockPremiseSupport';
+
+import {
+  electricMeterFeatureConvert,
+  payModeConvert,
+  standaloneDoorSensorFeatureConvert,
+  waterMeterFeatureConvert,
+} from './EnumConverter';
 
 import HashMap from '@ohos.util.HashMap';
 
 function hashMapToMap(map: HashMap<string, Object>): Map<string, Object> {
   const out = new Map<string, Object>();
-  map.forEach((value: Object, key: string) => {
-    out.set(key, value);
+  map.forEach((value?: Object, key?: string) => {
+    if (value !== undefined && key !== undefined) {
+      out.set(key, value);
+    }
   });
   return out;
 }
@@ -69,36 +91,57 @@ function getMapNumber(m: Map<string, Object>, key: string): number | undefined {
   return undefined;
 }
 
-function waterMeterStatusToMap(model: WaterMeterStatusModel): Map<string, Object> {
-  const m = new Map<string, Object>();
-  m.set('payMode', model.payMode);
-  m.set('onOff', model.onOff);
-  m.set('totalM3', model.totalM3);
-  m.set('remainderM3', model.remainderM3);
-  m.set('magneticInterference', model.magneticInterference);
-  m.set('electricQuantity', model.electricQuantity);
-  m.set('waterValveMalfunction', model.waterValveMalfunction);
-  m.set('featureValue', model.featureValue);
-  return m;
+function parseDeviceRssi(value: string | undefined): number {
+  if (value === undefined || value.length === 0) {
+    return 0;
+  }
+  const n = Number(value);
+  return Number.isNaN(n) ? 0 : n;
 }
 
-function electricMeterStatusToMap(model: ElectricMeterStatusModel): Map<string, Object> {
-  const m = new Map<string, Object>();
-  m.set('payMode', model.payMode);
-  m.set('onOff', model.onOff);
-  m.set('voltage', model.voltage);
-  m.set('electricCurrent', model.electricCurrent);
-  m.set('totalKwh', model.totalKwh);
-  m.set('maxPower', model.maxPower);
-  m.set('remainderKwh', model.remainderKwh);
-  m.set('featureValue', model.featureValue);
-  return m;
+function toElectricMeterDeviceInfo(info: TTElectricDeviceInfoModel): ElectricMeterDeviceInfo {
+  return new ElectricMeterDeviceInfo(
+    info.catOneCardNumber ?? '',
+    info.catOneImsi ?? '',
+    info.catOneNodeId ?? '',
+    info.catOneOperator ?? '',
+    parseDeviceRssi(info.catOneRssi),
+  );
+}
+
+function toWaterMeterDeviceInfo(info: TTWaterDeviceInfoModel): WaterMeterDeviceInfo {
+  return new WaterMeterDeviceInfo(
+    info.catOneCardNumber ?? '',
+    info.catOneImsi ?? '',
+    info.catOneNodeId ?? '',
+    info.catOneOperator ?? '',
+    parseDeviceRssi(info.catOneRssi),
+  );
+}
+
+function toConfigWiFiParameters(params: TTStandaloneDoorSensorInitParams): ConfigWiFiParameters {
+  return {
+    SSID: params.getWifiName(),
+    wifiPwd: params.getWifiPassword(),
+    serverAddress: params.getServerAddress(),
+    portNumber: `${params.getPortNumber()}`,
+  };
+}
+
+function toStandaloneDoorSensorInfo(info: TTDeviceInfoModel): TTStandaloneDoorSensorInfo {
+  return new TTStandaloneDoorSensorInfo(
+    undefined,
+    info.electricQuantity,
+    info.featureValue,
+    info.wifiMac,
+    info.modelNum,
+    info.hardwareRevision,
+    info.firmwareRevision,
+  );
 }
 
 /**
  * `TTAccessoryHostApi` 的 OpenHarmony 实现：覆盖键盘 / 遥控钥匙 / 门磁 / 水表 / 电表。
- *
- * 与 iOS 一致，部分接口在当前 SDK 没有等价能力，全部以 `notImplemented` 返回。
  */
 export class AccessoryHostApiImpl extends TTAccessoryHostApi {
   setAccessoryAddKeypadFingerprintParam(param: TTKeypadCredentialEventParam): void {
@@ -217,59 +260,41 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
     });
   }
 
-  standaloneDoorSensorInit(mac: string, info: Map<string, Object>,
-    result: Result<TTStandaloneDoorSensorInfo>): void {
-    const ssid = mapOptionalString(info, 'SSID') ?? mapOptionalString(info, 'wifi');
-    const wifiPwd = mapOptionalString(info, 'wifiPwd') ?? mapOptionalString(info, 'wifiPassword');
-    const serverAddress = mapOptionalString(info, 'serverAddress') ?? mapOptionalString(info, 'serverIp');
-    const portNumber = mapOptionalString(info, 'portNumber') ?? mapOptionalString(info, 'serverPort');
-    if (ssid === undefined || wifiPwd === undefined || serverAddress === undefined ||
-      portNumber === undefined) {
-      result.error(makeDoorSensorApiError('standaloneDoorSensorInit', SNError.invalidParam(),
-        '`SSID`, `wifiPwd`, `serverAddress`, `portNumber` are required'));
-      return;
-    }
-    const config: ConfigWiFiParameters = {
-      SSID: ssid,
-      wifiPwd: wifiPwd,
-      serverAddress: serverAddress,
-      portNumber: portNumber,
-      aesKey: mapOptionalString(info, 'aesKey'),
-      contractNumber: mapOptionalString(info, 'contractNumber'),
-    };
-    TTWiFiDoorMagnetic.initializeDoorMagnetic(mac, config, {
-      success: (deviceInfo: TTDeviceInfoModel): void => {
-        const out = new TTStandaloneDoorSensorInfo(
-          undefined,
-          deviceInfo.electricQuantity,
-          deviceInfo.featureValue,
-          deviceInfo.wifiMac,
-          deviceInfo.modelNum,
-          deviceInfo.hardwareRevision,
-          deviceInfo.firmwareRevision,
-        );
-        result.success(out);
+  standaloneDoorSensorInit(
+    params: TTStandaloneDoorSensorInitParams,
+    result: Result<TTStandaloneDoorSensorInfo>,
+  ): void {
+    const config = toConfigWiFiParameters(params);
+    TTWiFiDoorMagnetic.initializeDoorMagnetic(params.getMac(), config, {
+      success: (info: TTDeviceInfoModel): void => {
+        result.success(toStandaloneDoorSensorInfo(info));
       },
       failure: (err: SNError): void => {
-        result.error(makeDoorSensorApiError('standaloneDoorSensorInit', err));
+        result.error(makeStandaloneDoorSensorApiError('standaloneDoorSensorInit', err));
       },
     });
   }
 
   standaloneDoorSensorReadFeatureValue(mac: string, result: Result<string>): void {
     TTWiFiDoorMagnetic.getFeatureValue(mac, {
-      success: (fv: string): void => {
-        result.success(fv);
+      success: (value: string): void => {
+        result.success(value);
       },
       failure: (err: SNError): void => {
-        result.error(makeDoorSensorApiError('standaloneDoorSensorReadFeatureValue', err));
+        result.error(makeStandaloneDoorSensorApiError('standaloneDoorSensorReadFeatureValue', err));
       },
     });
   }
 
-  standaloneDoorSensorIsSupportFunction(featureValue: string, lockFunction: number): boolean {
-    const sdkFunc = lockFunction as SdkTTWiFiDoorMagneticFeatureValue;
-    return TTWiFiDoorMagnetic.supportFunction(sdkFunc, featureValue);
+  standaloneDoorSensorIsSupportFunction(
+    featureValue: string,
+    lockFunction: TTStandaloneDoorSensorFeature,
+  ): boolean {
+    const sdkFeature = standaloneDoorSensorFeatureConvert(lockFunction);
+    if (sdkFeature === null) {
+      return false;
+    }
+    return TTWiFiDoorMagnetic.supportFunction(sdkFeature, featureValue);
   }
 
   waterMeterConfigServer(url: string, clientId: string, accessToken: string): void {
@@ -297,29 +322,16 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
     });
   }
 
-  waterMeterInit(params: Map<string, Object>, result: Result<TTWaterMeterInitResult>): void {
-    let mac: string;
-    let payMode: string;
-    let price: string;
-    let waterMeterId: string;
-    try {
-      waterMeterId = mapStringValue(params, 'number');
-      mac = mapStringValue(params, 'mac');
-      payMode = mapStringValue(params, 'payMode');
-      price = mapStringValue(params, 'price');
-    } catch (e) {
-      result.error(e as Error);
-      return;
-    }
+  waterMeterInit(params: TTWaterMeterInitParam, result: Result<TTWaterMeterInitResult>): void {
     const model: AddElectricMeterModel = {
-      number: waterMeterId,
-      mac: mac,
-      payMode: payMode,
-      price: price,
+      number: params.getName(),
+      mac: params.getMac(),
+      payMode: payModeConvert(params.getPayMode()),
+      price: `${params.getPrice()}`,
     };
     TTWaterMeter.addWaterMeter(model, {
-      success: (_: void): void => {
-        result.success(new TTWaterMeterInitResult(waterMeterId, undefined));
+      success: (info: TTWaterMeterAddResult): void => {
+        result.success(new TTWaterMeterInitResult(info.waterMeterId ?? 0, info.featureValue ?? ''));
       },
       failure: (err: SNError): void => {
         result.error(makeWaterMeterApiError('waterMeterInit', err));
@@ -327,8 +339,8 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
     });
   }
 
-  waterMeterDelete(waterMeterId: string, result: Result<void>): void {
-    TTWaterMeter.deleteWaterMeter(waterMeterId, {
+  waterMeterDelete(mac: string, result: Result<void>): void {
+    TTWaterMeter.deleteWaterMeter(mac, {
       success: (_: void): void => {
         result.success(undefined);
       },
@@ -338,8 +350,8 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
     });
   }
 
-  waterMeterSetPowerOnOff(waterMeterId: string, isOn: boolean, result: Result<void>): void {
-    TTWaterMeter.setWaterPower(waterMeterId, isOn, {
+  waterMeterSetPowerOnOff(mac: string, isOn: boolean, result: Result<void>): void {
+    TTWaterMeter.setWaterPower(mac, isOn, {
       success: (_: void): void => {
         result.success(undefined);
       },
@@ -349,8 +361,8 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
     });
   }
 
-  waterMeterSetRemainderM3(waterMeterId: string, remainderM3: number, result: Result<void>): void {
-    TTWaterMeter.setRemainingWater(waterMeterId, `${remainderM3}`, {
+  waterMeterSetRemainderM3(mac: string, remainderM3: number, result: Result<void>): void {
+    TTWaterMeter.setRemainingWater(mac, `${remainderM3}`, {
       success: (_: void): void => {
         result.success(undefined);
       },
@@ -360,8 +372,8 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
     });
   }
 
-  waterMeterClearRemainderM3(waterMeterId: string, result: Result<void>): void {
-    TTWaterMeter.clearRemainingWater(waterMeterId, {
+  waterMeterClearRemainderM3(mac: string, result: Result<void>): void {
+    TTWaterMeter.clearRemainingWater(mac, {
       success: (_: void): void => {
         result.success(undefined);
       },
@@ -371,10 +383,10 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
     });
   }
 
-  waterMeterReadData(waterMeterId: string, result: Result<Map<string, Object>>): void {
-    TTWaterMeter.readWaterData(waterMeterId, {
-      success: (model: WaterMeterStatusModel): void => {
-        result.success(waterMeterStatusToMap(model));
+  waterMeterReadData(mac: string, result: Result<void>): void {
+    TTWaterMeter.readWaterData(mac, {
+      success: (_: WaterMeterStatusModel): void => {
+        result.success(undefined);
       },
       failure: (err: SNError): void => {
         result.error(makeWaterMeterApiError('waterMeterReadData', err));
@@ -382,8 +394,8 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
     });
   }
 
-  waterMeterSetPayMode(waterMeterId: string, payMode: number, result: Result<void>): void {
-    TTWaterMeter.setWaterPayMode(waterMeterId, payMode, '0', {
+  waterMeterSetPayMode(mac: string, payMode: TTMeterPayMode, price: number, result: Result<void>): void {
+    TTWaterMeter.setWaterPayMode(mac, payModeConvert(payMode), `${price}`, {
       success: (_: WaterMeterStatusModel): void => {
         result.success(undefined);
       },
@@ -393,9 +405,8 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
     });
   }
 
-  waterMeterCharge(waterMeterId: string, amount: number, result: Result<void>): void {
-    const amountStr = `${amount}`;
-    TTWaterMeter.rechargeWater(waterMeterId, amountStr, amountStr, {
+  waterMeterCharge(mac: string, amount: number, m3: number, result: Result<void>): void {
+    TTWaterMeter.rechargeWater(mac, `${amount}`, `${m3}`, {
       success: (_: void): void => {
         result.success(undefined);
       },
@@ -405,8 +416,8 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
     });
   }
 
-  waterMeterSetTotalUsage(waterMeterId: string, totalM3: number, result: Result<void>): void {
-    TTWaterMeter.setWaterTotalUsage(waterMeterId, `${totalM3}`, {
+  waterMeterSetTotalUsage(mac: string, totalM3: number, result: Result<void>): void {
+    TTWaterMeter.setWaterTotalUsage(mac, `${totalM3}`, {
       success: (_: WaterMeterStatusModel): void => {
         result.success(undefined);
       },
@@ -416,8 +427,8 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
     });
   }
 
-  waterMeterGetFeatureValue(waterMeterId: string, result: Result<string>): void {
-    TTWaterMeter.getWaterMeterFeatureValue(waterMeterId, {
+  waterMeterGetFeatureValue(mac: string, result: Result<string>): void {
+    TTWaterMeter.getWaterMeterFeatureValue(mac, {
       success: (fv: string): void => {
         result.success(fv);
       },
@@ -427,24 +438,46 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
     });
   }
 
-  waterMeterGetDeviceInfo(_waterMeterId: string, result: Result<WaterMeterDeviceInfo>): void {
-    result.error(makeNotImplementedError('waterMeterGetDeviceInfo'));
+  waterMeterGetDeviceInfo(mac: string, result: Result<WaterMeterDeviceInfo>): void {
+    TTWaterMeter.getDeviceInfo(mac, {
+      success: (info: TTWaterDeviceInfoModel): void => {
+        result.success(toWaterMeterDeviceInfo(info));
+      },
+      failure: (err: SNError): void => {
+        result.error(makeWaterMeterApiError('waterMeterGetDeviceInfo', err));
+      },
+    });
   }
 
-  waterMeterIsSupportFunction(_featureValue: string, _lockFunction: number): boolean {
-    return false;
+  waterMeterIsSupportFunction(featureValue: string, lockFunction: TTWaterMeterFeature): boolean {
+    const sdkFeature = waterMeterFeatureConvert(lockFunction) as SdkTTWaterMeterFeature;
+    return TTWaterMeter.supportFunction(sdkFeature, featureValue);
   }
 
-  waterMeterConfigApn(_apn: string, result: Result<void>): void {
-    result.error(makeNotImplementedError('waterMeterConfigApn'));
+  waterMeterConfigApn(mac: string, apn: string, result: Result<void>): void {
+    TTWaterMeter.configAPN(mac, apn, {
+      success: (_: void): void => {
+        result.success(undefined);
+      },
+      failure: (err: SNError): void => {
+        result.error(makeWaterMeterApiError('waterMeterConfigApn', err));
+      },
+    });
   }
 
-  waterMeterConfigMeterServer(_ip: string, _port: string, result: Result<void>): void {
-    result.error(makeNotImplementedError('waterMeterConfigMeterServer'));
+  waterMeterConfigMeterServer(mac: string, ip: string, port: string, result: Result<void>): void {
+    TTWaterMeter.configServer(mac, ip, port, {
+      success: (_: void): void => {
+        result.success(undefined);
+      },
+      failure: (err: SNError): void => {
+        result.error(makeWaterMeterApiError('waterMeterConfigMeterServer', err));
+      },
+    });
   }
 
-  waterMeterReset(waterMeterId: string, result: Result<void>): void {
-    TTWaterMeter.waterMeterEnterUpgradeMode(waterMeterId, {
+  waterMeterReset(mac: string, result: Result<void>): void {
+    TTWaterMeter.waterMeterEnterUpgradeMode(mac, {
       success: (_: void): void => {
         result.success(undefined);
       },
@@ -479,29 +512,16 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
     });
   }
 
-  electricMeterInit(params: Map<string, Object>, result: Result<TTElectricMeterInitResult>): void {
-    let mac: string;
-    let payMode: string;
-    let price: string;
-    let electricMeterId: string;
-    try {
-      electricMeterId = mapStringValue(params, 'number');
-      mac = mapStringValue(params, 'mac');
-      payMode = mapStringValue(params, 'payMode');
-      price = mapStringValue(params, 'price');
-    } catch (e) {
-      result.error(e as Error);
-      return;
-    }
+  electricMeterInit(params: TTElectricMeterInitParam, result: Result<TTElectricMeterInitResult>): void {
     const model: AddElectricMeterModel = {
-      number: electricMeterId,
-      mac: mac,
-      payMode: payMode,
-      price: price,
+      number: params.getName(),
+      mac: params.getMac(),
+      payMode: payModeConvert(params.getPayMode()),
+      price: `${params.getPrice()}`,
     };
     TTElectricMeter.addElectricMeter(model, {
-      success: (_: void): void => {
-        result.success(new TTElectricMeterInitResult(electricMeterId, undefined));
+      success: (info: TTElectricMeterAddResult): void => {
+        result.success(new TTElectricMeterInitResult(info.electricMeterId ?? 0, info.featureValue ?? ''));
       },
       failure: (err: SNError): void => {
         result.error(makeElectricMeterApiError('electricMeterInit', err));
@@ -509,8 +529,8 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
     });
   }
 
-  electricMeterDelete(electricMeterId: string, result: Result<void>): void {
-    TTElectricMeter.deleteElectricMeter(electricMeterId, {
+  electricMeterDelete(mac: string, result: Result<void>): void {
+    TTElectricMeter.deleteElectricMeter(mac, {
       success: (_: void): void => {
         result.success(undefined);
       },
@@ -520,8 +540,8 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
     });
   }
 
-  electricMeterSetPowerOnOff(electricMeterId: string, isOn: boolean, result: Result<void>): void {
-    TTElectricMeter.setPower(electricMeterId, isOn, {
+  electricMeterSetPowerOnOff(mac: string, isOn: boolean, result: Result<void>): void {
+    TTElectricMeter.setPower(mac, isOn, {
       success: (_: void): void => {
         result.success(undefined);
       },
@@ -531,9 +551,9 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
     });
   }
 
-  electricMeterSetRemainderKwh(electricMeterId: string, remainderKwh: number,
+  electricMeterSetRemainderKwh(mac: string, remainderKwh: number,
     result: Result<void>): void {
-    TTElectricMeter.setRemainingElectricity(electricMeterId, `${remainderKwh}`, {
+    TTElectricMeter.setRemainingElectricity(mac, `${remainderKwh}`, {
       success: (_: void): void => {
         result.success(undefined);
       },
@@ -543,8 +563,8 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
     });
   }
 
-  electricMeterClearRemainderKwh(electricMeterId: string, result: Result<void>): void {
-    TTElectricMeter.clearRemainingElectricity(electricMeterId, {
+  electricMeterClearRemainderKwh(mac: string, result: Result<void>): void {
+    TTElectricMeter.clearRemainingElectricity(mac, {
       success: (_: void): void => {
         result.success(undefined);
       },
@@ -554,10 +574,10 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
     });
   }
 
-  electricMeterReadData(electricMeterId: string, result: Result<Map<string, Object>>): void {
-    TTElectricMeter.readData(electricMeterId, {
-      success: (model: ElectricMeterStatusModel): void => {
-        result.success(electricMeterStatusToMap(model));
+  electricMeterReadData(mac: string, result: Result<void>): void {
+    TTElectricMeter.readData(mac, {
+      success: (_: ElectricMeterStatusModel): void => {
+        result.success(undefined);
       },
       failure: (err: SNError): void => {
         result.error(makeElectricMeterApiError('electricMeterReadData', err));
@@ -565,8 +585,8 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
     });
   }
 
-  electricMeterSetPayMode(electricMeterId: string, payMode: number, result: Result<void>): void {
-    TTElectricMeter.setPayMode(electricMeterId, payMode, '0', {
+  electricMeterSetPayMode(mac: string, payMode: TTMeterPayMode, price: number, result: Result<void>): void {
+    TTElectricMeter.setPayMode(mac, payModeConvert(payMode), `${price}`, {
       success: (_: ElectricMeterStatusModel): void => {
         result.success(undefined);
       },
@@ -576,9 +596,8 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
     });
   }
 
-  electricMeterCharge(electricMeterId: string, amount: number, result: Result<void>): void {
-    const amountStr = `${amount}`;
-    TTElectricMeter.recharge(electricMeterId, amountStr, amountStr, {
+  electricMeterCharge(mac: string, amount: number, kwh: number, result: Result<void>): void {
+    TTElectricMeter.recharge(mac, `${amount}`, `${kwh}`, {
       success: (_: void): void => {
         result.success(undefined);
       },
@@ -588,8 +607,8 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
     });
   }
 
-  electricMeterSetMaxPower(electricMeterId: string, maxPower: number, result: Result<void>): void {
-    TTElectricMeter.setMaxPower(electricMeterId, maxPower, {
+  electricMeterSetMaxPower(mac: string, maxPower: number, result: Result<void>): void {
+    TTElectricMeter.setMaxPower(mac, maxPower, {
       success: (_: void): void => {
         result.success(undefined);
       },
@@ -599,8 +618,8 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
     });
   }
 
-  electricMeterGetFeatureValue(electricMeterId: string, result: Result<string>): void {
-    TTElectricMeter.getFeatureValue(electricMeterId, {
+  electricMeterGetFeatureValue(mac: string, result: Result<string>): void {
+    TTElectricMeter.getFeatureValue(mac, {
       success: (fv: string): void => {
         result.success(fv);
       },
@@ -610,7 +629,52 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
     });
   }
 
-  electricMeterIsSupportFunction(_featureValue: string, _lockFunction: number): boolean {
-    return false;
+  electricMeterIsSupportFunction(featureValue: string, lockFunction: TTElectricMeterFeature): boolean {
+    const sdkFeature = electricMeterFeatureConvert(lockFunction) as SdkTTElectricMeterFeature;
+    return TTElectricMeter.supportFunction(sdkFeature, featureValue);
+  }
+
+  electricMeterGetDeviceInfo(mac: string, result: Result<ElectricMeterDeviceInfo>): void {
+    TTElectricMeter.getElectricMeterDeviceInfo(mac, {
+      success: (info: TTElectricDeviceInfoModel): void => {
+        result.success(toElectricMeterDeviceInfo(info));
+      },
+      failure: (err: SNError): void => {
+        result.error(makeElectricMeterApiError('electricMeterGetDeviceInfo', err));
+      },
+    });
+  }
+
+  electricMeterConfigApn(mac: string, apn: string, result: Result<void>): void {
+    TTElectricMeter.setElectricMeterApn(mac, apn, {
+      success: (_: void): void => {
+        result.success(undefined);
+      },
+      failure: (err: SNError): void => {
+        result.error(makeElectricMeterApiError('electricMeterConfigApn', err));
+      },
+    });
+  }
+
+  electricMeterConfigMeterServer(mac: string, ip: string, port: string, result: Result<void>): void {
+    TTElectricMeter.setElectricMeterServer(mac, ip, port, {
+      success: (_: void): void => {
+        result.success(undefined);
+      },
+      failure: (err: SNError): void => {
+        result.error(makeElectricMeterApiError('electricMeterConfigMeterServer', err));
+      },
+    });
+  }
+
+  electricMeterReset(mac: string, result: Result<void>): void {
+    TTElectricMeter.enterUpgradeMode(mac, {
+      success: (_: void): void => {
+        result.success(undefined);
+      },
+      failure: (err: SNError): void => {
+        result.error(makeElectricMeterApiError('electricMeterReset', err));
+      },
+    });
   }
 }

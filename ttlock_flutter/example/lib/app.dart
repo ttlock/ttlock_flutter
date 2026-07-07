@@ -25,11 +25,6 @@ class AppShell extends StatelessWidget {
             label: 'Dashboard',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.bluetooth_searching),
-            activeIcon: Icon(Icons.bluetooth_searching),
-            label: 'Scan',
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.settings_outlined),
             activeIcon: Icon(Icons.settings),
             label: 'Settings',

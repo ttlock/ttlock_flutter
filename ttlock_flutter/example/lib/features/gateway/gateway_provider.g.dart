@@ -6,7 +6,7 @@ part of 'gateway_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$gatewayNotifierHash() => r'841d77a4dd7e93f62210596980116a711540ad20';
+String _$gatewayNotifierHash() => r'4652178baa257faf0878e922b66090caa7afbc3b';
 
 /// See also [GatewayNotifier].
 @ProviderFor(GatewayNotifier)

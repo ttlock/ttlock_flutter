@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../core/storage/accessory_list_provider.dart';
 import '../../core/storage/accessory_storage.dart';
 import '../../core/theme/app_colors.dart';
@@ -9,37 +10,75 @@ import '../../core/widgets/loading_overlay.dart';
 import '../../features/settings/model/saved_keypad.dart';
 import 'keypad_provider.dart';
 
-class KeypadInfoPage extends ConsumerStatefulWidget {
+class KeypadInfoPage extends HookConsumerWidget {
   final String mac;
 
   const KeypadInfoPage({super.key, required this.mac});
 
   @override
-  ConsumerState<KeypadInfoPage> createState() => _KeypadInfoPageState();
-}
-
-class _KeypadInfoPageState extends ConsumerState<KeypadInfoPage> {
-  SavedKeypad? _device;
-
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
-
-  Future<void> _load() async {
-    final all = await AccessoryStorage().loadKeypads();
-    setState(() {
-      _device = all.where((d) => d.mac == widget.mac).firstOrNull;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final device = useState<SavedKeypad?>(null);
     final state = ref.watch(keypadNotifierProvider);
-    final device = _device;
 
-    if (device == null) {
+    Future<void> reload() async {
+      final all = await AccessoryStorage().loadKeypads();
+      device.value = all.where((d) => d.mac == mac).firstOrNull;
+    }
+
+    useEffect(() {
+      reload();
+      return null;
+    }, [mac]);
+
+    Future<void> rename(SavedKeypad savedDevice) async {
+      final ctrl = TextEditingController(text: savedDevice.name);
+      final name = await showDialog<String>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Rename'),
+          content: TextField(
+              controller: ctrl,
+              decoration: const InputDecoration(labelText: 'Name')),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+            FilledButton(
+                onPressed: () => Navigator.pop(ctx, ctrl.text),
+                child: const Text('Save')),
+          ],
+        ),
+      );
+      if (name == null || name.isEmpty) return;
+      await ref
+          .read(keypadListNotifierProvider(savedDevice.boundLockMac).notifier)
+          .updateDevice(savedDevice.copyWith(name: name));
+      await reload();
+    }
+
+    Future<void> delete(SavedKeypad savedDevice) async {
+      final ok = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Remove keypad?'),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: const Text('Cancel')),
+            FilledButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: const Text('Remove')),
+          ],
+        ),
+      );
+      if (ok != true || !context.mounted) return;
+      await ref
+          .read(keypadListNotifierProvider(savedDevice.boundLockMac).notifier)
+          .remove(savedDevice.mac);
+      if (context.mounted) Navigator.pop(context);
+    }
+
+    final savedDevice = device.value;
+    if (savedDevice == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Keypad')),
         body: const ErrorDisplay(message: 'Device not found'),
@@ -48,11 +87,11 @@ class _KeypadInfoPageState extends ConsumerState<KeypadInfoPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(device.name),
+        title: Text(savedDevice.name),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
-            onPressed: () => _rename(device),
+            onPressed: () => rename(savedDevice),
           ),
         ],
       ),
@@ -65,9 +104,9 @@ class _KeypadInfoPageState extends ConsumerState<KeypadInfoPage> {
                   child: ListTile(
                     leading:
                         const Icon(Icons.keyboard, color: AppColors.primary),
-                    title: Text(device.name, style: AppTextStyles.titleMedium),
+                    title: Text(savedDevice.name, style: AppTextStyles.titleMedium),
                     subtitle: Text(
-                      'MAC: ${device.mac}\n${device.isMultiFunction ? "Multifunctional" : "Standard"}',
+                      'MAC: ${savedDevice.mac}\n${savedDevice.isMultiFunction ? "Multifunctional" : "Standard"}',
                       style: AppTextStyles.bodySmall,
                     ),
                   ),
@@ -87,7 +126,7 @@ class _KeypadInfoPageState extends ConsumerState<KeypadInfoPage> {
                   ),
                 const SizedBox(height: 24),
                 FilledButton.icon(
-                  onPressed: () => _delete(device),
+                  onPressed: () => delete(savedDevice),
                   icon: const Icon(Icons.delete_outline),
                   label: const Text('Remove'),
                   style: FilledButton.styleFrom(
@@ -97,52 +136,5 @@ class _KeypadInfoPageState extends ConsumerState<KeypadInfoPage> {
               ],
             ),
     );
-  }
-
-  Future<void> _rename(SavedKeypad device) async {
-    final ctrl = TextEditingController(text: device.name);
-    final name = await showDialog<String>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Rename'),
-        content: TextField(
-            controller: ctrl,
-            decoration: const InputDecoration(labelText: 'Name')),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
-          FilledButton(
-              onPressed: () => Navigator.pop(ctx, ctrl.text),
-              child: const Text('Save')),
-        ],
-      ),
-    );
-    if (name == null || name.isEmpty) return;
-    await ref
-        .read(keypadListNotifierProvider(device.boundLockMac).notifier)
-        .updateDevice(device.copyWith(name: name));
-    await _load();
-  }
-
-  Future<void> _delete(SavedKeypad device) async {
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Remove keypad?'),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel')),
-          FilledButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Remove')),
-        ],
-      ),
-    );
-    if (ok != true || !mounted) return;
-    await ref
-        .read(keypadListNotifierProvider(device.boundLockMac).notifier)
-        .remove(device.mac);
-    if (mounted) Navigator.pop(context);
   }
 }

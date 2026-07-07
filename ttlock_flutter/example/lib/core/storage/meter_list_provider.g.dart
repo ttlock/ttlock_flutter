@@ -44,7 +44,7 @@ final electricMeterListProvider =
 // ignore: unused_element
 typedef ElectricMeterListRef
     = AutoDisposeFutureProviderRef<List<SavedMeterDevice>>;
-String _$meterListNotifierHash() => r'ee7a6c09e94d0a09c7e79c885e441069483907ae';
+String _$meterListNotifierHash() => r'a33de4bec71599ab1fa5d06b3de391f0ff55d565';
 
 /// See also [MeterListNotifier].
 @ProviderFor(MeterListNotifier)

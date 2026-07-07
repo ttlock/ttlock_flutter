@@ -6,7 +6,7 @@ part of 'keypad_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$keypadNotifierHash() => r'fbfb43ce6dabf34ddbc1dbd979ecc3aa355faf90';
+String _$keypadNotifierHash() => r'6381ec00012f74f3bb56bdbd8b3483d4924ee21e';
 
 /// See also [KeypadNotifier].
 @ProviderFor(KeypadNotifier)

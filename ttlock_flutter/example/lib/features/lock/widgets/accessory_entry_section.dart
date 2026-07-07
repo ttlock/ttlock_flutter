@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/storage/accessory_list_provider.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/section_header.dart';
 
-class AccessoryEntrySection extends ConsumerWidget {
+class AccessoryEntrySection extends HookConsumerWidget {
   final String lockMac;
 
   const AccessoryEntrySection({super.key, required this.lockMac});
@@ -23,7 +23,7 @@ class AccessoryEntrySection extends ConsumerWidget {
           const SectionHeader(title: 'Accessories', icon: Icons.link),
           _AccessoryTile(
             icon: Icons.sensors,
-            label: 'Door Sensor',
+            label: 'Door Sensor (Lock-bound)',
             count: counts.doorSensors,
             onTap: () => DoorSensorListRoute(lockMac).push(context),
           ),

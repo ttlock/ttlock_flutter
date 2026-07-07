@@ -1,7 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:toastification/toastification.dart';
 import 'package:ttlock_flutter/ttlock.dart';
 
@@ -11,72 +12,65 @@ import '../widgets/add_progress_overlay.dart';
 import '../widgets/credential_validity_sheet.dart';
 import 'card_provider.dart';
 
-class CardAddPage extends ConsumerStatefulWidget {
+class CardAddPage extends HookConsumerWidget {
   const CardAddPage({super.key, required this.lockMac});
 
   final String lockMac;
 
   @override
-  ConsumerState<CardAddPage> createState() => _CardAddPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final subRef = useRef<StreamSubscription<AddCardEvent>?>(null);
+    final validity = useState<CredentialValidity?>(null);
+    final adding = useState(false);
+    final message = useState('Place card near the lock');
 
-class _CardAddPageState extends ConsumerState<CardAddPage> {
-  StreamSubscription<AddCardEvent>? _sub;
-  CredentialValidity? _validity;
-  bool _adding = false;
-  String _message = 'Place card near the lock';
+    useEffect(() {
+      return () {
+        subRef.value?.cancel();
+      };
+    }, const []);
 
-  @override
-  void dispose() {
-    _sub?.cancel();
-    super.dispose();
-  }
+    Future<void> start() async {
+      final v = validity.value ?? await CredentialValiditySheet.show(context);
+      if (v == null || !context.mounted) return;
+      validity.value = v;
+      adding.value = true;
+      message.value = 'Place card near the lock…';
 
-  Future<void> _start() async {
-    final validity = _validity ?? await CredentialValiditySheet.show(context);
-    if (validity == null || !mounted) return;
-    setState(() {
-      _validity = validity;
-      _adding = true;
-      _message = 'Place card near the lock…';
-    });
+      final range = validityToDateRange(v);
+      subRef.value?.cancel();
+      subRef.value = ref
+          .read(cardListProvider(lockMac).notifier)
+          .addCardStream(lockMac, v)
+          .listen(
+        (event) async {
+          if (!context.mounted) return;
+          switch (event.phase) {
+            case TTAddCardPhase.waiting:
+              message.value = 'Reading card…';
+            case TTAddCardPhase.success:
+              final cardNumber = event.credentialNumber!;
+              await ref.read(cardListProvider(lockMac).notifier).onCardAdded(
+                    lockMac,
+                    cardNumber,
+                    range.startDate,
+                    range.endDate,
+                  );
+              toastification.show(
+                title: Text('Card added: $cardNumber'),
+                type: ToastificationType.success,
+              );
+              Navigator.pop(context);
+          }
+        },
+        onError: (e) {
+          if (!context.mounted) return;
+          adding.value = false;
+          toastification.show(title: Text('$e'), type: ToastificationType.error);
+        },
+      );
+    }
 
-    final range = validityToDateRange(validity);
-    _sub?.cancel();
-    _sub = ref
-        .read(cardListProvider(widget.lockMac).notifier)
-        .addCardStream(widget.lockMac, validity)
-        .listen(
-      (event) async {
-        if (!mounted) return;
-        switch (event.phase) {
-          case TTAddCardPhase.waiting:
-            setState(() => _message = 'Reading card…');
-          case TTAddCardPhase.success:
-            final cardNumber = event.credentialNumber!;
-            await ref.read(cardListProvider(widget.lockMac).notifier).onCardAdded(
-                  widget.lockMac,
-                  cardNumber,
-                  range.startDate,
-                  range.endDate,
-                );
-            toastification.show(
-              title: Text('Card added: $cardNumber'),
-              type: ToastificationType.success,
-            );
-            Navigator.pop(context);
-        }
-      },
-      onError: (e) {
-        if (!mounted) return;
-        setState(() => _adding = false);
-        toastification.show(title: Text('$e'), type: ToastificationType.error);
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Add Card')),
       body: Stack(
@@ -91,25 +85,25 @@ class _CardAddPageState extends ConsumerState<CardAddPage> {
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 title: const Text('Validity'),
-                subtitle: Text(_validity == null ? 'Not set' : 'Configured'),
+                subtitle: Text(validity.value == null ? 'Not set' : 'Configured'),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () async {
                   final v = await CredentialValiditySheet.show(
                     context,
-                    initial: _validity,
+                    initial: validity.value,
                   );
-                  if (v != null) setState(() => _validity = v);
+                  if (v != null) validity.value = v;
                 },
               ),
               const SizedBox(height: 16),
               FilledButton(
-                onPressed: _adding ? null : _start,
-                child: Text(_adding ? 'Adding…' : 'Start'),
+                onPressed: adding.value ? null : start,
+                child: Text(adding.value ? 'Adding…' : 'Start'),
               ),
             ],
           ),
-          if (_adding)
-            AddProgressOverlay(message: _message),
+          if (adding.value)
+            AddProgressOverlay(message: message.value),
         ],
       ),
     );

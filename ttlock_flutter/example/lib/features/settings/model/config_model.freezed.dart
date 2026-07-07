@@ -16,9 +16,9 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ConfigModel {
   int get uid;
+  String? get password;
   String? get serverIp;
   String? get serverPort;
-  String get gatewayName;
 
   /// Create a copy of ConfigModel
   /// with the given fields replaced by the non-null parameter values.
@@ -36,22 +36,22 @@ mixin _$ConfigModel {
         (other.runtimeType == runtimeType &&
             other is ConfigModel &&
             (identical(other.uid, uid) || other.uid == uid) &&
+            (identical(other.password, password) ||
+                other.password == password) &&
             (identical(other.serverIp, serverIp) ||
                 other.serverIp == serverIp) &&
             (identical(other.serverPort, serverPort) ||
-                other.serverPort == serverPort) &&
-            (identical(other.gatewayName, gatewayName) ||
-                other.gatewayName == gatewayName));
+                other.serverPort == serverPort));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, uid, serverIp, serverPort, gatewayName);
+      Object.hash(runtimeType, uid, password, serverIp, serverPort);
 
   @override
   String toString() {
-    return 'ConfigModel(uid: $uid, serverIp: $serverIp, serverPort: $serverPort, gatewayName: $gatewayName)';
+    return 'ConfigModel(uid: $uid, password: $password, serverIp: $serverIp, serverPort: $serverPort)';
   }
 }
 
@@ -61,8 +61,7 @@ abstract mixin class $ConfigModelCopyWith<$Res> {
           ConfigModel value, $Res Function(ConfigModel) _then) =
       _$ConfigModelCopyWithImpl;
   @useResult
-  $Res call(
-      {int uid, String? serverIp, String? serverPort, String gatewayName});
+  $Res call({int uid, String? password, String? serverIp, String? serverPort});
 }
 
 /// @nodoc
@@ -78,15 +77,19 @@ class _$ConfigModelCopyWithImpl<$Res> implements $ConfigModelCopyWith<$Res> {
   @override
   $Res call({
     Object? uid = null,
+    Object? password = freezed,
     Object? serverIp = freezed,
     Object? serverPort = freezed,
-    Object? gatewayName = null,
   }) {
     return _then(_self.copyWith(
       uid: null == uid
           ? _self.uid
           : uid // ignore: cast_nullable_to_non_nullable
               as int,
+      password: freezed == password
+          ? _self.password
+          : password // ignore: cast_nullable_to_non_nullable
+              as String?,
       serverIp: freezed == serverIp
           ? _self.serverIp
           : serverIp // ignore: cast_nullable_to_non_nullable
@@ -95,10 +98,6 @@ class _$ConfigModelCopyWithImpl<$Res> implements $ConfigModelCopyWith<$Res> {
           ? _self.serverPort
           : serverPort // ignore: cast_nullable_to_non_nullable
               as String?,
-      gatewayName: null == gatewayName
-          ? _self.gatewayName
-          : gatewayName // ignore: cast_nullable_to_non_nullable
-              as String,
     ));
   }
 }
@@ -107,10 +106,7 @@ class _$ConfigModelCopyWithImpl<$Res> implements $ConfigModelCopyWith<$Res> {
 @JsonSerializable()
 class _ConfigModel extends ConfigModel {
   const _ConfigModel(
-      {this.uid = 0,
-      this.serverIp,
-      this.serverPort,
-      this.gatewayName = 'Gateway'})
+      {this.uid = 0, this.password, this.serverIp, this.serverPort})
       : super._();
   factory _ConfigModel.fromJson(Map<String, dynamic> json) =>
       _$ConfigModelFromJson(json);
@@ -119,12 +115,11 @@ class _ConfigModel extends ConfigModel {
   @JsonKey()
   final int uid;
   @override
+  final String? password;
+  @override
   final String? serverIp;
   @override
   final String? serverPort;
-  @override
-  @JsonKey()
-  final String gatewayName;
 
   /// Create a copy of ConfigModel
   /// with the given fields replaced by the non-null parameter values.
@@ -147,22 +142,22 @@ class _ConfigModel extends ConfigModel {
         (other.runtimeType == runtimeType &&
             other is _ConfigModel &&
             (identical(other.uid, uid) || other.uid == uid) &&
+            (identical(other.password, password) ||
+                other.password == password) &&
             (identical(other.serverIp, serverIp) ||
                 other.serverIp == serverIp) &&
             (identical(other.serverPort, serverPort) ||
-                other.serverPort == serverPort) &&
-            (identical(other.gatewayName, gatewayName) ||
-                other.gatewayName == gatewayName));
+                other.serverPort == serverPort));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, uid, serverIp, serverPort, gatewayName);
+      Object.hash(runtimeType, uid, password, serverIp, serverPort);
 
   @override
   String toString() {
-    return 'ConfigModel(uid: $uid, serverIp: $serverIp, serverPort: $serverPort, gatewayName: $gatewayName)';
+    return 'ConfigModel(uid: $uid, password: $password, serverIp: $serverIp, serverPort: $serverPort)';
   }
 }
 
@@ -174,8 +169,7 @@ abstract mixin class _$ConfigModelCopyWith<$Res>
       __$ConfigModelCopyWithImpl;
   @override
   @useResult
-  $Res call(
-      {int uid, String? serverIp, String? serverPort, String gatewayName});
+  $Res call({int uid, String? password, String? serverIp, String? serverPort});
 }
 
 /// @nodoc
@@ -191,15 +185,19 @@ class __$ConfigModelCopyWithImpl<$Res> implements _$ConfigModelCopyWith<$Res> {
   @pragma('vm:prefer-inline')
   $Res call({
     Object? uid = null,
+    Object? password = freezed,
     Object? serverIp = freezed,
     Object? serverPort = freezed,
-    Object? gatewayName = null,
   }) {
     return _then(_ConfigModel(
       uid: null == uid
           ? _self.uid
           : uid // ignore: cast_nullable_to_non_nullable
               as int,
+      password: freezed == password
+          ? _self.password
+          : password // ignore: cast_nullable_to_non_nullable
+              as String?,
       serverIp: freezed == serverIp
           ? _self.serverIp
           : serverIp // ignore: cast_nullable_to_non_nullable
@@ -208,10 +206,6 @@ class __$ConfigModelCopyWithImpl<$Res> implements _$ConfigModelCopyWith<$Res> {
           ? _self.serverPort
           : serverPort // ignore: cast_nullable_to_non_nullable
               as String?,
-      gatewayName: null == gatewayName
-          ? _self.gatewayName
-          : gatewayName // ignore: cast_nullable_to_non_nullable
-              as String,
     ));
   }
 }

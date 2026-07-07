@@ -3,7 +3,6 @@ import 'package:ttlock_flutter/ttlock.dart';
 
 import '../../../core/storage/lock_list_provider.dart';
 import '../../../core/storage/lock_local_storage_provider.dart';
-import '../../../providers/ttlock_providers.dart';
 import 'lock_capabilities_probe.dart';
 
 part 'lock_capabilities_provider.g.dart';
@@ -25,7 +24,7 @@ class LockCapabilities extends _$LockCapabilities {
     final lock = await ref.read(lockByMacProvider(lockMac).future);
     if (lock == null) return {};
 
-    final api = ref.read(lockApiProvider);
+    final api = TTLock.lock;
     final supported = await probeLockCapabilities(api, lock.lockData);
     final now = DateTime.now();
 

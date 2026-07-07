@@ -5,7 +5,6 @@ import 'package:ttlock_flutter/ttlock.dart';
 
 import '../../../core/storage/lock_list_provider.dart';
 import '../../../core/storage/lock_local_storage_provider.dart';
-import '../../../providers/ttlock_providers.dart';
 import '../model/cached_credentials.dart';
 import '../model/credential_params.dart';
 import '../model/credential_validity.dart';
@@ -27,7 +26,7 @@ class CardList extends _$CardList {
     final lock = await ref.read(lockByMacProvider(lockMac).future);
     if (lock == null) return [];
 
-    final list = await ref.read(lockApiProvider).getAllValidCards(lock.lockData);
+    final list = await TTLock.lock.getAllValidCards(lock.lockData);
     final cached = list.map(CachedCard.fromModel).toList();
     final now = DateTime.now();
 
@@ -46,7 +45,7 @@ class CardList extends _$CardList {
   Future<void> clearAll(String lockMac) async {
     final lock = await ref.read(lockByMacProvider(lockMac).future);
     if (lock == null) return;
-    await ref.read(lockApiProvider).clearAllCards(lock.lockData);
+    await TTLock.lock.clearAllCards(lock.lockData);
     await ref.read(lockLocalCacheNotifierProvider(lockMac).notifier).patch(
           (c) => c.copyWith(cards: [], credentialsFetchedAt: DateTime.now()),
         );
@@ -56,7 +55,7 @@ class CardList extends _$CardList {
   Future<void> delete(String lockMac, String cardNumber) async {
     final lock = await ref.read(lockByMacProvider(lockMac).future);
     if (lock == null) return;
-    await ref.read(lockApiProvider).deleteCard(cardNumber, lock.lockData);
+    await TTLock.lock.deleteCard(cardNumber, lock.lockData);
     await ref.read(lockLocalCacheNotifierProvider(lockMac).notifier).patch((c) {
       final list = c.cards ?? [];
       return c.copyWith(
@@ -74,7 +73,7 @@ class CardList extends _$CardList {
     final lock = await ref.read(lockByMacProvider(lockMac).future);
     if (lock == null) return;
     final range = validityToDateRange(validity);
-    await ref.read(lockApiProvider).modifyCardValidityPeriod(
+    await TTLock.lock.modifyCardValidityPeriod(
       cardNumber,
       range.cycleList,
       range.startDate,
@@ -101,7 +100,7 @@ class CardList extends _$CardList {
     final lock = await ref.read(lockByMacProvider(lockMac).future);
     if (lock == null) return;
     final range = validityToDateRange(validity);
-    final api = ref.read(lockApiProvider);
+    final api = TTLock.lock;
     yield* api.lockAddCard(
       lock.lockData,
       cycleList: range.cycleList,

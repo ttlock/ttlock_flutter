@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../providers/ttlock_providers.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 
-class DeveloperTag extends ConsumerWidget {
+class DeveloperTag extends HookConsumerWidget {
   final String methodName;
   final int durationMs;
   final bool isSuccess;
@@ -62,48 +63,37 @@ class DeveloperTag extends ConsumerWidget {
                 Text('${durationMs}ms', style: AppTextStyles.labelSmall),
               ],
             ),
-            if (jsonData != null) _buildJsonSection(context),
+            if (jsonData != null) _ExpandableJsonBody(jsonData: jsonData!),
           ],
         ),
       ),
     );
   }
-
-  Widget _buildJsonSection(BuildContext context) {
-    return _ExpandableJsonSection(jsonData: jsonData!);
-  }
 }
 
-class _ExpandableJsonSection extends StatefulWidget {
+class _ExpandableJsonBody extends HookConsumerWidget {
+  const _ExpandableJsonBody({required this.jsonData});
   final String jsonData;
 
-  const _ExpandableJsonSection({required this.jsonData});
-
   @override
-  State<_ExpandableJsonSection> createState() => _ExpandableJsonSectionState();
-}
-
-class _ExpandableJsonSectionState extends State<_ExpandableJsonSection> {
-  bool _expanded = false;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final expanded = useState(false);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 4),
         GestureDetector(
-          onTap: () => setState(() => _expanded = !_expanded),
+          onTap: () => expanded.value = !expanded.value,
           child: Row(
             children: [
               Icon(
-                _expanded ? Icons.expand_less : Icons.expand_more,
+                expanded.value ? Icons.expand_less : Icons.expand_more,
                 size: 16,
                 color: AppColors.onSurfaceSecondary,
               ),
               const SizedBox(width: 4),
               Text(
-                _expanded ? 'Hide JSON' : 'Show JSON',
+                expanded.value ? 'Hide JSON' : 'Show JSON',
                 style: AppTextStyles.labelSmall.copyWith(
                   color: AppColors.onSurfaceSecondary,
                 ),
@@ -111,11 +101,11 @@ class _ExpandableJsonSectionState extends State<_ExpandableJsonSection> {
             ],
           ),
         ),
-        if (_expanded) ...[
+        if (expanded.value) ...[
           const SizedBox(height: 4),
           GestureDetector(
             onTap: () {
-              Clipboard.setData(ClipboardData(text: widget.jsonData));
+              Clipboard.setData(ClipboardData(text: jsonData));
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('JSON copied to clipboard'),
@@ -131,7 +121,7 @@ class _ExpandableJsonSectionState extends State<_ExpandableJsonSection> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                widget.jsonData,
+                jsonData,
                 style: AppTextStyles.bodySmall.copyWith(
                   fontFamily: 'monospace',
                   fontSize: 11,
@@ -143,5 +133,4 @@ class _ExpandableJsonSectionState extends State<_ExpandableJsonSection> {
       ],
     );
   }
-
 }

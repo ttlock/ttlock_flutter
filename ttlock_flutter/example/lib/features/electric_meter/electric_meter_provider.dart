@@ -1,6 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:ttlock_flutter/ttlock.dart';
-import '../../providers/ttlock_providers.dart';
 
 part 'electric_meter_provider.g.dart';
 
@@ -18,10 +17,10 @@ class ElectricMeterNotifier extends _$ElectricMeterNotifier {
   ElectricMeterState build() => const ElectricMeterState();
 
   Future<void> configServer(String url, String clientId, String accessToken) async {
-    final api = ref.read(electricMeterApiProvider);
+    final api = TTLock.electricMeter;
     state = ElectricMeterState(isLoading: true, error: null);
     try {
-      await runRemoteAccessoryApi(() => api.electricMeterConfigServer(url, clientId, accessToken));
+      await api.electricMeterConfigServer(url, clientId, accessToken);
       state = ElectricMeterState(result: 'Server configured');
     } on TTRemoteAccessoryException catch (e) {
       state = ElectricMeterState(error: e.toString());
@@ -29,10 +28,10 @@ class ElectricMeterNotifier extends _$ElectricMeterNotifier {
   }
 
   Future<void> connect(String mac) async {
-    final api = ref.read(electricMeterApiProvider);
+    final api = TTLock.electricMeter;
     state = ElectricMeterState(isLoading: true, error: null);
     try {
-      await runRemoteAccessoryApi(() => api.electricMeterConnect(mac));
+      await api.electricMeterConnect(mac);
       state = ElectricMeterState(result: 'Connected');
     } on TTRemoteAccessoryException catch (e) {
       state = ElectricMeterState(error: e.toString());
@@ -40,7 +39,7 @@ class ElectricMeterNotifier extends _$ElectricMeterNotifier {
   }
 
   Future<void> disconnect(String mac) async {
-    final api = ref.read(electricMeterApiProvider);
+    final api = TTLock.electricMeter;
     try {
       await api.electricMeterDisconnect(mac);
       state = ElectricMeterState(result: 'Disconnected');
@@ -55,7 +54,7 @@ class ElectricMeterNotifier extends _$ElectricMeterNotifier {
     TTMeterPayMode payMode = TTMeterPayMode.postpaid,
     double price = 0,
   }) async {
-    final api = ref.read(electricMeterApiProvider);
+    final api = TTLock.electricMeter;
     state = ElectricMeterState(isLoading: true, error: null);
     try {
       final result = await api.electricMeterInit(TTElectricMeterInitParam(
@@ -73,7 +72,7 @@ class ElectricMeterNotifier extends _$ElectricMeterNotifier {
   }
 
   Future<void> readData(String mac) async {
-    final api = ref.read(electricMeterApiProvider);
+    final api = TTLock.electricMeter;
     state = ElectricMeterState(isLoading: true, error: null);
     try {
       await api.electricMeterReadData(mac);
@@ -84,7 +83,7 @@ class ElectricMeterNotifier extends _$ElectricMeterNotifier {
   }
 
   Future<void> setPowerOnOff(String mac, bool isOn) async {
-    final api = ref.read(electricMeterApiProvider);
+    final api = TTLock.electricMeter;
     state = ElectricMeterState(isLoading: true, error: null);
     try {
       await api.electricMeterSetPowerOnOff(mac, isOn);
@@ -95,7 +94,7 @@ class ElectricMeterNotifier extends _$ElectricMeterNotifier {
   }
 
   Future<void> setPayMode(String mac, TTMeterPayMode mode, {double price = 0}) async {
-    final api = ref.read(electricMeterApiProvider);
+    final api = TTLock.electricMeter;
     state = ElectricMeterState(isLoading: true, error: null);
     try {
       await api.electricMeterSetPayMode(mac, mode, price);
@@ -106,7 +105,7 @@ class ElectricMeterNotifier extends _$ElectricMeterNotifier {
   }
 
   Future<void> charge(String mac, double amount, {double kwh = 0}) async {
-    final api = ref.read(electricMeterApiProvider);
+    final api = TTLock.electricMeter;
     state = ElectricMeterState(isLoading: true, error: null);
     try {
       await api.electricMeterCharge(mac, amount, kwh);
@@ -117,7 +116,7 @@ class ElectricMeterNotifier extends _$ElectricMeterNotifier {
   }
 
   Future<void> setMaxPower(String mac, double maxPower) async {
-    final api = ref.read(electricMeterApiProvider);
+    final api = TTLock.electricMeter;
     state = ElectricMeterState(isLoading: true, error: null);
     try {
       await api.electricMeterSetMaxPower(mac, maxPower);
@@ -128,7 +127,7 @@ class ElectricMeterNotifier extends _$ElectricMeterNotifier {
   }
 
   Future<void> getFeatureValue(String mac) async {
-    final api = ref.read(electricMeterApiProvider);
+    final api = TTLock.electricMeter;
     state = ElectricMeterState(isLoading: true, error: null);
     try {
       final value = await api.electricMeterGetFeatureValue(mac);
@@ -139,7 +138,7 @@ class ElectricMeterNotifier extends _$ElectricMeterNotifier {
   }
 
   Future<void> delete(String mac) async {
-    final api = ref.read(electricMeterApiProvider);
+    final api = TTLock.electricMeter;
     state = ElectricMeterState(isLoading: true, error: null);
     try {
       await api.electricMeterDelete(mac);

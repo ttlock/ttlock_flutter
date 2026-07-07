@@ -1,288 +1,232 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:ttlock_flutter/ttlock.dart';
+
+import '../../core/storage/gateway_list_provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
-import '../../core/widgets/section_header.dart';
-import '../../core/widgets/loading_overlay.dart';
-import '../../core/widgets/error_display.dart';
 import '../../core/widgets/device_info_section.dart';
-import '../../core/storage/config_provider.dart';
+import '../../core/widgets/error_display.dart';
+import '../../core/widgets/loading_overlay.dart';
+import '../../core/widgets/section_header.dart';
+import '../scan/scan_provider.dart';
 import 'gateway_provider.dart';
 
-class GatewayPage extends ConsumerStatefulWidget {
+class GatewayPage extends HookConsumerWidget {
   final String mac;
-  final TTGatewayType gatewayType;
-  final bool needsWifiConfig;
 
   const GatewayPage({
     super.key,
     required this.mac,
-    this.gatewayType = TTGatewayType.g2,
-    this.needsWifiConfig = false,
   });
 
   @override
-  ConsumerState<GatewayPage> createState() => _GatewayPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    useEffect(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(gatewayNotifierProvider.notifier).setMac(mac);
+      });
+      return null;
+    }, [mac]);
 
-class _GatewayPageState extends ConsumerState<GatewayPage> {
-  final _wifiCtrl = TextEditingController();
-  final _wifiPwdCtrl = TextEditingController();
-  final _ipCtrl = TextEditingController();
-  final _subnetCtrl = TextEditingController();
-  final _routerCtrl = TextEditingController();
-  final _dnsCtrl = TextEditingController();
-  final _apnCtrl = TextEditingController();
+    void enterUpgradeMode() {
+      ref.read(gatewayNotifierProvider.notifier).enterUpgradeMode();
+    }
 
-  @override
-  void initState() {
-    super.initState();
-    Future.microtask(
-        () => ref.read(gatewayNotifierProvider.notifier).connect(widget.mac));
-  }
+    void getNetworkMac() {
+      ref.read(gatewayNotifierProvider.notifier).getNetworkMac();
+    }
 
-  @override
-  void dispose() {
-    _wifiCtrl.dispose();
-    _wifiPwdCtrl.dispose();
-    _ipCtrl.dispose();
-    _subnetCtrl.dispose();
-    _routerCtrl.dispose();
-    _dnsCtrl.dispose();
-    _apnCtrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     final state = ref.watch(gatewayNotifierProvider);
+    final savedGateway = ref.watch(gatewayByMacProvider(mac)).valueOrNull;
+    final gatewayType = savedGateway != null
+        ? TTGatewayType.values[savedGateway.gatewayType.clamp(
+            0,
+            TTGatewayType.values.length - 1,
+          )]
+        : TTGatewayType.g2;
+    final needsWifi = gatewayNeedsWifi(gatewayType);
+    final needsApn = gatewayNeedsApn(gatewayType);
+
     return Scaffold(
-      appBar: AppBar(title: Text('Gateway ${widget.mac}')),
+      appBar: AppBar(title: Text('Gateway $mac')),
       body: state.isLoading
           ? const LoadingOverlay(message: 'Processing...')
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                // Error display
                 if (state.errorMessage != null)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 16),
-                    child: ErrorDisplay(
-                      message: state.errorMessage,
-                      onRetry: () => ref
-                          .read(gatewayNotifierProvider.notifier)
-                          .connect(widget.mac),
-                    ),
+                    child: ErrorDisplay(message: state.errorMessage),
                   ),
-
-                // Section: Device Info
                 SectionHeader(title: 'Device Info', icon: Icons.info_outline),
                 const SizedBox(height: 8),
-                DeviceInfoSection(mac: widget.mac),
-                const SizedBox(height: 8),
-                // Connection status
-                Card(
-                  child: ListTile(
-                    leading: Icon(
-                      state.isConnected ? Icons.wifi : Icons.wifi_off,
-                      color: state.isConnected
-                          ? AppColors.success
-                          : AppColors.error,
-                    ),
-                    title: Text(
-                      state.isConnected ? 'Connected' : 'Disconnected',
-                      style: AppTextStyles.titleMedium,
-                    ),
-                    subtitle: Text(
-                      'Type: ${widget.gatewayType.name}',
-                      style: AppTextStyles.bodySmall,
-                    ),
-                  ),
+                DeviceInfoSection(
+                  mac: mac,
+                  model: savedGateway?.gatewayModel,
                 ),
-                const SizedBox(height: 16),
-
-                // Section: Connection
-                SectionHeader(title: 'Connection', icon: Icons.link),
                 const SizedBox(height: 8),
-                if (state.isConnected)
-                  OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.error,
-                    ),
-                    onPressed: () async {
-                      await ref
-                          .read(gatewayNotifierProvider.notifier)
-                          .disconnect();
-                      if (context.mounted) Navigator.of(context).pop();
-                    },
-                    child: const Text('Disconnect'),
-                  )
-                else
-                  ElevatedButton(
-                    onPressed: () => ref
-                        .read(gatewayNotifierProvider.notifier)
-                        .connect(widget.mac),
-                    child: const Text('Connect'),
-                  ),
-                const SizedBox(height: 16),
-
-                // Section: WiFi Init
-                if (state.isConnected) ...[
-                  SectionHeader(title: 'WiFi Init', icon: Icons.wifi),
-                  const SizedBox(height: 8),
-                  if (widget.needsWifiConfig) ...[
-                    TextField(
-                      controller: _wifiCtrl,
-                      decoration: const InputDecoration(
-                          labelText: 'SSID', hintText: 'WiFi name'),
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _wifiPwdCtrl,
-                      decoration: const InputDecoration(
-                          labelText: 'Password',
-                          hintText: 'WiFi password'),
-                      obscureText: true,
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-                  ElevatedButton(
-                    onPressed: _initGateway,
-                    child: const Text('Initialize Gateway'),
-                  ),
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.wifi_find),
+                  onPressed: getNetworkMac,
+                  label: const Text('Get Network MAC'),
+                ),
+                if (needsWifi) ...[
                   const SizedBox(height: 16),
-
-                  // Section: Network Config
+                  SectionHeader(title: 'WiFi', icon: Icons.wifi),
+                  const SizedBox(height: 8),
+                  _NetworkInfoCard(
+                    rows: [
+                      _InfoRow(
+                        label: 'SSID',
+                        value: savedGateway?.wifiSsid ?? '-',
+                      ),
+                    ],
+                  ),
+                ],
+                if (needsWifi) ...[
+                  const SizedBox(height: 16),
                   SectionHeader(
-                      title: 'Network Config',
-                      icon: Icons.settings_ethernet),
-                  const SizedBox(height: 8),
-                  // Get Network MAC
-                  OutlinedButton.icon(
-                    icon: const Icon(Icons.wifi_find),
-                    onPressed: _getNetworkMac,
-                    label: const Text('Get Network MAC'),
-                  ),
-                  const SizedBox(height: 12),
-                  // Config IP
-                  TextField(
-                    controller: _ipCtrl,
-                    decoration: const InputDecoration(
-                        labelText: 'IP Address',
-                        hintText: '192.168.1.100'),
+                    title: 'IP Settings',
+                    icon: Icons.settings_ethernet,
                   ),
                   const SizedBox(height: 8),
-                  TextField(
-                    controller: _subnetCtrl,
-                    decoration: const InputDecoration(
-                        labelText: 'Subnet Mask',
-                        hintText: '255.255.255.0'),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _routerCtrl,
-                    decoration: const InputDecoration(
-                        labelText: 'Router', hintText: '192.168.1.1'),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _dnsCtrl,
-                    decoration: const InputDecoration(
-                        labelText: 'DNS', hintText: '8.8.8.8'),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: _configIp,
-                    child: const Text('Set IP'),
-                  ),
-                  const SizedBox(height: 12),
-                  // Config APN
-                  TextField(
-                    controller: _apnCtrl,
-                    decoration: const InputDecoration(
-                        labelText: 'APN', hintText: 'cmnet'),
-                  ),
-                  const SizedBox(height: 8),
-                  ElevatedButton(
-                    onPressed: _configApn,
-                    child: const Text('Set APN'),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Section: Danger Zone
-                  SectionHeader(
-                      title: 'Danger Zone', icon: Icons.warning_amber),
-                  const SizedBox(height: 8),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.error,
-                      foregroundColor: Colors.white,
-                    ),
-                    onPressed: _enterUpgradeMode,
-                    child: const Text('Enter Upgrade Mode'),
-                  ),
-
-                  // Result display
-                  if (state.lastResult.isNotEmpty) ...[
-                    const SizedBox(height: 16),
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Result', style: AppTextStyles.labelLarge),
-                            const SizedBox(height: 4),
-                            Text(state.lastResult,
-                                style: AppTextStyles.codeMedium),
-                          ],
+                  _NetworkInfoCard(
+                    rows: [
+                      _InfoRow(
+                        label: 'Mode',
+                        value: savedGateway?.useStaticIp == true
+                            ? 'Manual'
+                            : 'Auto (DHCP)',
+                      ),
+                      if (savedGateway?.useStaticIp == true) ...[
+                        _InfoRow(
+                          label: 'IP Address',
+                          value: savedGateway?.ipAddress ?? '-',
                         ),
+                        _InfoRow(
+                          label: 'Subnet Mask',
+                          value: savedGateway?.subnetMask ?? '-',
+                        ),
+                        _InfoRow(
+                          label: 'Router',
+                          value: savedGateway?.router ?? '-',
+                        ),
+                        _InfoRow(
+                          label: 'DNS',
+                          value: savedGateway?.preferredDns ?? '-',
+                        ),
+                      ],
+                    ],
+                  ),
+                ],
+                if (needsApn) ...[
+                  const SizedBox(height: 16),
+                  SectionHeader(title: 'APN Settings', icon: Icons.cell_tower),
+                  const SizedBox(height: 8),
+                  _NetworkInfoCard(
+                    rows: [
+                      _InfoRow(
+                        label: 'Status',
+                        value: savedGateway?.apnEnabled == true
+                            ? 'Enabled'
+                            : 'Disabled',
+                      ),
+                      if (savedGateway?.apnEnabled == true)
+                        _InfoRow(
+                          label: 'APN',
+                          value: savedGateway?.apn ?? '-',
+                        ),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: 16),
+                SectionHeader(
+                  title: 'Danger Zone',
+                  icon: Icons.warning_amber,
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.error,
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: enterUpgradeMode,
+                  child: const Text('Enter Upgrade Mode'),
+                ),
+                if (state.lastResult.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Result', style: AppTextStyles.labelLarge),
+                          const SizedBox(height: 4),
+                          Text(
+                            state.lastResult,
+                            style: AppTextStyles.codeMedium,
+                          ),
+                        ],
                       ),
                     ),
-                  ],
+                  ),
                 ],
               ],
             ),
     );
   }
+}
 
-  void _initGateway() {
-    final config = ref.read(configNotifierProvider).valueOrNull;
-    ref
-        .read(gatewayNotifierProvider.notifier)
-        .init(TTGatewayInitParams(
-      type: widget.gatewayType,
-      ttlockUid: config?.uid ?? 0,
-      gatewayName: config?.gatewayName ?? 'Gateway',
-      serverIp: config?.serverIp,
-      serverPort: config?.serverPort,
-      wifi: widget.needsWifiConfig ? _wifiCtrl.text : null,
-      wifiPassword: widget.needsWifiConfig ? _wifiPwdCtrl.text : null,
-    ));
+class _NetworkInfoCard extends StatelessWidget {
+  final List<_InfoRow> rows;
+
+  const _NetworkInfoCard({required this.rows});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Column(
+          children: [
+            for (var i = 0; i < rows.length; i++) ...[
+              rows[i],
+              if (i < rows.length - 1)
+                const Divider(height: 1),
+            ],
+          ],
+        ),
+      ),
+    );
   }
+}
 
-  void _getNetworkMac() {
-    ref.read(gatewayNotifierProvider.notifier).getNetworkMac();
-  }
+class _InfoRow extends StatelessWidget {
+  final String label;
+  final String value;
 
-  void _configIp() {
-    final notifier = ref.read(gatewayNotifierProvider.notifier);
-    notifier.configIp(TTIpSetting(
-      type: TTIpSettingType.staticIp.index,
-      ipAddress: _ipCtrl.text.isNotEmpty ? _ipCtrl.text : null,
-      subnetMask: _subnetCtrl.text.isNotEmpty ? _subnetCtrl.text : null,
-      router: _routerCtrl.text.isNotEmpty ? _routerCtrl.text : null,
-      preferredDns: _dnsCtrl.text.isNotEmpty ? _dnsCtrl.text : null,
-    ));
-  }
+  const _InfoRow({required this.label, required this.value});
 
-  void _configApn() {
-    if (_apnCtrl.text.isEmpty) return;
-    ref.read(gatewayNotifierProvider.notifier).configApn(_apnCtrl.text);
-  }
-
-  void _enterUpgradeMode() {
-    ref.read(gatewayNotifierProvider.notifier).enterUpgradeMode();
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 110,
+            child: Text(label, style: AppTextStyles.bodySmall),
+          ),
+          Expanded(
+            child: Text(value, style: AppTextStyles.bodyMedium),
+          ),
+        ],
+      ),
+    );
   }
 }

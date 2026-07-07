@@ -1,5 +1,5 @@
-import { FlutterError, TTCycleModel } from './Messages';
-import { ITTLockResult, SNError } from '@sciener/ttlock';
+import { FlutterError, PigeonEventSink, TTCycleModel, TTGatewayError, TTKeypadCredentialEventParam, TTLockCredentialEventParam, TTLockError, TTLockVersion, TTMultifunctionalKeypadError, TTRemoteAccessoryError, TTStandaloneDoorSensorError } from './Messages';
+import { ITTLockResult, SNError, TTLockFeatureValue } from '@sciener/ttlock';
 import {
   electricMeterErrorRevert,
   gatewayErrorRevert,
@@ -7,10 +7,11 @@ import {
   lockErrorRevert,
   multifunctionalKeypadErrorRevert,
   remoteAccessoryErrorRevert,
-  waterMeterErrorRevert,
+  meterErrorRevert,
+  standaloneDoorSensorErrorRevert,
 } from './EnumConverter';
 
-const NOT_IMPLEMENTED_CODE = 'NOT_IMPLEMENTED';
+export const NOT_IMPLEMENTED_CODE = 'NOT_IMPLEMENTED';
 const INVALID_VALUE_CODE = 'INVALID_VALUE';
 const NO_LOCK_DATA_CODE = 'NO_LOCK_DATA';
 const NO_GATEWAY_CODE = 'NO_GATEWAY';
@@ -91,7 +92,7 @@ function pickErrorMessage(err: SNError, fallback: string): string {
 
 export function makeLockApiError(operation: string, error: SNError, message?: string): FlutterError {
   const fallback = `${operation} failed: ${error.code}`;
-  const mapped = lockErrorRevert(error.code);
+  const mapped = lockErrorRevert(error.code) ?? TTLockError.FAIL;
   return new FlutterError(
     `${mapped}`,
     'lockError',
@@ -101,7 +102,7 @@ export function makeLockApiError(operation: string, error: SNError, message?: st
 
 export function makeGatewayApiError(operation: string, error: SNError, message?: string): FlutterError {
   const fallback = `${operation} failed: ${error.code}`;
-  const mapped = gatewayErrorRevert(error.code);
+  const mapped = gatewayErrorRevert(error.code) ?? TTGatewayError.FAILED;
   return new FlutterError(
     `${mapped}`,
     'gatewayError',
@@ -111,7 +112,7 @@ export function makeGatewayApiError(operation: string, error: SNError, message?:
 
 export function makeRemoteAccessoryApiError(operation: string, error: SNError, message?: string): FlutterError {
   const fallback = `${operation} failed: ${error.code}`;
-  const mapped = remoteAccessoryErrorRevert(error.code);
+  const mapped = remoteAccessoryErrorRevert(error.code) ?? TTRemoteAccessoryError.FAILED;
   return new FlutterError(
     `${mapped}`,
     'remoteAccessoryError',
@@ -121,7 +122,7 @@ export function makeRemoteAccessoryApiError(operation: string, error: SNError, m
 
 export function makeKeypadAccessoryApiError(operation: string, error: SNError, message?: string): FlutterError {
   const fallback = `${operation} failed: ${error.code}`;
-  const mapped = keypadErrorRevert(error.code);
+  const mapped = keypadErrorRevert(error.code) ?? TTRemoteAccessoryError.FAILED;
   return new FlutterError(
     `${mapped}`,
     'keypadError',
@@ -131,7 +132,7 @@ export function makeKeypadAccessoryApiError(operation: string, error: SNError, m
 
 export function makeMultifunctionalKeypadApiError(operation: string, error: SNError, message?: string): FlutterError {
   const fallback = `${operation} failed: ${error.code}`;
-  const mapped = multifunctionalKeypadErrorRevert(error.code);
+  const mapped = multifunctionalKeypadErrorRevert(error.code) ?? TTMultifunctionalKeypadError.FAILED;
   return new FlutterError(
     `${mapped}`,
     'multifunctionalKeypadError',
@@ -141,7 +142,7 @@ export function makeMultifunctionalKeypadApiError(operation: string, error: SNEr
 
 export function makeDoorSensorApiError(operation: string, error: SNError, message?: string): FlutterError {
   const fallback = `${operation} failed: ${error.code}`;
-  const mapped = remoteAccessoryErrorRevert(error.code);
+  const mapped = remoteAccessoryErrorRevert(error.code) ?? TTRemoteAccessoryError.FAILED;
   return new FlutterError(
     `${mapped}`,
     'doorSensorError',
@@ -149,9 +150,19 @@ export function makeDoorSensorApiError(operation: string, error: SNError, messag
   );
 }
 
+export function makeStandaloneDoorSensorApiError(operation: string, error: SNError, message?: string): FlutterError {
+  const fallback = `${operation} failed: ${error.code}`;
+  const mapped = standaloneDoorSensorErrorRevert(error.code) ?? TTStandaloneDoorSensorError.FAILED;
+  return new FlutterError(
+    `${mapped}`,
+    'standaloneDoorSensorError',
+    message !== undefined ? message : pickErrorMessage(error, fallback),
+  );
+}
+
 export function makeWaterMeterApiError(operation: string, error: SNError, message?: string): FlutterError {
   const fallback = `${operation} failed: ${error.code}`;
-  const mapped = waterMeterErrorRevert(error.code);
+  const mapped = meterErrorRevert(error.code) ?? TTRemoteAccessoryError.FAILED;
   return new FlutterError(
     `${mapped}`,
     'waterMeterError',
@@ -161,12 +172,54 @@ export function makeWaterMeterApiError(operation: string, error: SNError, messag
 
 export function makeElectricMeterApiError(operation: string, error: SNError, message?: string): FlutterError {
   const fallback = `${operation} failed: ${error.code}`;
-  const mapped = electricMeterErrorRevert(error.code);
+  const mapped = electricMeterErrorRevert(error.code) ?? TTRemoteAccessoryError.FAILED;
   return new FlutterError(
     `${mapped}`,
     'electricMeterError',
     message !== undefined ? message : pickErrorMessage(error, fallback),
   );
+}
+
+interface LockVersionLike {
+  protocolType?: number;
+  protocolVersion?: number;
+  scene?: number;
+  groupId?: number;
+  orgId?: number;
+}
+
+/** lockVersion JSON 字符串 → Pigeon `TTLockVersion`（扫描回调用）。 */
+export function lockVersionFromJsonString(value: string | null | undefined): TTLockVersion {
+  if (value === null || value === undefined || value.length === 0) {
+    return new TTLockVersion(0, 0, 0, 0, 0);
+  }
+  try {
+    const obj = JSON.parse(value) as LockVersionLike;
+    return new TTLockVersion(
+      obj.protocolType ?? 0,
+      obj.protocolVersion ?? 0,
+      obj.scene ?? 0,
+      obj.groupId ?? 0,
+      obj.orgId ?? 0,
+    );
+  } catch (_e) {
+    return new TTLockVersion(0, 0, 0, 0, 0);
+  }
+}
+
+export function emitLockSinkError(sink: PigeonEventSink<Object>, op: string, err: SNError): void {
+  sink.error(`${lockErrorRevert(err.code) ?? TTLockError.FAIL}`, pickErrorMessage(err, `${op} failed`), null);
+}
+
+export function emitGatewaySinkError(sink: PigeonEventSink<Object>, op: string, err: SNError): void {
+  sink.error(`${gatewayErrorRevert(err.code) ?? TTGatewayError.FAILED}`, pickErrorMessage(err, `${op} failed`), null);
+}
+
+export function emitKeypadSinkError(sink: PigeonEventSink<Object>, status: number, isMulti: boolean): void {
+  const code = isMulti
+    ? multifunctionalKeypadErrorRevert(status) ?? TTMultifunctionalKeypadError.FAILED
+    : keypadErrorRevert(status) ?? TTRemoteAccessoryError.FAILED;
+  sink.error(`${code}`, isMulti ? 'multifunctional keypad failure' : 'keypad failure', null);
 }
 
 /**
@@ -186,7 +239,7 @@ export class LockCredentialSlot {
     this.lockData = param.getLockData();
     this.startDateMs = param.getStartDate();
     this.endDateMs = param.getEndDate();
-    this.cycleList = param.getCycleList();
+    this.cycleList = param.getCycleList() ?? null;
   }
 
   toValidityRange(): ValidityRange {
@@ -212,7 +265,7 @@ export class KeypadCredentialSlot {
     this.isMultifunctionalKeypad = param.getIsMultifunctional();
     this.startDateMs = param.getStartDate();
     this.endDateMs = param.getEndDate();
-    this.cycleList = param.getCycleList();
+    this.cycleList = param.getCycleList() ?? null;
   }
 
   toValidityRange(): ValidityRange {
@@ -388,21 +441,10 @@ export function mapNumberValue(data: Map<string, Object>, key: string): number {
   throw makeInvalidValueError(`Missing number value for key: ${key}`);
 }
 
-export function mapOptionalString(data: Map<string, Object>, key: string): string | undefined {
+export function mapOptionalNumberValue(data: Map<string, Object>, key: string): number | null {
   const v = data.get(key);
   if (v === undefined || v === null) {
-    return undefined;
-  }
-  if (typeof v === 'string') {
-    return v;
-  }
-  return `${v}`;
-}
-
-export function mapOptionalNumber(data: Map<string, Object>, key: string): number | undefined {
-  const v = data.get(key);
-  if (v === undefined || v === null) {
-    return undefined;
+    return null;
   }
   if (typeof v === 'number') {
     return v;
@@ -413,7 +455,7 @@ export function mapOptionalNumber(data: Map<string, Object>, key: string): numbe
       return parsed;
     }
   }
-  return undefined;
+  return null;
 }
 
 /**

@@ -6,7 +6,7 @@ part of 'lock_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$lockNotifierHash() => r'68d91d0c4fe9b392f9e8edd59c43c3ccae408ad6';
+String _$lockNotifierHash() => r'babb9aa9ab331f712cce2cfdd12afb7f7b690fed';
 
 /// See also [LockNotifier].
 @ProviderFor(LockNotifier)

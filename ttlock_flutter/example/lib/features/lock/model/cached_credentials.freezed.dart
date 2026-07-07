@@ -20,7 +20,7 @@ mixin _$CachedPasscode {
   int get startDate;
   int get endDate;
   int get keyboardPwdType;
-  int get cycleType;
+  int? get cycleType;
 
   /// Create a copy of CachedPasscode
   /// with the given fields replaced by the non-null parameter values.
@@ -74,7 +74,7 @@ abstract mixin class $CachedPasscodeCopyWith<$Res> {
       int startDate,
       int endDate,
       int keyboardPwdType,
-      int cycleType});
+      int? cycleType});
 }
 
 /// @nodoc
@@ -95,7 +95,7 @@ class _$CachedPasscodeCopyWithImpl<$Res>
     Object? startDate = null,
     Object? endDate = null,
     Object? keyboardPwdType = null,
-    Object? cycleType = null,
+    Object? cycleType = freezed,
   }) {
     return _then(_self.copyWith(
       keyboardPwd: null == keyboardPwd
@@ -118,10 +118,10 @@ class _$CachedPasscodeCopyWithImpl<$Res>
           ? _self.keyboardPwdType
           : keyboardPwdType // ignore: cast_nullable_to_non_nullable
               as int,
-      cycleType: null == cycleType
+      cycleType: freezed == cycleType
           ? _self.cycleType
           : cycleType // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
     ));
   }
 }
@@ -135,7 +135,7 @@ class _CachedPasscode extends CachedPasscode {
       required this.startDate,
       required this.endDate,
       this.keyboardPwdType = 0,
-      this.cycleType = 0})
+      this.cycleType})
       : super._();
   factory _CachedPasscode.fromJson(Map<String, dynamic> json) =>
       _$CachedPasscodeFromJson(json);
@@ -153,8 +153,7 @@ class _CachedPasscode extends CachedPasscode {
   @JsonKey()
   final int keyboardPwdType;
   @override
-  @JsonKey()
-  final int cycleType;
+  final int? cycleType;
 
   /// Create a copy of CachedPasscode
   /// with the given fields replaced by the non-null parameter values.
@@ -214,7 +213,7 @@ abstract mixin class _$CachedPasscodeCopyWith<$Res>
       int startDate,
       int endDate,
       int keyboardPwdType,
-      int cycleType});
+      int? cycleType});
 }
 
 /// @nodoc
@@ -235,7 +234,7 @@ class __$CachedPasscodeCopyWithImpl<$Res>
     Object? startDate = null,
     Object? endDate = null,
     Object? keyboardPwdType = null,
-    Object? cycleType = null,
+    Object? cycleType = freezed,
   }) {
     return _then(_CachedPasscode(
       keyboardPwd: null == keyboardPwd
@@ -258,10 +257,10 @@ class __$CachedPasscodeCopyWithImpl<$Res>
           ? _self.keyboardPwdType
           : keyboardPwdType // ignore: cast_nullable_to_non_nullable
               as int,
-      cycleType: null == cycleType
+      cycleType: freezed == cycleType
           ? _self.cycleType
           : cycleType // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
     ));
   }
 }

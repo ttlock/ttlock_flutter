@@ -6,7 +6,7 @@ part of 'face_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$faceListHash() => r'8d8e27f205813a6dfee7a6d0329bb420008ab0fe';
+String _$faceListHash() => r'5f03f4d9c4ba182a9c2bbf96f1198c57df8c777b';
 
 /// Copied from Dart SDK
 class _SystemHash {

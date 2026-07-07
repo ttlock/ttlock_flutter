@@ -3,7 +3,6 @@ import 'package:ttlock_flutter/ttlock.dart';
 
 import '../../../core/storage/lock_list_provider.dart';
 import '../../../core/storage/lock_local_storage_provider.dart';
-import '../../../providers/ttlock_providers.dart';
 import '../model/cached_credentials.dart';
 import '../model/credential_params.dart';
 import '../model/credential_validity.dart';
@@ -67,7 +66,7 @@ class FaceList extends _$FaceList {
   Future<void> clearOnLock(String lockMac) async {
     final lock = await ref.read(lockByMacProvider(lockMac).future);
     if (lock == null) return;
-    await ref.read(lockApiProvider).clearFace(lock.lockData);
+    await TTLock.lock.clearFace(lock.lockData);
     await ref.read(lockLocalCacheNotifierProvider(lockMac).notifier).patch(
           (c) => c.copyWith(faces: [], credentialsFetchedAt: DateTime.now()),
         );
@@ -77,7 +76,7 @@ class FaceList extends _$FaceList {
   Future<void> deleteOnLock(String lockMac, String faceNumber) async {
     final lock = await ref.read(lockByMacProvider(lockMac).future);
     if (lock == null) return;
-    await ref.read(lockApiProvider).deleteFace(faceNumber, lock.lockData);
+    await TTLock.lock.deleteFace(faceNumber, lock.lockData);
     await ref.read(lockLocalCacheNotifierProvider(lockMac).notifier).patch((c) {
       final list = c.faces ?? [];
       return c.copyWith(
@@ -94,7 +93,7 @@ class FaceList extends _$FaceList {
     final lock = await ref.read(lockByMacProvider(lockMac).future);
     if (lock == null) return;
     final range = validityToDateRange(validity);
-    yield* ref.read(lockApiProvider).lockAddFace(
+    yield* TTLock.lock.lockAddFace(
           lock.lockData,
           cycleList: range.cycleList,
           startDate: range.startDate,

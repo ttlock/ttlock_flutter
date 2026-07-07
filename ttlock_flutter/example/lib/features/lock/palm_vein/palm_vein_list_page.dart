@@ -1,15 +1,82 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:toastification/toastification.dart';
 
 import '../../../core/storage/lock_list_provider.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/widgets/async_value_view.dart';
 import '../model/credential_params.dart';
 import 'palm_vein_provider.dart';
 import 'palm_vein_add_page.dart';
 
-class PalmVeinListPage extends ConsumerWidget {
+Future<void> clearAllPalmVeins(
+  BuildContext context,
+  WidgetRef ref,
+  String lockMac,
+) async {
+  final ok = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: const Text('Clear all palm veins on lock?'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, false),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(ctx, true),
+          child: const Text('Clear'),
+        ),
+      ],
+    ),
+  );
+  if (ok != true || !context.mounted) return;
+  try {
+    context.loaderOverlay.show();
+    await ref.read(palmVeinListProvider(lockMac).notifier).clearOnLock(lockMac);
+    if (context.mounted) {
+      context.loaderOverlay.hide();
+      toastification.show(title: const Text('Palm veins cleared'));
+    }
+  } catch (e) {
+    if (context.mounted) {
+      context.loaderOverlay.hide();
+      toastification.show(
+        title: Text('$e'),
+        type: ToastificationType.error,
+      );
+    }
+  }
+}
+
+Future<void> deletePalmVein(
+  BuildContext context,
+  WidgetRef ref,
+  String lockMac,
+  String palmVeinNumber,
+) async {
+  try {
+    context.loaderOverlay.show();
+    await ref.read(palmVeinListProvider(lockMac).notifier).deleteOnLock(lockMac, palmVeinNumber);
+    if (context.mounted) {
+      context.loaderOverlay.hide();
+      toastification.show(
+        title: const Text('Palm vein deleted'),
+      );
+    }
+  } catch (e) {
+    if (context.mounted) {
+      context.loaderOverlay.hide();
+      toastification.show(
+        title: Text('$e'),
+        type: ToastificationType.error,
+      );
+    }
+  }
+}
+
+class PalmVeinListPage extends HookConsumerWidget {
   const PalmVeinListPage({super.key, required this.lockMac});
 
   final String lockMac;
@@ -28,43 +95,7 @@ class PalmVeinListPage extends ConsumerWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () async {
-              final ok = await showDialog<bool>(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                  title: const Text('Clear all palm veins on lock?'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(ctx, false),
-                      child: const Text('Cancel'),
-                    ),
-                    FilledButton(
-                      onPressed: () => Navigator.pop(ctx, true),
-                      child: const Text('Clear'),
-                    ),
-                  ],
-                ),
-              );
-              if (ok != true || !context.mounted) return;
-              try {
-                context.loaderOverlay.show();
-                await ref
-                    .read(palmVeinListProvider(lockMac).notifier)
-                    .clearOnLock(lockMac);
-                if (context.mounted) {
-                  context.loaderOverlay.hide();
-                  toastification.show(title: const Text('Palm veins cleared'));
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  context.loaderOverlay.hide();
-                  toastification.show(
-                    title: Text('$e'),
-                    type: ToastificationType.error,
-                  );
-                }
-              }
-            },
+            onPressed: () => clearAllPalmVeins(context, ref, lockMac),
             child: const Text('Clear All'),
           ),
           IconButton(
@@ -73,9 +104,9 @@ class PalmVeinListPage extends ConsumerWidget {
           ),
         ],
       ),
-      body: listAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('$e')),
+      body: AsyncValueView.when(
+        value: listAsync,
+        onRetry: (_, __) => ref.invalidate(palmVeinListProvider(lockMac)),
         data: (list) {
           if (list.isEmpty) {
             return Center(
@@ -106,28 +137,7 @@ class PalmVeinListPage extends ConsumerWidget {
                   ),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete_outline),
-                    onPressed: () async {
-                      try {
-                        context.loaderOverlay.show();
-                        await ref
-                            .read(palmVeinListProvider(lockMac).notifier)
-                            .deleteOnLock(lockMac, pv.palmVeinNumber);
-                        if (context.mounted) {
-                          context.loaderOverlay.hide();
-                          toastification.show(
-                            title: const Text('Palm vein deleted'),
-                          );
-                        }
-                      } catch (e) {
-                        if (context.mounted) {
-                          context.loaderOverlay.hide();
-                          toastification.show(
-                            title: Text('$e'),
-                            type: ToastificationType.error,
-                          );
-                        }
-                      }
-                    },
+                    onPressed: () => deletePalmVein(context, ref, lockMac, pv.palmVeinNumber),
                   ),
                 ),
               );

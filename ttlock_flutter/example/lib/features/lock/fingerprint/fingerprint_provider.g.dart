@@ -6,7 +6,7 @@ part of 'fingerprint_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$fingerprintListHash() => r'09cc0c88ccc3ac54bd4b4f90131043a36a1b9670';
+String _$fingerprintListHash() => r'8f0b15b79c9c7fce9071343174e08afa9f17fb7a';
 
 /// Copied from Dart SDK
 class _SystemHash {

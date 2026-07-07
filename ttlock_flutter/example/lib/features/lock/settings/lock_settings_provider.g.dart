@@ -6,7 +6,7 @@ part of 'lock_settings_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$lockSettingsHash() => r'3b68a9cc65a342ed3d970d5cd0cd9d6b3f8f680b';
+String _$lockSettingsHash() => r'0fe33e1586864d052ba4fe33ff56c28eab4685d2';
 
 /// Copied from Dart SDK
 class _SystemHash {

@@ -1,7 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:ttlock_flutter/ttlock.dart';
 
-import '../../providers/ttlock_providers.dart';
 import 'model/lock_state.dart';
 
 part 'lock_provider.g.dart';
@@ -21,10 +20,10 @@ class LockNotifier extends _$LockNotifier {
   }
 
   Future<void> initLock(TTLockInitParams params) async {
-    final api = ref.read(lockApiProvider);
+    final api = TTLock.lock;
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      final lockData = await runLockApi(() => api.initLock(params));
+      final lockData = await api.initLock(params);
       state = state.copyWith(
         lockData: lockData,
         isConnected: true,
@@ -36,10 +35,10 @@ class LockNotifier extends _$LockNotifier {
   }
 
   Future<String?> controlLock(String lockData, TTControlAction action) async {
-    final api = ref.read(lockApiProvider);
+    final api = TTLock.lock;
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      final result = await runLockApi(() => api.controlLock(lockData, action));
+      final result = await api.controlLock(lockData, action);
       state = state.copyWith(
         isLoading: false,
         lastResult:
@@ -55,7 +54,7 @@ class LockNotifier extends _$LockNotifier {
   Future<T?> callApi<T>(Future<T> Function() fn, {String? operation}) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      final result = await runLockApi(fn);
+      final result = await fn();
       state = state.copyWith(
         isLoading: false,
         lastResult: result?.toString() ?? 'success',

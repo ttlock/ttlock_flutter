@@ -9,6 +9,15 @@ abstract class SavedGatewayDevice with _$SavedGatewayDevice {
     required String name,
     required String mac,
     @Default('') String gatewayModel,
+    @Default(0) int gatewayType,
+    String? wifiSsid,
+    @Default(false) bool useStaticIp,
+    String? ipAddress,
+    String? subnetMask,
+    String? router,
+    String? preferredDns,
+    @Default(false) bool apnEnabled,
+    String? apn,
     required DateTime initializedAt,
   }) = _SavedGatewayDevice;
 

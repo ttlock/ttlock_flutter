@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:ttlock_flutter/ttlock.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
@@ -8,21 +8,15 @@ import '../../core/widgets/error_display.dart';
 import '../../core/widgets/loading_overlay.dart';
 import 'water_meter_provider.dart';
 
-class WaterMeterPage extends ConsumerStatefulWidget {
+class WaterMeterPage extends HookConsumerWidget {
   final String mac;
   final String? meterId;
 
   const WaterMeterPage({super.key, required this.mac, this.meterId});
 
   @override
-  ConsumerState<WaterMeterPage> createState() => _WaterMeterPageState();
-}
-
-class _WaterMeterPageState extends ConsumerState<WaterMeterPage> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(waterMeterNotifierProvider);
-    final mac = widget.mac;
     return Scaffold(
       appBar: AppBar(title: Text('Water Meter')),
       body: state.isLoading
@@ -35,7 +29,7 @@ class _WaterMeterPageState extends ConsumerState<WaterMeterPage> {
                     leading: const Icon(Icons.water_drop, color: AppColors.primary),
                     title: Text('Water Meter', style: AppTextStyles.titleMedium),
                     subtitle: Text(
-                      widget.meterId != null ? 'MAC: $mac\nID: ${widget.meterId}' : 'MAC: $mac',
+                      meterId != null ? 'MAC: $mac\nID: $meterId' : 'MAC: $mac',
                       style: AppTextStyles.bodySmall,
                     ),
                   ),

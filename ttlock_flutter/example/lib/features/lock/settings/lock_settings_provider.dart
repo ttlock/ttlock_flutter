@@ -3,7 +3,6 @@ import 'package:ttlock_flutter/ttlock.dart';
 
 import '../../../core/storage/lock_list_provider.dart';
 import '../../../core/storage/lock_local_storage_provider.dart';
-import '../../../providers/ttlock_providers.dart';
 import 'lock_settings_fetch.dart';
 import 'lock_settings_snapshot.dart';
 import 'lock_settings_state.dart';
@@ -28,7 +27,7 @@ class LockSettings extends _$LockSettings {
     final lock = await ref.read(lockByMacProvider(lockMac).future);
     if (lock == null) return const LockSettingsState();
 
-    final api = ref.read(lockApiProvider);
+    final api = TTLock.lock;
     final snapshot = await fetchLockSettingsSnapshot(api, lock.lockData);
     final now = DateTime.now();
 
@@ -58,7 +57,7 @@ class LockSettings extends _$LockSettings {
 
   Future<void> setConfig(TTLockConfig config, bool value) async {
     final data = await _lockData();
-    await ref.read(lockApiProvider).setLockConfig(config, value, data);
+    await TTLock.lock.setLockConfig(config, value, data);
     await _patchSnapshot((s) {
       switch (config) {
         case TTLockConfig.audio:
@@ -83,31 +82,37 @@ class LockSettings extends _$LockSettings {
           return s.copyWith(privacyLock: value);
         case TTLockConfig.resetButton:
           return s.copyWith(resetButton: value);
+        case TTLockConfig.securityM1Card:
+          return s.copyWith(securityM1Card: value);
+        case TTLockConfig.semiAutomaticModeControl:
+          return s.copyWith(semiAutomaticModeControl: value);
+        case TTLockConfig.lockSupervision:
+          return s.copyWith(lockSupervision: value);
       }
     });
   }
 
   Future<void> setRemoteUnlock(bool value) async {
     final data = await _lockData();
-    await ref.read(lockApiProvider).setRemoteUnlockSwitchState(value, data);
+    await TTLock.lock.setRemoteUnlockSwitchState(value, data);
     await _patchSnapshot((s) => s.copyWith(remoteUnlock: value));
   }
 
   Future<void> setAutoLock(int seconds) async {
     final data = await _lockData();
-    await ref.read(lockApiProvider).setAutoLockingPeriodicTime(seconds, data);
+    await TTLock.lock.setAutoLockingPeriodicTime(seconds, data);
     await _patchSnapshot((s) => s.copyWith(autoLockSeconds: seconds));
   }
 
   Future<void> setDirection(TTLockDirection direction) async {
     final data = await _lockData();
-    await ref.read(lockApiProvider).setLockDirection(direction, data);
+    await TTLock.lock.setLockDirection(direction, data);
     await _patchSnapshot((s) => s.copyWith(direction: direction.name));
   }
 
   Future<void> setSoundVolume(TTSoundVolumeType volume) async {
     final data = await _lockData();
-    await ref.read(lockApiProvider).setSoundVolume(volume, data);
+    await TTLock.lock.setSoundVolume(volume, data);
     await _patchSnapshot((s) => s.copyWith(soundVolume: volume.name));
   }
 }

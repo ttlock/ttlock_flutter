@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/widgets/section_header.dart';
@@ -7,7 +8,7 @@ import '../../core/widgets/error_display.dart';
 import '../../core/widgets/loading_overlay.dart';
 import 'keypad_provider.dart';
 
-class KeypadPage extends ConsumerStatefulWidget {
+class KeypadPage extends HookConsumerWidget {
   final String mac;
   final String lockData;
   final String lockMac;
@@ -22,29 +23,40 @@ class KeypadPage extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<KeypadPage> createState() => _KeypadPageState();
-}
-
-class _KeypadPageState extends ConsumerState<KeypadPage> {
-  final _slotCtrl = TextEditingController(text: '1');
-
-  @override
-  void dispose() {
-    _slotCtrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final slotCtrl = useTextEditingController(text: '1');
     final state = ref.watch(keypadNotifierProvider);
+
+    Future<void> deleteDevice() async {
+      final ok = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Remove keypad?'),
+          content: const Text('This cannot be undone.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Remove'),
+            ),
+          ],
+        ),
+      );
+      if (ok == true && context.mounted) {
+        Navigator.pop(context);
+      }
+    }
+
     return Scaffold(
-      appBar: AppBar(title: Text('Keypad ${widget.mac}')),
+      appBar: AppBar(title: Text('Keypad $mac')),
       body: state.isLoading
           ? const LoadingOverlay(message: 'Processing...')
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                // ── Device Info Card ──
                 Card(
                   child: ListTile(
                     leading: const Icon(Icons.keyboard,
@@ -53,7 +65,7 @@ class _KeypadPageState extends ConsumerState<KeypadPage> {
                       children: [
                         Text('Wireless Keypad',
                             style: AppTextStyles.titleMedium),
-                        if (widget.isMultifunctional == true) ...[
+                        if (isMultifunctional == true) ...[
                           const SizedBox(width: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -70,7 +82,7 @@ class _KeypadPageState extends ConsumerState<KeypadPage> {
                         ],
                       ],
                     ),
-                    subtitle: Text('MAC: ${widget.mac}',
+                    subtitle: Text('MAC: $mac',
                         style: AppTextStyles.bodySmall),
                   ),
                 ),
@@ -89,8 +101,6 @@ class _KeypadPageState extends ConsumerState<KeypadPage> {
                     ),
                   ),
                 ],
-
-                // ── Operation Area ──
                 const SizedBox(height: 24),
                 SectionHeader(title: 'Operations', icon: Icons.play_arrow),
                 const SizedBox(height: 8),
@@ -99,14 +109,14 @@ class _KeypadPageState extends ConsumerState<KeypadPage> {
                   label: 'Init Keypad',
                   onTap: () => ref
                       .read(keypadNotifierProvider.notifier)
-                      .initKeypad(widget.mac, widget.lockMac),
+                      .initKeypad(mac, lockMac),
                 ),
                 _ActionButton(
                   icon: Icons.settings,
                   label: 'Init Multifunctional Keypad',
                   onTap: () => ref
                       .read(keypadNotifierProvider.notifier)
-                      .initMultifunctional(widget.mac, widget.lockData),
+                      .initMultifunctional(mac, lockData),
                 ),
                 const SizedBox(height: 16),
                 Row(
@@ -114,7 +124,7 @@ class _KeypadPageState extends ConsumerState<KeypadPage> {
                     SizedBox(
                       width: 100,
                       child: TextField(
-                        controller: _slotCtrl,
+                        controller: slotCtrl,
                         decoration: const InputDecoration(
                             labelText: 'Slot #', isDense: true),
                         keyboardType: TextInputType.number,
@@ -126,17 +136,15 @@ class _KeypadPageState extends ConsumerState<KeypadPage> {
                         icon: Icons.delete,
                         label: 'Delete Stored Lock',
                         onTap: () {
-                          final slot = int.tryParse(_slotCtrl.text) ?? 1;
+                          final slot = int.tryParse(slotCtrl.text) ?? 1;
                           ref
                               .read(keypadNotifierProvider.notifier)
-                              .deleteStoredLock(widget.mac, slot);
+                              .deleteStoredLock(mac, slot);
                         },
                       ),
                     ),
                   ],
                 ),
-
-                // ── Danger Zone ──
                 const SizedBox(height: 24),
                 const SectionHeader(
                   title: 'Danger Zone',
@@ -153,36 +161,13 @@ class _KeypadPageState extends ConsumerState<KeypadPage> {
                             .copyWith(color: AppColors.error)),
                     trailing: const Icon(Icons.chevron_right,
                         size: 18, color: AppColors.error),
-                    onTap: () => _deleteDevice(),
+                    onTap: deleteDevice,
                     dense: true,
                   ),
                 ),
               ],
             ),
     );
-  }
-
-  Future<void> _deleteDevice() async {
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Remove keypad?'),
-        content: const Text('This cannot be undone.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Remove'),
-          ),
-        ],
-      ),
-    );
-    if (ok == true && mounted) {
-      Navigator.pop(context);
-    }
   }
 }
 

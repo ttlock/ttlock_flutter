@@ -56,6 +56,19 @@ Never throwMultifunctionalKeypadError(PlatformException e) {
   throw TTPigeonException(code, msg);
 }
 
+Never throwStandaloneDoorSensorError(PlatformException e) {
+  final code = e.code;
+  final msg = e.message;
+  if (code == 'channel-error' || code == 'null-error') {
+    throw TTPigeonException(code, msg);
+  }
+  final i = int.tryParse(code);
+  if (i != null && i >= 0 && i < TTStandaloneDoorSensorError.values.length) {
+    throw TTStandaloneDoorSensorException(TTStandaloneDoorSensorError.values[i], msg);
+  }
+  throw TTPigeonException(code, msg);
+}
+
 /// [initMultifunctionalKeypad] 在原生侧可能回调锁错误或键盘错误；二者 `raw` 可能重叠，
 /// 约定：`raw >= [TTMultifunctionalKeypadError] 个数` 时按 [TTLockError] 解析，否则按键盘错误解析。
 Future<T> runMultifunctionalKeypadInit<T>(Future<T> Function() fn) async {
@@ -102,6 +115,14 @@ Future<T> runMultifunctionalKeypadApi<T>(Future<T> Function() fn) async {
   }
 }
 
+Future<T> runStandaloneDoorSensorApi<T>(Future<T> Function() fn) async {
+  try {
+    return await fn();
+  } on PlatformException catch (e) {
+    throwStandaloneDoorSensorError(e);
+  }
+}
+
 Object _mapPlatformException(PlatformException e, Never Function(PlatformException) convert) {
   try {
     convert(e);
@@ -144,6 +165,10 @@ Stream<T> mapRemoteAccessoryStreamErrors<T>(Stream<T> stream) =>
 /// EventChannel 流上的 [PlatformException] → [TTMultifunctionalKeypadException] / [TTPigeonException]。
 Stream<T> mapMultifunctionalKeypadStreamErrors<T>(Stream<T> stream) =>
     _mapStreamErrors(stream, throwMultifunctionalKeypadError);
+
+/// EventChannel 流上的 [PlatformException] → [TTStandaloneDoorSensorException] / [TTPigeonException]。
+Stream<T> mapStandaloneDoorSensorStreamErrors<T>(Stream<T> stream) =>
+    _mapStreamErrors(stream, throwStandaloneDoorSensorError);
 
 /// 键盘录入类 EventChannel：原生可能回调锁错误或键盘错误（见 [runMultifunctionalKeypadInit]）。
 Never throwKeypadCredentialStreamError(PlatformException e) {

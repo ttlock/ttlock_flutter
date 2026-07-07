@@ -1,52 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:ttlock_flutter/ttlock.dart';
 
 import '../../../core/storage/lock_list_provider.dart';
-import '../../../providers/ttlock_providers.dart';
 import 'settings_operation.dart';
 
-class LockNetworkSettingsPage extends ConsumerStatefulWidget {
+class LockNetworkSettingsPage extends HookConsumerWidget {
   const LockNetworkSettingsPage({super.key, required this.lockMac});
 
   final String lockMac;
 
   @override
-  ConsumerState<LockNetworkSettingsPage> createState() =>
-      _LockNetworkSettingsPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ssidController = useTextEditingController();
+    final wifiPasswordController = useTextEditingController();
+    final serverIpController = useTextEditingController();
+    final serverPortController = useTextEditingController();
+    final ipAddressController = useTextEditingController();
+    final subnetController = useTextEditingController();
+    final routerController = useTextEditingController();
+    final dnsController = useTextEditingController();
+    final ipType = useState(0);
 
-class _LockNetworkSettingsPageState extends ConsumerState<LockNetworkSettingsPage> {
-  final _ssidController = TextEditingController();
-  final _wifiPasswordController = TextEditingController();
-  final _serverIpController = TextEditingController();
-  final _serverPortController = TextEditingController();
-  final _ipAddressController = TextEditingController();
-  final _subnetController = TextEditingController();
-  final _routerController = TextEditingController();
-  final _dnsController = TextEditingController();
-  int _ipType = 0;
+    Future<String?> lockData() async {
+      final lock = await ref.read(lockByMacProvider(lockMac).future);
+      return lock?.lockData;
+    }
 
-  @override
-  void dispose() {
-    _ssidController.dispose();
-    _wifiPasswordController.dispose();
-    _serverIpController.dispose();
-    _serverPortController.dispose();
-    _ipAddressController.dispose();
-    _subnetController.dispose();
-    _routerController.dispose();
-    _dnsController.dispose();
-    super.dispose();
-  }
-
-  Future<String?> _lockData() async {
-    final lock = await ref.read(lockByMacProvider(widget.lockMac).future);
-    return lock?.lockData;
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Network')),
       body: ListView(
@@ -54,23 +35,23 @@ class _LockNetworkSettingsPageState extends ConsumerState<LockNetworkSettingsPag
         children: [
           const Text('WiFi', style: TextStyle(fontWeight: FontWeight.bold)),
           TextField(
-            controller: _ssidController,
+            controller: ssidController,
             decoration: const InputDecoration(labelText: 'SSID'),
           ),
           TextField(
-            controller: _wifiPasswordController,
+            controller: wifiPasswordController,
             decoration: const InputDecoration(labelText: 'Password'),
             obscureText: true,
           ),
           FilledButton(
             onPressed: () async {
-              final data = await _lockData();
+              final data = await lockData();
               if (data == null) return;
               await runSettingsOperation(
                 context,
-                action: () => ref.read(lockApiProvider).configWifi(
-                      _ssidController.text.trim(),
-                      _wifiPasswordController.text,
+                action: () => TTLock.lock.configWifi(
+                      ssidController.text.trim(),
+                      wifiPasswordController.text,
                       data,
                     ),
                 successMessage: 'WiFi configured',
@@ -80,11 +61,11 @@ class _LockNetworkSettingsPageState extends ConsumerState<LockNetworkSettingsPag
           ),
           FilledButton.tonal(
             onPressed: () async {
-              final data = await _lockData();
+              final data = await lockData();
               if (data == null) return;
               final info = await runSettingsOperation(
                 context,
-                action: () => ref.read(lockApiProvider).getWifiInfo(data),
+                action: () => TTLock.lock.getWifiInfo(data),
               );
               if (info != null && context.mounted) {
                 showDialog(
@@ -106,23 +87,23 @@ class _LockNetworkSettingsPageState extends ConsumerState<LockNetworkSettingsPag
           const Divider(height: 32),
           const Text('Server', style: TextStyle(fontWeight: FontWeight.bold)),
           TextField(
-            controller: _serverIpController,
+            controller: serverIpController,
             decoration: const InputDecoration(labelText: 'IP'),
           ),
           TextField(
-            controller: _serverPortController,
+            controller: serverPortController,
             decoration: const InputDecoration(labelText: 'Port'),
             keyboardType: TextInputType.number,
           ),
           FilledButton(
             onPressed: () async {
-              final data = await _lockData();
+              final data = await lockData();
               if (data == null) return;
               await runSettingsOperation(
                 context,
-                action: () => ref.read(lockApiProvider).configServer(
-                      _serverIpController.text.trim(),
-                      _serverPortController.text.trim(),
+                action: () => TTLock.lock.configServer(
+                      serverIpController.text.trim(),
+                      serverPortController.text.trim(),
                       data,
                     ),
                 successMessage: 'Server configured',
@@ -137,36 +118,36 @@ class _LockNetworkSettingsPageState extends ConsumerState<LockNetworkSettingsPag
               ButtonSegment(value: 0, label: Text('DHCP')),
               ButtonSegment(value: 1, label: Text('Static')),
             ],
-            selected: {_ipType},
-            onSelectionChanged: (s) => setState(() => _ipType = s.first),
+            selected: {ipType.value},
+            onSelectionChanged: (s) => ipType.value = s.first,
           ),
-          if (_ipType == 1) ...[
-            TextField(controller: _ipAddressController, decoration: const InputDecoration(labelText: 'IP')),
-            TextField(controller: _subnetController, decoration: const InputDecoration(labelText: 'Subnet')),
-            TextField(controller: _routerController, decoration: const InputDecoration(labelText: 'Router')),
-            TextField(controller: _dnsController, decoration: const InputDecoration(labelText: 'DNS')),
+          if (ipType.value == 1) ...[
+            TextField(controller: ipAddressController, decoration: const InputDecoration(labelText: 'IP')),
+            TextField(controller: subnetController, decoration: const InputDecoration(labelText: 'Subnet')),
+            TextField(controller: routerController, decoration: const InputDecoration(labelText: 'Router')),
+            TextField(controller: dnsController, decoration: const InputDecoration(labelText: 'DNS')),
           ],
           FilledButton(
             onPressed: () async {
-              final data = await _lockData();
+              final data = await lockData();
               if (data == null) return;
               await runSettingsOperation(
                 context,
-                action: () => ref.read(lockApiProvider).configIp(
+                action: () => TTLock.lock.configIp(
                       TTIpSetting(
-                        type: _ipType,
-                        ipAddress: _ipAddressController.text.trim().isEmpty
+                        type: ipType.value,
+                        ipAddress: ipAddressController.text.trim().isEmpty
                             ? null
-                            : _ipAddressController.text.trim(),
-                        subnetMask: _subnetController.text.trim().isEmpty
+                            : ipAddressController.text.trim(),
+                        subnetMask: subnetController.text.trim().isEmpty
                             ? null
-                            : _subnetController.text.trim(),
-                        router: _routerController.text.trim().isEmpty
+                            : subnetController.text.trim(),
+                        router: routerController.text.trim().isEmpty
                             ? null
-                            : _routerController.text.trim(),
-                        preferredDns: _dnsController.text.trim().isEmpty
+                            : routerController.text.trim(),
+                        preferredDns: dnsController.text.trim().isEmpty
                             ? null
-                            : _dnsController.text.trim(),
+                            : dnsController.text.trim(),
                       ),
                       data,
                     ),

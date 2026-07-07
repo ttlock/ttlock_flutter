@@ -8,9 +8,11 @@ part of 'routes.dart';
 
 List<RouteBase> get $appRoutes => [
       $mainShellRoute,
+      $scanRoute,
       $lockRoute,
       $gatewayRoute,
       $doorSensorInfoRoute,
+      $standaloneDoorSensorRoute,
       $remoteKeyInfoRoute,
       $keypadInfoRoute,
       $waterMeterRoute,
@@ -25,14 +27,6 @@ RouteBase get $mainShellRoute => StatefulShellRouteData.$route(
             GoRouteData.$route(
               path: '/',
               factory: _$DashboardRoute._fromState,
-            ),
-          ],
-        ),
-        StatefulShellBranchData.$branch(
-          routes: [
-            GoRouteData.$route(
-              path: '/scan',
-              factory: _$ScanRoute._fromState,
             ),
           ],
         ),
@@ -75,6 +69,33 @@ mixin _$DashboardRoute on GoRouteData {
   void replace(BuildContext context) => context.replace(location);
 }
 
+mixin _$SettingsRoute on GoRouteData {
+  static SettingsRoute _fromState(GoRouterState state) => const SettingsRoute();
+
+  @override
+  String get location => GoRouteData.$location(
+        '/settings',
+      );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $scanRoute => GoRouteData.$route(
+      path: '/scan',
+      factory: _$ScanRoute._fromState,
+    );
+
 mixin _$ScanRoute on GoRouteData {
   static ScanRoute _fromState(GoRouterState state) => ScanRoute(
         type: state.uri.queryParameters['type'],
@@ -92,28 +113,6 @@ mixin _$ScanRoute on GoRouteData {
           if (_self.lockData != null) 'lock-data': _self.lockData,
           if (_self.lockMac != null) 'lock-mac': _self.lockMac,
         },
-      );
-
-  @override
-  void go(BuildContext context) => context.go(location);
-
-  @override
-  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
-
-  @override
-  void pushReplacement(BuildContext context) =>
-      context.pushReplacement(location);
-
-  @override
-  void replace(BuildContext context) => context.replace(location);
-}
-
-mixin _$SettingsRoute on GoRouteData {
-  static SettingsRoute _fromState(GoRouterState state) => const SettingsRoute();
-
-  @override
-  String get location => GoRouteData.$location(
-        '/settings',
       );
 
   @override
@@ -686,11 +685,44 @@ mixin _$PalmVeinListRoute on GoRouteData {
 RouteBase get $gatewayRoute => GoRouteData.$route(
       path: '/gateway/:mac',
       factory: _$GatewayRoute._fromState,
+      routes: [
+        GoRouteData.$route(
+          path: 'init',
+          factory: _$GatewayInitRoute._fromState,
+        ),
+      ],
     );
 
 mixin _$GatewayRoute on GoRouteData {
   static GatewayRoute _fromState(GoRouterState state) => GatewayRoute(
         state.pathParameters['mac']!,
+      );
+
+  GatewayRoute get _self => this as GatewayRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+        '/gateway/${Uri.encodeComponent(_self.mac)}',
+      );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin _$GatewayInitRoute on GoRouteData {
+  static GatewayInitRoute _fromState(GoRouterState state) => GatewayInitRoute(
+        state.pathParameters['mac']!,
+        name: state.uri.queryParameters['name'] ?? 'Gateway',
         gatewayType: _$convertMapValue('gateway-type',
                 state.uri.queryParameters, _$TTGatewayTypeEnumMap._$fromName) ??
             TTGatewayType.g2,
@@ -699,12 +731,13 @@ mixin _$GatewayRoute on GoRouteData {
             false,
       );
 
-  GatewayRoute get _self => this as GatewayRoute;
+  GatewayInitRoute get _self => this as GatewayInitRoute;
 
   @override
   String get location => GoRouteData.$location(
-        '/gateway/${Uri.encodeComponent(_self.mac)}',
+        '/gateway/${Uri.encodeComponent(_self.mac)}/init',
         queryParams: {
+          if (_self.name != 'Gateway') 'name': _self.name,
           if (_self.gatewayType != TTGatewayType.g2)
             'gateway-type': _$TTGatewayTypeEnumMap[_self.gatewayType],
           if (_self.needsWifiConfig != false)
@@ -775,6 +808,38 @@ mixin _$DoorSensorInfoRoute on GoRouteData {
   @override
   String get location => GoRouteData.$location(
         '/door-sensor/${Uri.encodeComponent(_self.mac)}',
+      );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $standaloneDoorSensorRoute => GoRouteData.$route(
+      path: '/standalone-door-sensor/:mac',
+      factory: _$StandaloneDoorSensorRoute._fromState,
+    );
+
+mixin _$StandaloneDoorSensorRoute on GoRouteData {
+  static StandaloneDoorSensorRoute _fromState(GoRouterState state) =>
+      StandaloneDoorSensorRoute(
+        state.pathParameters['mac']!,
+      );
+
+  StandaloneDoorSensorRoute get _self => this as StandaloneDoorSensorRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+        '/standalone-door-sensor/${Uri.encodeComponent(_self.mac)}',
       );
 
   @override

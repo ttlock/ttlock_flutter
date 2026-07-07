@@ -1,17 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+
 import '../../core/router/routes.dart';
 import '../../core/storage/accessory_list_provider.dart';
 import '../../core/storage/lock_list_provider.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../core/widgets/async_value_view.dart';
 import '../../core/widgets/device_card.dart';
-import '../../core/widgets/error_display.dart';
 import '../../features/scan/scan_config.dart';
 
-class KeypadListPage extends ConsumerWidget {
-  final String lockMac;
+Future<void> openAddKeypadScan(
+  BuildContext context,
+  WidgetRef ref,
+  String lockMac,
+) async {
+  final lock = await ref.read(lockByMacProvider(lockMac).future);
+  if (lock == null || !context.mounted) return;
+  ScanRoute(
+    type: DeviceType.keypad.name,
+    lockData: lock.lockData,
+    lockMac: lockMac,
+  ).push(context);
+}
 
+class KeypadListPage extends HookConsumerWidget {
   const KeypadListPage({super.key, required this.lockMac});
+
+  final String lockMac;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -28,21 +43,13 @@ class KeypadListPage extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () async {
-              final lock = await ref.read(lockByMacProvider(lockMac).future);
-              if (lock == null || !context.mounted) return;
-              ScanRoute(
-                type: DeviceType.keypad.name,
-                lockData: lock.lockData,
-                lockMac: lockMac,
-              ).push(context);
-            },
+            onPressed: () => openAddKeypadScan(context, ref, lockMac),
           ),
         ],
       ),
-      body: keypadsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => ErrorDisplay(message: e.toString()),
+      body: AsyncValueView.when(
+        value: keypadsAsync,
+        onRetry: (_, __) => ref.invalidate(keypadListNotifierProvider(lockMac)),
         data: (keypads) {
           if (keypads.isEmpty) {
             return Center(

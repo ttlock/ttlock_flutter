@@ -16,7 +16,13 @@ class LockListNotifier extends _$LockListNotifier {
   Future<List<SavedLockDevice>> build() async => _lockStorage.load();
 
   Future<void> addDevice(SavedLockDevice device) async {
-    final list = <SavedLockDevice>[...?state.valueOrNull, device];
+    final list = <SavedLockDevice>[...?state.valueOrNull];
+    final idx = list.indexWhere((d) => d.mac == device.mac);
+    if (idx >= 0) {
+      list[idx] = device;
+    } else {
+      list.add(device);
+    }
     await _lockStorage.save(list);
     ref.invalidateSelf();
   }

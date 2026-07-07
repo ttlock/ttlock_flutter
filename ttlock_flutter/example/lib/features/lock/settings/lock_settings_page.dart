@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:ttlock_flutter/ttlock.dart';
 
 import '../../../command/lock_commands.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/storage/lock_list_provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/async_value_view.dart';
 import '../../../core/widgets/section_header.dart';
-import '../../../providers/ttlock_providers.dart';
 import '../../lock/capabilities/lock_capabilities_provider.dart';
 import 'lock_settings_provider.dart';
 import 'widgets/preset_seconds_sheet.dart';
 import 'widgets/settings_switch_tile.dart';
 
-class LockSettingsPage extends ConsumerWidget {
+class LockSettingsPage extends HookConsumerWidget {
   const LockSettingsPage({super.key, required this.lockMac});
 
   final String lockMac;
@@ -82,7 +82,7 @@ class LockSettingsPage extends ConsumerWidget {
     if (ok != true || !context.mounted) return;
     final lock = await ref.read(lockByMacProvider(lockMac).future);
     if (lock == null) return;
-    await ref.read(lockApiProvider).resetLock(lock.lockData);
+    await TTLock.lock.resetLock(lock.lockData);
     await ref.read(lockListNotifierProvider.notifier).removeDevice(lockMac);
     if (context.mounted) context.go('/');
   }
@@ -108,7 +108,7 @@ class LockSettingsPage extends ConsumerWidget {
     if (ok != true || !context.mounted) return;
     final lock = await ref.read(lockByMacProvider(lockMac).future);
     if (lock == null) return;
-    final newData = await ref.read(lockApiProvider).resetEkey(lock.lockData);
+    final newData = await TTLock.lock.resetEkey(lock.lockData);
     await ref
         .read(lockListNotifierProvider.notifier)
         .updateDevice(lock.copyWith(lockData: newData));
@@ -156,12 +156,13 @@ class LockSettingsPage extends ConsumerWidget {
         ),
       ),
       body: settingsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
-        data: (s) {
-          final caps = capsAsync.valueOrNull ?? {};
-
-          return ListView(
+        loading: () => AsyncValueView.loading(),
+        error: (e, _) => AsyncValueView.error(message: '$e'),
+        data: (s) => capsAsync.when(
+          loading: () =>
+              AsyncValueView.loading(message: 'Loading capabilities…'),
+          error: (e, _) => AsyncValueView.error(message: '$e'),
+          data: (caps) => ListView(
             children: [
               // ── General ──
               const SectionHeader(title: 'General', icon: Icons.info_outline),
@@ -370,8 +371,8 @@ class LockSettingsPage extends ConsumerWidget {
                 onTap: () => _removeFromApp(context, ref),
               ),
             ],
-          );
-        },
+          ),
+        ),
       ),
     );
   }

@@ -22,10 +22,4 @@ class TTRemoteKeyApi {
 
   Future<pigeon.TTLockSystemModel> initRemoteKey(String mac, String lockData) =>
       runRemoteAccessoryApi(() => _host.initRemoteKey(mac, lockData));
-
-  Future<List<String>> getStoredLocks(String mac) =>
-      runRemoteAccessoryApi(() => _host.getStoredLocks(mac));
-
-  Future<void> deleteStoredLock(String mac, int slotNumber) =>
-      runRemoteAccessoryApi(() => _host.deleteStoredLock(mac, slotNumber));
 }

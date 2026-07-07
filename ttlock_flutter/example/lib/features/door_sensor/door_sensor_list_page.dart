@@ -1,17 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+
 import '../../core/router/routes.dart';
 import '../../core/storage/accessory_list_provider.dart';
 import '../../core/storage/lock_list_provider.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../core/widgets/async_value_view.dart';
 import '../../core/widgets/device_card.dart';
-import '../../core/widgets/error_display.dart';
 import '../../features/scan/scan_config.dart';
 
-class DoorSensorListPage extends ConsumerWidget {
-  final String lockMac;
+Future<void> openAddDoorSensorScan(
+  BuildContext context,
+  WidgetRef ref,
+  String lockMac,
+) async {
+  final lock = await ref.read(lockByMacProvider(lockMac).future);
+  if (lock == null || !context.mounted) return;
+  ScanRoute(
+    type: DeviceType.doorSensor.name,
+    lockData: lock.lockData,
+    lockMac: lockMac,
+  ).push(context);
+}
 
+class DoorSensorListPage extends HookConsumerWidget {
   const DoorSensorListPage({super.key, required this.lockMac});
+
+  final String lockMac;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -21,28 +36,20 @@ class DoorSensorListPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: lockAsync.when(
-          data: (lock) => Text(lock?.name ?? 'Door Sensors'),
+          data: (lock) => Text('${lock?.name ?? 'Lock'} · Door Sensors'),
           loading: () => const Text('Door Sensors'),
           error: (_, __) => const Text('Door Sensors'),
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () async {
-              final lock = await ref.read(lockByMacProvider(lockMac).future);
-              if (lock == null || !context.mounted) return;
-              ScanRoute(
-                type: DeviceType.doorSensor.name,
-                lockData: lock.lockData,
-                lockMac: lockMac,
-              ).push(context);
-            },
+            onPressed: () => openAddDoorSensorScan(context, ref, lockMac),
           ),
         ],
       ),
-      body: sensorsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => ErrorDisplay(message: e.toString()),
+      body: AsyncValueView.when(
+        value: sensorsAsync,
+        onRetry: (_, __) => ref.invalidate(doorSensorListNotifierProvider(lockMac)),
         data: (sensors) {
           if (sensors.isEmpty) {
             return Center(

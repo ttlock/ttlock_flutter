@@ -18,6 +18,15 @@ mixin _$SavedGatewayDevice {
   String get name;
   String get mac;
   String get gatewayModel;
+  int get gatewayType;
+  String? get wifiSsid;
+  bool get useStaticIp;
+  String? get ipAddress;
+  String? get subnetMask;
+  String? get router;
+  String? get preferredDns;
+  bool get apnEnabled;
+  String? get apn;
   DateTime get initializedAt;
 
   /// Create a copy of SavedGatewayDevice
@@ -40,18 +49,47 @@ mixin _$SavedGatewayDevice {
             (identical(other.mac, mac) || other.mac == mac) &&
             (identical(other.gatewayModel, gatewayModel) ||
                 other.gatewayModel == gatewayModel) &&
+            (identical(other.gatewayType, gatewayType) ||
+                other.gatewayType == gatewayType) &&
+            (identical(other.wifiSsid, wifiSsid) ||
+                other.wifiSsid == wifiSsid) &&
+            (identical(other.useStaticIp, useStaticIp) ||
+                other.useStaticIp == useStaticIp) &&
+            (identical(other.ipAddress, ipAddress) ||
+                other.ipAddress == ipAddress) &&
+            (identical(other.subnetMask, subnetMask) ||
+                other.subnetMask == subnetMask) &&
+            (identical(other.router, router) || other.router == router) &&
+            (identical(other.preferredDns, preferredDns) ||
+                other.preferredDns == preferredDns) &&
+            (identical(other.apnEnabled, apnEnabled) ||
+                other.apnEnabled == apnEnabled) &&
+            (identical(other.apn, apn) || other.apn == apn) &&
             (identical(other.initializedAt, initializedAt) ||
                 other.initializedAt == initializedAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, name, mac, gatewayModel, initializedAt);
+  int get hashCode => Object.hash(
+      runtimeType,
+      name,
+      mac,
+      gatewayModel,
+      gatewayType,
+      wifiSsid,
+      useStaticIp,
+      ipAddress,
+      subnetMask,
+      router,
+      preferredDns,
+      apnEnabled,
+      apn,
+      initializedAt);
 
   @override
   String toString() {
-    return 'SavedGatewayDevice(name: $name, mac: $mac, gatewayModel: $gatewayModel, initializedAt: $initializedAt)';
+    return 'SavedGatewayDevice(name: $name, mac: $mac, gatewayModel: $gatewayModel, gatewayType: $gatewayType, wifiSsid: $wifiSsid, useStaticIp: $useStaticIp, ipAddress: $ipAddress, subnetMask: $subnetMask, router: $router, preferredDns: $preferredDns, apnEnabled: $apnEnabled, apn: $apn, initializedAt: $initializedAt)';
   }
 }
 
@@ -62,7 +100,19 @@ abstract mixin class $SavedGatewayDeviceCopyWith<$Res> {
       _$SavedGatewayDeviceCopyWithImpl;
   @useResult
   $Res call(
-      {String name, String mac, String gatewayModel, DateTime initializedAt});
+      {String name,
+      String mac,
+      String gatewayModel,
+      int gatewayType,
+      String? wifiSsid,
+      bool useStaticIp,
+      String? ipAddress,
+      String? subnetMask,
+      String? router,
+      String? preferredDns,
+      bool apnEnabled,
+      String? apn,
+      DateTime initializedAt});
 }
 
 /// @nodoc
@@ -81,6 +131,15 @@ class _$SavedGatewayDeviceCopyWithImpl<$Res>
     Object? name = null,
     Object? mac = null,
     Object? gatewayModel = null,
+    Object? gatewayType = null,
+    Object? wifiSsid = freezed,
+    Object? useStaticIp = null,
+    Object? ipAddress = freezed,
+    Object? subnetMask = freezed,
+    Object? router = freezed,
+    Object? preferredDns = freezed,
+    Object? apnEnabled = null,
+    Object? apn = freezed,
     Object? initializedAt = null,
   }) {
     return _then(_self.copyWith(
@@ -96,6 +155,42 @@ class _$SavedGatewayDeviceCopyWithImpl<$Res>
           ? _self.gatewayModel
           : gatewayModel // ignore: cast_nullable_to_non_nullable
               as String,
+      gatewayType: null == gatewayType
+          ? _self.gatewayType
+          : gatewayType // ignore: cast_nullable_to_non_nullable
+              as int,
+      wifiSsid: freezed == wifiSsid
+          ? _self.wifiSsid
+          : wifiSsid // ignore: cast_nullable_to_non_nullable
+              as String?,
+      useStaticIp: null == useStaticIp
+          ? _self.useStaticIp
+          : useStaticIp // ignore: cast_nullable_to_non_nullable
+              as bool,
+      ipAddress: freezed == ipAddress
+          ? _self.ipAddress
+          : ipAddress // ignore: cast_nullable_to_non_nullable
+              as String?,
+      subnetMask: freezed == subnetMask
+          ? _self.subnetMask
+          : subnetMask // ignore: cast_nullable_to_non_nullable
+              as String?,
+      router: freezed == router
+          ? _self.router
+          : router // ignore: cast_nullable_to_non_nullable
+              as String?,
+      preferredDns: freezed == preferredDns
+          ? _self.preferredDns
+          : preferredDns // ignore: cast_nullable_to_non_nullable
+              as String?,
+      apnEnabled: null == apnEnabled
+          ? _self.apnEnabled
+          : apnEnabled // ignore: cast_nullable_to_non_nullable
+              as bool,
+      apn: freezed == apn
+          ? _self.apn
+          : apn // ignore: cast_nullable_to_non_nullable
+              as String?,
       initializedAt: null == initializedAt
           ? _self.initializedAt
           : initializedAt // ignore: cast_nullable_to_non_nullable
@@ -111,6 +206,15 @@ class _SavedGatewayDevice implements SavedGatewayDevice {
       {required this.name,
       required this.mac,
       this.gatewayModel = '',
+      this.gatewayType = 0,
+      this.wifiSsid,
+      this.useStaticIp = false,
+      this.ipAddress,
+      this.subnetMask,
+      this.router,
+      this.preferredDns,
+      this.apnEnabled = false,
+      this.apn,
       required this.initializedAt});
   factory _SavedGatewayDevice.fromJson(Map<String, dynamic> json) =>
       _$SavedGatewayDeviceFromJson(json);
@@ -122,6 +226,27 @@ class _SavedGatewayDevice implements SavedGatewayDevice {
   @override
   @JsonKey()
   final String gatewayModel;
+  @override
+  @JsonKey()
+  final int gatewayType;
+  @override
+  final String? wifiSsid;
+  @override
+  @JsonKey()
+  final bool useStaticIp;
+  @override
+  final String? ipAddress;
+  @override
+  final String? subnetMask;
+  @override
+  final String? router;
+  @override
+  final String? preferredDns;
+  @override
+  @JsonKey()
+  final bool apnEnabled;
+  @override
+  final String? apn;
   @override
   final DateTime initializedAt;
 
@@ -149,18 +274,47 @@ class _SavedGatewayDevice implements SavedGatewayDevice {
             (identical(other.mac, mac) || other.mac == mac) &&
             (identical(other.gatewayModel, gatewayModel) ||
                 other.gatewayModel == gatewayModel) &&
+            (identical(other.gatewayType, gatewayType) ||
+                other.gatewayType == gatewayType) &&
+            (identical(other.wifiSsid, wifiSsid) ||
+                other.wifiSsid == wifiSsid) &&
+            (identical(other.useStaticIp, useStaticIp) ||
+                other.useStaticIp == useStaticIp) &&
+            (identical(other.ipAddress, ipAddress) ||
+                other.ipAddress == ipAddress) &&
+            (identical(other.subnetMask, subnetMask) ||
+                other.subnetMask == subnetMask) &&
+            (identical(other.router, router) || other.router == router) &&
+            (identical(other.preferredDns, preferredDns) ||
+                other.preferredDns == preferredDns) &&
+            (identical(other.apnEnabled, apnEnabled) ||
+                other.apnEnabled == apnEnabled) &&
+            (identical(other.apn, apn) || other.apn == apn) &&
             (identical(other.initializedAt, initializedAt) ||
                 other.initializedAt == initializedAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, name, mac, gatewayModel, initializedAt);
+  int get hashCode => Object.hash(
+      runtimeType,
+      name,
+      mac,
+      gatewayModel,
+      gatewayType,
+      wifiSsid,
+      useStaticIp,
+      ipAddress,
+      subnetMask,
+      router,
+      preferredDns,
+      apnEnabled,
+      apn,
+      initializedAt);
 
   @override
   String toString() {
-    return 'SavedGatewayDevice(name: $name, mac: $mac, gatewayModel: $gatewayModel, initializedAt: $initializedAt)';
+    return 'SavedGatewayDevice(name: $name, mac: $mac, gatewayModel: $gatewayModel, gatewayType: $gatewayType, wifiSsid: $wifiSsid, useStaticIp: $useStaticIp, ipAddress: $ipAddress, subnetMask: $subnetMask, router: $router, preferredDns: $preferredDns, apnEnabled: $apnEnabled, apn: $apn, initializedAt: $initializedAt)';
   }
 }
 
@@ -173,7 +327,19 @@ abstract mixin class _$SavedGatewayDeviceCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String name, String mac, String gatewayModel, DateTime initializedAt});
+      {String name,
+      String mac,
+      String gatewayModel,
+      int gatewayType,
+      String? wifiSsid,
+      bool useStaticIp,
+      String? ipAddress,
+      String? subnetMask,
+      String? router,
+      String? preferredDns,
+      bool apnEnabled,
+      String? apn,
+      DateTime initializedAt});
 }
 
 /// @nodoc
@@ -192,6 +358,15 @@ class __$SavedGatewayDeviceCopyWithImpl<$Res>
     Object? name = null,
     Object? mac = null,
     Object? gatewayModel = null,
+    Object? gatewayType = null,
+    Object? wifiSsid = freezed,
+    Object? useStaticIp = null,
+    Object? ipAddress = freezed,
+    Object? subnetMask = freezed,
+    Object? router = freezed,
+    Object? preferredDns = freezed,
+    Object? apnEnabled = null,
+    Object? apn = freezed,
     Object? initializedAt = null,
   }) {
     return _then(_SavedGatewayDevice(
@@ -207,6 +382,42 @@ class __$SavedGatewayDeviceCopyWithImpl<$Res>
           ? _self.gatewayModel
           : gatewayModel // ignore: cast_nullable_to_non_nullable
               as String,
+      gatewayType: null == gatewayType
+          ? _self.gatewayType
+          : gatewayType // ignore: cast_nullable_to_non_nullable
+              as int,
+      wifiSsid: freezed == wifiSsid
+          ? _self.wifiSsid
+          : wifiSsid // ignore: cast_nullable_to_non_nullable
+              as String?,
+      useStaticIp: null == useStaticIp
+          ? _self.useStaticIp
+          : useStaticIp // ignore: cast_nullable_to_non_nullable
+              as bool,
+      ipAddress: freezed == ipAddress
+          ? _self.ipAddress
+          : ipAddress // ignore: cast_nullable_to_non_nullable
+              as String?,
+      subnetMask: freezed == subnetMask
+          ? _self.subnetMask
+          : subnetMask // ignore: cast_nullable_to_non_nullable
+              as String?,
+      router: freezed == router
+          ? _self.router
+          : router // ignore: cast_nullable_to_non_nullable
+              as String?,
+      preferredDns: freezed == preferredDns
+          ? _self.preferredDns
+          : preferredDns // ignore: cast_nullable_to_non_nullable
+              as String?,
+      apnEnabled: null == apnEnabled
+          ? _self.apnEnabled
+          : apnEnabled // ignore: cast_nullable_to_non_nullable
+              as bool,
+      apn: freezed == apn
+          ? _self.apn
+          : apn // ignore: cast_nullable_to_non_nullable
+              as String?,
       initializedAt: null == initializedAt
           ? _self.initializedAt
           : initializedAt // ignore: cast_nullable_to_non_nullable

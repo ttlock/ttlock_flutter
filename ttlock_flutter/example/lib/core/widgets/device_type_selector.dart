@@ -16,6 +16,7 @@ class DeviceTypeSelector extends StatelessWidget {
   static const _mainTypes = [
     DeviceType.lock,
     DeviceType.gateway,
+    DeviceType.standaloneDoorSensor,
     DeviceType.waterMeter,
     DeviceType.electricMeter,
   ];
@@ -78,6 +79,8 @@ class DeviceTypeSelector extends StatelessWidget {
         return (icon: Icons.lock, label: 'Lock');
       case DeviceType.gateway:
         return (icon: Icons.router, label: 'Gateway');
+      case DeviceType.standaloneDoorSensor:
+        return (icon: Icons.sensors, label: 'Door Sensor');
       case DeviceType.waterMeter:
         return (icon: Icons.water_drop, label: 'Water Meter');
       case DeviceType.electricMeter:

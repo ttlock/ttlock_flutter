@@ -7,7 +7,7 @@ part of 'door_sensor_provider.dart';
 // **************************************************************************
 
 String _$doorSensorNotifierHash() =>
-    r'4f640b0a00e4fdeeda331b966884c8f755056777';
+    r'02c0f8d698e3bce00bc3979fce04b8c37851b35a';
 
 /// See also [DoorSensorNotifier].
 @ProviderFor(DoorSensorNotifier)

@@ -6,7 +6,7 @@ part of 'passcode_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$passcodeListHash() => r'461b996f1c2f9398c91deaf3844e7651ceaec35a';
+String _$adminPasscodeHash() => r'3cf7a370d862d79ce1a3afce6a39cdaeb1603530';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -28,6 +28,136 @@ class _SystemHash {
     return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
   }
 }
+
+/// See also [adminPasscode].
+@ProviderFor(adminPasscode)
+const adminPasscodeProvider = AdminPasscodeFamily();
+
+/// See also [adminPasscode].
+class AdminPasscodeFamily extends Family<AsyncValue<String?>> {
+  /// See also [adminPasscode].
+  const AdminPasscodeFamily();
+
+  /// See also [adminPasscode].
+  AdminPasscodeProvider call(
+    String lockMac,
+  ) {
+    return AdminPasscodeProvider(
+      lockMac,
+    );
+  }
+
+  @override
+  AdminPasscodeProvider getProviderOverride(
+    covariant AdminPasscodeProvider provider,
+  ) {
+    return call(
+      provider.lockMac,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'adminPasscodeProvider';
+}
+
+/// See also [adminPasscode].
+class AdminPasscodeProvider extends AutoDisposeFutureProvider<String?> {
+  /// See also [adminPasscode].
+  AdminPasscodeProvider(
+    String lockMac,
+  ) : this._internal(
+          (ref) => adminPasscode(
+            ref as AdminPasscodeRef,
+            lockMac,
+          ),
+          from: adminPasscodeProvider,
+          name: r'adminPasscodeProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$adminPasscodeHash,
+          dependencies: AdminPasscodeFamily._dependencies,
+          allTransitiveDependencies:
+              AdminPasscodeFamily._allTransitiveDependencies,
+          lockMac: lockMac,
+        );
+
+  AdminPasscodeProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.lockMac,
+  }) : super.internal();
+
+  final String lockMac;
+
+  @override
+  Override overrideWith(
+    FutureOr<String?> Function(AdminPasscodeRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: AdminPasscodeProvider._internal(
+        (ref) => create(ref as AdminPasscodeRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        lockMac: lockMac,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<String?> createElement() {
+    return _AdminPasscodeProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is AdminPasscodeProvider && other.lockMac == lockMac;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, lockMac.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin AdminPasscodeRef on AutoDisposeFutureProviderRef<String?> {
+  /// The parameter `lockMac` of this provider.
+  String get lockMac;
+}
+
+class _AdminPasscodeProviderElement
+    extends AutoDisposeFutureProviderElement<String?> with AdminPasscodeRef {
+  _AdminPasscodeProviderElement(super.provider);
+
+  @override
+  String get lockMac => (origin as AdminPasscodeProvider).lockMac;
+}
+
+String _$passcodeListHash() => r'59def56bd163eb90175beffec290555bbffd9897';
 
 abstract class _$PasscodeList
     extends BuildlessAutoDisposeAsyncNotifier<List<TTPasscodeModel>> {

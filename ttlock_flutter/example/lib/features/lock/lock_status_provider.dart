@@ -3,7 +3,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:ttlock_flutter/ttlock.dart';
 
 import '../../core/storage/lock_list_provider.dart';
-import '../../providers/ttlock_providers.dart';
 
 part 'lock_status_provider.freezed.dart';
 part 'lock_status_provider.g.dart';
@@ -32,7 +31,7 @@ class LockStatus extends _$LockStatus {
     final lock = await ref.read(lockByMacProvider(lockMac).future);
     if (lock == null) return const LockStatusState();
 
-    final api = ref.read(lockApiProvider);
+    final api = TTLock.lock;
     final data = lock.lockData;
 
     int? power;

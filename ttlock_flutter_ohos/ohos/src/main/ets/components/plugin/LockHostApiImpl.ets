@@ -1,18 +1,4 @@
 import {
-  TTLock,
-  ITTLockResult,
-  IInitLockModel,
-  ITTControlModel,
-  ITTSwitchState,
-  ITTAudioModel,
-  ITTPeriodicTime,
-  ITTPublicSwitchModel,
-  ITTLockWifiInfoModel,
-  ITTLockCyclicConfig,
-  SNError,
-} from '@sciener/ttlock';
-
-import {
   AccessoryElectricQuantityResult,
   AutoLockingTime,
   CameraLockWifiResult,
@@ -31,6 +17,8 @@ import {
   TTLockHostApi,
   TTLockInitParams,
   TTLockSwitchState,
+  TTLockScanWifiEventParam,
+  TTLockCredentialEventParam,
   TTLockSystemModel,
   TTLockVersion,
   TTOperateRecordType,
@@ -38,6 +26,7 @@ import {
   TTPasscodeType,
   TTPalmVeinModel,
   TTPassageModeType,
+  TTPassageModeModel,
   TTPowerSaverWorkType,
   TTRemoteAccessory,
   TTSensitivityValue,
@@ -50,13 +39,16 @@ import {
   bluetoothStateRevert,
   controlActionConvert,
   featureValueConvert,
+  liftWorkActivateTypeConvert,
   lockConfigConvert,
   lockDirectionConvert,
   operateLogTypeConvert,
   passageModeTypeConvert,
   passcodeTypeConvert,
+  powerSaverWorkModeConvert,
   remoteAccessoryConvert,
   sensitivityValueConvert,
+  sensitivityValueRevert,
   soundVolumeConvert,
   soundVolumeRevert,
   lockSwitchStateRevert,
@@ -65,15 +57,32 @@ import {
 
 import {
   cycleListToConfig,
+  makeInvalidValueError,
   makeLockApiError,
   makeNotImplementedError,
   parseJsonArrayString,
   mapStringValue,
   mapNumberValue,
+  mapOptionalNumberValue,
   EventContextStore,
+  TTResultBridge,
 } from './TtlockPremiseSupport';
 
 import HashMap from '@ohos.util.HashMap';
+import {
+  TTLock,
+  IInitLockModel,
+  ITTControlModel,
+  ITTSwitchState,
+  ITTAudioModel,
+  ITTPeriodicTime,
+  ITTPublicSwitchModel,
+  ITTLockWifiInfoModel,
+  ITTLockCyclicConfig,
+  CameraLockInfo,
+  SNError,
+  TTSensitivityValue as SdkTTSensitivityValue,
+} from '@sciener/ttlock';
 
 interface LockVersionJson {
   protocolType: number;
@@ -103,8 +112,10 @@ function lockVersionToJsonString(version: TTLockVersion | undefined): string | n
 
 function hashMapToMap(map: HashMap<string, Object>): Map<string, Object> {
   const out = new Map<string, Object>();
-  map.forEach((value: Object, key: string) => {
-    out.set(key, value);
+  map.forEach((value?: Object, key?: string) => {
+    if (value !== undefined && key !== undefined) {
+      out.set(key, value);
+    }
   });
   return out;
 }
@@ -118,7 +129,10 @@ function hashMapToMap(map: HashMap<string, Object>): Map<string, Object> {
  */
 export class LockHostApiImpl extends TTLockHostApi {
   setLockScanWifiParam(param: TTLockScanWifiEventParam): void {
-    EventContextStore.shared.lockScanWifi.lockData = param.getLockData();
+    const lockData = param.getLockData();
+    if (lockData !== undefined && lockData.length > 0) {
+      EventContextStore.shared.lockScanWifi.lockData = lockData;
+    }
   }
 
   setLockAddCardParam(param: TTLockCredentialEventParam): void {
@@ -153,8 +167,8 @@ export class LockHostApiImpl extends TTLockHostApi {
       lockVersion: lockVersionToJsonString(params.getLockVersion()),
       clientPara: params.getClientPara() ?? null,
     };
-    const callback: ITTLockResult<string> = {
-      success: (lockData: string): void => {
+    const callback = new TTResultBridge<string>(
+      (lockData: string): void => {
         const hotelInfo: string | undefined = params.getHotelInfo();
         const buildingNumber: number | undefined = params.getBuildingNumber();
         const floorNumber: number | undefined = params.getFloorNumber();
@@ -164,57 +178,57 @@ export class LockHostApiImpl extends TTLockHostApi {
             hotelInfo,
             buildingNumber ?? 0,
             floorNumber ?? 0,
-            {
-              success: (_: void): void => {
+            new TTResultBridge<void>(
+              (_: void): void => {
                 result.success(lockData);
               },
-              failure: (_e: SNError): void => {
+              (_e: SNError): void => {
                 result.success(lockData);
               },
-            },
+            ),
           );
         } else {
           result.success(lockData);
         }
       },
-      failure: (err: SNError): void => {
+      (err: SNError): void => {
         result.error(makeLockApiError('initLock', err));
       },
-    };
+    );
     TTLock.initLock(config, callback);
   }
 
   resetLock(lockData: string, result: Result<void>): void {
-    TTLock.resetLock(lockData, {
-      success: (_: void): void => {
+    TTLock.resetLock(lockData, new TTResultBridge<void>(
+      (_: void): void => {
         result.success(undefined);
       },
-      failure: (err: SNError): void => {
+      (err: SNError): void => {
         result.error(makeLockApiError('resetLock', err));
       },
-    });
+    ));
   }
 
   resetEkey(lockData: string, result: Result<string>): void {
-    TTLock.resetEKey(lockData, {
-      success: (newLockData: string): void => {
+    TTLock.resetEKey(lockData, new TTResultBridge<string>(
+      (newLockData: string): void => {
         result.success(newLockData);
       },
-      failure: (err: SNError): void => {
+      (err: SNError): void => {
         result.error(makeLockApiError('resetEkey', err));
       },
-    });
+    ));
   }
 
   resetLockByCode(lockMac: string, resetCode: string, result: Result<void>): void {
-    TTLock.resetLockByCode(resetCode, lockMac, {
-      success: (_: void): void => {
+    TTLock.resetLockByCode(resetCode, lockMac, new TTResultBridge<void>(
+      (_: void): void => {
         result.success(undefined);
       },
-      failure: (err: SNError): void => {
+      (err: SNError): void => {
         result.error(makeLockApiError('resetLockByCode', err));
       },
-    });
+    ));
   }
 
   verifyLock(lockMac: string, result: Result<void>): void {
@@ -222,8 +236,8 @@ export class LockHostApiImpl extends TTLockHostApi {
   }
 
   controlLock(lockData: string, action: TTControlAction, result: Result<ControlLockResult>): void {
-    TTLock.controlLockWithControlAction(lockData, controlActionConvert(action), {
-      success: (model: ITTControlModel): void => {
+    TTLock.controlLockWithControlAction(lockData, controlActionConvert(action), new TTResultBridge<ITTControlModel>(
+      (model: ITTControlModel): void => {
         const out = new ControlLockResult(
           model.lockTime,
           model.electricQuantity,
@@ -232,29 +246,32 @@ export class LockHostApiImpl extends TTLockHostApi {
         );
         result.success(out);
       },
-      failure: (err: SNError): void => {
+      (err: SNError): void => {
         result.error(makeLockApiError('controlLock', err));
       },
-    });
+    ));
   }
 
   getLockSwitchState(lockData: string, result: Result<TTLockSwitchState>): void {
-    TTLock.getLockSwitchState(lockData, {
-      success: (state: ITTSwitchState): void => {
-        result.success(lockSwitchStateRevert(state.lockSwitchState));
+    TTLock.getLockSwitchState(lockData, new TTResultBridge<ITTSwitchState>(
+      (state: ITTSwitchState): void => {
+        result.success(lockSwitchStateRevert(state.lockSwitchState) ?? TTLockSwitchState.UNKNOW);
       },
-      failure: (err: SNError): void => {
+      (err: SNError): void => {
         result.error(makeLockApiError('getLockSwitchState', err));
       },
-    });
+    ));
   }
 
   supportFunction(lockFunction: TTLockFunction, lockData: string): boolean {
-    const featureValue = featureValueConvert(lockFunction);
-    if (featureValue === null) {
+    if (lockData.length === 0) {
       return false;
     }
-    return false;
+    const feature = featureValueConvert(lockFunction);
+    if (feature === null) {
+      return false;
+    }
+    return TTLock.supportFunction(lockData, feature!);
   }
 
   createCustomPasscode(passcode: string, startDate: number, endDate: number,
@@ -331,7 +348,7 @@ export class LockHostApiImpl extends TTLockHostApi {
               mapNumberValue(item, 'startDate'),
               mapNumberValue(item, 'endDate'),
               mapNumberValue(item, 'keyboardPwdType'),
-              mapNumberValue(item, 'cycleType'),
+              mapOptionalNumberValue(item, 'cycleType'),
             ));
           }
           result.success(out);
@@ -378,15 +395,8 @@ export class LockHostApiImpl extends TTLockHostApi {
     });
   }
 
-  getPasscodeVerificationParams(lockData: string, result: Result<string>): void {
-    TTLock.getPasscodeVerificationParams(lockData, {
-      success: (params: string): void => {
-        result.success(params);
-      },
-      failure: (err: SNError): void => {
-        result.error(makeLockApiError('getPasscodeVerificationParams', err));
-      },
-    });
+  getPasscodeVerificationParams(_lockData: string, result: Result<string>): void {
+    result.error(makeNotImplementedError('getPasscodeVerificationParams'));
   }
 
   modifyCardValidityPeriod(cardNumber: string, cycleList: Array<TTCycleModel>,
@@ -572,34 +582,91 @@ export class LockHostApiImpl extends TTLockHostApi {
   }
 
   modifyPalmVein(
-    _palmVeinNumber: string,
-    _cycleList: Array<TTCycleModel>,
-    _startDate: number,
-    _endDate: number,
-    _lockData: string,
+    palmVeinNumber: string,
+    cycleList: Array<TTCycleModel>,
+    startDate: number,
+    endDate: number,
+    lockData: string,
     result: Result<void>,
   ): void {
-    result.error(makeNotImplementedError('modifyPalmVein'));
+    const cyclic: ITTLockCyclicConfig[] | null = cycleListToConfig(cycleList) as ITTLockCyclicConfig[] | null;
+    TTLock.modifyPalmVein(lockData, palmVeinNumber, startDate, endDate, cyclic, {
+      success: (_: void): void => {
+        result.success(undefined);
+      },
+      failure: (err: SNError): void => {
+        result.error(makeLockApiError('modifyPalmVein', err));
+      },
+    });
   }
 
-  deletePalmVein(_palmVeinNumber: string, _lockData: string, result: Result<void>): void {
-    result.error(makeNotImplementedError('deletePalmVein'));
+  deletePalmVein(palmVeinNumber: string, lockData: string, result: Result<void>): void {
+    TTLock.deletePalmVein(lockData, palmVeinNumber, {
+      success: (_: void): void => {
+        result.success(undefined);
+      },
+      failure: (err: SNError): void => {
+        result.error(makeLockApiError('deletePalmVein', err));
+      },
+    });
   }
 
-  clearPalmVein(_lockData: string, result: Result<void>): void {
-    result.error(makeNotImplementedError('clearPalmVein'));
+  clearPalmVein(lockData: string, result: Result<void>): void {
+    TTLock.clearPalmVein(lockData, {
+      success: (_: void): void => {
+        result.success(undefined);
+      },
+      failure: (err: SNError): void => {
+        result.error(makeLockApiError('clearPalmVein', err));
+      },
+    });
   }
 
-  getAllValidPalmVeins(_lockData: string, result: Result<Array<TTPalmVeinModel>>): void {
-    result.error(makeNotImplementedError('getAllValidPalmVeins'));
+  getAllValidPalmVeins(lockData: string, result: Result<Array<TTPalmVeinModel>>): void {
+    TTLock.getAllValidPalmVein(lockData, {
+      success: (json: string): void => {
+        try {
+          const arr = parseJsonArrayString(json);
+          const out: Array<TTPalmVeinModel> = [];
+          for (const item of arr) {
+            out.push(new TTPalmVeinModel(
+              mapStringValue(item, 'palmVeinNumber'),
+              mapNumberValue(item, 'startDate'),
+              mapNumberValue(item, 'endDate'),
+            ));
+          }
+          result.success(out);
+        } catch (e) {
+          result.error(e as Error);
+        }
+      },
+      failure: (err: SNError): void => {
+        result.error(makeLockApiError('getAllValidPalmVeins', err));
+      },
+    });
   }
 
-  setMotorTorqueLevel(_torqueLevel: number, _lockData: string, result: Result<void>): void {
-    result.error(makeNotImplementedError('setMotorTorqueLevel'));
+  setMotorTorqueLevel(torqueLevel: number, lockData: string, result: Result<void>): void {
+    TTLock.setMotorTorqueLevel(lockData, torqueLevel, {
+      success: (_: void): void => {
+        result.success(undefined);
+      },
+      failure: (err: SNError): void => {
+        result.error(makeLockApiError('setMotorTorqueLevel', err));
+      },
+    });
   }
 
-  setLockLatchBolt(_keepTime: number, _lockData: string, result: Result<void>): void {
-    result.error(makeNotImplementedError('setLockLatchBolt'));
+  setLockLatchBolt(keepTime: number, lockData: string, result: Result<void>): void {
+    // 与 Android 对齐：isControl=true，driveLevel 使用 SDK 默认值（-1）。
+    TTLock.setLatchBolt(lockData, true, keepTime, -1, {
+      success: (_: void): void => {
+        result.success(undefined);
+      },
+      failure: (err: SNError): void => {
+        result.error(makeLockApiError('setLockLatchBolt', err));
+      },
+    });
   }
 
   setLockTime(timestamp: number, lockData: string, result: Result<void>): void {
@@ -745,7 +812,12 @@ export class LockHostApiImpl extends TTLockHostApi {
   }
 
   getLockConfig(config: TTLockConfig, lockData: string, result: Result<boolean>): void {
-    TTLock.getLockConfigWithType(lockData, lockConfigConvert(config), {
+    const sdkConfig = lockConfigConvert(config);
+    if (sdkConfig === null) {
+      result.error(makeInvalidValueError(`锁配置 ${config} 在 OpenHarmony SDK 中无对应项`));
+      return;
+    }
+    TTLock.getLockConfigWithType(lockData, sdkConfig, {
       success: (model: ITTPublicSwitchModel): void => {
         result.success(model.isOn);
       },
@@ -756,12 +828,39 @@ export class LockHostApiImpl extends TTLockHostApi {
   }
 
   setLockConfig(config: TTLockConfig, isOn: boolean, lockData: string, result: Result<void>): void {
-    TTLock.setLockConfigWithType(lockData, isOn, lockConfigConvert(config), {
+    const sdkConfig = lockConfigConvert(config);
+    if (sdkConfig === null) {
+      result.error(makeInvalidValueError(`锁配置 ${config} 在 OpenHarmony SDK 中无对应项`));
+      return;
+    }
+    TTLock.setLockConfigWithType(lockData, isOn, sdkConfig, {
       success: (_: void): void => {
         result.success(undefined);
       },
       failure: (err: SNError): void => {
         result.error(makeLockApiError('setLockConfig', err));
+      },
+    });
+  }
+
+  getLightTime(lockData: string, result: Result<number>): void {
+    TTLock.getLightTime(lockData, {
+      success: (seconds: number): void => {
+        result.success(seconds);
+      },
+      failure: (err: SNError): void => {
+        result.error(makeLockApiError('getLightTime', err));
+      },
+    });
+  }
+
+  setLightTime(seconds: number, lockData: string, result: Result<void>): void {
+    TTLock.setLightTime(lockData, seconds, {
+      success: (_: void): void => {
+        result.success(undefined);
+      },
+      failure: (err: SNError): void => {
+        result.error(makeLockApiError('setLightTime', err));
       },
     });
   }
@@ -813,24 +912,119 @@ export class LockHostApiImpl extends TTLockHostApi {
     });
   }
 
-  activateLift(_floors: string, _lockData: string, result: Result<ControlLockResult>): void {
-    result.error(makeNotImplementedError('activateLift'));
+  getPassageModes(lockData: string, result: Result<Array<TTPassageModeModel>>): void {
+    TTLock.getPassageMode(lockData, {
+      success: (json: string): void => {
+        try {
+          const arr = parseJsonArrayString(json);
+          const out: Array<TTPassageModeModel> = [];
+          for (const item of arr) {
+            const modeType = mapNumberValue(item, 'modeType');
+            const type = modeType === 1 ? TTPassageModeType.WEEKLY : TTPassageModeType.MONTHLY;
+            const repeatRaw = item.get('repeatList');
+            let weekly: Array<number> | undefined = undefined;
+            if (Array.isArray(repeatRaw)) {
+              weekly = [];
+              for (const v of repeatRaw as Object[]) {
+                if (typeof v === 'number') {
+                  weekly.push(v);
+                }
+              }
+            }
+            out.push(new TTPassageModeModel(
+              type,
+              mapNumberValue(item, 'startDate'),
+              mapNumberValue(item, 'endDate'),
+              weekly,
+              undefined,
+            ));
+          }
+          result.success(out);
+        } catch (_e) {
+          result.success([]);
+        }
+      },
+      failure: (err: SNError): void => {
+        result.error(makeLockApiError('getPassageModes', err));
+      },
+    });
   }
 
-  setLiftControlable(_floors: string, _lockData: string, result: Result<void>): void {
-    result.error(makeNotImplementedError('setLiftControlable'));
+  activateLift(floors: string, lockData: string, result: Result<ControlLockResult>): void {
+    const floorList: Array<number> = [];
+    for (const raw of floors.split(',')) {
+      const item = raw.trim();
+      if (item.length === 0) {
+        continue;
+      }
+      const floor = Number(item);
+      if (!Number.isNaN(floor)) {
+        floorList.push(floor);
+      }
+    }
+    if (floorList.length === 0) {
+      result.error(makeLockApiError('activateLift', SNError.invalidParam(), `Invalid floors: ${floors}`));
+      return;
+    }
+    const normalizedFloors = floorList.join(',');
+    TTLock.activateHotelLiftFloors(lockData, normalizedFloors, {
+      success: (model: ITTControlModel): void => {
+        const out = new ControlLockResult(
+          model.lockTime,
+          model.electricQuantity,
+          model.uniqueId,
+          undefined,
+        );
+        result.success(out);
+      },
+      failure: (err: SNError): void => {
+        result.error(makeLockApiError('activateLift', err));
+      },
+    });
   }
 
-  setLiftWorkMode(_type: TTLiftWorkActivateType, _lockData: string, result: Result<void>): void {
-    result.error(makeNotImplementedError('setLiftWorkMode'));
+  setLiftControlable(floors: string, lockData: string, result: Result<void>): void {
+    TTLock.setLiftControllableFloors(lockData, floors, {
+      success: (_: void): void => {
+        result.success(undefined);
+      },
+      failure: (err: SNError): void => {
+        result.error(makeLockApiError('setLiftControlable', err));
+      },
+    });
   }
 
-  setPowerSaverWorkMode(_type: TTPowerSaverWorkType, _lockData: string, result: Result<void>): void {
-    result.error(makeNotImplementedError('setPowerSaverWorkMode'));
+  setLiftWorkMode(type: TTLiftWorkActivateType, lockData: string, result: Result<void>): void {
+    TTLock.setLiftWorkMode(lockData, liftWorkActivateTypeConvert(type), {
+      success: (_: void): void => {
+        result.success(undefined);
+      },
+      failure: (err: SNError): void => {
+        result.error(makeLockApiError('setLiftWorkMode', err));
+      },
+    });
   }
 
-  setPowerSaverControlableLock(_lockMac: string, _lockData: string, result: Result<void>): void {
-    result.error(makeNotImplementedError('setPowerSaverControlableLock'));
+  setPowerSaverWorkMode(type: TTPowerSaverWorkType, lockData: string, result: Result<void>): void {
+    TTLock.setPowerSaverWorkMode(lockData, powerSaverWorkModeConvert(type), {
+      success: (_: void): void => {
+        result.success(undefined);
+      },
+      failure: (err: SNError): void => {
+        result.error(makeLockApiError('setPowerSaverWorkMode', err));
+      },
+    });
+  }
+
+  setPowerSaverControlableLock(lockMac: string, lockData: string, result: Result<void>): void {
+    TTLock.setPowerSaverControllableLock(lockData, lockMac, {
+      success: (_: void): void => {
+        result.success(undefined);
+      },
+      failure: (err: SNError): void => {
+        result.error(makeLockApiError('setPowerSaverControlableLock', err));
+      },
+    });
   }
 
   setHotel(hotelInfo: string, buildingNumber: number, floorNumber: number, lockData: string,
@@ -948,9 +1142,29 @@ export class LockHostApiImpl extends TTLockHostApi {
     );
   }
 
-  configCameraLockWifi(_wifiName: string, _wifiPassword: string, _lockData: string,
+  configCameraLockWifi(wifiName: string, wifiPassword: string, lockData: string,
     result: Result<CameraLockWifiResult>): void {
-    result.error(makeNotImplementedError('configCameraLockWifi'));
+    // SDK v1.0.6 该接口第 4 个参数为 string 预留字段，传空串与 Android 行为保持一致。
+    TTLock.cameraLockConfigWifi(lockData, wifiName, wifiPassword, '', {
+      success: (info: CameraLockInfo): void => {
+        try {
+          const payload = JSON.stringify(info);
+          const arr = parseJsonArrayString(`[${payload}]`);
+          if (arr.length > 0) {
+            const serial = mapStringValue(arr[0], 'videoModuleSerialNumber');
+            const wifiMac = mapStringValue(arr[0], 'wifiMac');
+            result.success(new CameraLockWifiResult(serial, wifiMac));
+            return;
+          }
+        } catch (_e) {
+          // ignore and fallback
+        }
+        result.success(new CameraLockWifiResult('', ''));
+      },
+      failure: (err: SNError): void => {
+        result.error(makeLockApiError('configCameraLockWifi', err));
+      },
+    });
   }
 
   setSoundVolume(type: TTSoundVolumeType, lockData: string, result: Result<void>): void {
@@ -982,6 +1196,17 @@ export class LockHostApiImpl extends TTLockHostApi {
       },
       failure: (err: SNError): void => {
         result.error(makeLockApiError('setSensitivity', err));
+      },
+    });
+  }
+
+  getSensitivity(lockData: string, result: Result<TTSensitivityValue>): void {
+    TTLock.getSensitivity(lockData, {
+      success: (value: SdkTTSensitivityValue): void => {
+        result.success(sensitivityValueRevert(value));
+      },
+      failure: (err: SNError): void => {
+        result.error(makeLockApiError('getSensitivity', err));
       },
     });
   }
@@ -1036,7 +1261,12 @@ export class LockHostApiImpl extends TTLockHostApi {
 
   getRemoteAccessoryElectricQuantity(accessory: TTRemoteAccessory, mac: string, lockData: string,
     result: Result<AccessoryElectricQuantityResult>): void {
-    TTLock.getAccessoryElectricQuantity(lockData, mac, remoteAccessoryConvert(accessory), {
+    const sdkAccessory = remoteAccessoryConvert(accessory);
+    if (sdkAccessory === null) {
+      result.error(makeInvalidValueError(`配件类型 ${accessory} 在 OpenHarmony SDK 中无对应项`));
+      return;
+    }
+    TTLock.getAccessoryElectricQuantity(lockData, mac, sdkAccessory, {
       success: (info: HashMap<string, Object>): void => {
         const data = hashMapToMap(info);
         const eqRaw = data.get('electricQuantity');

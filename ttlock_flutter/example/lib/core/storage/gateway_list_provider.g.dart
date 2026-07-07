@@ -160,7 +160,7 @@ class _GatewayByMacProviderElement
 }
 
 String _$gatewayListNotifierHash() =>
-    r'86ec69b072c4a3dc8b0e30155740403c7ed575a6';
+    r'7abd9a3050476f83ffe1256fd2fda17bdce9ddb4';
 
 /// See also [GatewayListNotifier].
 @ProviderFor(GatewayListNotifier)

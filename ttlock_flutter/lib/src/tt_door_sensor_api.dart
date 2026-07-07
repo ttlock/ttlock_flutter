@@ -21,25 +21,24 @@ class TTDoorSensorApi {
       mapRemoteAccessoryStreamErrors(pigeon.accessoryStartScanDoorSensor());
 
   Stream<pigeon.TTStandaloneDoorSensorScanModel> accessoryStandaloneDoorSensorStartScan() =>
-      mapRemoteAccessoryStreamErrors(pigeon.accessoryStandaloneDoorSensorStartScan());
+      mapStandaloneDoorSensorStreamErrors(pigeon.accessoryStandaloneDoorSensorStartScan());
 
   Future<pigeon.TTLockSystemModel> initDoorSensor(String mac, String lockData) =>
       runRemoteAccessoryApi(() => _host.initDoorSensor(mac, lockData));
 
   Future<pigeon.TTStandaloneDoorSensorInfo> standaloneDoorSensorInit(
-    String mac,
-    Map<String, Object?> info,
+    pigeon.TTStandaloneDoorSensorInitParams params,
   ) =>
-      runRemoteAccessoryApi(() => _host.standaloneDoorSensorInit(mac, info));
+      runStandaloneDoorSensorApi(() => _host.standaloneDoorSensorInit(params));
 
   Future<String> standaloneDoorSensorReadFeatureValue(String mac) =>
-      runRemoteAccessoryApi(() => _host.standaloneDoorSensorReadFeatureValue(mac));
+      runStandaloneDoorSensorApi(() => _host.standaloneDoorSensorReadFeatureValue(mac));
 
   Future<bool> standaloneDoorSensorIsSupportFunction(
     String featureValue,
-    int function,
+    pigeon.TTStandaloneDoorSensorFeature function,
   ) =>
-      runRemoteAccessoryApi(
+      runStandaloneDoorSensorApi(
         () => _host.standaloneDoorSensorIsSupportFunction(featureValue, function),
       );
 }

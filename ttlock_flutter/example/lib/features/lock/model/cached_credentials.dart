@@ -12,7 +12,7 @@ abstract class CachedPasscode with _$CachedPasscode {
     required int startDate,
     required int endDate,
     @Default(0) int keyboardPwdType,
-    @Default(0) int cycleType,
+    int? cycleType,
   }) = _CachedPasscode;
 
   factory CachedPasscode.fromJson(Map<String, dynamic> json) =>

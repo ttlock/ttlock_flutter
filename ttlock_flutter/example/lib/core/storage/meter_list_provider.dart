@@ -14,7 +14,13 @@ class MeterListNotifier extends _$MeterListNotifier {
   Future<List<SavedMeterDevice>> build() async => _meterStorage.load();
 
   Future<void> addDevice(SavedMeterDevice device) async {
-    final list = <SavedMeterDevice>[...?state.valueOrNull, device];
+    final list = <SavedMeterDevice>[...?state.valueOrNull];
+    final idx = list.indexWhere((d) => d.mac == device.mac);
+    if (idx >= 0) {
+      list[idx] = device;
+    } else {
+      list.add(device);
+    }
     await _meterStorage.save(list);
     ref.invalidateSelf();
   }

@@ -6,17 +6,17 @@ import 'package:toastification/toastification.dart';
 import 'package:ttlock_flutter/ttlock.dart';
 
 import '../../core/storage/accessory_list_provider.dart';
-import '../../core/storage/gateway_list_provider.dart';
+import '../../core/storage/config_provider.dart';
 import '../../core/storage/lock_list_provider.dart';
 import '../../core/storage/meter_list_provider.dart';
+import '../../core/storage/standalone_door_sensor_list_provider.dart';
 import '../../features/settings/model/saved_door_sensor.dart';
-import '../../features/settings/model/saved_gateway_device.dart';
 import '../../features/settings/model/saved_keypad.dart';
 import '../../features/settings/model/saved_lock_device.dart';
 import '../../features/settings/model/saved_meter_device.dart';
 import '../../features/settings/model/saved_remote_key.dart';
+import '../../features/settings/model/saved_standalone_door_sensor.dart';
 import '../../features/lock/lock_cache_initializer.dart';
-import '../../providers/ttlock_providers.dart';
 import 'scan_config.dart';
 
 part 'scan_provider.g.dart';
@@ -26,6 +26,8 @@ bool gatewayNeedsWifi(TTGatewayType type) {
       type == TTGatewayType.g5 ||
       type == TTGatewayType.g6;
 }
+
+bool gatewayNeedsApn(TTGatewayType type) => type == TTGatewayType.g4;
 
 class DiscoveredDevice {
   final DeviceType type;
@@ -72,10 +74,7 @@ class ScanNotifier extends _$ScanNotifier {
   @override
   ScanState build(ScanConfig config) {
     ref.onDispose(_cancelAll);
-    final selected = config.isAccessory
-        ? config.deviceType
-        : config.deviceType;
-    return ScanState(config: config, selectedType: selected);
+    return ScanState(config: config, selectedType: config.deviceType);
   }
 
   void selectType(DeviceType type) {
@@ -85,6 +84,7 @@ class ScanNotifier extends _$ScanNotifier {
       selectedType: type,
       devices: const [],
     );
+    startScan();
   }
 
   Future<void> startScan() async {
@@ -159,6 +159,22 @@ class ScanNotifier extends _$ScanNotifier {
             devices.removeWhere((d) => d.mac == m.mac);
             devices.add(DiscoveredDevice(
               type: DeviceType.doorSensor,
+              name: m.name,
+              mac: m.mac,
+              rssi: m.rssi,
+            ));
+            update();
+          },
+          onError: onError,
+        ));
+        break;
+      case DeviceType.standaloneDoorSensor:
+        _subs.add(
+            TTLock.doorSensor.accessoryStandaloneDoorSensorStartScan().listen(
+          (m) {
+            devices.removeWhere((d) => d.mac == m.mac);
+            devices.add(DiscoveredDevice(
+              type: DeviceType.standaloneDoorSensor,
               name: m.name,
               mac: m.mac,
               rssi: m.rssi,
@@ -258,7 +274,7 @@ class ScanNotifier extends _$ScanNotifier {
           if (device.lockVersion == null) {
             return InitResult.failure('Lock version missing');
           }
-          final api = ref.read(lockApiProvider);
+          final api = TTLock.lock;
           final lockData = await api.initLock(TTLockInitParams(
             lockMac: device.mac,
             lockVersion: device.lockVersion!,
@@ -281,31 +297,13 @@ class ScanNotifier extends _$ScanNotifier {
           return InitResult.lock(device.mac);
 
         case DeviceType.gateway:
-          final api = ref.read(gatewayApiProvider);
-          final gatewayType = device.gatewayType ?? TTGatewayType.g2;
-          final status = await runGatewayApi(() => api.connect(device.mac));
-          if (status != TTGatewayConnectStatus.success) {
-            return InitResult.failure('Gateway connect failed');
-          }
-          await ref.read(gatewayListNotifierProvider.notifier).addDevice(
-                SavedGatewayDevice(
-                  name: device.name,
-                  mac: device.mac,
-                  initializedAt: now,
-                ),
-              );
-          return InitResult.gateway(
-            device.mac,
-            gatewayType: gatewayType,
-            needsWifi: gatewayNeedsWifi(gatewayType),
-          );
+          // Gateway init is handled on GatewayInitPage after device selection.
+          throw StateError('Gateway should not be initialized from scan');
 
         case DeviceType.doorSensor:
           final lockData = state.config.lockData!;
           final lockMac = state.config.lockMac!;
-          await runRemoteAccessoryApi(() => ref
-              .read(doorSensorApiProvider)
-              .initDoorSensor(device.mac, lockData));
+          await TTLock.doorSensor.initDoorSensor(device.mac, lockData);
           await ref
               .read(doorSensorListNotifierProvider(lockMac).notifier)
               .add(SavedDoorSensor(
@@ -316,12 +314,43 @@ class ScanNotifier extends _$ScanNotifier {
               ));
           return InitResult.doorSensor(device.mac);
 
+        case DeviceType.standaloneDoorSensor:
+          final config = await ref.read(configNotifierProvider.future);
+          final result = await TTLock.doorSensor.standaloneDoorSensorInit(
+            TTStandaloneDoorSensorInitParams(
+              mac: device.mac,
+              doorSensorName: device.name,
+              wifiName: '',
+              wifiPassword: '',
+              serverAddress: config.serverIp!,
+              portNumber: int.parse(config.serverPort!),
+            ),
+          );
+          await ref
+              .read(standaloneDoorSensorListNotifierProvider.notifier)
+              .addDevice(
+                SavedStandaloneDoorSensor(
+                  name: device.name,
+                  mac: device.mac,
+                  doorSensorData: result.doorSensorData,
+                  featureValue: result.featureValue,
+                  modelNum: result.modelNum,
+                  electricQuantity: result.electricQuantity,
+                  initializedAt: now,
+                ),
+              );
+          return InitResult.standaloneDoorSensor(device.mac);
+
         case DeviceType.remoteKey:
           final lockData = state.config.lockData!;
           final lockMac = state.config.lockMac!;
-          await runRemoteAccessoryApi(() => ref
-              .read(remoteKeyApiProvider)
-              .initRemoteKey(device.mac, lockData));
+          try {
+            await TTLock.remoteKey.initRemoteKey(device.mac, lockData);
+          } on TTRemoteAccessoryException catch (e) {
+            return InitResult.failure('${e.code.name}: ${e.message}');
+          } catch (e) {
+            return InitResult.failure(e.toString());
+          }
           await ref
               .read(remoteKeyListNotifierProvider(lockMac).notifier)
               .add(SavedRemoteKey(
@@ -336,13 +365,10 @@ class ScanNotifier extends _$ScanNotifier {
           final lockData = state.config.lockData!;
           final lockMac = state.config.lockMac!;
           if (device.isMultifunctionalKeypad) {
-            await runMultifunctionalKeypadInit(() => ref
-                .read(remoteKeypadApiProvider)
-                .initMultifunctionalKeypad(device.mac, lockData));
+            await TTLock.remoteKeypad
+                .initMultifunctionalKeypad(device.mac, lockData);
           } else {
-            await runRemoteAccessoryApi(() => ref
-                .read(remoteKeypadApiProvider)
-                .initRemoteKeypad(device.mac, lockMac));
+            await TTLock.remoteKeypad.initRemoteKeypad(device.mac, lockMac);
           }
           await ref.read(keypadListNotifierProvider(lockMac).notifier).add(
                 SavedKeypad(
@@ -356,7 +382,7 @@ class ScanNotifier extends _$ScanNotifier {
           return InitResult.keypad(device.mac);
 
         case DeviceType.waterMeter:
-          final result = await ref.read(waterMeterApiProvider).waterMeterInit(
+          final result = await TTLock.waterMeter.waterMeterInit(
                 TTWaterMeterInitParam(
                   mac: device.mac,
                   name: device.name,
@@ -376,7 +402,7 @@ class ScanNotifier extends _$ScanNotifier {
           return InitResult.waterMeter(device.mac);
 
         case DeviceType.electricMeter:
-          final result = await ref.read(electricMeterApiProvider).electricMeterInit(
+          final result = await TTLock.electricMeter.electricMeterInit(
                 TTElectricMeterInitParam(
                   mac: device.mac,
                   name: device.name,
@@ -412,12 +438,8 @@ sealed class InitResult {
   factory InitResult.failure(String message) = InitFailure;
 
   factory InitResult.lock(String mac) = InitLock;
-  factory InitResult.gateway(
-    String mac, {
-    required TTGatewayType gatewayType,
-    required bool needsWifi,
-  }) = InitGateway;
   factory InitResult.doorSensor(String mac) = InitDoorSensor;
+  factory InitResult.standaloneDoorSensor(String mac) = InitStandaloneDoorSensor;
   factory InitResult.remoteKey(String mac) = InitRemoteKey;
   factory InitResult.keypad(String mac) = InitKeypad;
   factory InitResult.waterMeter(String id) = InitWaterMeter;
@@ -434,20 +456,14 @@ class InitLock extends InitResult {
   const InitLock(this.mac);
 }
 
-class InitGateway extends InitResult {
-  final String mac;
-  final TTGatewayType gatewayType;
-  final bool needsWifi;
-  const InitGateway(
-    this.mac, {
-    required this.gatewayType,
-    required this.needsWifi,
-  });
-}
-
 class InitDoorSensor extends InitResult {
   final String mac;
   const InitDoorSensor(this.mac);
+}
+
+class InitStandaloneDoorSensor extends InitResult {
+  final String mac;
+  const InitStandaloneDoorSensor(this.mac);
 }
 
 class InitRemoteKey extends InitResult {

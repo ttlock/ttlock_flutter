@@ -19,6 +19,7 @@ mixin _$DashboardState {
   List<SavedGatewayDevice> get gateways;
   List<SavedMeterDevice> get waterMeters;
   List<SavedMeterDevice> get electricMeters;
+  List<SavedStandaloneDoorSensor> get standaloneDoorSensors;
   bool get isLoading;
 
   /// Create a copy of DashboardState
@@ -40,6 +41,8 @@ mixin _$DashboardState {
                 .equals(other.waterMeters, waterMeters) &&
             const DeepCollectionEquality()
                 .equals(other.electricMeters, electricMeters) &&
+            const DeepCollectionEquality()
+                .equals(other.standaloneDoorSensors, standaloneDoorSensors) &&
             (identical(other.isLoading, isLoading) ||
                 other.isLoading == isLoading));
   }
@@ -51,11 +54,12 @@ mixin _$DashboardState {
       const DeepCollectionEquality().hash(gateways),
       const DeepCollectionEquality().hash(waterMeters),
       const DeepCollectionEquality().hash(electricMeters),
+      const DeepCollectionEquality().hash(standaloneDoorSensors),
       isLoading);
 
   @override
   String toString() {
-    return 'DashboardState(locks: $locks, gateways: $gateways, waterMeters: $waterMeters, electricMeters: $electricMeters, isLoading: $isLoading)';
+    return 'DashboardState(locks: $locks, gateways: $gateways, waterMeters: $waterMeters, electricMeters: $electricMeters, standaloneDoorSensors: $standaloneDoorSensors, isLoading: $isLoading)';
   }
 }
 
@@ -70,6 +74,7 @@ abstract mixin class $DashboardStateCopyWith<$Res> {
       List<SavedGatewayDevice> gateways,
       List<SavedMeterDevice> waterMeters,
       List<SavedMeterDevice> electricMeters,
+      List<SavedStandaloneDoorSensor> standaloneDoorSensors,
       bool isLoading});
 }
 
@@ -90,6 +95,7 @@ class _$DashboardStateCopyWithImpl<$Res>
     Object? gateways = null,
     Object? waterMeters = null,
     Object? electricMeters = null,
+    Object? standaloneDoorSensors = null,
     Object? isLoading = null,
   }) {
     return _then(_self.copyWith(
@@ -109,6 +115,10 @@ class _$DashboardStateCopyWithImpl<$Res>
           ? _self.electricMeters
           : electricMeters // ignore: cast_nullable_to_non_nullable
               as List<SavedMeterDevice>,
+      standaloneDoorSensors: null == standaloneDoorSensors
+          ? _self.standaloneDoorSensors
+          : standaloneDoorSensors // ignore: cast_nullable_to_non_nullable
+              as List<SavedStandaloneDoorSensor>,
       isLoading: null == isLoading
           ? _self.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
@@ -125,11 +135,13 @@ class _DashboardState implements DashboardState {
       required final List<SavedGatewayDevice> gateways,
       required final List<SavedMeterDevice> waterMeters,
       required final List<SavedMeterDevice> electricMeters,
+      required final List<SavedStandaloneDoorSensor> standaloneDoorSensors,
       this.isLoading = false})
       : _locks = locks,
         _gateways = gateways,
         _waterMeters = waterMeters,
-        _electricMeters = electricMeters;
+        _electricMeters = electricMeters,
+        _standaloneDoorSensors = standaloneDoorSensors;
 
   final List<SavedLockDevice> _locks;
   @override
@@ -163,6 +175,15 @@ class _DashboardState implements DashboardState {
     return EqualUnmodifiableListView(_electricMeters);
   }
 
+  final List<SavedStandaloneDoorSensor> _standaloneDoorSensors;
+  @override
+  List<SavedStandaloneDoorSensor> get standaloneDoorSensors {
+    if (_standaloneDoorSensors is EqualUnmodifiableListView)
+      return _standaloneDoorSensors;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_standaloneDoorSensors);
+  }
+
   @override
   @JsonKey()
   final bool isLoading;
@@ -186,6 +207,8 @@ class _DashboardState implements DashboardState {
                 .equals(other._waterMeters, _waterMeters) &&
             const DeepCollectionEquality()
                 .equals(other._electricMeters, _electricMeters) &&
+            const DeepCollectionEquality()
+                .equals(other._standaloneDoorSensors, _standaloneDoorSensors) &&
             (identical(other.isLoading, isLoading) ||
                 other.isLoading == isLoading));
   }
@@ -197,11 +220,12 @@ class _DashboardState implements DashboardState {
       const DeepCollectionEquality().hash(_gateways),
       const DeepCollectionEquality().hash(_waterMeters),
       const DeepCollectionEquality().hash(_electricMeters),
+      const DeepCollectionEquality().hash(_standaloneDoorSensors),
       isLoading);
 
   @override
   String toString() {
-    return 'DashboardState(locks: $locks, gateways: $gateways, waterMeters: $waterMeters, electricMeters: $electricMeters, isLoading: $isLoading)';
+    return 'DashboardState(locks: $locks, gateways: $gateways, waterMeters: $waterMeters, electricMeters: $electricMeters, standaloneDoorSensors: $standaloneDoorSensors, isLoading: $isLoading)';
   }
 }
 
@@ -218,6 +242,7 @@ abstract mixin class _$DashboardStateCopyWith<$Res>
       List<SavedGatewayDevice> gateways,
       List<SavedMeterDevice> waterMeters,
       List<SavedMeterDevice> electricMeters,
+      List<SavedStandaloneDoorSensor> standaloneDoorSensors,
       bool isLoading});
 }
 
@@ -238,6 +263,7 @@ class __$DashboardStateCopyWithImpl<$Res>
     Object? gateways = null,
     Object? waterMeters = null,
     Object? electricMeters = null,
+    Object? standaloneDoorSensors = null,
     Object? isLoading = null,
   }) {
     return _then(_DashboardState(
@@ -257,6 +283,10 @@ class __$DashboardStateCopyWithImpl<$Res>
           ? _self._electricMeters
           : electricMeters // ignore: cast_nullable_to_non_nullable
               as List<SavedMeterDevice>,
+      standaloneDoorSensors: null == standaloneDoorSensors
+          ? _self._standaloneDoorSensors
+          : standaloneDoorSensors // ignore: cast_nullable_to_non_nullable
+              as List<SavedStandaloneDoorSensor>,
       isLoading: null == isLoading
           ? _self.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable

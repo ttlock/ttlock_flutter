@@ -4,4 +4,5 @@ export 'tt_gateway_exception.dart';
 export 'tt_lock_exception.dart';
 export 'tt_multifunctional_keypad_exception.dart';
 export 'tt_remote_accessory_exception.dart';
+export 'tt_standalone_door_sensor_exception.dart';
 export 'package:ttlock_flutter/src/pigeon_errors.dart';

@@ -4,7 +4,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:ttlock_flutter/ttlock.dart';
 
 import '../../../core/storage/lock_local_storage_provider.dart';
-import '../../../providers/ttlock_providers.dart';
 import '../model/cached_credentials.dart';
 import '../model/credential_params.dart';
 import '../model/credential_validity.dart';
@@ -28,7 +27,7 @@ class FingerprintList extends _$FingerprintList {
     if (lock == null) return [];
 
     final list =
-        await ref.read(lockApiProvider).getAllValidFingerprints(lock.lockData);
+        await TTLock.lock.getAllValidFingerprints(lock.lockData);
     final cached = list.map(CachedFingerprint.fromModel).toList();
     final now = DateTime.now();
 
@@ -47,7 +46,7 @@ class FingerprintList extends _$FingerprintList {
   Future<void> clearAll(String lockMac) async {
     final lock = await ref.read(lockByMacProvider(lockMac).future);
     if (lock == null) return;
-    await ref.read(lockApiProvider).clearAllFingerprints(lock.lockData);
+    await TTLock.lock.clearAllFingerprints(lock.lockData);
     await ref.read(lockLocalCacheNotifierProvider(lockMac).notifier).patch(
           (c) => c.copyWith(fingerprints: [], credentialsFetchedAt: DateTime.now()),
         );
@@ -57,7 +56,7 @@ class FingerprintList extends _$FingerprintList {
   Future<void> delete(String lockMac, String fingerprintNumber) async {
     final lock = await ref.read(lockByMacProvider(lockMac).future);
     if (lock == null) return;
-    await ref.read(lockApiProvider).deleteFingerprint(fingerprintNumber, lock.lockData);
+    await TTLock.lock.deleteFingerprint(fingerprintNumber, lock.lockData);
     await ref.read(lockLocalCacheNotifierProvider(lockMac).notifier).patch((c) {
       final list = c.fingerprints ?? [];
       return c.copyWith(
@@ -76,7 +75,7 @@ class FingerprintList extends _$FingerprintList {
     final lock = await ref.read(lockByMacProvider(lockMac).future);
     if (lock == null) return;
     final range = validityToDateRange(validity);
-    await ref.read(lockApiProvider).modifyFingerprintValidityPeriod(
+    await TTLock.lock.modifyFingerprintValidityPeriod(
       fingerprintNumber,
       range.cycleList,
       range.startDate,
@@ -112,7 +111,7 @@ class FingerprintList extends _$FingerprintList {
     final lock = await ref.read(lockByMacProvider(lockMac).future);
     if (lock == null) return;
     final range = validityToDateRange(validity);
-    final api = ref.read(lockApiProvider);
+    final api = TTLock.lock;
     yield* api.lockAddFingerprint(
       lock.lockData,
       cycleList: range.cycleList,

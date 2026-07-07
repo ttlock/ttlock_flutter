@@ -3,7 +3,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:ttlock_flutter/ttlock.dart';
 import '../../../core/storage/lock_list_provider.dart';
 import '../../../core/storage/lock_local_storage_provider.dart';
-import '../../../providers/ttlock_providers.dart';
 import '../model/cached_credentials.dart';
 
 part 'palm_vein_provider.g.dart';
@@ -19,8 +18,8 @@ class PalmVeinList extends _$PalmVeinList {
   Future<void> deleteOnLock(String lockMac, String palmVeinNumber) async {
     final lock = await ref.read(lockByMacProvider(lockMac).future);
     if (lock == null) return;
-    final api = ref.read(lockApiProvider);
-    await runLockApi(() => api.deletePalmVein(palmVeinNumber, lock.lockData));
+    final api = TTLock.lock;
+    await api.deletePalmVein(palmVeinNumber, lock.lockData);
     final list = (state.valueOrNull ?? [])
         .where((p) => p.palmVeinNumber != palmVeinNumber).toList();
     await ref.read(lockLocalCacheNotifierProvider(lockMac).notifier).patch(
@@ -31,8 +30,8 @@ class PalmVeinList extends _$PalmVeinList {
   Future<void> clearOnLock(String lockMac) async {
     final lock = await ref.read(lockByMacProvider(lockMac).future);
     if (lock == null) return;
-    final api = ref.read(lockApiProvider);
-    await runLockApi(() => api.clearPalmVein(lock.lockData));
+    final api = TTLock.lock;
+    await api.clearPalmVein(lock.lockData);
     await ref.read(lockLocalCacheNotifierProvider(lockMac).notifier).patch(
       (c) => c.copyWith(palmVeins: <CachedPalmVein>[]));
     ref.invalidateSelf();
@@ -56,7 +55,7 @@ class PalmVeinList extends _$PalmVeinList {
   }) async* {
     final lock = await ref.read(lockByMacProvider(lockMac).future);
     if (lock == null) return;
-    final api = ref.read(lockApiProvider);
+    final api = TTLock.lock;
     yield* api.lockAddPalmVein(lock.lockData, startDate: startDate, endDate: endDate);
   }
 }

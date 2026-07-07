@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:toastification/toastification.dart';
 import 'package:ttlock_flutter/ttlock.dart';
 
@@ -7,9 +7,8 @@ import '../../../command/lock_commands.dart';
 import '../../../command/operation_record.dart';
 import '../../../core/storage/lock_list_provider.dart';
 import '../../../core/widgets/section_header.dart';
-import '../../../providers/ttlock_providers.dart';
 
-class QuickActionsSection extends ConsumerWidget {
+class QuickActionsSection extends HookConsumerWidget {
   final String lockMac;
   final Set<TTLockFunction> caps;
   final void Function(OperationRecord) onLog;
@@ -70,9 +69,9 @@ class QuickActionsSection extends ConsumerWidget {
     if (lock == null) return;
     final start = DateTime.now();
     try {
-      final api = ref.read(lockApiProvider);
-      await runLockApi(() => api.setLockTime(
-        DateTime.now().millisecondsSinceEpoch ~/ 1000, lock.lockData));
+      final api = TTLock.lock;
+      await api.setLockTime(
+        DateTime.now().millisecondsSinceEpoch ~/ 1000, lock.lockData);
       onLog(OperationRecord(
         methodName: 'setLockTime',
         duration: DateTime.now().difference(start),
@@ -98,8 +97,8 @@ class QuickActionsSection extends ConsumerWidget {
     if (lock == null) return;
     final start = DateTime.now();
     try {
-      final api = ref.read(lockApiProvider);
-      final info = await runLockApi(() => api.getLockSystemInfo(lock.lockData));
+      final api = TTLock.lock;
+      final info = await api.getLockSystemInfo(lock.lockData);
       onLog(OperationRecord(
         methodName: 'getLockSystemInfo',
         duration: DateTime.now().difference(start),
@@ -140,7 +139,7 @@ class QuickActionsSection extends ConsumerWidget {
     if (lock == null) return;
     final start = DateTime.now();
     try {
-      final api = ref.read(lockApiProvider);
+      final api = TTLock.lock;
       final wifiInfo = await api.getWifiInfo(lock.lockData);
       onLog(OperationRecord(
         methodName: 'getWifiInfo',
@@ -167,8 +166,8 @@ class QuickActionsSection extends ConsumerWidget {
   Future<void> _verifyLock(BuildContext context, WidgetRef ref) async {
     final start = DateTime.now();
     try {
-      final api = ref.read(lockApiProvider);
-      await runLockApi(() => api.verifyLock(lockMac));
+      final api = TTLock.lock;
+      await api.verifyLock(lockMac);
       onLog(OperationRecord(
         methodName: 'verifyLock', duration: DateTime.now().difference(start),
         isSuccess: true, timestamp: DateTime.now(),

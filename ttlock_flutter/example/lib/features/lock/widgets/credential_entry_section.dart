@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:ttlock_flutter/ttlock.dart';
 
 import '../../../core/router/routes.dart';
@@ -9,7 +9,7 @@ import '../../../core/widgets/section_header.dart';
 import '../capabilities/lock_capabilities_provider.dart';
 import '../../../core/storage/lock_local_cache.dart';
 
-class CredentialEntrySection extends ConsumerWidget {
+class CredentialEntrySection extends HookConsumerWidget {
   const CredentialEntrySection({super.key, required this.lockMac});
 
   final String lockMac;

@@ -1,17 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+
 import '../../core/router/routes.dart';
 import '../../core/storage/accessory_list_provider.dart';
 import '../../core/storage/lock_list_provider.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../core/widgets/async_value_view.dart';
 import '../../core/widgets/device_card.dart';
-import '../../core/widgets/error_display.dart';
 import '../../features/scan/scan_config.dart';
 
-class RemoteKeyListPage extends ConsumerWidget {
-  final String lockMac;
+Future<void> openAddRemoteKeyScan(
+  BuildContext context,
+  WidgetRef ref,
+  String lockMac,
+) async {
+  final lock = await ref.read(lockByMacProvider(lockMac).future);
+  if (lock == null || !context.mounted) return;
+  ScanRoute(
+    type: DeviceType.remoteKey.name,
+    lockData: lock.lockData,
+    lockMac: lockMac,
+  ).push(context);
+}
 
+class RemoteKeyListPage extends HookConsumerWidget {
   const RemoteKeyListPage({super.key, required this.lockMac});
+
+  final String lockMac;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -28,21 +43,13 @@ class RemoteKeyListPage extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () async {
-              final lock = await ref.read(lockByMacProvider(lockMac).future);
-              if (lock == null || !context.mounted) return;
-              ScanRoute(
-                type: DeviceType.remoteKey.name,
-                lockData: lock.lockData,
-                lockMac: lockMac,
-              ).push(context);
-            },
+            onPressed: () => openAddRemoteKeyScan(context, ref, lockMac),
           ),
         ],
       ),
-      body: keysAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => ErrorDisplay(message: e.toString()),
+      body: AsyncValueView.when(
+        value: keysAsync,
+        onRetry: (_, __) => ref.invalidate(remoteKeyListNotifierProvider(lockMac)),
         data: (keys) {
           if (keys.isEmpty) {
             return Center(

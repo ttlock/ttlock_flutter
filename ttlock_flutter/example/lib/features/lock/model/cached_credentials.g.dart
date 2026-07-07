@@ -13,7 +13,7 @@ _CachedPasscode _$CachedPasscodeFromJson(Map<String, dynamic> json) =>
       startDate: (json['start_date'] as num).toInt(),
       endDate: (json['end_date'] as num).toInt(),
       keyboardPwdType: (json['keyboard_pwd_type'] as num?)?.toInt() ?? 0,
-      cycleType: (json['cycle_type'] as num?)?.toInt() ?? 0,
+      cycleType: (json['cycle_type'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$CachedPasscodeToJson(_CachedPasscode instance) =>

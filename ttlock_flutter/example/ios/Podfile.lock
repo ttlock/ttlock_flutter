@@ -5,10 +5,10 @@ PODS:
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
+  - TTLock (3.6.8)
   - ttlock_flutter_ios (0.0.1):
     - Flutter
-    - TTLockOnPremise (= 2.2.2)
-  - TTLockOnPremise (2.2.2)
+    - TTLock (= 3.6.8)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
@@ -18,7 +18,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
-    - TTLockOnPremise
+    - TTLock
 
 EXTERNAL SOURCES:
   Flutter:
@@ -31,11 +31,11 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/ttlock_flutter_ios/ios"
 
 SPEC CHECKSUMS:
-  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   permission_handler_apple: ee2fe0fd04551b304eb002714ff067c371c822ed
-  shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
-  ttlock_flutter_ios: ae9e765981e906c00867a9f47e82695cc7fac320
-  TTLockOnPremise: d232e24622a05cb4b42cc218ec5fa9a886a8baa5
+  shared_preferences_foundation: 5086985c1d43c5ba4d5e69a4e8083a389e2909e6
+  TTLock: 38fc351b450e0f0a71fe48fc99e05bd108a87550
+  ttlock_flutter_ios: 748b5671dab23cbdc7e63f93533b825b2858320a
 
 PODFILE CHECKSUM: 53026eaf67b63baa2e316e457f9701dbdf33f41a
 

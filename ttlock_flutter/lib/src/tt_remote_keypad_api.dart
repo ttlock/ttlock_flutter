@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
-import 'package:ttlock_flutter_platform_interface/pigeon/messages.g.dart' as pigeon;
+import 'package:ttlock_flutter_platform_interface/pigeon/messages.g.dart'
+    as pigeon;
 
 import 'event_stream_params.dart';
 import 'pigeon_errors.dart';
@@ -45,8 +46,10 @@ class TTRemoteKeypadApi {
       endDate: endDate,
     );
     return Stream<void>.fromFuture(
-      runRemoteAccessoryApi(() => _host.setAccessoryAddKeypadFingerprintParam(param)),
-    ).asyncExpand((_) => mapKeypadCredentialStreamErrors(pigeon.accessoryAddKeypadFingerprint()));
+      runRemoteAccessoryApi(
+          () => _host.setAccessoryAddKeypadFingerprintParam(param)),
+    ).asyncExpand((_) => mapKeypadCredentialStreamErrors(
+        pigeon.accessoryAddKeypadFingerprint()));
   }
 
   /// 订阅前调用 [setAccessoryAddKeypadCardParam]。
@@ -74,10 +77,12 @@ class TTRemoteKeypadApi {
     );
     return Stream<void>.fromFuture(
       runRemoteAccessoryApi(() => _host.setAccessoryAddKeypadCardParam(param)),
-    ).asyncExpand((_) => mapKeypadCredentialStreamErrors(pigeon.accessoryAddKeypadCard()));
+    ).asyncExpand((_) =>
+        mapKeypadCredentialStreamErrors(pigeon.accessoryAddKeypadCard()));
   }
 
-  Future<pigeon.RemoteKeypadInitResult> initRemoteKeypad(String mac, String lockMac) =>
+  Future<pigeon.RemoteKeypadInitResult> initRemoteKeypad(
+          String mac, String lockMac) =>
       runRemoteAccessoryApi(() => _host.initRemoteKeypad(mac, lockMac));
 
   Future<pigeon.MultifunctionalKeypadInitResult> initMultifunctionalKeypad(
@@ -89,5 +94,9 @@ class TTRemoteKeypadApi {
       );
 
   Future<void> deleteStoredLock(String mac, int slotNumber) =>
-      runMultifunctionalKeypadApi(() => _host.deleteStoredLock(mac, slotNumber));
+      runMultifunctionalKeypadApi(
+          () => _host.deleteStoredLock(mac, slotNumber));
+
+  Future<List<String>> getStoredLocks(String mac) =>
+      runMultifunctionalKeypadApi(() => _host.getStoredLocks(mac));
 }

@@ -1,6 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:ttlock_flutter/ttlock.dart';
-import '../../providers/ttlock_providers.dart';
 
 part 'water_meter_provider.g.dart';
 
@@ -18,10 +17,10 @@ class WaterMeterNotifier extends _$WaterMeterNotifier {
   WaterMeterState build() => const WaterMeterState();
 
   Future<void> configServer(String url, String clientId, String accessToken) async {
-    final api = ref.read(waterMeterApiProvider);
+    final api = TTLock.waterMeter;
     state = WaterMeterState(isLoading: true, error: null);
     try {
-      await runRemoteAccessoryApi(() => api.waterMeterConfigServer(url, clientId, accessToken));
+      await api.waterMeterConfigServer(url, clientId, accessToken);
       state = WaterMeterState(result: 'Server configured');
     } on TTRemoteAccessoryException catch (e) {
       state = WaterMeterState(error: e.toString());
@@ -29,10 +28,10 @@ class WaterMeterNotifier extends _$WaterMeterNotifier {
   }
 
   Future<void> connect(String mac) async {
-    final api = ref.read(waterMeterApiProvider);
+    final api = TTLock.waterMeter;
     state = WaterMeterState(isLoading: true, error: null);
     try {
-      await runRemoteAccessoryApi(() => api.waterMeterConnect(mac));
+      await api.waterMeterConnect(mac);
       state = WaterMeterState(result: 'Connected');
     } on TTRemoteAccessoryException catch (e) {
       state = WaterMeterState(error: e.toString());
@@ -40,7 +39,7 @@ class WaterMeterNotifier extends _$WaterMeterNotifier {
   }
 
   Future<void> disconnect(String mac) async {
-    final api = ref.read(waterMeterApiProvider);
+    final api = TTLock.waterMeter;
     try {
       await api.waterMeterDisconnect(mac);
       state = WaterMeterState(result: 'Disconnected');
@@ -55,7 +54,7 @@ class WaterMeterNotifier extends _$WaterMeterNotifier {
     TTMeterPayMode payMode = TTMeterPayMode.postpaid,
     double price = 0,
   }) async {
-    final api = ref.read(waterMeterApiProvider);
+    final api = TTLock.waterMeter;
     state = WaterMeterState(isLoading: true, error: null);
     try {
       final result = await api.waterMeterInit(TTWaterMeterInitParam(
@@ -73,7 +72,7 @@ class WaterMeterNotifier extends _$WaterMeterNotifier {
   }
 
   Future<void> readData(String mac) async {
-    final api = ref.read(waterMeterApiProvider);
+    final api = TTLock.waterMeter;
     state = WaterMeterState(isLoading: true, error: null);
     try {
       await api.waterMeterReadData(mac);
@@ -84,7 +83,7 @@ class WaterMeterNotifier extends _$WaterMeterNotifier {
   }
 
   Future<void> setPowerOnOff(String mac, bool isOn) async {
-    final api = ref.read(waterMeterApiProvider);
+    final api = TTLock.waterMeter;
     state = WaterMeterState(isLoading: true, error: null);
     try {
       await api.waterMeterSetPowerOnOff(mac, isOn);
@@ -95,7 +94,7 @@ class WaterMeterNotifier extends _$WaterMeterNotifier {
   }
 
   Future<void> setPayMode(String mac, TTMeterPayMode mode, {double price = 0}) async {
-    final api = ref.read(waterMeterApiProvider);
+    final api = TTLock.waterMeter;
     state = WaterMeterState(isLoading: true, error: null);
     try {
       await api.waterMeterSetPayMode(mac, mode, price);
@@ -106,7 +105,7 @@ class WaterMeterNotifier extends _$WaterMeterNotifier {
   }
 
   Future<void> charge(String mac, double amount, {double m3 = 0}) async {
-    final api = ref.read(waterMeterApiProvider);
+    final api = TTLock.waterMeter;
     state = WaterMeterState(isLoading: true, error: null);
     try {
       await api.waterMeterCharge(mac, amount, m3);
@@ -117,7 +116,7 @@ class WaterMeterNotifier extends _$WaterMeterNotifier {
   }
 
   Future<void> getFeatureValue(String mac) async {
-    final api = ref.read(waterMeterApiProvider);
+    final api = TTLock.waterMeter;
     state = WaterMeterState(isLoading: true, error: null);
     try {
       final value = await api.waterMeterGetFeatureValue(mac);
@@ -128,7 +127,7 @@ class WaterMeterNotifier extends _$WaterMeterNotifier {
   }
 
   Future<void> getDeviceInfo(String mac) async {
-    final api = ref.read(waterMeterApiProvider);
+    final api = TTLock.waterMeter;
     state = WaterMeterState(isLoading: true, error: null);
     try {
       final info = await api.waterMeterGetDeviceInfo(mac);
@@ -139,7 +138,7 @@ class WaterMeterNotifier extends _$WaterMeterNotifier {
   }
 
   Future<void> delete(String mac) async {
-    final api = ref.read(waterMeterApiProvider);
+    final api = TTLock.waterMeter;
     state = WaterMeterState(isLoading: true, error: null);
     try {
       await api.waterMeterDelete(mac);
@@ -150,7 +149,7 @@ class WaterMeterNotifier extends _$WaterMeterNotifier {
   }
 
   Future<void> reset(String mac) async {
-    final api = ref.read(waterMeterApiProvider);
+    final api = TTLock.waterMeter;
     state = WaterMeterState(isLoading: true, error: null);
     try {
       await api.waterMeterReset(mac);

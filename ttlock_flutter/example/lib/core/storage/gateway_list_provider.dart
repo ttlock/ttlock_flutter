@@ -14,7 +14,13 @@ class GatewayListNotifier extends _$GatewayListNotifier {
   Future<List<SavedGatewayDevice>> build() async => _gatewayStorage.load();
 
   Future<void> addDevice(SavedGatewayDevice device) async {
-    final list = <SavedGatewayDevice>[...?state.valueOrNull, device];
+    final list = <SavedGatewayDevice>[...?state.valueOrNull];
+    final idx = list.indexWhere((d) => d.mac == device.mac);
+    if (idx >= 0) {
+      list[idx] = device;
+    } else {
+      list.add(device);
+    }
     await _gatewayStorage.save(list);
     ref.invalidateSelf();
   }

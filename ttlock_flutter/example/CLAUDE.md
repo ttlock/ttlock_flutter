@@ -104,17 +104,23 @@ lib/
 
 ### 状态管理
 
-使用 `hooks_riverpod` + `riverpod_annotation`（codegen）：
+使用 `hooks_riverpod` + `riverpod_annotation` + `flutter_hooks`：
 
-- Provider 通过 `@riverpod` 注解 + build_runner 生成 `.g.dart`
-- Feature-level Notifier 封装 API 调用逻辑（如 `ScanNotifier`、`LockNotifier`）
-- 全局 TTLock API provider 集中在 `lib/providers/ttlock_providers.dart`
+- **需 `ref` 的页面/组件**：必须使用 `HookConsumerWidget`（禁止 `ConsumerWidget` / `ConsumerStatefulWidget`）
+- **UI 局部状态**：`useTextEditingController`、`useTabController`、`useState`、`useEffect`
+- **数据 provider**（列表、配置、设备信息）：`@riverpod class` + `Future<T> build()`；页面用 `ref.watch(...).when()` 或 `AsyncValueView.when`
+- **命令 provider**（BLE 操作、连接、扫描）：同步 `build()` + freezed state；操作 loading 用 `state.isLoading` 或 `loaderOverlay`
+- **禁止**：`initState` 触发数据加载；数据页用手动 `isLoading` / `valueOrNull` 替代主数据 `.when()`
+
+参考实现：`settings_page.dart`、`card_list_page.dart`
+
+公共组件：`core/widgets/async_value_view.dart`
 
 ### 常见模式：Feature Page 结构
 
 每个 feature 通常由 3 个文件组成：
 
-1. `{feature}_page.dart` — UI 层（`ConsumerWidget` 或 `ConsumerStatefulWidget`）
+1. `{feature}_page.dart` — UI 层（`HookConsumerWidget`）
 2. `{feature}_provider.dart` — 状态管理（`@riverpod` Notifier，封装 API 调用）
 3. `model/{feature}_state.dart`（可选）— freezed 状态模型
 

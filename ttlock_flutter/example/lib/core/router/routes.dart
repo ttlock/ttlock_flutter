@@ -5,7 +5,9 @@ import '../../app.dart';
 import '../../features/dashboard/dashboard_page.dart';
 import '../../features/door_sensor/door_sensor_info_page.dart';
 import '../../features/door_sensor/door_sensor_list_page.dart';
+import '../../features/door_sensor/standalone_door_sensor_info_page.dart';
 import '../../features/electric_meter/electric_meter_page.dart';
+import '../../features/gateway/gateway_init_page.dart';
 import '../../features/gateway/gateway_page.dart';
 import '../../features/lock/card/card_add_page.dart';
 import '../../features/lock/card/card_list_page.dart';
@@ -38,10 +40,6 @@ class DashboardBranch extends StatefulShellBranchData {
   const DashboardBranch();
 }
 
-class ScanBranch extends StatefulShellBranchData {
-  const ScanBranch();
-}
-
 class SettingsBranch extends StatefulShellBranchData {
   const SettingsBranch();
 }
@@ -52,11 +50,6 @@ class SettingsBranch extends StatefulShellBranchData {
     TypedStatefulShellBranch<DashboardBranch>(
       routes: [
         TypedGoRoute<DashboardRoute>(path: '/'),
-      ],
-    ),
-    TypedStatefulShellBranch<ScanBranch>(
-      routes: [
-        TypedGoRoute<ScanRoute>(path: '/scan'),
       ],
     ),
     TypedStatefulShellBranch<SettingsBranch>(
@@ -88,7 +81,8 @@ class DashboardRoute extends GoRouteData with _$DashboardRoute {
       const DashboardPage();
 }
 
-// ─── Scan ───
+// ─── Scan (full-screen, outside shell) ───
+@TypedGoRoute<ScanRoute>(path: '/scan')
 class ScanRoute extends GoRouteData with _$ScanRoute {
   const ScanRoute({this.type, this.lockData, this.lockMac});
 
@@ -323,23 +317,40 @@ class PalmVeinListRoute extends GoRouteData with _$PalmVeinListRoute {
       PalmVeinListPage(lockMac: mac);
 }
 
-// ─── Gateway Detail ───
-@TypedGoRoute<GatewayRoute>(path: '/gateway/:mac')
+// ─── Gateway ───
+@TypedGoRoute<GatewayRoute>(
+  path: '/gateway/:mac',
+  routes: [
+    TypedGoRoute<GatewayInitRoute>(path: 'init'),
+  ],
+)
 class GatewayRoute extends GoRouteData with _$GatewayRoute {
-  const GatewayRoute(
+  const GatewayRoute(this.mac);
+
+  final String mac;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      GatewayPage(mac: mac);
+}
+
+class GatewayInitRoute extends GoRouteData with _$GatewayInitRoute {
+  const GatewayInitRoute(
     this.mac, {
+    this.name = 'Gateway',
     this.gatewayType = TTGatewayType.g2,
     this.needsWifiConfig = false,
   });
 
   final String mac;
+  final String name;
   final TTGatewayType gatewayType;
   final bool needsWifiConfig;
 
   @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      GatewayPage(
+  Widget build(BuildContext context, GoRouterState state) => GatewayInitPage(
         mac: mac,
+        name: name,
         gatewayType: gatewayType,
         needsWifiConfig: needsWifiConfig,
       );
@@ -355,6 +366,18 @@ class DoorSensorInfoRoute extends GoRouteData with _$DoorSensorInfoRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) =>
       DoorSensorInfoPage(mac: mac);
+}
+
+@TypedGoRoute<StandaloneDoorSensorRoute>(path: '/standalone-door-sensor/:mac')
+class StandaloneDoorSensorRoute extends GoRouteData
+    with _$StandaloneDoorSensorRoute {
+  const StandaloneDoorSensorRoute(this.mac);
+
+  final String mac;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      StandaloneDoorSensorInfoPage(mac: mac);
 }
 
 @TypedGoRoute<RemoteKeyInfoRoute>(path: '/remote-key/:mac')

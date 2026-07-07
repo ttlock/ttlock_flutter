@@ -91,13 +91,13 @@ class TTRemoteKeypad {
     });
   }
 
-  @Deprecated('Use TTLock.remoteKey.getStoredLocks(mac) instead.')
+  @Deprecated('Use TTLock.remoteKeypad.getStoredLocks(mac) instead.')
   static void getStoredLocks(
     String mac,
     TTRemoteKeypadGetStoredLockSuccessCallback callback,
     TTRemoteKeypadFailedCallback failedCallback,
   ) {
-    new_ttlock.TTLock.remoteKey.getStoredLocks(mac).then((list) {
+    new_ttlock.TTLock.remoteKeypad.getStoredLocks(mac).then((list) {
       callback(list);
     }).catchError((e, _) {
       if (e is TTRemoteAccessoryException) {

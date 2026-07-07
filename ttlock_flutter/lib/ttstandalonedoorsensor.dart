@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:ttlock_flutter/ttlock.dart' as new_ttlock;
 import 'package:ttlock_flutter/ttlock_classic.dart';
 import 'package:ttlock_flutter/errors/tt_remote_accessory_exception.dart';
+import 'package:ttlock_flutter/errors/tt_standalone_door_sensor_exception.dart';
 import 'dart:convert';
 
 @Deprecated('Use Stream<TTStandaloneDoorSensorScanModel> from TTLock.doorSensor.accessoryStandaloneDoorSensorStartScan().')
@@ -61,11 +62,25 @@ class TTStandaloneDoorSensor {
       }
     }
 
+    final params = TTStandaloneDoorSensorInitParams(
+      mac: mac,
+      doorSensorName: info['doorSensorName'] as String? ??
+          info['doorSensorNumber'] as String? ??
+          '',
+      wifiName: info['wifiName'] as String? ?? info['SSID'] as String? ?? '',
+      wifiPassword:
+          info['wifiPassword'] as String? ?? info['wifiPwd'] as String? ?? '',
+      serverAddress: info['serverAddress'] as String? ?? '',
+      portNumber: (info['portNumber'] as num?)?.toInt() ?? 0,
+    );
+
     new_ttlock.TTLock.doorSensor
-        .standaloneDoorSensorInit(mac, Map<String, Object?>.from(info))
+        .standaloneDoorSensorInit(params)
         .then(callback)
         .catchError((e, _) {
-      if (e is TTRemoteAccessoryException) {
+      if (e is TTStandaloneDoorSensorException) {
+        failedCallback(TTRemoteAccessoryError.failed, e.message ?? '');
+      } else if (e is TTRemoteAccessoryException) {
         failedCallback(e.code, e.message ?? '');
       } else {
         failedCallback(TTRemoteAccessoryError.failed, e.toString());
@@ -83,7 +98,9 @@ class TTStandaloneDoorSensor {
         .standaloneDoorSensorReadFeatureValue(mac)
         .then(callback)
         .catchError((e, _) {
-      if (e is TTRemoteAccessoryException) {
+      if (e is TTStandaloneDoorSensorException) {
+        failedCallback(TTRemoteAccessoryError.failed, e.message ?? '');
+      } else if (e is TTRemoteAccessoryException) {
         failedCallback(e.code, e.message ?? '');
       } else {
         failedCallback(TTRemoteAccessoryError.failed, e.toString());
@@ -105,9 +122,13 @@ class TTStandaloneDoorSensor {
     required String featureValue,
     required int supportFunction,
   }) {
+    final feature = supportFunction >= 0 &&
+            supportFunction < TTStandaloneDoorSensorFeature.values.length
+        ? TTStandaloneDoorSensorFeature.values[supportFunction]
+        : TTStandaloneDoorSensorFeature.wifi24G;
     return new_ttlock.TTLock.doorSensor.standaloneDoorSensorIsSupportFunction(
       featureValue,
-      supportFunction,
+      feature,
     );
   }
 }

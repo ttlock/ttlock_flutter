@@ -20,7 +20,13 @@ class DoorSensorListNotifier extends _$DoorSensorListNotifier {
 
   Future<void> add(SavedDoorSensor device) async {
     final all = await _accessoryStorage.loadDoorSensors();
-    await _accessoryStorage.saveDoorSensors([...all, device]);
+    final idx = all.indexWhere((d) => d.mac == device.mac);
+    if (idx >= 0) {
+      all[idx] = device;
+    } else {
+      all.add(device);
+    }
+    await _accessoryStorage.saveDoorSensors(all);
     ref.invalidateSelf();
   }
 
@@ -50,7 +56,13 @@ class RemoteKeyListNotifier extends _$RemoteKeyListNotifier {
 
   Future<void> add(SavedRemoteKey device) async {
     final all = await _accessoryStorage.loadRemoteKeys();
-    await _accessoryStorage.saveRemoteKeys([...all, device]);
+    final idx = all.indexWhere((d) => d.mac == device.mac);
+    if (idx >= 0) {
+      all[idx] = device;
+    } else {
+      all.add(device);
+    }
+    await _accessoryStorage.saveRemoteKeys(all);
     ref.invalidateSelf();
   }
 
@@ -80,7 +92,13 @@ class KeypadListNotifier extends _$KeypadListNotifier {
 
   Future<void> add(SavedKeypad device) async {
     final all = await _accessoryStorage.loadKeypads();
-    await _accessoryStorage.saveKeypads([...all, device]);
+    final idx = all.indexWhere((d) => d.mac == device.mac);
+    if (idx >= 0) {
+      all[idx] = device;
+    } else {
+      all.add(device);
+    }
+    await _accessoryStorage.saveKeypads(all);
     ref.invalidateSelf();
   }
 

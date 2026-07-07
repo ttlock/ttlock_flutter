@@ -1,5 +1,3 @@
-import EventChannel, { EventSink, StreamHandler } from '@ohos/flutter_ohos/src/main/ets/plugin/common/EventChannel';
-import StandardMethodCodec from '@ohos/flutter_ohos/src/main/ets/plugin/common/StandardMethodCodec';
 import { BinaryMessenger } from '@ohos/flutter_ohos/src/main/ets/plugin/common/BinaryMessenger';
 
 import {
@@ -8,42 +6,45 @@ import {
   TTWaterMeter,
   TTWiFiDoorMagnetic,
   TTLockScanModel as SdkTTLockScanModel,
-  TTGatewayScanModel as SdkTTGatewayScanModel,
   IFaceModel,
+  IPalmVeinModel,
   IAddFingerprintProgressModel,
   TTAddState as SdkTTAddState,
   TTKeypadStatus as SdkTTKeypadStatus,
   SNError,
 } from '@sciener/ttlock';
-import {
-  TTKeyboardScanModel,
-  TTKeyScanModel,
-  TTDoorMagneticScanModel,
-  TTWaterMeterScanModel,
-  TTElectricMeterScanModel,
-} from '@sciener/ttlock/src/main/ets/e/f/g/h';
-import {
-  ITTLockAddICCardModel,
-  ITTLockAddFingerprintModel,
-  ITTLockScanWifiModel,
-} from '@sciener/ttlock/src/main/ets/e/f/i/i';
-import {
-  TTGatewayType as SdkTTGatewayType,
-} from '@sciener/ttlock/src/main/ets/e/f/l/l';
 
 import HashMap from '@ohos.util.HashMap';
 
 import {
+  AccessoryAddKeypadCardStreamHandler,
+  AccessoryAddKeypadFingerprintStreamHandler,
+  AccessoryElectricMeterStartScanStreamHandler,
+  AccessoryStandaloneDoorSensorStartScanStreamHandler,
+  AccessoryStartScanDoorSensorStreamHandler,
+  AccessoryStartScanRemoteKeyStreamHandler,
+  AccessoryStartScanRemoteKeypadStreamHandler,
+  AccessoryWaterMeterStartScanStreamHandler,
   AddCardEvent,
   AddFaceEvent,
   AddFingerprintEvent,
+  AddPalmVeinEvent,
+  GatewayGetNearbyWifiStreamHandler,
+  GatewayStartScanStreamHandler,
+  LockAddCardStreamHandler,
+  LockAddFaceStreamHandler,
+  LockAddFingerprintStreamHandler,
+  LockAddPalmVeinStreamHandler,
+  LockScanLockStreamHandler,
+  LockScanWifiStreamHandler,
+  PigeonEventSink,
+  TTAddCardPhase,
   TTAddFacePhase,
-  PigeonCodec,
+  TTAddFingerprintPhase,
+  TTAddPalmVeinPhase,
   TTGatewayScanModel,
-  TTGatewayType,
   TTLockScanModel,
   TTLockSwitchState,
-  TTLockVersion,
   TTMeterScanModel,
   TTRemoteAccessoryScanModel,
   TTStandaloneDoorSensorScanModel,
@@ -56,89 +57,33 @@ import {
   ValidityRange,
   cycleListToConfig,
   CycleConfigEntry,
+  emitGatewaySinkError,
+  emitKeypadSinkError,
+  emitLockSinkError,
+  lockVersionFromJsonString,
+  NOT_IMPLEMENTED_CODE,
 } from './TtlockPremiseSupport';
 
 import {
   faceErrorRevert,
   facePhaseRevert,
-  gatewayErrorRevert,
-  keypadErrorRevert,
-  lockErrorRevert,
-  multifunctionalKeypadErrorRevert,
+  gatewayTypeRevert,
   lockSwitchStateRevert,
+  palmVeinErrorRevert,
 } from './EnumConverter';
-
-const STREAM_PREFIX = 'dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.';
+import {
+  ITTLockAddFingerprintModel,
+  ITTLockAddICCardModel, ITTLockScanWifiModel } from '@sciener/ttlock/src/main/ets/TTLock/d/g/g';
+import {
+  TTDoorMagneticScanModel,
+  TTElectricMeterScanModel,
+  TTKeyboardScanModel, TTKeyScanModel,
+  TTGatewayScanModel as SdkTTGatewayScanModel,
+  TTWaterMeterScanModel } from '@sciener/ttlock/src/main/ets/TTLock/d/e/f';
 
 const NO_LOCK_DATA = 'NO_LOCK_DATA';
-const NO_GATEWAY = 'NO_GATEWAY';
+const NO_GATEWAY_MAC = 'NO_GATEWAY_MAC';
 const NO_KEYPAD = 'NO_KEYPAD';
-
-interface LockVersionLike {
-  protocolType?: number;
-  protocolVersion?: number;
-  scene?: number;
-  groupId?: number;
-  orgId?: number;
-}
-
-function pigeonMethodCodec(): StandardMethodCodec {
-  return new StandardMethodCodec(PigeonCodec.INSTANCE);
-}
-
-/**
- * 引擎 detach 时，每条 EventChannel 需要清空已注册的 StreamHandler。
- * `setStreamHandler(null)` 在 ArkTS 严格模式下不便表达，
- * 改注册一个空实现的单例即可。
- */
-class NoopStreamHandler implements StreamHandler {
-  static shared: NoopStreamHandler = new NoopStreamHandler();
-
-  onListen(_args: Object, _events: EventSink): void {
-  }
-
-  onCancel(_args: Object): void {
-  }
-}
-
-function gatewayTypeRevert(t: SdkTTGatewayType): TTGatewayType {
-  switch (t) {
-    case SdkTTGatewayType.g2:
-      return TTGatewayType.G2;
-    case SdkTTGatewayType.g3:
-      return TTGatewayType.G3;
-    case SdkTTGatewayType.g4:
-      return TTGatewayType.G4;
-    case SdkTTGatewayType.g5:
-      return TTGatewayType.G5;
-    case SdkTTGatewayType.g6:
-      return TTGatewayType.G6;
-    default:
-      return TTGatewayType.G2;
-  }
-}
-
-function nowMillis(): number {
-  return Date.now();
-}
-
-function pigeonLockVersion(value: string | null | undefined): TTLockVersion {
-  if (value === null || value === undefined || value.length === 0) {
-    return new TTLockVersion(0, 0, 0, 0, 0);
-  }
-  try {
-    const obj = JSON.parse(value) as LockVersionLike;
-    return new TTLockVersion(
-      obj.protocolType ?? 0,
-      obj.protocolVersion ?? 0,
-      obj.scene ?? 0,
-      obj.groupId ?? 0,
-      obj.orgId ?? 0,
-    );
-  } catch (_e) {
-    return new TTLockVersion(0, 0, 0, 0, 0);
-  }
-}
 
 function readScanWifiEntry(item: Map<string, Object>): TTWifiScanEntry {
   const ssidVal = item.get('SSID') ?? item.get('ssid');
@@ -180,40 +125,86 @@ function buildGatewayWifiScanResult(map: HashMap<string, Object>): TTWifiScanRes
   return new TTWifiScanResult(entries);
 }
 
-function emitLockError(events: EventSink, op: string, err: SNError): void {
-  const code = lockErrorRevert(err.code);
-  events.error(`${code}`, err.msg.length > 0 ? err.msg : `${op} failed`, null);
+function doorMagneticToRemoteAccessoryScanModel(
+  model: TTDoorMagneticScanModel,
+  isMultifunctionalKeypad: boolean,
+): TTRemoteAccessoryScanModel {
+  return new TTRemoteAccessoryScanModel(
+    model.name,
+    model.mac,
+    model.rssi,
+    isMultifunctionalKeypad,
+    new Map<string, Object>(),
+    model.timestamp,
+  );
 }
 
-function emitGatewayError(events: EventSink, op: string, err: SNError): void {
-  const code = gatewayErrorRevert(err.code);
-  events.error(`${code}`, err.msg.length > 0 ? err.msg : `${op} failed`, null);
+function doorMagneticToStandaloneDoorSensorScanModel(
+  model: TTDoorMagneticScanModel,
+): TTStandaloneDoorSensorScanModel {
+  return new TTStandaloneDoorSensorScanModel(
+    model.name,
+    model.mac,
+    model.rssi,
+    model.timestamp,
+  );
 }
 
-function emitKeypadStatusFromSdk(events: EventSink, status: SdkTTKeypadStatus, isMulti: boolean): void {
-  const code = isMulti
-    ? multifunctionalKeypadErrorRevert(status as number)
-    : keypadErrorRevert(status as number);
-  events.error(`${code}`, isMulti ? 'multifunctional keypad failure' : 'keypad failure', null);
+function keyToRemoteAccessoryScanModel(
+  model: TTKeyScanModel,
+  isMultifunctionalKeypad: boolean,
+): TTRemoteAccessoryScanModel {
+  return new TTRemoteAccessoryScanModel(
+    model.name,
+    model.mac,
+    model.rssi,
+    isMultifunctionalKeypad,
+    new Map<string, Object>(),
+    model.timestamp,
+  );
 }
 
-class LockScanLockHandler implements StreamHandler {
-  onListen(_args: Object, events: EventSink): void {
+function keyboardToRemoteAccessoryScanModel(
+  model: TTKeyboardScanModel,
+  isMultifunctionalKeypad: boolean,
+): TTRemoteAccessoryScanModel {
+  return new TTRemoteAccessoryScanModel(
+    model.name,
+    model.mac,
+    model.rssi,
+    isMultifunctionalKeypad,
+    new Map<string, Object>(),
+    model.timestamp,
+  );
+}
+
+interface DisposableStreamHandler {
+  onCancel(args: Object): void;
+}
+
+class ScanLockImpl extends LockScanLockStreamHandler implements DisposableStreamHandler {
+  constructor(messenger: BinaryMessenger) {
+    super();
+    LockScanLockStreamHandler.register(messenger, this);
+  }
+
+  onListen(_args: Object, sink: PigeonEventSink<TTLockScanModel>): void {
     TTLock.startScanLock((m: SdkTTLockScanModel): void => {
-      const switchState: TTLockSwitchState = lockSwitchStateRevert(m.lockSwitchState);
+      const switchState: TTLockSwitchState =
+        lockSwitchStateRevert(m.lockSwitchState) ?? TTLockSwitchState.UNKNOW;
       const out = new TTLockScanModel(
         m.name,
         m.mac,
         m.isInited,
         m.isAllowUnlock,
         m.electricQuantity,
-        pigeonLockVersion(m.lockVersion),
+        lockVersionFromJsonString(m.lockVersion),
         switchState,
         m.rssi,
         m.oneMeterRssi,
         m.timestamp,
       );
-      events.success(out);
+      sink.success(out);
     });
   }
 
@@ -222,20 +213,25 @@ class LockScanLockHandler implements StreamHandler {
   }
 }
 
-class LockScanWifiHandler implements StreamHandler {
-  onListen(_args: Object, events: EventSink): void {
+class ScanLockWifiImpl extends LockScanWifiStreamHandler implements DisposableStreamHandler {
+  constructor(messenger: BinaryMessenger) {
+    super();
+    LockScanWifiStreamHandler.register(messenger, this);
+  }
+
+  onListen(_args: Object, sink: PigeonEventSink<TTWifiScanResult>): void {
     const lockData: string | null = EventContextStore.shared.lockScanWifi.lockData;
     if (lockData === null || lockData.length === 0) {
-      events.error(NO_LOCK_DATA,
+      sink.error(NO_LOCK_DATA,
         '请先通过 setLockScanWifiParam 设置 lockData 后再使用 lockScanWifi', null);
       return;
     }
     TTLock.lockScanNearbyWifi(lockData, {
       success: (model: ITTLockScanWifiModel): void => {
-        events.success(buildLockScanWifiResult(model));
+        sink.success(buildLockScanWifiResult(model));
       },
       failure: (err: SNError): void => {
-        emitLockError(events, 'lockScanWifi', err);
+        emitLockSinkError(sink, 'lockScanWifi', err);
       },
     });
   }
@@ -244,12 +240,17 @@ class LockScanWifiHandler implements StreamHandler {
   }
 }
 
-class LockAddCardHandler implements StreamHandler {
-  onListen(_args: Object, events: EventSink): void {
+class AddLockCardImpl extends LockAddCardStreamHandler implements DisposableStreamHandler {
+  constructor(messenger: BinaryMessenger) {
+    super();
+    LockAddCardStreamHandler.register(messenger, this);
+  }
+
+  onListen(_args: Object, sink: PigeonEventSink<AddCardEvent>): void {
     const slot = EventContextStore.shared.lockAddCard;
     const lockData: string | null = slot.lockData;
     if (lockData === null || lockData.length === 0) {
-      events.error(NO_LOCK_DATA,
+      sink.error(NO_LOCK_DATA,
         '请先通过 setLockAddCardParam 设置参数后再使用 lockAddCard', null);
       return;
     }
@@ -258,13 +259,13 @@ class LockAddCardHandler implements StreamHandler {
     TTLock.addICCard(lockData, range.start, range.end, cyclic, {
       success: (model: ITTLockAddICCardModel): void => {
         if (model.status === 1) {
-          events.success(new AddCardEvent(true, undefined));
+          sink.success(new AddCardEvent(TTAddCardPhase.WAITING, undefined));
         } else {
-          events.success(new AddCardEvent(false, model.cardNumber));
+          sink.success(new AddCardEvent(TTAddCardPhase.SUCCESS, model.cardNumber));
         }
       },
       failure: (err: SNError): void => {
-        emitLockError(events, 'lockAddCard', err);
+        emitLockSinkError(sink, 'lockAddCard', err);
       },
     });
   }
@@ -273,12 +274,17 @@ class LockAddCardHandler implements StreamHandler {
   }
 }
 
-class LockAddFingerprintHandler implements StreamHandler {
-  onListen(_args: Object, events: EventSink): void {
+class AddLockFingerprintImpl extends LockAddFingerprintStreamHandler implements DisposableStreamHandler {
+  constructor(messenger: BinaryMessenger) {
+    super();
+    LockAddFingerprintStreamHandler.register(messenger, this);
+  }
+
+  onListen(_args: Object, sink: PigeonEventSink<AddFingerprintEvent>): void {
     const slot = EventContextStore.shared.lockAddFingerprint;
     const lockData: string | null = slot.lockData;
     if (lockData === null || lockData.length === 0) {
-      events.error(NO_LOCK_DATA,
+      sink.error(NO_LOCK_DATA,
         '请先通过 setLockAddFingerprintParam 设置参数后再使用 lockAddFingerprint', null);
       return;
     }
@@ -287,13 +293,17 @@ class LockAddFingerprintHandler implements StreamHandler {
     TTLock.addFingerprint(lockData, range.start, range.end, cyclic, {
       success: (model: ITTLockAddFingerprintModel): void => {
         if (model.success) {
-          events.success(new AddFingerprintEvent(false, undefined, undefined, model.fingerprintNumber));
+          sink.success(new AddFingerprintEvent(TTAddFingerprintPhase.SUCCESS, undefined, undefined,
+            model.fingerprintNumber));
         } else {
-          events.success(new AddFingerprintEvent(true, model.currentCount, model.totalCount, undefined));
+          sink.success(new AddFingerprintEvent(TTAddFingerprintPhase.COLLECTING,
+            model.currentCount,
+            model.totalCount,
+            undefined));
         }
       },
       failure: (err: SNError): void => {
-        emitLockError(events, 'lockAddFingerprint', err);
+        emitLockSinkError(sink, 'lockAddFingerprint', err);
       },
     });
   }
@@ -302,12 +312,17 @@ class LockAddFingerprintHandler implements StreamHandler {
   }
 }
 
-class LockAddFaceHandler implements StreamHandler {
-  onListen(_args: Object, events: EventSink): void {
+class AddLockFaceImpl extends LockAddFaceStreamHandler implements DisposableStreamHandler {
+  constructor(messenger: BinaryMessenger) {
+    super();
+    LockAddFaceStreamHandler.register(messenger, this);
+  }
+
+  onListen(_args: Object, sink: PigeonEventSink<AddFaceEvent>): void {
     const slot = EventContextStore.shared.lockAddFace;
     const lockData: string | null = slot.lockData;
     if (lockData === null || lockData.length === 0) {
-      events.error(NO_LOCK_DATA,
+      sink.error(NO_LOCK_DATA,
         '请先通过 setLockAddFaceParam 设置参数后再使用 lockAddFace', null);
       return;
     }
@@ -316,9 +331,9 @@ class LockAddFaceHandler implements StreamHandler {
     TTLock.addFace(lockData, range.start, range.end, cyclic, {
       success: (model: IFaceModel): void => {
         if (model.addState === SdkTTAddState.success) {
-          events.success(new AddFaceEvent(TTAddFacePhase.SUCCESS, undefined, model.faceNumber));
+          sink.success(new AddFaceEvent(TTAddFacePhase.SUCCESS, undefined, model.faceNumber));
         } else {
-          events.success(new AddFaceEvent(
+          sink.success(new AddFaceEvent(
             facePhaseRevert(model.addState),
             faceErrorRevert(model.errorCode),
             undefined,
@@ -326,7 +341,7 @@ class LockAddFaceHandler implements StreamHandler {
         }
       },
       failure: (err: SNError): void => {
-        emitLockError(events, 'lockAddFace', err);
+        emitLockSinkError(sink, 'lockAddFace', err);
       },
     });
   }
@@ -335,25 +350,57 @@ class LockAddFaceHandler implements StreamHandler {
   }
 }
 
-class LockAddPalmVeinHandler implements StreamHandler {
-  onListen(_args: Object, events: EventSink): void {
-    events.error(
-      'NOT_IMPLEMENTED',
-      'lockAddPalmVein is not implemented on OpenHarmony',
-      null,
-    );
+class AddLockPalmVeinImpl extends LockAddPalmVeinStreamHandler implements DisposableStreamHandler {
+  constructor(messenger: BinaryMessenger) {
+    super();
+    LockAddPalmVeinStreamHandler.register(messenger, this);
+  }
+
+  onListen(_args: Object, sink: PigeonEventSink<AddPalmVeinEvent>): void {
+    const slot = EventContextStore.shared.lockAddPalmVein;
+    const lockData: string | null = slot.lockData;
+    if (lockData === null || lockData.length === 0) {
+      sink.error(NO_LOCK_DATA,
+        '请先通过 setLockAddPalmVeinParam 设置参数后再使用 lockAddPalmVein', null);
+      return;
+    }
+    const range: ValidityRange = slot.toValidityRange();
+    const cyclic: CycleConfigEntry[] | null = cycleListToConfig(range.cyclic);
+    TTLock.addPalmVein(lockData, range.start, range.end, cyclic, {
+      success: (model: IPalmVeinModel): void => {
+        if (model.addState === SdkTTAddState.success) {
+          sink.success(new AddPalmVeinEvent(TTAddPalmVeinPhase.SUCCESS, undefined, model.palmVeinNumber));
+        } else if (model.addState === SdkTTAddState.canStartAdd) {
+          sink.success(new AddPalmVeinEvent(TTAddPalmVeinPhase.CAN_START_ADD, undefined, undefined));
+        } else {
+          sink.success(new AddPalmVeinEvent(
+            TTAddPalmVeinPhase.ERROR,
+            palmVeinErrorRevert(model.errorCode),
+            undefined,
+          ));
+        }
+      },
+      failure: (err: SNError): void => {
+        emitLockSinkError(sink, 'lockAddPalmVein', err);
+      },
+    });
   }
 
   onCancel(_args: Object): void {
   }
 }
 
-class GatewayStartScanHandler implements StreamHandler {
-  onListen(_args: Object, events: EventSink): void {
+class GatewayStartScanImpl extends GatewayStartScanStreamHandler implements DisposableStreamHandler {
+  constructor(messenger: BinaryMessenger) {
+    super();
+    GatewayStartScanStreamHandler.register(messenger, this);
+  }
+
+  onListen(_args: Object, sink: PigeonEventSink<TTGatewayScanModel>): void {
     TTLock.startScanGateway((m: SdkTTGatewayScanModel): void => {
       const isDfuMode: boolean = m.isNordicDfuMode || m.isTeLinkDfuMode;
       const out = new TTGatewayScanModel(m.name, m.mac, m.rssi, isDfuMode, gatewayTypeRevert(m.type));
-      events.success(out);
+      sink.success(out);
     });
   }
 
@@ -362,20 +409,28 @@ class GatewayStartScanHandler implements StreamHandler {
   }
 }
 
-class GatewayGetNearbyWifiHandler implements StreamHandler {
-  onListen(_args: Object, events: EventSink): void {
+class GatewayGetNearbyWifiImpl extends GatewayGetNearbyWifiStreamHandler implements DisposableStreamHandler {
+  constructor(messenger: BinaryMessenger) {
+    super();
+    GatewayGetNearbyWifiStreamHandler.register(messenger, this);
+  }
+
+  onListen(_args: Object, sink: PigeonEventSink<TTWifiScanResult>): void {
     const mac: string | null = EventContextStore.shared.gatewayGetNearbyWifi.gatewayMac;
     if (mac === null || mac.length === 0) {
-      events.error(NO_GATEWAY,
-        '请先通过 setGatewayGetNearbyWifiParam 设置网关 MAC 后再使用 gatewayGetNearbyWifi', null);
+      sink.error(
+        NO_GATEWAY_MAC,
+        'noGatewayMac',
+        '请先通过 setGatewayGetNearbyWifiParam 设置网关 MAC 后再使用 gatewayGetNearbyWifi',
+      );
       return;
     }
     TTLock.scanWiFiByGateway({
       success: (info: HashMap<String, Object>): void => {
-        events.success(buildGatewayWifiScanResult(info as HashMap<String, Object> as HashMap<string, Object>));
+        sink.success(buildGatewayWifiScanResult(info as HashMap<String, Object> as HashMap<string, Object>));
       },
       failure: (err: SNError): void => {
-        emitGatewayError(events, 'gatewayGetNearbyWifi', err);
+        emitGatewaySinkError(sink, 'gatewayGetNearbyWifi', err);
       },
     });
   }
@@ -384,12 +439,16 @@ class GatewayGetNearbyWifiHandler implements StreamHandler {
   }
 }
 
-class AccessoryStartScanRemoteKeyHandler implements StreamHandler {
-  onListen(_args: Object, events: EventSink): void {
+class AccessoryStartScanRemoteKeyImpl extends AccessoryStartScanRemoteKeyStreamHandler
+  implements DisposableStreamHandler {
+  constructor(messenger: BinaryMessenger) {
+    super();
+    AccessoryStartScanRemoteKeyStreamHandler.register(messenger, this);
+  }
+
+  onListen(_args: Object, sink: PigeonEventSink<TTRemoteAccessoryScanModel>): void {
     TTLock.startScanWirelessKey((m: TTKeyScanModel): void => {
-      const out = new TTRemoteAccessoryScanModel(m.name, m.mac, m.rssi, nowMillis(), false,
-        new Map<string, Object>());
-      events.success(out);
+      sink.success(keyToRemoteAccessoryScanModel(m, false));
     });
   }
 
@@ -398,12 +457,16 @@ class AccessoryStartScanRemoteKeyHandler implements StreamHandler {
   }
 }
 
-class AccessoryStartScanRemoteKeypadHandler implements StreamHandler {
-  onListen(_args: Object, events: EventSink): void {
+class AccessoryStartScanRemoteKeypadImpl extends AccessoryStartScanRemoteKeypadStreamHandler
+  implements DisposableStreamHandler {
+  constructor(messenger: BinaryMessenger) {
+    super();
+    AccessoryStartScanRemoteKeypadStreamHandler.register(messenger, this);
+  }
+
+  onListen(_args: Object, sink: PigeonEventSink<TTRemoteAccessoryScanModel>): void {
     TTLock.startScanWirelessKeyboard((m: TTKeyboardScanModel): void => {
-      const out = new TTRemoteAccessoryScanModel(m.name, m.mac, m.rssi, nowMillis(),
-        m.isMultifunctionalKeypad, new Map<string, Object>());
-      events.success(out);
+      sink.success(keyboardToRemoteAccessoryScanModel(m, m.isMultifunctionalKeypad));
     });
   }
 
@@ -412,17 +475,23 @@ class AccessoryStartScanRemoteKeypadHandler implements StreamHandler {
   }
 }
 
-class AccessoryAddKeypadFingerprintHandler implements StreamHandler {
-  onListen(_args: Object, events: EventSink): void {
+class AccessoryAddKeypadFingerprintImpl extends AccessoryAddKeypadFingerprintStreamHandler
+  implements DisposableStreamHandler {
+  constructor(messenger: BinaryMessenger) {
+    super();
+    AccessoryAddKeypadFingerprintStreamHandler.register(messenger, this);
+  }
+
+  onListen(_args: Object, sink: PigeonEventSink<AddFingerprintEvent>): void {
     const slot = EventContextStore.shared.accessoryAddKeypadFingerprint;
     const lockData: string | null = slot.lockData;
     if (lockData === null || lockData.length === 0) {
-      events.error(NO_LOCK_DATA, '请先通过 setAccessoryAddKeypadFingerprintParam 设置 lockData', null);
+      sink.error(NO_LOCK_DATA, '请先通过 setAccessoryAddKeypadFingerprintParam 设置 lockData', null);
       return;
     }
     const keypadMac: string | null = slot.keypadMac;
     if (keypadMac === null || keypadMac.length === 0) {
-      events.error(NO_KEYPAD, '请先通过 setAccessoryAddKeypadFingerprintParam 设置 keypadMac', null);
+      sink.error(NO_KEYPAD, '请先通过 setAccessoryAddKeypadFingerprintParam 设置 keypadMac', null);
       return;
     }
     const range: ValidityRange = slot.toValidityRange();
@@ -435,18 +504,19 @@ class AccessoryAddKeypadFingerprintHandler implements StreamHandler {
       range.end,
       cyclic,
       (progress: IAddFingerprintProgressModel): void => {
-        events.success(new AddFingerprintEvent(true, progress.currentCount,
+        sink.success(new AddFingerprintEvent(TTAddFingerprintPhase.COLLECTING, progress.currentCount,
           progress.totalCount, undefined));
       },
       (status: SdkTTKeypadStatus): void => {
-        emitKeypadStatusFromSdk(events, status, isMulti);
+        emitKeypadSinkError(sink, status as number, isMulti);
       },
       {
         success: (fingerprintNumber: string): void => {
-          events.success(new AddFingerprintEvent(false, undefined, undefined, fingerprintNumber));
+          sink.success(new AddFingerprintEvent(TTAddFingerprintPhase.SUCCESS, undefined, undefined,
+            fingerprintNumber));
         },
         failure: (err: SNError): void => {
-          emitLockError(events, 'accessoryAddKeypadFingerprint', err);
+          emitLockSinkError(sink, 'accessoryAddKeypadFingerprint', err);
         },
       },
     );
@@ -456,17 +526,22 @@ class AccessoryAddKeypadFingerprintHandler implements StreamHandler {
   }
 }
 
-class AccessoryAddKeypadCardHandler implements StreamHandler {
-  onListen(_args: Object, events: EventSink): void {
+class AccessoryAddKeypadCardImpl extends AccessoryAddKeypadCardStreamHandler implements DisposableStreamHandler {
+  constructor(messenger: BinaryMessenger) {
+    super();
+    AccessoryAddKeypadCardStreamHandler.register(messenger, this);
+  }
+
+  onListen(_args: Object, sink: PigeonEventSink<AddCardEvent>): void {
     const slot = EventContextStore.shared.accessoryAddKeypadCard;
     const lockData: string | null = slot.lockData;
     if (lockData === null || lockData.length === 0) {
-      events.error(NO_LOCK_DATA, '请先通过 setAccessoryAddKeypadCardParam 设置 lockData', null);
+      sink.error(NO_LOCK_DATA, '请先通过 setAccessoryAddKeypadCardParam 设置 lockData', null);
       return;
     }
     const keypadMac: string | null = slot.keypadMac;
     if (keypadMac === null || keypadMac.length === 0) {
-      events.error(NO_KEYPAD, '请先通过 setAccessoryAddKeypadCardParam 设置 keypadMac', null);
+      sink.error(NO_KEYPAD, '请先通过 setAccessoryAddKeypadCardParam 设置 keypadMac', null);
       return;
     }
     const range: ValidityRange = slot.toValidityRange();
@@ -478,14 +553,14 @@ class AccessoryAddKeypadCardHandler implements StreamHandler {
       range.end,
       cyclic,
       (_progress: void): void => {
-        events.success(new AddCardEvent(true, undefined));
+        sink.success(new AddCardEvent(TTAddCardPhase.WAITING, undefined));
       },
       {
         success: (cardNumber: string): void => {
-          events.success(new AddCardEvent(false, cardNumber));
+          sink.success(new AddCardEvent(TTAddCardPhase.SUCCESS, cardNumber));
         },
         failure: (err: SNError): void => {
-          emitLockError(events, 'accessoryAddKeypadCard', err);
+          emitLockSinkError(sink, 'accessoryAddKeypadCard', err);
         },
       },
     );
@@ -495,12 +570,16 @@ class AccessoryAddKeypadCardHandler implements StreamHandler {
   }
 }
 
-class AccessoryStartScanDoorSensorHandler implements StreamHandler {
-  onListen(_args: Object, events: EventSink): void {
+class AccessoryStartScanDoorSensorImpl extends AccessoryStartScanDoorSensorStreamHandler
+  implements DisposableStreamHandler {
+  constructor(messenger: BinaryMessenger) {
+    super();
+    AccessoryStartScanDoorSensorStreamHandler.register(messenger, this);
+  }
+
+  onListen(_args: Object, sink: PigeonEventSink<TTRemoteAccessoryScanModel>): void {
     TTLock.startScanDoorMagnetic((m: TTDoorMagneticScanModel): void => {
-      const out = new TTRemoteAccessoryScanModel(m.name, m.mac, m.rssi, nowMillis(), false,
-        new Map<string, Object>());
-      events.success(out);
+      sink.success(doorMagneticToRemoteAccessoryScanModel(m, false));
     });
   }
 
@@ -509,11 +588,16 @@ class AccessoryStartScanDoorSensorHandler implements StreamHandler {
   }
 }
 
-class AccessoryStandaloneDoorSensorStartScanHandler implements StreamHandler {
-  onListen(_args: Object, events: EventSink): void {
+class AccessoryStandaloneDoorSensorStartScanImpl extends AccessoryStandaloneDoorSensorStartScanStreamHandler
+  implements DisposableStreamHandler {
+  constructor(messenger: BinaryMessenger) {
+    super();
+    AccessoryStandaloneDoorSensorStartScanStreamHandler.register(messenger, this);
+  }
+
+  onListen(_args: Object, sink: PigeonEventSink<TTStandaloneDoorSensorScanModel>): void {
     TTWiFiDoorMagnetic.startScanWiFiDoorMagnetic((m: TTDoorMagneticScanModel): void => {
-      const out = new TTStandaloneDoorSensorScanModel(m.name, m.mac, m.rssi, nowMillis());
-      events.success(out);
+      sink.success(doorMagneticToStandaloneDoorSensorScanModel(m));
     });
   }
 
@@ -522,11 +606,17 @@ class AccessoryStandaloneDoorSensorStartScanHandler implements StreamHandler {
   }
 }
 
-class AccessoryWaterMeterStartScanHandler implements StreamHandler {
-  onListen(_args: Object, events: EventSink): void {
+class AccessoryWaterMeterStartScanImpl extends AccessoryWaterMeterStartScanStreamHandler
+  implements DisposableStreamHandler {
+  constructor(messenger: BinaryMessenger) {
+    super();
+    AccessoryWaterMeterStartScanStreamHandler.register(messenger, this);
+  }
+
+  onListen(_args: Object, sink: PigeonEventSink<TTMeterScanModel>): void {
     TTWaterMeter.startScanWaterMeter((m: TTWaterMeterScanModel): void => {
       const out = new TTMeterScanModel(m.name, m.mac, m.rssi);
-      events.success(out);
+      sink.success(out);
     });
   }
 
@@ -535,11 +625,17 @@ class AccessoryWaterMeterStartScanHandler implements StreamHandler {
   }
 }
 
-class AccessoryElectricMeterStartScanHandler implements StreamHandler {
-  onListen(_args: Object, events: EventSink): void {
+class AccessoryElectricMeterStartScanImpl extends AccessoryElectricMeterStartScanStreamHandler
+  implements DisposableStreamHandler {
+  constructor(messenger: BinaryMessenger) {
+    super();
+    AccessoryElectricMeterStartScanStreamHandler.register(messenger, this);
+  }
+
+  onListen(_args: Object, sink: PigeonEventSink<TTMeterScanModel>): void {
     TTElectricMeter.startScanElectricMeter((m: TTElectricMeterScanModel): void => {
       const out = new TTMeterScanModel(m.name, m.mac, m.rssi);
-      events.success(out);
+      sink.success(out);
     });
   }
 
@@ -548,60 +644,47 @@ class AccessoryElectricMeterStartScanHandler implements StreamHandler {
   }
 }
 
-interface ChannelEntry {
-  method: string;
-  handler: StreamHandler;
-}
+const STREAM_CANCEL_ARGS: Object = new Object();
 
 /**
- * 在 plugin 启动时统一注册 14 条 EventChannel（与 iOS / Android `Messages.kt`
- * 一致），所有 channel 名称的格式为
- * `dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.<methodName>`。
- *
- * 调用 {@link dispose} 会反注册全部流，避免内存泄漏。
+ * 在 plugin 启动时实例化 16 条 Pigeon EventChannel 实现类；
+ * 各实现类在构造时通过 `*StreamHandler.register` 完成注册，
+ * 与 Android `StreamHandlers.kt` 模式一致。
  */
 export class EventStreamHandlers {
+  private handlers: Array<DisposableStreamHandler> = [];
   private messenger: BinaryMessenger;
-  private channels: Array<EventChannel> = [];
 
   constructor(messenger: BinaryMessenger) {
     this.messenger = messenger;
   }
 
   register(): void {
-    const entries: ChannelEntry[] = [
-      { method: 'lockScanLock', handler: new LockScanLockHandler() },
-      { method: 'lockScanWifi', handler: new LockScanWifiHandler() },
-      { method: 'lockAddCard', handler: new LockAddCardHandler() },
-      { method: 'lockAddFingerprint', handler: new LockAddFingerprintHandler() },
-      { method: 'lockAddFace', handler: new LockAddFaceHandler() },
-      { method: 'lockAddPalmVein', handler: new LockAddPalmVeinHandler() },
-      { method: 'gatewayStartScan', handler: new GatewayStartScanHandler() },
-      { method: 'gatewayGetNearbyWifi', handler: new GatewayGetNearbyWifiHandler() },
-      { method: 'accessoryStartScanRemoteKey', handler: new AccessoryStartScanRemoteKeyHandler() },
-      { method: 'accessoryStartScanRemoteKeypad', handler: new AccessoryStartScanRemoteKeypadHandler() },
-      { method: 'accessoryAddKeypadFingerprint', handler: new AccessoryAddKeypadFingerprintHandler() },
-      { method: 'accessoryAddKeypadCard', handler: new AccessoryAddKeypadCardHandler() },
-      { method: 'accessoryStartScanDoorSensor', handler: new AccessoryStartScanDoorSensorHandler() },
-      {
-        method: 'accessoryStandaloneDoorSensorStartScan',
-        handler: new AccessoryStandaloneDoorSensorStartScanHandler(),
-      },
-      { method: 'accessoryWaterMeterStartScan', handler: new AccessoryWaterMeterStartScanHandler() },
-      { method: 'accessoryElectricMeterStartScan', handler: new AccessoryElectricMeterStartScanHandler() },
+    const messenger = this.messenger;
+    this.handlers = [
+      new ScanLockImpl(messenger),
+      new ScanLockWifiImpl(messenger),
+      new AddLockCardImpl(messenger),
+      new AddLockFingerprintImpl(messenger),
+      new AddLockFaceImpl(messenger),
+      new AddLockPalmVeinImpl(messenger),
+      new GatewayStartScanImpl(messenger),
+      new GatewayGetNearbyWifiImpl(messenger),
+      new AccessoryStartScanRemoteKeyImpl(messenger),
+      new AccessoryStartScanRemoteKeypadImpl(messenger),
+      new AccessoryAddKeypadFingerprintImpl(messenger),
+      new AccessoryAddKeypadCardImpl(messenger),
+      new AccessoryStartScanDoorSensorImpl(messenger),
+      new AccessoryStandaloneDoorSensorStartScanImpl(messenger),
+      new AccessoryWaterMeterStartScanImpl(messenger),
+      new AccessoryElectricMeterStartScanImpl(messenger),
     ];
-    const codec = pigeonMethodCodec();
-    for (const entry of entries) {
-      const channel = new EventChannel(this.messenger, `${STREAM_PREFIX}${entry.method}`, codec);
-      channel.setStreamHandler(entry.handler);
-      this.channels.push(channel);
-    }
   }
 
   dispose(): void {
-    for (const channel of this.channels) {
-      channel.setStreamHandler(NoopStreamHandler.shared);
+    for (const handler of this.handlers) {
+      handler.onCancel(STREAM_CANCEL_ARGS);
     }
-    this.channels = [];
+    this.handlers = [];
   }
 }

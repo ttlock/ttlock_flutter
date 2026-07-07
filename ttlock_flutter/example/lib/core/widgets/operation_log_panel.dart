@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../command/operation_record.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 
-class OperationLogPanel extends ConsumerWidget {
+class OperationLogPanel extends HookConsumerWidget {
   final List<OperationRecord> records;
   final VoidCallback? onClear;
 
