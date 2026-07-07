@@ -1810,7 +1810,7 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
   public void setLatchBoltKeepTime(final TtlockModel ttlockModel) {
     TTLockClient.getDefault().setLatchBolt(
-            -1, ttlockModel.latchBoltKeepTime, ttlockModel.lockData,
+            ttlockModel.latchBoltDriveLevel, ttlockModel.latchBoltKeepTime, ttlockModel.lockData,
             new SetLatchBoltCallback() {
       @Override
       public void onSetSuccess() {

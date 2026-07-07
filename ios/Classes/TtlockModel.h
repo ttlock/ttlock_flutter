@@ -103,6 +103,7 @@
 
 @property (nonatomic, strong) NSNumber *torqueLevel;
 @property (nonatomic, strong) NSNumber *latchBoltKeepTime;
+@property (nonatomic, strong) NSNumber *latchBoltDriveLevel;
 
 //管理员密码
 @property (nonatomic, strong) NSString *adminPasscode;

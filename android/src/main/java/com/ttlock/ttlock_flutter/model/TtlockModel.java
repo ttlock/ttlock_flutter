@@ -92,6 +92,8 @@ public class TtlockModel {
     public int currentTime;
     //斜舌保持时间
     public int latchBoltKeepTime;
+    //斜舌驱动等级
+    public int latchBoltDriveLevel;
     //电机扭力等级
     public int motorTorqueLevel;
 

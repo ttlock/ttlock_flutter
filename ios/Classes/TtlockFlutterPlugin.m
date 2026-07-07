@@ -392,7 +392,7 @@ ErrorDeviceKey
             [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];
         }];
     }else if ([command isEqualToString:command_set_lock_latch_bolt]) {
-        [TTLock setLatchBoltWithDriveLevel:-1 keepTime:lockModel.latchBoltKeepTime.intValue lockData:lockModel.lockData success:^{
+        [TTLock setLatchBoltWithDriveLevel:lockModel.latchBoltDriveLevel.intValue keepTime:lockModel.latchBoltKeepTime.intValue lockData:lockModel.lockData success:^{
             [weakSelf successCallbackCommand:command data:nil];
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];

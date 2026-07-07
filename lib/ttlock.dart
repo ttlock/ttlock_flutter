@@ -786,10 +786,15 @@ class TTLock {
     invoke(COMMAND_SET_LOCK_MOTOR_TORQUE_LEVEL, map, callback, fail: failedCallback);
   }
 
-  static void setLockLatchBolt(int keepTime, String lockData,
-      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+  static void setLockLatchBolt(
+      int keepTime,
+      String lockData,
+      TTSuccessCallback callback,
+      TTFailedCallback failedCallback,
+      {int driveLevel = -1}) {
     Map map = Map();
     map[TTResponse.latchBoltKeepTime] = keepTime;
+    map[TTResponse.latchBoltDriveLevel] = driveLevel;
     map[TTResponse.lockData] = lockData;
     invoke(COMMAND_SET_LOCK_LATCH_BOLT, map, callback, fail: failedCallback);
   }
@@ -1995,6 +2000,7 @@ class TTResponse {
 
   static const String torqueLevel = "torqueLevel";
   static const String latchBoltKeepTime = "latchBoltKeepTime";
+  static const String latchBoltDriveLevel = "latchBoltDriveLevel";
 
 }
 
