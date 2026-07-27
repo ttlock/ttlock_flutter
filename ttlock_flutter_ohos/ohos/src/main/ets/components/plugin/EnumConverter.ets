@@ -425,6 +425,9 @@ export function featureValueConvert(lockFunction: TTLockFunction): SdkTTLockFeat
     case TTLockFunction.SEMI_AUTOMATIC_MODE_CONTROL:
     case TTLockFunction.SUPPORT_SET_USER_ATTRIBUTES:
     case TTLockFunction.SUPPORT_SUPERVISION:
+    case TTLockFunction.YI_NUO_PHOTO_FACE:
+    case TTLockFunction.URL_FACE:
+    case TTLockFunction.HUMAN_PRESENCE_SENSOR:
       return null;
     case TTLockFunction.WIFI_POWER_SAVING_TIME:
       return SdkTTLockFeatureValue.wifiPowerSavingTime;

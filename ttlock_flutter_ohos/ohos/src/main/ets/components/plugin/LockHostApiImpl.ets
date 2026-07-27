@@ -33,6 +33,7 @@ import {
   TTSoundVolumeType,
   TTWifiInfoModel,
   TTCycleModel,
+  TTAliasType,
 } from './Messages';
 
 import {
@@ -557,6 +558,16 @@ export class LockHostApiImpl extends TTLockHostApi {
         result.error(makeLockApiError('addFaceData', err));
       },
     });
+  }
+
+  addFaceUrl(url: string, cycleList: Array<TTCycleModel> | undefined, startDate: number, endDate: number,
+    lockData: string, result: Result<string>): void {
+    result.error(makeNotImplementedError('addFaceUrl'));
+  }
+
+  setAlias(type: TTAliasType, credentialId: string, alias: string, lockData: string,
+    result: Result<void>): void {
+    result.error(makeNotImplementedError('setAlias'));
   }
 
   deleteFace(faceNumber: string, lockData: string, result: Result<void>): void {
