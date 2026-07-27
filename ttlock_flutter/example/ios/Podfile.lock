@@ -5,16 +5,22 @@ PODS:
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
-  - TTLock (3.6.8)
+  - TTLock (3.6.14)
   - ttlock_flutter_ios (0.0.1):
     - Flutter
-    - TTLock (= 3.6.8)
+    - TTLock (= 3.6.14)
+  - wifi_iot (0.0.1):
+    - Flutter
+  - wifi_scan (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - ttlock_flutter_ios (from `.symlinks/plugins/ttlock_flutter_ios/ios`)
+  - wifi_iot (from `.symlinks/plugins/wifi_iot/ios`)
+  - wifi_scan (from `.symlinks/plugins/wifi_scan/ios`)
 
 SPEC REPOS:
   trunk:
@@ -29,14 +35,20 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
   ttlock_flutter_ios:
     :path: ".symlinks/plugins/ttlock_flutter_ios/ios"
+  wifi_iot:
+    :path: ".symlinks/plugins/wifi_iot/ios"
+  wifi_scan:
+    :path: ".symlinks/plugins/wifi_scan/ios"
 
 SPEC CHECKSUMS:
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   permission_handler_apple: ee2fe0fd04551b304eb002714ff067c371c822ed
   shared_preferences_foundation: 5086985c1d43c5ba4d5e69a4e8083a389e2909e6
-  TTLock: 38fc351b450e0f0a71fe48fc99e05bd108a87550
-  ttlock_flutter_ios: 748b5671dab23cbdc7e63f93533b825b2858320a
+  TTLock: 14c10ddee336a081637952a6cd43da1d84941f95
+  ttlock_flutter_ios: 4d212d263def75cbc5d02b64f7ef2dfca0fee00b
+  wifi_iot: b5aafd6f9b52f8a357383a1deabab45f31cd602d
+  wifi_scan: 6d20b3b4f59bbad1ddcf3e241560f3acd62f6cbe
 
-PODFILE CHECKSUM: 53026eaf67b63baa2e316e457f9701dbdf33f41a
+PODFILE CHECKSUM: 4ea0b451545998ba8c6297e2f2bbdbaa4af02255
 
 COCOAPODS: 1.16.2
