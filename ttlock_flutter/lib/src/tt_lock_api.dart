@@ -291,6 +291,41 @@ class TTLockApi {
         () => _host.addFaceData(cycleList, startDate, endDate, faceFeatureData, lockData),
       );
 
+  Future<String> addFaceUrl(
+    String url,
+    List<pigeon.TTCycleModel>? cycleList,
+    int startDate,
+    int endDate,
+    String lockData,
+  ) {
+    if (url.isEmpty) {
+      throw ArgumentError.value(url, 'url', 'must not be empty');
+    }
+    if (lockData.isEmpty) {
+      throw ArgumentError.value(lockData, 'lockData', 'must not be empty');
+    }
+    return runLockApi(
+      () => _host.addFaceUrl(url, cycleList, startDate, endDate, lockData),
+    );
+  }
+
+  Future<void> setAlias(
+    pigeon.TTAliasType type,
+    String credentialId,
+    String alias,
+    String lockData,
+  ) {
+    if (credentialId.isEmpty) {
+      throw ArgumentError.value(credentialId, 'credentialId', 'must not be empty');
+    }
+    if (lockData.isEmpty) {
+      throw ArgumentError.value(lockData, 'lockData', 'must not be empty');
+    }
+    return runLockApi(
+      () => _host.setAlias(type, credentialId, alias, lockData),
+    );
+  }
+
   Future<void> deleteFace(String faceNumber, String lockData) =>
       runLockApi(() => _host.deleteFace(faceNumber, lockData));
 
