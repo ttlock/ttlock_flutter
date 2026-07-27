@@ -7,7 +7,7 @@ part of 'electric_meter_provider.dart';
 // **************************************************************************
 
 String _$electricMeterNotifierHash() =>
-    r'd223a3e8d500c2f470c47bc65a093d822f27e6f8';
+    r'265dc16594ce3514f38e3d36ffb4c9a3c4661eae';
 
 /// See also [ElectricMeterNotifier].
 @ProviderFor(ElectricMeterNotifier)

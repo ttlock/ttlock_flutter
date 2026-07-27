@@ -6,16 +6,11 @@ import 'package:toastification/toastification.dart';
 import 'package:ttlock_flutter/ttlock.dart';
 
 import '../../core/storage/accessory_list_provider.dart';
-import '../../core/storage/config_provider.dart';
 import '../../core/storage/lock_list_provider.dart';
-import '../../core/storage/meter_list_provider.dart';
-import '../../core/storage/standalone_door_sensor_list_provider.dart';
 import '../../features/settings/model/saved_door_sensor.dart';
 import '../../features/settings/model/saved_keypad.dart';
 import '../../features/settings/model/saved_lock_device.dart';
-import '../../features/settings/model/saved_meter_device.dart';
 import '../../features/settings/model/saved_remote_key.dart';
-import '../../features/settings/model/saved_standalone_door_sensor.dart';
 import '../../features/lock/lock_cache_initializer.dart';
 import 'scan_config.dart';
 
@@ -315,31 +310,9 @@ class ScanNotifier extends _$ScanNotifier {
           return InitResult.doorSensor(device.mac);
 
         case DeviceType.standaloneDoorSensor:
-          final config = await ref.read(configNotifierProvider.future);
-          final result = await TTLock.doorSensor.standaloneDoorSensorInit(
-            TTStandaloneDoorSensorInitParams(
-              mac: device.mac,
-              doorSensorName: device.name,
-              wifiName: '',
-              wifiPassword: '',
-              serverAddress: config.serverIp!,
-              portNumber: int.parse(config.serverPort!),
-            ),
+          throw StateError(
+            'Standalone door sensor should be initialized from init page',
           );
-          await ref
-              .read(standaloneDoorSensorListNotifierProvider.notifier)
-              .addDevice(
-                SavedStandaloneDoorSensor(
-                  name: device.name,
-                  mac: device.mac,
-                  doorSensorData: result.doorSensorData,
-                  featureValue: result.featureValue,
-                  modelNum: result.modelNum,
-                  electricQuantity: result.electricQuantity,
-                  initializedAt: now,
-                ),
-              );
-          return InitResult.standaloneDoorSensor(device.mac);
 
         case DeviceType.remoteKey:
           final lockData = state.config.lockData!;
@@ -382,44 +355,12 @@ class ScanNotifier extends _$ScanNotifier {
           return InitResult.keypad(device.mac);
 
         case DeviceType.waterMeter:
-          final result = await TTLock.waterMeter.waterMeterInit(
-                TTWaterMeterInitParam(
-                  mac: device.mac,
-                  name: device.name,
-                  payMode: TTMeterPayMode.postpaid,
-                  price: 0,
-                ),
-              );
-          await ref.read(meterListNotifierProvider.notifier).addDevice(
-                SavedMeterDevice(
-                  name: device.name,
-                  mac: device.mac,
-                  meterId: result.waterMeterId.toString(),
-                  meterType: 'water',
-                  initializedAt: now,
-                ),
-              );
-          return InitResult.waterMeter(device.mac);
+          throw StateError('Water meter should be initialized from init page');
 
         case DeviceType.electricMeter:
-          final result = await TTLock.electricMeter.electricMeterInit(
-                TTElectricMeterInitParam(
-                  mac: device.mac,
-                  name: device.name,
-                  payMode: TTMeterPayMode.postpaid,
-                  price: 0,
-                ),
-              );
-          await ref.read(meterListNotifierProvider.notifier).addDevice(
-                SavedMeterDevice(
-                  name: device.name,
-                  mac: device.mac,
-                  meterId: result.electricMeterId.toString(),
-                  meterType: 'electric',
-                  initializedAt: now,
-                ),
-              );
-          return InitResult.electricMeter(device.mac);
+          throw StateError(
+            'Electric meter should be initialized from init page',
+          );
       }
     } catch (e) {
       toastification.show(

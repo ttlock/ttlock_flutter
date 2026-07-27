@@ -11,6 +11,9 @@ _ConfigModel _$ConfigModelFromJson(Map<String, dynamic> json) => _ConfigModel(
       password: json['password'] as String?,
       serverIp: json['server_ip'] as String?,
       serverPort: json['server_port'] as String?,
+      serverRegion:
+          $enumDecodeNullable(_$ServerRegionEnumMap, json['server_region']) ??
+              ServerRegion.china,
     );
 
 Map<String, dynamic> _$ConfigModelToJson(_ConfigModel instance) =>
@@ -19,4 +22,10 @@ Map<String, dynamic> _$ConfigModelToJson(_ConfigModel instance) =>
       'password': instance.password,
       'server_ip': instance.serverIp,
       'server_port': instance.serverPort,
+      'server_region': _$ServerRegionEnumMap[instance.serverRegion]!,
     };
+
+const _$ServerRegionEnumMap = {
+  ServerRegion.china: 'china',
+  ServerRegion.global: 'global',
+};

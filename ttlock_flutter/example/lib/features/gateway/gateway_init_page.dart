@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:ttlock_flutter/ttlock.dart';
 
+import '../../core/config/server_endpoint_config.dart';
 import '../../core/env/app_mode.dart';
 import '../../core/router/routes.dart';
 import '../../core/storage/config_provider.dart';
@@ -11,6 +12,7 @@ import '../../core/theme/app_text_styles.dart';
 import '../../core/widgets/error_display.dart';
 import '../../core/widgets/loading_overlay.dart';
 import '../../core/widgets/section_header.dart';
+import '../../core/widgets/server_endpoint_fields.dart';
 import '../scan/scan_provider.dart';
 import 'gateway_init_provider.dart';
 import 'widgets/gateway_wifi_scan_sheet.dart';
@@ -41,6 +43,9 @@ class GatewayInitPage extends HookConsumerWidget {
     final routerCtrl = useTextEditingController();
     final dnsCtrl = useTextEditingController();
     final apnCtrl = useTextEditingController();
+    final serverIpCtrl = useTextEditingController();
+    final serverPortCtrl = useTextEditingController();
+    final initFormKey = useMemoized(GlobalKey<FormState>.new);
 
     final isConnecting = useState(true);
     final connectFailed = useState<String?>(null);
@@ -57,6 +62,22 @@ class GatewayInitPage extends HookConsumerWidget {
     useListenable(routerCtrl);
     useListenable(dnsCtrl);
     useListenable(apnCtrl);
+    useListenable(serverIpCtrl);
+    useListenable(serverPortCtrl);
+
+    final config = ref.watch(configNotifierProvider).valueOrNull;
+    useEffect(() {
+      if (config == null) return null;
+      final endpoint =
+          config.defaultServerEndpoint(DeviceServerKind.gateway);
+      if (serverIpCtrl.text.isEmpty) {
+        serverIpCtrl.text = endpoint.address;
+      }
+      if (serverPortCtrl.text.isEmpty) {
+        serverPortCtrl.text = endpoint.port;
+      }
+      return null;
+    }, [config?.uid, config?.serverRegion, config?.serverIp, config?.serverPort]);
 
     Future<void> showWifiSheet() async {
       final result = await GatewayWifiScanSheet.show(
@@ -109,6 +130,8 @@ class GatewayInitPage extends HookConsumerWidget {
         (!needsWifiConfig || selectedSsid.value != null);
 
     Future<void> initGateway() async {
+      if (!(initFormKey.currentState?.validate() ?? false)) return;
+
       final config = ref.read(configNotifierProvider).valueOrNull;
       if (config == null || !config.isValid) {
         if (!context.mounted) return;
@@ -150,8 +173,8 @@ class GatewayInitPage extends HookConsumerWidget {
           ttlockUid: config.uid,
           gatewayName: name,
           ttlockLoginPassword: AppEnv.isOnline ? config.password : null,
-          serverIp: config.serverIp,
-          serverPort: config.serverPort,
+          serverIp: serverIpCtrl.text.trim(),
+          serverPort: serverPortCtrl.text.trim(),
           wifi: needsWifiConfig ? selectedSsid.value : null,
           wifiPassword: needsWifiConfig ? wifiPwdCtrl.text : null,
         ),
@@ -174,7 +197,6 @@ class GatewayInitPage extends HookConsumerWidget {
     }
 
     final state = ref.watch(gatewayInitNotifierProvider);
-    final config = ref.watch(configNotifierProvider).valueOrNull;
     final isConfigValid = config?.isValid ?? false;
     final configError =
         config?.validationError ?? 'Configuration incomplete';
@@ -369,6 +391,20 @@ class GatewayInitPage extends HookConsumerWidget {
                         ),
                       ),
                     ],
+                    const SizedBox(height: 16),
+                  ],
+                  if (config != null) ...[
+                    SectionHeader(title: 'Server', icon: Icons.dns),
+                    const SizedBox(height: 8),
+                    Form(
+                      key: initFormKey,
+                      child: ServerEndpointFields(
+                        config: config,
+                        deviceKind: DeviceServerKind.gateway,
+                        ipController: serverIpCtrl,
+                        portController: serverPortCtrl,
+                      ),
+                    ),
                     const SizedBox(height: 16),
                   ],
                   SectionHeader(title: 'Initialize', icon: Icons.play_arrow),

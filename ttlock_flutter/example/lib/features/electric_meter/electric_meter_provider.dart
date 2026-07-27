@@ -16,6 +16,17 @@ class ElectricMeterNotifier extends _$ElectricMeterNotifier {
   @override
   ElectricMeterState build() => const ElectricMeterState();
 
+  Future<void> configMeterServer(String mac, String ip, String port) async {
+    final api = TTLock.electricMeter;
+    state = ElectricMeterState(isLoading: true, error: null);
+    try {
+      await api.electricMeterConfigMeterServer(mac, ip, port);
+      state = ElectricMeterState(result: 'Meter server configured');
+    } on TTRemoteAccessoryException catch (e) {
+      state = ElectricMeterState(error: e.toString());
+    }
+  }
+
   Future<void> configServer(String url, String clientId, String accessToken) async {
     final api = TTLock.electricMeter;
     state = ElectricMeterState(isLoading: true, error: null);

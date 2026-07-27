@@ -6,6 +6,8 @@ import '../../features/dashboard/dashboard_page.dart';
 import '../../features/door_sensor/door_sensor_info_page.dart';
 import '../../features/door_sensor/door_sensor_list_page.dart';
 import '../../features/door_sensor/standalone_door_sensor_info_page.dart';
+import '../../features/door_sensor/standalone_door_sensor_init_page.dart';
+import '../../features/electric_meter/electric_meter_init_page.dart';
 import '../../features/electric_meter/electric_meter_page.dart';
 import '../../features/gateway/gateway_init_page.dart';
 import '../../features/gateway/gateway_page.dart';
@@ -31,6 +33,7 @@ import '../../features/remote_keypad/keypad_list_page.dart';
 import '../../features/scan/scan_config.dart';
 import '../../features/scan/scan_page.dart';
 import '../../features/settings/settings_page.dart';
+import '../../features/water_meter/water_meter_init_page.dart';
 import '../../features/water_meter/water_meter_page.dart';
 
 part 'routes.g.dart';
@@ -368,7 +371,12 @@ class DoorSensorInfoRoute extends GoRouteData with _$DoorSensorInfoRoute {
       DoorSensorInfoPage(mac: mac);
 }
 
-@TypedGoRoute<StandaloneDoorSensorRoute>(path: '/standalone-door-sensor/:mac')
+@TypedGoRoute<StandaloneDoorSensorRoute>(
+  path: '/standalone-door-sensor/:mac',
+  routes: [
+    TypedGoRoute<StandaloneDoorSensorInitRoute>(path: 'init'),
+  ],
+)
 class StandaloneDoorSensorRoute extends GoRouteData
     with _$StandaloneDoorSensorRoute {
   const StandaloneDoorSensorRoute(this.mac);
@@ -378,6 +386,18 @@ class StandaloneDoorSensorRoute extends GoRouteData
   @override
   Widget build(BuildContext context, GoRouterState state) =>
       StandaloneDoorSensorInfoPage(mac: mac);
+}
+
+class StandaloneDoorSensorInitRoute extends GoRouteData
+    with _$StandaloneDoorSensorInitRoute {
+  const StandaloneDoorSensorInitRoute(this.mac, {this.name = 'Door Sensor'});
+
+  final String mac;
+  final String name;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      StandaloneDoorSensorInitPage(mac: mac, name: name);
 }
 
 @TypedGoRoute<RemoteKeyInfoRoute>(path: '/remote-key/:mac')
@@ -415,6 +435,18 @@ class WaterMeterRoute extends GoRouteData with _$WaterMeterRoute {
   }
 }
 
+@TypedGoRoute<WaterMeterInitRoute>(path: '/water-meter-init/:mac')
+class WaterMeterInitRoute extends GoRouteData with _$WaterMeterInitRoute {
+  const WaterMeterInitRoute(this.mac, {this.name = 'Water Meter'});
+
+  final String mac;
+  final String name;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      WaterMeterInitPage(mac: mac, name: name);
+}
+
 @TypedGoRoute<ElectricMeterRoute>(path: '/electric-meter/:id')
 class ElectricMeterRoute extends GoRouteData with _$ElectricMeterRoute {
   const ElectricMeterRoute(this.id);
@@ -425,4 +457,16 @@ class ElectricMeterRoute extends GoRouteData with _$ElectricMeterRoute {
   Widget build(BuildContext context, GoRouterState state) {
     return ElectricMeterPage(mac: id, meterId: id);
   }
+}
+
+@TypedGoRoute<ElectricMeterInitRoute>(path: '/electric-meter-init/:mac')
+class ElectricMeterInitRoute extends GoRouteData with _$ElectricMeterInitRoute {
+  const ElectricMeterInitRoute(this.mac, {this.name = 'Electric Meter'});
+
+  final String mac;
+  final String name;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      ElectricMeterInitPage(mac: mac, name: name);
 }

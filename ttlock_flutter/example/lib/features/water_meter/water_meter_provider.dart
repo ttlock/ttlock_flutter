@@ -16,6 +16,17 @@ class WaterMeterNotifier extends _$WaterMeterNotifier {
   @override
   WaterMeterState build() => const WaterMeterState();
 
+  Future<void> configMeterServer(String mac, String ip, String port) async {
+    final api = TTLock.waterMeter;
+    state = WaterMeterState(isLoading: true, error: null);
+    try {
+      await api.waterMeterConfigMeterServer(mac, ip, port);
+      state = WaterMeterState(result: 'Meter server configured');
+    } on TTRemoteAccessoryException catch (e) {
+      state = WaterMeterState(error: e.toString());
+    }
+  }
+
   Future<void> configServer(String url, String clientId, String accessToken) async {
     final api = TTLock.waterMeter;
     state = WaterMeterState(isLoading: true, error: null);

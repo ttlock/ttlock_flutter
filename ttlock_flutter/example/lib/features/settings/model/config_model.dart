@@ -4,6 +4,15 @@ import '../../../core/env/app_mode.dart';
 part 'config_model.freezed.dart';
 part 'config_model.g.dart';
 
+/// 在线版服务器区域：中国 / 全球。
+@JsonEnum(alwaysCreate: true)
+enum ServerRegion {
+  @JsonValue('china')
+  china,
+  @JsonValue('global')
+  global,
+}
+
 @freezed
 abstract class ConfigModel with _$ConfigModel {
   const ConfigModel._();
@@ -13,6 +22,7 @@ abstract class ConfigModel with _$ConfigModel {
     String? password,
     String? serverIp,
     String? serverPort,
+    @Default(ServerRegion.china) ServerRegion serverRegion,
   }) = _ConfigModel;
 
   /// Returns null when configuration is complete for the current environment.

@@ -166,6 +166,24 @@ Future<void> _onDeviceTap(
     return;
   }
 
+  if (device.type == DeviceType.standaloneDoorSensor) {
+    ref.read(scanNotifierProvider(config).notifier).stopScan();
+    StandaloneDoorSensorInitRoute(device.mac, name: device.name).push(context);
+    return;
+  }
+
+  if (device.type == DeviceType.waterMeter) {
+    ref.read(scanNotifierProvider(config).notifier).stopScan();
+    WaterMeterInitRoute(device.mac, name: device.name).push(context);
+    return;
+  }
+
+  if (device.type == DeviceType.electricMeter) {
+    ref.read(scanNotifierProvider(config).notifier).stopScan();
+    ElectricMeterInitRoute(device.mac, name: device.name).push(context);
+    return;
+  }
+
   context.loaderOverlay.show();
   final result = await ref
       .read(scanNotifierProvider(config).notifier)

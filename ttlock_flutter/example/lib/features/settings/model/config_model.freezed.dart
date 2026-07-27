@@ -19,6 +19,7 @@ mixin _$ConfigModel {
   String? get password;
   String? get serverIp;
   String? get serverPort;
+  ServerRegion get serverRegion;
 
   /// Create a copy of ConfigModel
   /// with the given fields replaced by the non-null parameter values.
@@ -41,17 +42,19 @@ mixin _$ConfigModel {
             (identical(other.serverIp, serverIp) ||
                 other.serverIp == serverIp) &&
             (identical(other.serverPort, serverPort) ||
-                other.serverPort == serverPort));
+                other.serverPort == serverPort) &&
+            (identical(other.serverRegion, serverRegion) ||
+                other.serverRegion == serverRegion));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, uid, password, serverIp, serverPort);
+  int get hashCode => Object.hash(
+      runtimeType, uid, password, serverIp, serverPort, serverRegion);
 
   @override
   String toString() {
-    return 'ConfigModel(uid: $uid, password: $password, serverIp: $serverIp, serverPort: $serverPort)';
+    return 'ConfigModel(uid: $uid, password: $password, serverIp: $serverIp, serverPort: $serverPort, serverRegion: $serverRegion)';
   }
 }
 
@@ -61,7 +64,12 @@ abstract mixin class $ConfigModelCopyWith<$Res> {
           ConfigModel value, $Res Function(ConfigModel) _then) =
       _$ConfigModelCopyWithImpl;
   @useResult
-  $Res call({int uid, String? password, String? serverIp, String? serverPort});
+  $Res call(
+      {int uid,
+      String? password,
+      String? serverIp,
+      String? serverPort,
+      ServerRegion serverRegion});
 }
 
 /// @nodoc
@@ -80,6 +88,7 @@ class _$ConfigModelCopyWithImpl<$Res> implements $ConfigModelCopyWith<$Res> {
     Object? password = freezed,
     Object? serverIp = freezed,
     Object? serverPort = freezed,
+    Object? serverRegion = null,
   }) {
     return _then(_self.copyWith(
       uid: null == uid
@@ -98,6 +107,10 @@ class _$ConfigModelCopyWithImpl<$Res> implements $ConfigModelCopyWith<$Res> {
           ? _self.serverPort
           : serverPort // ignore: cast_nullable_to_non_nullable
               as String?,
+      serverRegion: null == serverRegion
+          ? _self.serverRegion
+          : serverRegion // ignore: cast_nullable_to_non_nullable
+              as ServerRegion,
     ));
   }
 }
@@ -106,7 +119,11 @@ class _$ConfigModelCopyWithImpl<$Res> implements $ConfigModelCopyWith<$Res> {
 @JsonSerializable()
 class _ConfigModel extends ConfigModel {
   const _ConfigModel(
-      {this.uid = 0, this.password, this.serverIp, this.serverPort})
+      {this.uid = 0,
+      this.password,
+      this.serverIp,
+      this.serverPort,
+      this.serverRegion = ServerRegion.china})
       : super._();
   factory _ConfigModel.fromJson(Map<String, dynamic> json) =>
       _$ConfigModelFromJson(json);
@@ -120,6 +137,9 @@ class _ConfigModel extends ConfigModel {
   final String? serverIp;
   @override
   final String? serverPort;
+  @override
+  @JsonKey()
+  final ServerRegion serverRegion;
 
   /// Create a copy of ConfigModel
   /// with the given fields replaced by the non-null parameter values.
@@ -147,17 +167,19 @@ class _ConfigModel extends ConfigModel {
             (identical(other.serverIp, serverIp) ||
                 other.serverIp == serverIp) &&
             (identical(other.serverPort, serverPort) ||
-                other.serverPort == serverPort));
+                other.serverPort == serverPort) &&
+            (identical(other.serverRegion, serverRegion) ||
+                other.serverRegion == serverRegion));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, uid, password, serverIp, serverPort);
+  int get hashCode => Object.hash(
+      runtimeType, uid, password, serverIp, serverPort, serverRegion);
 
   @override
   String toString() {
-    return 'ConfigModel(uid: $uid, password: $password, serverIp: $serverIp, serverPort: $serverPort)';
+    return 'ConfigModel(uid: $uid, password: $password, serverIp: $serverIp, serverPort: $serverPort, serverRegion: $serverRegion)';
   }
 }
 
@@ -169,7 +191,12 @@ abstract mixin class _$ConfigModelCopyWith<$Res>
       __$ConfigModelCopyWithImpl;
   @override
   @useResult
-  $Res call({int uid, String? password, String? serverIp, String? serverPort});
+  $Res call(
+      {int uid,
+      String? password,
+      String? serverIp,
+      String? serverPort,
+      ServerRegion serverRegion});
 }
 
 /// @nodoc
@@ -188,6 +215,7 @@ class __$ConfigModelCopyWithImpl<$Res> implements _$ConfigModelCopyWith<$Res> {
     Object? password = freezed,
     Object? serverIp = freezed,
     Object? serverPort = freezed,
+    Object? serverRegion = null,
   }) {
     return _then(_ConfigModel(
       uid: null == uid
@@ -206,6 +234,10 @@ class __$ConfigModelCopyWithImpl<$Res> implements _$ConfigModelCopyWith<$Res> {
           ? _self.serverPort
           : serverPort // ignore: cast_nullable_to_non_nullable
               as String?,
+      serverRegion: null == serverRegion
+          ? _self.serverRegion
+          : serverRegion // ignore: cast_nullable_to_non_nullable
+              as ServerRegion,
     ));
   }
 }

@@ -19,6 +19,8 @@ dependencies:
   json_annotation: ^4.9.0
   shared_preferences: ^2.3.5
   permission_handler: ^11.3.1
+  wifi_iot: ^0.3.19+2
+  wifi_scan: ^0.4.1+2
   cupertino_icons: ^1.0.8
   ttlock_flutter:
     path: ../

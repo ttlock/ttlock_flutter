@@ -2876,7 +2876,7 @@ abstract class TTAccessoryHostApi {
     TTStandaloneDoorSensorFeature lockFunction,
   );
 
-  /// 配置电表服务器。
+  /// 配置蓝牙电表服务器。
   ///
   /// [url] 服务器地址。
   /// [clientId] 客户端 ID。
@@ -2980,7 +2980,7 @@ abstract class TTAccessoryHostApi {
   @async
   void electricMeterConfigApn(String mac, String apn);
 
-  /// 配置电表计量服务器。
+  /// 配置4G卡蓝牙电表服务器。
   ///
   /// [mac] 电表 MAC 地址。
   /// [ip] 服务器 IP。
@@ -2994,7 +2994,7 @@ abstract class TTAccessoryHostApi {
   @async
   void electricMeterReset(String mac);
 
-  /// 配置水表服务器。
+  /// 配置蓝牙水表服务器。
   ///
   /// [url] 服务器地址。
   /// [clientId] 客户端 ID。
@@ -3098,7 +3098,7 @@ abstract class TTAccessoryHostApi {
   @async
   void waterMeterConfigApn(String mac, String apn);
 
-  /// 配置水表计量服务器。
+  /// 配置4G卡蓝牙水表服务器。
   ///
   /// [mac] 水表 MAC 地址。
   /// [ip] 服务器 IP。

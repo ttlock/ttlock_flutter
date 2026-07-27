@@ -7,7 +7,7 @@ part of 'water_meter_provider.dart';
 // **************************************************************************
 
 String _$waterMeterNotifierHash() =>
-    r'0261f2fa6f92d6e7b2c2e6ad5e6b04e94a62b7d5';
+    r'5244822437b977266554d14b07d87e2e1cab5e26';
 
 /// See also [WaterMeterNotifier].
 @ProviderFor(WaterMeterNotifier)

@@ -16,7 +16,9 @@ List<RouteBase> get $appRoutes => [
       $remoteKeyInfoRoute,
       $keypadInfoRoute,
       $waterMeterRoute,
+      $waterMeterInitRoute,
       $electricMeterRoute,
+      $electricMeterInitRoute,
     ];
 
 RouteBase get $mainShellRoute => StatefulShellRouteData.$route(
@@ -827,6 +829,12 @@ mixin _$DoorSensorInfoRoute on GoRouteData {
 RouteBase get $standaloneDoorSensorRoute => GoRouteData.$route(
       path: '/standalone-door-sensor/:mac',
       factory: _$StandaloneDoorSensorRoute._fromState,
+      routes: [
+        GoRouteData.$route(
+          path: 'init',
+          factory: _$StandaloneDoorSensorInitRoute._fromState,
+        ),
+      ],
     );
 
 mixin _$StandaloneDoorSensorRoute on GoRouteData {
@@ -840,6 +848,38 @@ mixin _$StandaloneDoorSensorRoute on GoRouteData {
   @override
   String get location => GoRouteData.$location(
         '/standalone-door-sensor/${Uri.encodeComponent(_self.mac)}',
+      );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin _$StandaloneDoorSensorInitRoute on GoRouteData {
+  static StandaloneDoorSensorInitRoute _fromState(GoRouterState state) =>
+      StandaloneDoorSensorInitRoute(
+        state.pathParameters['mac']!,
+        name: state.uri.queryParameters['name'] ?? 'Door Sensor',
+      );
+
+  StandaloneDoorSensorInitRoute get _self =>
+      this as StandaloneDoorSensorInitRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+        '/standalone-door-sensor/${Uri.encodeComponent(_self.mac)}/init',
+        queryParams: {
+          if (_self.name != 'Door Sensor') 'name': _self.name,
+        },
       );
 
   @override
@@ -950,6 +990,42 @@ mixin _$WaterMeterRoute on GoRouteData {
   void replace(BuildContext context) => context.replace(location);
 }
 
+RouteBase get $waterMeterInitRoute => GoRouteData.$route(
+      path: '/water-meter-init/:mac',
+      factory: _$WaterMeterInitRoute._fromState,
+    );
+
+mixin _$WaterMeterInitRoute on GoRouteData {
+  static WaterMeterInitRoute _fromState(GoRouterState state) =>
+      WaterMeterInitRoute(
+        state.pathParameters['mac']!,
+        name: state.uri.queryParameters['name'] ?? 'Water Meter',
+      );
+
+  WaterMeterInitRoute get _self => this as WaterMeterInitRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+        '/water-meter-init/${Uri.encodeComponent(_self.mac)}',
+        queryParams: {
+          if (_self.name != 'Water Meter') 'name': _self.name,
+        },
+      );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
 RouteBase get $electricMeterRoute => GoRouteData.$route(
       path: '/electric-meter/:id',
       factory: _$ElectricMeterRoute._fromState,
@@ -966,6 +1042,42 @@ mixin _$ElectricMeterRoute on GoRouteData {
   @override
   String get location => GoRouteData.$location(
         '/electric-meter/${Uri.encodeComponent(_self.id)}',
+      );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $electricMeterInitRoute => GoRouteData.$route(
+      path: '/electric-meter-init/:mac',
+      factory: _$ElectricMeterInitRoute._fromState,
+    );
+
+mixin _$ElectricMeterInitRoute on GoRouteData {
+  static ElectricMeterInitRoute _fromState(GoRouterState state) =>
+      ElectricMeterInitRoute(
+        state.pathParameters['mac']!,
+        name: state.uri.queryParameters['name'] ?? 'Electric Meter',
+      );
+
+  ElectricMeterInitRoute get _self => this as ElectricMeterInitRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+        '/electric-meter-init/${Uri.encodeComponent(_self.mac)}',
+        queryParams: {
+          if (_self.name != 'Electric Meter') 'name': _self.name,
+        },
       );
 
   @override

@@ -3,7 +3,10 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:ttlock_flutter/ttlock.dart';
 
+import '../../../core/config/server_endpoint_config.dart';
+import '../../../core/storage/config_provider.dart';
 import '../../../core/storage/lock_list_provider.dart';
+import '../../../core/widgets/server_endpoint_fields.dart';
 import 'settings_operation.dart';
 
 class LockNetworkSettingsPage extends HookConsumerWidget {
@@ -22,6 +25,20 @@ class LockNetworkSettingsPage extends HookConsumerWidget {
     final routerController = useTextEditingController();
     final dnsController = useTextEditingController();
     final ipType = useState(0);
+
+    final config = ref.watch(configNotifierProvider).valueOrNull;
+
+    useEffect(() {
+      if (config == null) return null;
+      final endpoint = config.defaultServerEndpoint(DeviceServerKind.wifiLock);
+      if (serverIpController.text.isEmpty) {
+        serverIpController.text = endpoint.address;
+      }
+      if (serverPortController.text.isEmpty) {
+        serverPortController.text = endpoint.port;
+      }
+      return null;
+    }, [config?.uid, config?.serverRegion, config?.serverIp, config?.serverPort]);
 
     Future<String?> lockData() async {
       final lock = await ref.read(lockByMacProvider(lockMac).future);
@@ -76,7 +93,10 @@ class LockNetworkSettingsPage extends HookConsumerWidget {
                       'MAC: ${info.wifiMac}\nRSSI: ${info.wifiRssi}',
                     ),
                     actions: [
-                      TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        child: const Text('OK'),
+                      ),
                     ],
                   ),
                 );
@@ -86,15 +106,24 @@ class LockNetworkSettingsPage extends HookConsumerWidget {
           ),
           const Divider(height: 32),
           const Text('Server', style: TextStyle(fontWeight: FontWeight.bold)),
-          TextField(
-            controller: serverIpController,
-            decoration: const InputDecoration(labelText: 'IP'),
-          ),
-          TextField(
-            controller: serverPortController,
-            decoration: const InputDecoration(labelText: 'Port'),
-            keyboardType: TextInputType.number,
-          ),
+          if (config != null)
+            ServerEndpointFields(
+              config: config,
+              deviceKind: DeviceServerKind.wifiLock,
+              ipController: serverIpController,
+              portController: serverPortController,
+            )
+          else ...[
+            TextField(
+              controller: serverIpController,
+              decoration: const InputDecoration(labelText: 'Address'),
+            ),
+            TextField(
+              controller: serverPortController,
+              decoration: const InputDecoration(labelText: 'Port'),
+              keyboardType: TextInputType.number,
+            ),
+          ],
           FilledButton(
             onPressed: () async {
               final data = await lockData();
@@ -122,10 +151,22 @@ class LockNetworkSettingsPage extends HookConsumerWidget {
             onSelectionChanged: (s) => ipType.value = s.first,
           ),
           if (ipType.value == 1) ...[
-            TextField(controller: ipAddressController, decoration: const InputDecoration(labelText: 'IP')),
-            TextField(controller: subnetController, decoration: const InputDecoration(labelText: 'Subnet')),
-            TextField(controller: routerController, decoration: const InputDecoration(labelText: 'Router')),
-            TextField(controller: dnsController, decoration: const InputDecoration(labelText: 'DNS')),
+            TextField(
+              controller: ipAddressController,
+              decoration: const InputDecoration(labelText: 'IP'),
+            ),
+            TextField(
+              controller: subnetController,
+              decoration: const InputDecoration(labelText: 'Subnet'),
+            ),
+            TextField(
+              controller: routerController,
+              decoration: const InputDecoration(labelText: 'Router'),
+            ),
+            TextField(
+              controller: dnsController,
+              decoration: const InputDecoration(labelText: 'DNS'),
+            ),
           ],
           FilledButton(
             onPressed: () async {

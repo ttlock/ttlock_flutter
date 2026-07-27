@@ -6,7 +6,7 @@ part of 'remote_key_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$remoteKeyNotifierHash() => r'ce846402619f17ec3f0844d0c8360b8aa9d4127c';
+String _$remoteKeyNotifierHash() => r'66b34791dcdf114ab906b18187591c28e03a7f7a';
 
 /// See also [RemoteKeyNotifier].
 @ProviderFor(RemoteKeyNotifier)

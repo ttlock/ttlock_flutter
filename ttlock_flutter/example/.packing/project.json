@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "projectType": "flutter",
+  "platforms": [
+    "android",
+    "ios",
+    "ohos"
+  ],
+  "inject": {},
+  "environments": {
+    "dev": {
+      "upload": {
+        "ref": null
+      },
+      "notify": {
+        "ref": null
+      }
+    },
+    "staging": {
+      "upload": {
+        "ref": null
+      },
+      "notify": {
+        "ref": null
+      }
+    },
+    "prod": {
+      "inject": {},
+      "upload": {
+        "ref": "pgyer"
+      },
+      "notify": {
+        "ref": "dingtalk"
+      }
+    }
+  },
+  "androidArtifactPrefer": "apk",
+  "androidGradleModule": "app",
+  "iosExportMethod": "app-store",
+  "ohosProduct": "default",
+  "ohosModule": "entry",
+  "ohosBuildType": "app"
+}

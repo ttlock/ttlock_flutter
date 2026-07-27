@@ -10360,7 +10360,7 @@ export abstract class TTAccessoryHostApi {
   */
   abstract standaloneDoorSensorIsSupportFunction(featureValue: string , lockFunction: TTStandaloneDoorSensorFeature ): boolean;
   /*
-  *  配置电表服务器。
+  *  配置蓝牙电表服务器。
   * 
   *  [url] 服务器地址。
   *  [clientId] 客户端 ID。
@@ -10467,7 +10467,7 @@ export abstract class TTAccessoryHostApi {
   */
   abstract electricMeterConfigApn(mac: string , apn: string , result: Result<void>): void;
   /*
-  *  配置电表计量服务器。
+  *  配置4G卡蓝牙电表服务器。
   * 
   *  [mac] 电表 MAC 地址。
   *  [ip] 服务器 IP。
@@ -10481,7 +10481,7 @@ export abstract class TTAccessoryHostApi {
   */
   abstract electricMeterReset(mac: string , result: Result<void>): void;
   /*
-  *  配置水表服务器。
+  *  配置蓝牙水表服务器。
   * 
   *  [url] 服务器地址。
   *  [clientId] 客户端 ID。
@@ -10588,7 +10588,7 @@ export abstract class TTAccessoryHostApi {
   */
   abstract waterMeterConfigApn(mac: string , apn: string , result: Result<void>): void;
   /*
-  *  配置水表计量服务器。
+  *  配置4G卡蓝牙水表服务器。
   * 
   *  [mac] 水表 MAC 地址。
   *  [ip] 服务器 IP。

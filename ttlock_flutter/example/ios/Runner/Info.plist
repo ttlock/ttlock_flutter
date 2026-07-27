@@ -24,6 +24,10 @@
 	<true/>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>TTLock want to controle smart lock by bluetooth</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>TTLock uses your location to read the current WiFi name when configuring standalone door sensors.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>TTLock uses your location to read the current WiFi name when configuring standalone door sensors.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

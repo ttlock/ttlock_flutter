@@ -6,7 +6,7 @@ part of 'scan_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$scanNotifierHash() => r'038f91c25fbb81ab7eeb953894284eb76a11cdc5';
+String _$scanNotifierHash() => r'20b31cd3021664bc8d98bc527614a3a04c782a91';
 
 /// Copied from Dart SDK
 class _SystemHash {

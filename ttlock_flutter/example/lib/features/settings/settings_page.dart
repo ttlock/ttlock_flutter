@@ -40,6 +40,7 @@ class _SettingsBody extends HookConsumerWidget {
     final passwordCtrl = useTextEditingController(text: config.password ?? '');
     final ipCtrl = useTextEditingController(text: config.serverIp ?? '');
     final portCtrl = useTextEditingController(text: config.serverPort ?? '');
+    final region = useState(config.serverRegion);
     final formKey = useMemoized(GlobalKey<FormState>.new);
 
     Future<void> save() async {
@@ -47,9 +48,10 @@ class _SettingsBody extends HookConsumerWidget {
       final newConfig = config.copyWith(
         uid: int.tryParse(uidCtrl.text) ?? 0,
         password: AppEnv.isOnline ? passwordCtrl.text : null,
-        serverIp: AppEnv.isOnPremise ? ipCtrl.text : null,
+        serverRegion: AppEnv.isOnline ? region.value : config.serverRegion,
+        serverIp: AppEnv.isOnPremise ? ipCtrl.text.trim() : null,
         serverPort: AppEnv.isOnPremise && portCtrl.text.isNotEmpty
-            ? portCtrl.text
+            ? portCtrl.text.trim()
             : null,
       );
       await ref.read(configNotifierProvider.notifier).save(newConfig);
@@ -68,14 +70,24 @@ class _SettingsBody extends HookConsumerWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppEnv.isOnPremise ? AppColors.warning.withValues(alpha: 0.1) : AppColors.primary.withValues(alpha: 0.1),
+              color: AppEnv.isOnPremise
+                  ? AppColors.warning.withValues(alpha: 0.1)
+                  : AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
               children: [
-                Icon(AppEnv.isOnPremise ? Icons.dns : Icons.cloud, color: AppEnv.isOnPremise ? AppColors.warning : AppColors.primary),
+                Icon(
+                  AppEnv.isOnPremise ? Icons.dns : Icons.cloud,
+                  color: AppEnv.isOnPremise
+                      ? AppColors.warning
+                      : AppColors.primary,
+                ),
                 const SizedBox(width: 8),
-                Text('Mode: ${AppEnv.isOnPremise ? "On-Premise" : "Online"}', style: AppTextStyles.labelLarge),
+                Text(
+                  'Mode: ${AppEnv.isOnPremise ? "On-Premise" : "Online"}',
+                  style: AppTextStyles.labelLarge,
+                ),
               ],
             ),
           ),
@@ -104,23 +116,54 @@ class _SettingsBody extends HookConsumerWidget {
                   (v == null || v.isEmpty) ? 'Password is required' : null,
               onTapOutside: (event) => FocusScope.of(context).unfocus(),
             ),
+            const SizedBox(height: 16),
+            Text(
+              'Server Region',
+              style: AppTextStyles.labelLarge,
+            ),
+            const SizedBox(height: 8),
+            SegmentedButton<ServerRegion>(
+              segments: const [
+                ButtonSegment(
+                  value: ServerRegion.china,
+                  label: Text('China'),
+                  icon: Icon(Icons.flag),
+                ),
+                ButtonSegment(
+                  value: ServerRegion.global,
+                  label: Text('Global'),
+                  icon: Icon(Icons.public),
+                ),
+              ],
+              selected: {region.value},
+              onSelectionChanged: (selection) {
+                region.value = selection.first;
+              },
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Device-specific server addresses are applied automatically during provisioning.',
+              style: AppTextStyles.bodySmall.copyWith(
+                color: Colors.grey.shade600,
+              ),
+            ),
           ] else ...[
             const SizedBox(height: 16),
             TextFormField(
               controller: ipCtrl,
               decoration: const InputDecoration(
-                labelText: 'Server IP',
+                labelText: 'Server Address',
                 hintText: 'e.g. 192.168.1.100',
               ),
               validator: (v) =>
-                  (v == null || v.isEmpty) ? 'Server IP is required' : null,
+                  (v == null || v.isEmpty) ? 'Server address is required' : null,
               onTapOutside: (event) => FocusScope.of(context).unfocus(),
             ),
             const SizedBox(height: 16),
             TextFormField(
               controller: portCtrl,
               decoration: const InputDecoration(
-                labelText: 'Server Port (optional)',
+                labelText: 'Server Port',
                 hintText: 'e.g. 2229',
               ),
               keyboardType: TextInputType.number,
