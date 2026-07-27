@@ -1597,6 +1597,30 @@ enum TTNbAwakeTimeType {
   interval,
 }
 
+/// 凭证别名类型（对应 iOS `TTAliasType`）。
+enum TTAliasType {
+  /// 指纹。
+  fingerprint,
+
+  /// IC 卡。
+  card,
+
+  /// 无线钥匙。
+  wirelessKeyFob,
+
+  /// 人脸。
+  face,
+
+  /// 掌静脉。
+  palmVein,
+
+  /// 密码。
+  passcode,
+
+  /// 二维码。
+  qrCode,
+}
+
 /// 锁功能能力位。
 enum TTLockFunction {
   /// 密码。
@@ -1874,6 +1898,15 @@ enum TTLockFunction {
 
   /// 支持监管。
   supportSupervision,
+
+  /// 易诺拍照人脸。
+  yiNuoPhotoFace,
+
+  /// 通过 URL 添加人脸。
+  urlFace,
+
+  /// 人体存在传感器。
+  humanPresenceSensor,
 }
 
 /// 人脸录入状态。
@@ -2344,6 +2377,38 @@ abstract class TTLockHostApi {
   /// [lockData] 锁凭证。
   @async
   String addFaceData(List<TTCycleModel>? cycleList, int startDate, int endDate, String faceFeatureData, String lockData);
+
+  /// 通过图片 URL 添加人脸。
+  ///
+  /// 返回人脸编号。
+  ///
+  /// [url] 人脸图片 URL。
+  /// [cycleList] 周期时间段列表。
+  /// [startDate] 有效期起始时间，毫秒时间戳；永久钥匙传 0。
+  /// [endDate] 有效期结束时间，毫秒时间戳；永久钥匙传 0。
+  /// [lockData] 锁凭证。
+  @async
+  String addFaceUrl(
+    String url,
+    List<TTCycleModel>? cycleList,
+    int startDate,
+    int endDate,
+    String lockData,
+  );
+
+  /// 为凭证设置别名。
+  ///
+  /// [type] 别名类型（指纹/卡/人脸等）。
+  /// [credentialId] 凭证标识（人脸编号、卡号、密码等）。
+  /// [alias] 别名字符串。
+  /// [lockData] 锁凭证。
+  @async
+  void setAlias(
+    TTAliasType type,
+    String credentialId,
+    String alias,
+    String lockData,
+  );
 
   /// 删除人脸。
   ///
