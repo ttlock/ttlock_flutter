@@ -146,6 +146,8 @@ public class TTLockCommand {
     public static final String COMMAND_MODIFY_FACE = "faceModify";
     public static final String COMMAND_CLEAR_FACE = "faceClear";
 
+    public static final String COMMAND_GET_ALL_VALID_FACE = "getAllValidFace";
+
     public static final String COMMAND_SET_WORKING_TIME = "setLockWorkingTime";
 
 

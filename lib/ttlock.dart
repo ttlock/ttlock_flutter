@@ -149,6 +149,7 @@ class TTLock {
   static const String COMMAND_MODIFY_FACE = "faceModify";
   static const String COMMAND_DELETE_FACE = "faceDelete";
   static const String COMMAND_CLEAR_FACE = "faceClear";
+  static const String COMMAND_GET_ALL_VALID_FACE = "getAllValidFace";
   static const String COMMAND_SET_WORKING_TIME = "setLockWorkingTime";
 
   // static const String COMMAND_GET_PASSCODE_VERIFICATION_PARAMS = "getPasscodeVerificationParams";
@@ -1251,6 +1252,12 @@ class TTLock {
     invoke(COMMAND_DELETE_FACE, map, callback, fail_callback: failedCallback);
   }
 
+  static void getAllValidFaces(String lockData,
+      TTGetAllFacesCallback callback, TTFailedCallback failedCallback) {
+    invoke(COMMAND_GET_ALL_VALID_FACE, lockData, callback,
+        fail_callback: failedCallback);
+  }
+
   static void setLockWorkingTime(int startDate, int endDate, String lockData,
       TTSuccessCallback callback, TTFailedCallback failedCallback) {
     Map map = Map();
@@ -1515,6 +1522,15 @@ class TTLock {
           fingerprintList = convert.jsonDecode(fingerprintListString);
         }
         getAllFingerprintsCallback(fingerprintList);
+        break;
+      case COMMAND_GET_ALL_VALID_FACE:
+        TTGetAllFacesCallback getAllFacesCallback = callBack;
+        List faceList = [];
+        String? faceListString = data[TTResponse.faceListString];
+        if (faceListString != null) {
+          faceList = convert.jsonDecode(faceListString);
+        }
+        getAllFacesCallback(faceList);
         break;
       case COMMAND_GET_NB_AWAKE_TIMES:
         TTGetNbAwakeTimesCallback getNbAwakeTimesCallback = callBack;
@@ -1942,6 +1958,7 @@ class TTResponse {
   static const String passcodeListString = "passcodeListString";
   static const String cardListString = "cardListString";
   static const String fingerprintListString = "fingerprintListString";
+  static const String faceListString = "faceListString";
 
   static const String nbServerAddress = "nbServerAddress";
   static const String nbServerPort = "nbServerPort";
@@ -2229,6 +2246,7 @@ typedef TTAddFingerprintProgressCallback = void Function(
     int currentCount, int totalCount);
 typedef TTAddFingerprintCallback = void Function(String fingerprintNumber);
 typedef TTGetAllFingerprintsCallback = void Function(List fingerprintList);
+typedef TTGetAllFacesCallback = void Function(List faceList);
 typedef TTGetSwitchStateCallback = void Function(bool isOn);
 typedef TTGetLockStatusCallback = void Function(TTLockSwitchState state);
 typedef TTGetLockDirectionCallback = void Function(TTLockDirection direction);

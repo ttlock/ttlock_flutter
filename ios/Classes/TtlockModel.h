@@ -153,6 +153,8 @@
 
 @property (nonatomic, strong) NSString *faceFeatureData;
 
+@property (nonatomic, strong) NSString *faceListString;
+
 @property (nonatomic, strong) NSString * apn;
 @property (nonatomic, strong) NSNumber *slotNumber;
 

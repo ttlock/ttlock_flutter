@@ -955,9 +955,19 @@ typedef NS_ENUM(NSInteger, ErrorDevice) {
     }
     
     else if ([command isEqualToString:command_face_clear]) {
-        
+
         [TTLock clearFaceWithLockData:lockModel.lockData success:^{
             [weakSelf successCallbackCommand:command data:nil];
+        } failure:^(TTError errorCode, NSString *errorMsg) {
+            [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];
+        }];
+    }
+
+    else if ([command isEqualToString:command_get_all_valid_face]) {
+        [TTLock getAllValidFacesWithLockData:lockModel.lockData success:^(NSString *allFacesJsonString) {
+            TtlockModel *data = [TtlockModel new];
+            data.faceListString = allFacesJsonString;
+            [weakSelf successCallbackCommand:command data:data];
         } failure:^(TTError errorCode, NSString *errorMsg) {
             [weakSelf errorCallbackCommand:command code:errorCode msg:errorMsg];
         }];

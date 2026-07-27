@@ -151,6 +151,8 @@ public class TtlockModel {
 
     public String faceNumber;
 
+    public String faceListString;
+
     /** 独立门磁：扫描/初始化等使用的 info JSON 字符串 */
     public String standaloneInfoStr;
     /** 独立门磁：功能位图，用于 isSupportFunction */

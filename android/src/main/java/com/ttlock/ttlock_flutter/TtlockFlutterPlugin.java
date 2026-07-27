@@ -41,6 +41,7 @@ import com.ttlock.bl.sdk.callback.DeleteRemoteCallback;
 import com.ttlock.bl.sdk.callback.GetAccessoryBatteryLevelCallback;
 import com.ttlock.bl.sdk.callback.GetAdminPasscodeCallback;
 import com.ttlock.bl.sdk.callback.GetAllValidFingerprintCallback;
+import com.ttlock.bl.sdk.callback.GetAllValidFaceCallback;
 import com.ttlock.bl.sdk.callback.GetAllValidICCardCallback;
 import com.ttlock.bl.sdk.callback.GetAllValidPasscodeCallback;
 import com.ttlock.bl.sdk.callback.GetAutoLockingPeriodCallback;
@@ -2478,6 +2479,9 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
       case TTLockCommand.COMMAND_CLEAR_FACE:
         clearFace(ttlockModel);
         break;
+      case TTLockCommand.COMMAND_GET_ALL_VALID_FACE:
+        getAllValidFaces(ttlockModel);
+        break;
       case TTLockCommand.COMMAND_SET_WORKING_TIME:
         setLockWorkingTime(ttlockModel);
         break;
@@ -4481,6 +4485,27 @@ public class TtlockFlutterPlugin implements FlutterPlugin, MethodCallHandler, Ac
         TTLockClient.getDefault().clearFace(ttlockModel.lockData, new ClearFaceCallback() {
           @Override
           public void onClearSuccess() {
+            apiSuccess(ttlockModel);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            apiFail(lockError);
+          }
+        });
+      } else {
+        apiFail(LockError.LOCK_NO_PERMISSION);
+      }
+    });
+  }
+
+  public void getAllValidFaces(final TtlockModel ttlockModel) {
+    PermissionUtils.doWithConnectPermission(activity, success -> {
+      if (success) {
+        TTLockClient.getDefault().getAllValidFaces(ttlockModel.lockData, ttlockModel.lockMac, new GetAllValidFaceCallback() {
+          @Override
+          public void onGetAllValidFaceSuccess(String faceStr) {
+            ttlockModel.faceListString = faceStr;
             apiSuccess(ttlockModel);
           }
 
