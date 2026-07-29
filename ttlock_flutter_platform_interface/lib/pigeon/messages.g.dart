@@ -334,6 +334,8 @@ enum TTLockError {
   invalidClientPara,
   /// 锁已锁定。
   lockIsLocked,
+  /// 记录已存在。
+  recordExist,
   /// 记录不存在。
   recordNotExist,
   /// 不支持修改密码。

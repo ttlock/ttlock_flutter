@@ -523,6 +523,8 @@ export enum TTLockError {
   INVALID_CLIENT_PARA,
   /* 锁已锁定。*/
   LOCK_IS_LOCKED,
+  /* 记录已存在。*/
+  RECORD_EXIST,
   /* 记录不存在。*/
   RECORD_NOT_EXIST,
   /* 不支持修改密码。*/

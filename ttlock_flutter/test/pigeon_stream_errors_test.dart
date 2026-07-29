@@ -27,6 +27,27 @@ void main() {
     });
   });
 
+  group('TTLockError enum', () {
+    test('contains recordExist and maps to TTLockException', () async {
+      final recordExistList = TTLockError.values.where((e) => e.name == 'recordExist').toList();
+      expect(recordExistList, hasLength(1));
+      final recordExist = recordExistList.single;
+
+      final stream = mapLockStreamErrors<int>(
+        Stream<int>.error(
+          PlatformException(code: '${recordExist.index}', message: 'record exists'),
+        ),
+      );
+
+      await expectLater(
+        stream,
+        emitsError(
+          isA<TTLockException>().having((e) => e.code, 'code', recordExist),
+        ),
+      );
+    });
+  });
+
   group('mapGatewayStreamErrors', () {
     test('converts PlatformException to TTGatewayException', () async {
       final stream = mapGatewayStreamErrors<int>(
