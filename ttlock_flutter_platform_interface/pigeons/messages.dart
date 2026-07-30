@@ -746,7 +746,7 @@ class TTWifiScanResult {
   List<TTWifiScanEntry> wifiList;
 
   TTWifiScanResult({
-    required this.wifiList
+    required this.wifiList,
   });
 }
 
