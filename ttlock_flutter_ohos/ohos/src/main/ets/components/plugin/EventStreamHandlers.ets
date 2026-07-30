@@ -229,6 +229,9 @@ class ScanLockWifiImpl extends LockScanWifiStreamHandler implements DisposableSt
     TTLock.lockScanNearbyWifi(lockData, {
       success: (model: ITTLockScanWifiModel): void => {
         sink.success(buildLockScanWifiResult(model));
+        if (model.isFinished) {
+          sink.endOfStream();
+        }
       },
       failure: (err: SNError): void => {
         emitLockSinkError(sink, 'lockScanWifi', err);
@@ -427,7 +430,13 @@ class GatewayGetNearbyWifiImpl extends GatewayGetNearbyWifiStreamHandler impleme
     }
     TTLock.scanWiFiByGateway({
       success: (info: HashMap<String, Object>): void => {
-        sink.success(buildGatewayWifiScanResult(info as HashMap<String, Object> as HashMap<string, Object>));
+        const map = info as HashMap<String, Object> as HashMap<string, Object>;
+        const finishedRaw = map.get('finished') ?? map.get('isFinished');
+        const finished: boolean = finishedRaw === true || finishedRaw === 1;
+        sink.success(buildGatewayWifiScanResult(map));
+        if (finished) {
+          sink.endOfStream();
+        }
       },
       failure: (err: SNError): void => {
         emitGatewaySinkError(sink, 'gatewayGetNearbyWifi', err);

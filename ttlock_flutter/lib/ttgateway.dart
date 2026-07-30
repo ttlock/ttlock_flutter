@@ -80,7 +80,7 @@ class TTGateway {
       return item?.toString() ?? '';
     }
 
-    new_ttlock.TTLock.gateway.gatewayGetNearbyWifi(gatewayMac: gatewayMac).listen(
+    _scanWifiSub = new_ttlock.TTLock.gateway.gatewayGetNearbyWifi(gatewayMac: gatewayMac).listen(
       (wifiList) {
         for (final item in wifiList.wifiList) {
           final key = wifiKey(item);
