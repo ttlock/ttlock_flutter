@@ -475,9 +475,10 @@ class TTLockApi {
   Future<void> configWifi(
     String wifiName,
     String wifiPassword,
+    String lockMac,
     String lockData,
   ) =>
-      runLockApi(() => _host.configWifi(wifiName, wifiPassword, lockData));
+      runLockApi(() => _host.configWifi(wifiName, wifiPassword, lockMac, lockData));
 
   Future<void> configServer(String ip, String port, String lockData) =>
       runLockApi(() => _host.configServer(ip, port, lockData));

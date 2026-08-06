@@ -6715,9 +6715,10 @@ export abstract class TTLockHostApi {
   * 
   *  [wifiName] WiFi 名称。
   *  [wifiPassword] WiFi 密码。
+  *  [lockMac] 锁蓝牙 MAC 地址。
   *  [lockData] 锁凭证。
   */
-  abstract configWifi(wifiName: string , wifiPassword: string , lockData: string , result: Result<void>): void;
+  abstract configWifi(wifiName: string , wifiPassword: string , lockMac: string , lockData: string , result: Result<void>): void;
   /*
   *  配置服务器。
   * 
@@ -9505,8 +9506,8 @@ export abstract class TTLockHostApi {
                   return;
               }
               let args: Array<Object> = message as Array<Object>;
-              if (args.length < 3) {
-                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected at least 3 argument(s).')));
+              if (args.length < 4) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected at least 4 argument(s).')));
                   return;
               }
               class ResultImp implements Result<void>{
@@ -9523,7 +9524,7 @@ export abstract class TTLockHostApi {
               }
               let resultCallback: Result<void> = new ResultImp();
 
-              api!.configWifi(args[0] as string, args[1] as string, args[2] as string, resultCallback);
+              api!.configWifi(args[0] as string, args[1] as string, args[2] as string, args[3] as string, resultCallback);
             } });
       } else {
         channel.setMessageHandler(null);

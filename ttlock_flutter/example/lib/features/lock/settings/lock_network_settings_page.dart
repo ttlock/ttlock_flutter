@@ -69,6 +69,7 @@ class LockNetworkSettingsPage extends HookConsumerWidget {
                 action: () => TTLock.lock.configWifi(
                       ssidController.text.trim(),
                       wifiPasswordController.text,
+                      lockMac,
                       data,
                     ),
                 successMessage: 'WiFi configured',

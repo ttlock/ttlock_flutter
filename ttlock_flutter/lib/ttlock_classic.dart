@@ -940,13 +940,14 @@ class TTLock {
     );
   }
 
-  @Deprecated('Use TTLock.lock.configWifi(wifiName: ..., wifiPassword: ..., lockData: ...) instead.')
-  static void configWifi(String wifiName, String wifiPassword, String lockData,
-      TTSuccessCallback callback, TTFailedCallback failedCallback) {
+  @Deprecated('Use TTLock.lock.configWifi(wifiName: ..., wifiPassword: ..., lockMac: ..., lockData: ...) instead.')
+  static void configWifi(String wifiName, String wifiPassword, String lockMac,
+      String lockData, TTSuccessCallback callback, TTFailedCallback failedCallback) {
     _runLockVoid(
       new_ttlock.TTLock.lock.configWifi(
         wifiName,
         wifiPassword,
+        lockMac,
         lockData,
       ),
       callback,

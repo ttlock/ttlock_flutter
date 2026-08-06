@@ -5623,15 +5623,16 @@ class TTLockHostApi {
   ///
   /// [wifiName] WiFi 名称。
   /// [wifiPassword] WiFi 密码。
+  /// [lockMac] 锁蓝牙 MAC 地址。
   /// [lockData] 锁凭证。
-  Future<void> configWifi(String wifiName, String wifiPassword, String lockData) async {
+  Future<void> configWifi(String wifiName, String wifiPassword, String lockMac, String lockData) async {
     final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.configWifi$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[wifiName, wifiPassword, lockData]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[wifiName, wifiPassword, lockMac, lockData]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(

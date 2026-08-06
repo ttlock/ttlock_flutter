@@ -2691,9 +2691,15 @@ abstract class TTLockHostApi {
   ///
   /// [wifiName] WiFi 名称。
   /// [wifiPassword] WiFi 密码。
+  /// [lockMac] 锁蓝牙 MAC 地址。
   /// [lockData] 锁凭证。
   @async
-  void configWifi(String wifiName, String wifiPassword, String lockData);
+  void configWifi(
+    String wifiName,
+    String wifiPassword,
+    String lockMac,
+    String lockData,
+  );
 
   /// 配置服务器。
   ///
