@@ -4,9 +4,10 @@ ttlock-developers-email-list@googlegroups.com
 
 ### ttlock_flutter
 
-
-
 ##### Config
+
+Initial Setup:
+* Download the ttlock-release.aar file from the android/libs folder and add it to your project's android/libs folder.
 
 iOS: 
 1. In XCode,Add Key`Privacy - Bluetooth Peripheral Usage Description` Value `your description for bluetooth` to your project's `info` ➜ `Custom iOS Target Projectes`
