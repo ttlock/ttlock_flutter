@@ -528,6 +528,24 @@ class TTPalmVeinModel {
   });
 }
 
+/// 二维码信息。
+class TTQrCodeModel {
+  /// 二维码编号。
+  final String qrCodeNumber;
+
+  /// 有效期起始，毫秒时间戳。
+  final int startDate;
+
+  /// 有效期截止，毫秒时间戳。
+  final int endDate;
+
+  TTQrCodeModel({
+    required this.qrCodeNumber,
+    required this.startDate,
+    required this.endDate,
+  });
+}
+
 /// 网关扫描结果。
 class TTGatewayScanModel {
   /// 网关名称。
@@ -2460,6 +2478,58 @@ abstract class TTLockHostApi {
   /// [lockData] 锁凭证。
   @async
   List<TTPalmVeinModel> getAllValidPalmVeins(String lockData);
+
+  /// 添加二维码。
+  ///
+  /// [qrCodeNumber] 二维码编号。
+  /// [cycleList] 周期时间段列表，空或 null 表示无周期。
+  /// [startDate] 有效期起始时间，毫秒时间戳；永久有效时传 0。
+  /// [endDate] 有效期结束时间，毫秒时间戳；永久有效时传 0。
+  /// [lockData] 锁凭证。
+  @async
+  void addQrCode(
+    String qrCodeNumber,
+    List<TTCycleModel>? cycleList,
+    int startDate,
+    int endDate,
+    String lockData,
+  );
+
+  /// 修改二维码有效期。
+  ///
+  /// [qrCodeNumber] 二维码编号。
+  /// [cycleList] 周期时间段列表，空或 null 表示无周期。
+  /// [startDate] 有效期起始时间，毫秒时间戳。
+  /// [endDate] 有效期结束时间，毫秒时间戳。
+  /// [lockData] 锁凭证。
+  @async
+  void modifyQrCodeValidityPeriod(
+    String qrCodeNumber,
+    List<TTCycleModel>? cycleList,
+    int startDate,
+    int endDate,
+    String lockData,
+  );
+
+  /// 删除二维码。
+  ///
+  /// [qrCodeNumber] 二维码编号。
+  /// [endDate] 二维码有效期结束时间，毫秒时间戳。
+  /// [lockData] 锁凭证。
+  @async
+  void deleteQrCode(String qrCodeNumber, int endDate, String lockData);
+
+  /// 清除所有二维码。
+  ///
+  /// [lockData] 锁凭证。
+  @async
+  void clearAllQrCodes(String lockData);
+
+  /// 获取所有有效二维码。
+  ///
+  /// [lockData] 锁凭证。
+  @async
+  List<TTQrCodeModel> getAllValidQrCodes(String lockData);
 
   /// 设置电机扭矩等级。
   ///

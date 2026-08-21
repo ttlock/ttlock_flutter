@@ -28,6 +28,7 @@ import {
   TTPassageModeType,
   TTPassageModeModel,
   TTPowerSaverWorkType,
+  TTQrCodeModel,
   TTRemoteAccessory,
   TTSensitivityValue,
   TTSoundVolumeType,
@@ -655,6 +656,45 @@ export class LockHostApiImpl extends TTLockHostApi {
         result.error(makeLockApiError('getAllValidPalmVeins', err));
       },
     });
+  }
+
+  addQrCode(
+    _qrCodeNumber: string,
+    _cycleList: Array<TTCycleModel> | undefined,
+    _startDate: number,
+    _endDate: number,
+    _lockData: string,
+    result: Result<void>,
+  ): void {
+    result.error(makeNotImplementedError('addQrCode'));
+  }
+
+  modifyQrCodeValidityPeriod(
+    _qrCodeNumber: string,
+    _cycleList: Array<TTCycleModel> | undefined,
+    _startDate: number,
+    _endDate: number,
+    _lockData: string,
+    result: Result<void>,
+  ): void {
+    result.error(makeNotImplementedError('modifyQrCodeValidityPeriod'));
+  }
+
+  deleteQrCode(
+    _qrCodeNumber: string,
+    _endDate: number,
+    _lockData: string,
+    result: Result<void>,
+  ): void {
+    result.error(makeNotImplementedError('deleteQrCode'));
+  }
+
+  clearAllQrCodes(_lockData: string, result: Result<void>): void {
+    result.error(makeNotImplementedError('clearAllQrCodes'));
+  }
+
+  getAllValidQrCodes(_lockData: string, result: Result<Array<TTQrCodeModel>>): void {
+    result.error(makeNotImplementedError('getAllValidQrCodes'));
   }
 
   setMotorTorqueLevel(torqueLevel: number, lockData: string, result: Result<void>): void {

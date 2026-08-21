@@ -358,6 +358,43 @@ class TTLockApi {
   Future<List<pigeon.TTPalmVeinModel>> getAllValidPalmVeins(String lockData) =>
       runLockApi(() => _host.getAllValidPalmVeins(lockData));
 
+  Future<void> addQrCode(
+    String qrCodeNumber,
+    List<pigeon.TTCycleModel>? cycleList,
+    int startDate,
+    int endDate,
+    String lockData,
+  ) =>
+      runLockApi(
+        () => _host.addQrCode(qrCodeNumber, cycleList, startDate, endDate, lockData),
+      );
+
+  Future<void> modifyQrCodeValidityPeriod(
+    String qrCodeNumber,
+    List<pigeon.TTCycleModel>? cycleList,
+    int startDate,
+    int endDate,
+    String lockData,
+  ) =>
+      runLockApi(
+        () => _host.modifyQrCodeValidityPeriod(
+          qrCodeNumber,
+          cycleList,
+          startDate,
+          endDate,
+          lockData,
+        ),
+      );
+
+  Future<void> deleteQrCode(String qrCodeNumber, int endDate, String lockData) =>
+      runLockApi(() => _host.deleteQrCode(qrCodeNumber, endDate, lockData));
+
+  Future<void> clearAllQrCodes(String lockData) =>
+      runLockApi(() => _host.clearAllQrCodes(lockData));
+
+  Future<List<pigeon.TTQrCodeModel>> getAllValidQrCodes(String lockData) =>
+      runLockApi(() => _host.getAllValidQrCodes(lockData));
+
   Future<void> setMotorTorqueLevel(int torqueLevel, String lockData) =>
       runLockApi(() => _host.setMotorTorqueLevel(torqueLevel, lockData));
 

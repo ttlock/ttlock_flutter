@@ -3652,6 +3652,79 @@ export class TTPalmVeinModel {
 }
 
 /*
+*  二维码信息。
+* 
+*  Generated class from Pigeon that represents data sent in messages.
+*/
+export class TTQrCodeModel {
+  private qrCodeNumber: string;
+
+  public setQrCodeNumber(qrCodeNumber: string): void {
+    this.qrCodeNumber = qrCodeNumber;
+  }
+
+  getQrCodeNumber(): string{
+    return this.qrCodeNumber;
+  }
+
+  private startDate: number;
+
+  public setStartDate(startDate: number): void {
+    this.startDate = startDate;
+  }
+
+  getStartDate(): number{
+    return this.startDate;
+  }
+
+  private endDate: number;
+
+  public setEndDate(endDate: number): void {
+    this.endDate = endDate;
+  }
+
+  getEndDate(): number{
+    return this.endDate;
+  }
+
+  constructor(qrCodeNumber: string, startDate: number, endDate: number) {
+    this.qrCodeNumber = qrCodeNumber;
+    this.startDate = startDate;
+    this.endDate = endDate;
+  }
+
+  toList(): Array<Object | null> {
+    let arr: Array<Object | null> = new Array<Object | null>();
+    if (this.qrCodeNumber === undefined || this.qrCodeNumber === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.qrCodeNumber);
+    }
+    if (this.startDate === undefined || this.startDate === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.startDate);
+    }
+    if (this.endDate === undefined || this.endDate === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.endDate);
+    }
+    return arr;
+  }
+
+  static fromList(arr: Object[]): TTQrCodeModel {
+    let qrCodeNumberObject: Object = arr[0];
+    const qrCodeNumber: string = qrCodeNumberObject as string;
+    let startDateObject: Object = arr[1];
+    const startDate: number = startDateObject as number;
+    let endDateObject: Object = arr[2];
+    const endDate: number = endDateObject as number;
+    return new TTQrCodeModel(qrCodeNumber, startDate, endDate);
+  }
+}
+
+/*
 *  网关扫描结果。
 * 
 *  Generated class from Pigeon that represents data sent in messages.
@@ -5870,46 +5943,48 @@ export class PigeonCodec extends StandardMessageCodec {
       case this.getByte(185):
         return TTPalmVeinModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(186):
-        return TTGatewayScanModel.fromList(super.readValue(buffer) as Object[]);
+        return TTQrCodeModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(187):
-        return GatewayDeviceInfo.fromList(super.readValue(buffer) as Object[]);
+        return TTGatewayScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(188):
-        return TTRemoteAccessoryScanModel.fromList(super.readValue(buffer) as Object[]);
+        return GatewayDeviceInfo.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(189):
-        return TTStandaloneDoorSensorInitParams.fromList(super.readValue(buffer) as Object[]);
+        return TTRemoteAccessoryScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(190):
-        return TTStandaloneDoorSensorScanModel.fromList(super.readValue(buffer) as Object[]);
+        return TTStandaloneDoorSensorInitParams.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(191):
-        return TTStandaloneDoorSensorInfo.fromList(super.readValue(buffer) as Object[]);
+        return TTStandaloneDoorSensorScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(192):
-        return TTMeterScanModel.fromList(super.readValue(buffer) as Object[]);
+        return TTStandaloneDoorSensorInfo.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(193):
-        return TTWaterMeterInitResult.fromList(super.readValue(buffer) as Object[]);
+        return TTMeterScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(194):
-        return TTElectricMeterInitResult.fromList(super.readValue(buffer) as Object[]);
+        return TTWaterMeterInitResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(195):
-        return TTWifiScanResult.fromList(super.readValue(buffer) as Object[]);
+        return TTElectricMeterInitResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(196):
-        return TTWifiScanEntry.fromList(super.readValue(buffer) as Object[]);
+        return TTWifiScanResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(197):
-        return RemoteKeypadInitResult.fromList(super.readValue(buffer) as Object[]);
+        return TTWifiScanEntry.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(198):
-        return MultifunctionalKeypadInitResult.fromList(super.readValue(buffer) as Object[]);
+        return RemoteKeypadInitResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(199):
-        return WaterMeterDeviceInfo.fromList(super.readValue(buffer) as Object[]);
+        return MultifunctionalKeypadInitResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(200):
-        return ElectricMeterDeviceInfo.fromList(super.readValue(buffer) as Object[]);
+        return WaterMeterDeviceInfo.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(201):
-        return TTWaterMeterInitParam.fromList(super.readValue(buffer) as Object[]);
+        return ElectricMeterDeviceInfo.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(202):
-        return TTElectricMeterInitParam.fromList(super.readValue(buffer) as Object[]);
+        return TTWaterMeterInitParam.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(203):
-        return AddCardEvent.fromList(super.readValue(buffer) as Object[]);
+        return TTElectricMeterInitParam.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(204):
-        return AddFingerprintEvent.fromList(super.readValue(buffer) as Object[]);
+        return AddCardEvent.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(205):
-        return AddFaceEvent.fromList(super.readValue(buffer) as Object[]);
+        return AddFingerprintEvent.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(206):
+        return AddFaceEvent.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(207):
         return AddPalmVeinEvent.fromList(super.readValue(buffer) as Object[]);
       default:
         return super.readValueOfType(type, buffer);
@@ -6088,68 +6163,71 @@ export class PigeonCodec extends StandardMessageCodec {
     } else if (value instanceof TTPalmVeinModel) {
       stream.writeUint8(this.getByte(185));
       this.writeValue(stream, (value as TTPalmVeinModel).toList());
-    } else if (value instanceof TTGatewayScanModel) {
+    } else if (value instanceof TTQrCodeModel) {
       stream.writeUint8(this.getByte(186));
+      this.writeValue(stream, (value as TTQrCodeModel).toList());
+    } else if (value instanceof TTGatewayScanModel) {
+      stream.writeUint8(this.getByte(187));
       this.writeValue(stream, (value as TTGatewayScanModel).toList());
     } else if (value instanceof GatewayDeviceInfo) {
-      stream.writeUint8(this.getByte(187));
+      stream.writeUint8(this.getByte(188));
       this.writeValue(stream, (value as GatewayDeviceInfo).toList());
     } else if (value instanceof TTRemoteAccessoryScanModel) {
-      stream.writeUint8(this.getByte(188));
+      stream.writeUint8(this.getByte(189));
       this.writeValue(stream, (value as TTRemoteAccessoryScanModel).toList());
     } else if (value instanceof TTStandaloneDoorSensorInitParams) {
-      stream.writeUint8(this.getByte(189));
+      stream.writeUint8(this.getByte(190));
       this.writeValue(stream, (value as TTStandaloneDoorSensorInitParams).toList());
     } else if (value instanceof TTStandaloneDoorSensorScanModel) {
-      stream.writeUint8(this.getByte(190));
+      stream.writeUint8(this.getByte(191));
       this.writeValue(stream, (value as TTStandaloneDoorSensorScanModel).toList());
     } else if (value instanceof TTStandaloneDoorSensorInfo) {
-      stream.writeUint8(this.getByte(191));
+      stream.writeUint8(this.getByte(192));
       this.writeValue(stream, (value as TTStandaloneDoorSensorInfo).toList());
     } else if (value instanceof TTMeterScanModel) {
-      stream.writeUint8(this.getByte(192));
+      stream.writeUint8(this.getByte(193));
       this.writeValue(stream, (value as TTMeterScanModel).toList());
     } else if (value instanceof TTWaterMeterInitResult) {
-      stream.writeUint8(this.getByte(193));
+      stream.writeUint8(this.getByte(194));
       this.writeValue(stream, (value as TTWaterMeterInitResult).toList());
     } else if (value instanceof TTElectricMeterInitResult) {
-      stream.writeUint8(this.getByte(194));
+      stream.writeUint8(this.getByte(195));
       this.writeValue(stream, (value as TTElectricMeterInitResult).toList());
     } else if (value instanceof TTWifiScanResult) {
-      stream.writeUint8(this.getByte(195));
+      stream.writeUint8(this.getByte(196));
       this.writeValue(stream, (value as TTWifiScanResult).toList());
     } else if (value instanceof TTWifiScanEntry) {
-      stream.writeUint8(this.getByte(196));
+      stream.writeUint8(this.getByte(197));
       this.writeValue(stream, (value as TTWifiScanEntry).toList());
     } else if (value instanceof RemoteKeypadInitResult) {
-      stream.writeUint8(this.getByte(197));
+      stream.writeUint8(this.getByte(198));
       this.writeValue(stream, (value as RemoteKeypadInitResult).toList());
     } else if (value instanceof MultifunctionalKeypadInitResult) {
-      stream.writeUint8(this.getByte(198));
+      stream.writeUint8(this.getByte(199));
       this.writeValue(stream, (value as MultifunctionalKeypadInitResult).toList());
     } else if (value instanceof WaterMeterDeviceInfo) {
-      stream.writeUint8(this.getByte(199));
+      stream.writeUint8(this.getByte(200));
       this.writeValue(stream, (value as WaterMeterDeviceInfo).toList());
     } else if (value instanceof ElectricMeterDeviceInfo) {
-      stream.writeUint8(this.getByte(200));
+      stream.writeUint8(this.getByte(201));
       this.writeValue(stream, (value as ElectricMeterDeviceInfo).toList());
     } else if (value instanceof TTWaterMeterInitParam) {
-      stream.writeUint8(this.getByte(201));
+      stream.writeUint8(this.getByte(202));
       this.writeValue(stream, (value as TTWaterMeterInitParam).toList());
     } else if (value instanceof TTElectricMeterInitParam) {
-      stream.writeUint8(this.getByte(202));
+      stream.writeUint8(this.getByte(203));
       this.writeValue(stream, (value as TTElectricMeterInitParam).toList());
     } else if (value instanceof AddCardEvent) {
-      stream.writeUint8(this.getByte(203));
+      stream.writeUint8(this.getByte(204));
       this.writeValue(stream, (value as AddCardEvent).toList());
     } else if (value instanceof AddFingerprintEvent) {
-      stream.writeUint8(this.getByte(204));
+      stream.writeUint8(this.getByte(205));
       this.writeValue(stream, (value as AddFingerprintEvent).toList());
     } else if (value instanceof AddFaceEvent) {
-      stream.writeUint8(this.getByte(205));
+      stream.writeUint8(this.getByte(206));
       this.writeValue(stream, (value as AddFaceEvent).toList());
     } else if (value instanceof AddPalmVeinEvent) {
-      stream.writeUint8(this.getByte(206));
+      stream.writeUint8(this.getByte(207));
       this.writeValue(stream, (value as AddPalmVeinEvent).toList());
     } else {
       super.writeValue(stream, value);
@@ -6491,6 +6569,46 @@ export abstract class TTLockHostApi {
   *  [lockData] 锁凭证。
   */
   abstract getAllValidPalmVeins(lockData: string , result: Result<Array<TTPalmVeinModel>>): void;
+  /*
+  *  添加二维码。
+  * 
+  *  [qrCodeNumber] 二维码编号。
+  *  [cycleList] 周期时间段列表，空或 null 表示无周期。
+  *  [startDate] 有效期起始时间，毫秒时间戳；永久有效时传 0。
+  *  [endDate] 有效期结束时间，毫秒时间戳；永久有效时传 0。
+  *  [lockData] 锁凭证。
+  */
+  abstract addQrCode(qrCodeNumber: string , cycleList: Array<TTCycleModel> | undefined , startDate: number , endDate: number , lockData: string , result: Result<void>): void;
+  /*
+  *  修改二维码有效期。
+  * 
+  *  [qrCodeNumber] 二维码编号。
+  *  [cycleList] 周期时间段列表，空或 null 表示无周期。
+  *  [startDate] 有效期起始时间，毫秒时间戳。
+  *  [endDate] 有效期结束时间，毫秒时间戳。
+  *  [lockData] 锁凭证。
+  */
+  abstract modifyQrCodeValidityPeriod(qrCodeNumber: string , cycleList: Array<TTCycleModel> | undefined , startDate: number , endDate: number , lockData: string , result: Result<void>): void;
+  /*
+  *  删除二维码。
+  * 
+  *  [qrCodeNumber] 二维码编号。
+  *  [endDate] 二维码有效期结束时间，毫秒时间戳。
+  *  [lockData] 锁凭证。
+  */
+  abstract deleteQrCode(qrCodeNumber: string , endDate: number , lockData: string , result: Result<void>): void;
+  /*
+  *  清除所有二维码。
+  * 
+  *  [lockData] 锁凭证。
+  */
+  abstract clearAllQrCodes(lockData: string , result: Result<void>): void;
+  /*
+  *  获取所有有效二维码。
+  * 
+  *  [lockData] 锁凭证。
+  */
+  abstract getAllValidQrCodes(lockData: string , result: Result<Array<TTQrCodeModel>>): void;
   /*
   *  设置电机扭矩等级。
   * 
@@ -8373,6 +8491,186 @@ export abstract class TTLockHostApi {
               let resultCallback: Result<Array<TTPalmVeinModel>> = new ResultImp();
 
               api!.getAllValidPalmVeins(args[0] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.addQrCode' + separatedMessageChannelSuffix, TTLockHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              if (!(Array.isArray(message))) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected List.')));
+                  return;
+              }
+              let args: Array<Object> = message as Array<Object>;
+              if (args.length < 5) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected at least 5 argument(s).')));
+                  return;
+              }
+              class ResultImp implements Result<void>{
+                    success(result: void): void {
+                      let res: Array<Object | null> = [];
+                      res.push(null);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object | null> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<void> = new ResultImp();
+
+              api!.addQrCode(args[0] as string, args[1] as Array<TTCycleModel> | undefined, args[2] as number, args[3] as number, args[4] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.modifyQrCodeValidityPeriod' + separatedMessageChannelSuffix, TTLockHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              if (!(Array.isArray(message))) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected List.')));
+                  return;
+              }
+              let args: Array<Object> = message as Array<Object>;
+              if (args.length < 5) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected at least 5 argument(s).')));
+                  return;
+              }
+              class ResultImp implements Result<void>{
+                    success(result: void): void {
+                      let res: Array<Object | null> = [];
+                      res.push(null);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object | null> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<void> = new ResultImp();
+
+              api!.modifyQrCodeValidityPeriod(args[0] as string, args[1] as Array<TTCycleModel> | undefined, args[2] as number, args[3] as number, args[4] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.deleteQrCode' + separatedMessageChannelSuffix, TTLockHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              if (!(Array.isArray(message))) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected List.')));
+                  return;
+              }
+              let args: Array<Object> = message as Array<Object>;
+              if (args.length < 3) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected at least 3 argument(s).')));
+                  return;
+              }
+              class ResultImp implements Result<void>{
+                    success(result: void): void {
+                      let res: Array<Object | null> = [];
+                      res.push(null);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object | null> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<void> = new ResultImp();
+
+              api!.deleteQrCode(args[0] as string, args[1] as number, args[2] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.clearAllQrCodes' + separatedMessageChannelSuffix, TTLockHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              if (!(Array.isArray(message))) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected List.')));
+                  return;
+              }
+              let args: Array<Object> = message as Array<Object>;
+              if (args.length < 1) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected at least 1 argument(s).')));
+                  return;
+              }
+              class ResultImp implements Result<void>{
+                    success(result: void): void {
+                      let res: Array<Object | null> = [];
+                      res.push(null);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object | null> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<void> = new ResultImp();
+
+              api!.clearAllQrCodes(args[0] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.getAllValidQrCodes' + separatedMessageChannelSuffix, TTLockHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              if (!(Array.isArray(message))) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected List.')));
+                  return;
+              }
+              let args: Array<Object> = message as Array<Object>;
+              if (args.length < 1) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected at least 1 argument(s).')));
+                  return;
+              }
+              class ResultImp implements Result<Array<TTQrCodeModel>>{
+                    success(result: Array<TTQrCodeModel>): void {
+                      let res: Array<Object | null> = [];
+                      res.push(result);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object | null> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<Array<TTQrCodeModel>> = new ResultImp();
+
+              api!.getAllValidQrCodes(args[0] as string, resultCallback);
             } });
       } else {
         channel.setMessageHandler(null);

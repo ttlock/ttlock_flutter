@@ -2188,6 +2188,60 @@ class TTPalmVeinModel {
   int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
 }
 
+/// 二维码信息。
+class TTQrCodeModel {
+  TTQrCodeModel({
+    required this.qrCodeNumber,
+    required this.startDate,
+    required this.endDate,
+  });
+
+  /// 二维码编号。
+  String qrCodeNumber;
+
+  /// 有效期起始，毫秒时间戳。
+  int startDate;
+
+  /// 有效期截止，毫秒时间戳。
+  int endDate;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      qrCodeNumber,
+      startDate,
+      endDate,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static TTQrCodeModel decode(Object result) {
+    result as List<Object?>;
+    return TTQrCodeModel(
+      qrCodeNumber: result[0]! as String,
+      startDate: result[1]! as int,
+      endDate: result[2]! as int,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! TTQrCodeModel || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(qrCodeNumber, other.qrCodeNumber) && _deepEquals(startDate, other.startDate) && _deepEquals(endDate, other.endDate);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
 /// 网关扫描结果。
 class TTGatewayScanModel {
   TTGatewayScanModel({
@@ -3633,68 +3687,71 @@ class _PigeonCodec extends StandardMessageCodec {
     }    else if (value is TTPalmVeinModel) {
       buffer.putUint8(185);
       writeValue(buffer, value.encode());
-    }    else if (value is TTGatewayScanModel) {
+    }    else if (value is TTQrCodeModel) {
       buffer.putUint8(186);
       writeValue(buffer, value.encode());
-    }    else if (value is GatewayDeviceInfo) {
+    }    else if (value is TTGatewayScanModel) {
       buffer.putUint8(187);
       writeValue(buffer, value.encode());
-    }    else if (value is TTRemoteAccessoryScanModel) {
+    }    else if (value is GatewayDeviceInfo) {
       buffer.putUint8(188);
       writeValue(buffer, value.encode());
-    }    else if (value is TTStandaloneDoorSensorInitParams) {
+    }    else if (value is TTRemoteAccessoryScanModel) {
       buffer.putUint8(189);
       writeValue(buffer, value.encode());
-    }    else if (value is TTStandaloneDoorSensorScanModel) {
+    }    else if (value is TTStandaloneDoorSensorInitParams) {
       buffer.putUint8(190);
       writeValue(buffer, value.encode());
-    }    else if (value is TTStandaloneDoorSensorInfo) {
+    }    else if (value is TTStandaloneDoorSensorScanModel) {
       buffer.putUint8(191);
       writeValue(buffer, value.encode());
-    }    else if (value is TTMeterScanModel) {
+    }    else if (value is TTStandaloneDoorSensorInfo) {
       buffer.putUint8(192);
       writeValue(buffer, value.encode());
-    }    else if (value is TTWaterMeterInitResult) {
+    }    else if (value is TTMeterScanModel) {
       buffer.putUint8(193);
       writeValue(buffer, value.encode());
-    }    else if (value is TTElectricMeterInitResult) {
+    }    else if (value is TTWaterMeterInitResult) {
       buffer.putUint8(194);
       writeValue(buffer, value.encode());
-    }    else if (value is TTWifiScanResult) {
+    }    else if (value is TTElectricMeterInitResult) {
       buffer.putUint8(195);
       writeValue(buffer, value.encode());
-    }    else if (value is TTWifiScanEntry) {
+    }    else if (value is TTWifiScanResult) {
       buffer.putUint8(196);
       writeValue(buffer, value.encode());
-    }    else if (value is RemoteKeypadInitResult) {
+    }    else if (value is TTWifiScanEntry) {
       buffer.putUint8(197);
       writeValue(buffer, value.encode());
-    }    else if (value is MultifunctionalKeypadInitResult) {
+    }    else if (value is RemoteKeypadInitResult) {
       buffer.putUint8(198);
       writeValue(buffer, value.encode());
-    }    else if (value is WaterMeterDeviceInfo) {
+    }    else if (value is MultifunctionalKeypadInitResult) {
       buffer.putUint8(199);
       writeValue(buffer, value.encode());
-    }    else if (value is ElectricMeterDeviceInfo) {
+    }    else if (value is WaterMeterDeviceInfo) {
       buffer.putUint8(200);
       writeValue(buffer, value.encode());
-    }    else if (value is TTWaterMeterInitParam) {
+    }    else if (value is ElectricMeterDeviceInfo) {
       buffer.putUint8(201);
       writeValue(buffer, value.encode());
-    }    else if (value is TTElectricMeterInitParam) {
+    }    else if (value is TTWaterMeterInitParam) {
       buffer.putUint8(202);
       writeValue(buffer, value.encode());
-    }    else if (value is AddCardEvent) {
+    }    else if (value is TTElectricMeterInitParam) {
       buffer.putUint8(203);
       writeValue(buffer, value.encode());
-    }    else if (value is AddFingerprintEvent) {
+    }    else if (value is AddCardEvent) {
       buffer.putUint8(204);
       writeValue(buffer, value.encode());
-    }    else if (value is AddFaceEvent) {
+    }    else if (value is AddFingerprintEvent) {
       buffer.putUint8(205);
       writeValue(buffer, value.encode());
-    }    else if (value is AddPalmVeinEvent) {
+    }    else if (value is AddFaceEvent) {
       buffer.putUint8(206);
+      writeValue(buffer, value.encode());
+    }    else if (value is AddPalmVeinEvent) {
+      buffer.putUint8(207);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -3856,46 +3913,48 @@ class _PigeonCodec extends StandardMessageCodec {
       case 185:
         return TTPalmVeinModel.decode(readValue(buffer)!);
       case 186:
-        return TTGatewayScanModel.decode(readValue(buffer)!);
+        return TTQrCodeModel.decode(readValue(buffer)!);
       case 187:
-        return GatewayDeviceInfo.decode(readValue(buffer)!);
+        return TTGatewayScanModel.decode(readValue(buffer)!);
       case 188:
-        return TTRemoteAccessoryScanModel.decode(readValue(buffer)!);
+        return GatewayDeviceInfo.decode(readValue(buffer)!);
       case 189:
-        return TTStandaloneDoorSensorInitParams.decode(readValue(buffer)!);
+        return TTRemoteAccessoryScanModel.decode(readValue(buffer)!);
       case 190:
-        return TTStandaloneDoorSensorScanModel.decode(readValue(buffer)!);
+        return TTStandaloneDoorSensorInitParams.decode(readValue(buffer)!);
       case 191:
-        return TTStandaloneDoorSensorInfo.decode(readValue(buffer)!);
+        return TTStandaloneDoorSensorScanModel.decode(readValue(buffer)!);
       case 192:
-        return TTMeterScanModel.decode(readValue(buffer)!);
+        return TTStandaloneDoorSensorInfo.decode(readValue(buffer)!);
       case 193:
-        return TTWaterMeterInitResult.decode(readValue(buffer)!);
+        return TTMeterScanModel.decode(readValue(buffer)!);
       case 194:
-        return TTElectricMeterInitResult.decode(readValue(buffer)!);
+        return TTWaterMeterInitResult.decode(readValue(buffer)!);
       case 195:
-        return TTWifiScanResult.decode(readValue(buffer)!);
+        return TTElectricMeterInitResult.decode(readValue(buffer)!);
       case 196:
-        return TTWifiScanEntry.decode(readValue(buffer)!);
+        return TTWifiScanResult.decode(readValue(buffer)!);
       case 197:
-        return RemoteKeypadInitResult.decode(readValue(buffer)!);
+        return TTWifiScanEntry.decode(readValue(buffer)!);
       case 198:
-        return MultifunctionalKeypadInitResult.decode(readValue(buffer)!);
+        return RemoteKeypadInitResult.decode(readValue(buffer)!);
       case 199:
-        return WaterMeterDeviceInfo.decode(readValue(buffer)!);
+        return MultifunctionalKeypadInitResult.decode(readValue(buffer)!);
       case 200:
-        return ElectricMeterDeviceInfo.decode(readValue(buffer)!);
+        return WaterMeterDeviceInfo.decode(readValue(buffer)!);
       case 201:
-        return TTWaterMeterInitParam.decode(readValue(buffer)!);
+        return ElectricMeterDeviceInfo.decode(readValue(buffer)!);
       case 202:
-        return TTElectricMeterInitParam.decode(readValue(buffer)!);
+        return TTWaterMeterInitParam.decode(readValue(buffer)!);
       case 203:
-        return AddCardEvent.decode(readValue(buffer)!);
+        return TTElectricMeterInitParam.decode(readValue(buffer)!);
       case 204:
-        return AddFingerprintEvent.decode(readValue(buffer)!);
+        return AddCardEvent.decode(readValue(buffer)!);
       case 205:
-        return AddFaceEvent.decode(readValue(buffer)!);
+        return AddFingerprintEvent.decode(readValue(buffer)!);
       case 206:
+        return AddFaceEvent.decode(readValue(buffer)!);
+      case 207:
         return AddPalmVeinEvent.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -4918,6 +4977,122 @@ class TTLockHostApi {
     )
     ;
     return (pigeonVar_replyValue! as List<Object?>).cast<TTPalmVeinModel>();
+  }
+
+  /// 添加二维码。
+  ///
+  /// [qrCodeNumber] 二维码编号。
+  /// [cycleList] 周期时间段列表，空或 null 表示无周期。
+  /// [startDate] 有效期起始时间，毫秒时间戳；永久有效时传 0。
+  /// [endDate] 有效期结束时间，毫秒时间戳；永久有效时传 0。
+  /// [lockData] 锁凭证。
+  Future<void> addQrCode(String qrCodeNumber, List<TTCycleModel>? cycleList, int startDate, int endDate, String lockData) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.addQrCode$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[qrCodeNumber, cycleList, startDate, endDate, lockData]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  /// 修改二维码有效期。
+  ///
+  /// [qrCodeNumber] 二维码编号。
+  /// [cycleList] 周期时间段列表，空或 null 表示无周期。
+  /// [startDate] 有效期起始时间，毫秒时间戳。
+  /// [endDate] 有效期结束时间，毫秒时间戳。
+  /// [lockData] 锁凭证。
+  Future<void> modifyQrCodeValidityPeriod(String qrCodeNumber, List<TTCycleModel>? cycleList, int startDate, int endDate, String lockData) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.modifyQrCodeValidityPeriod$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[qrCodeNumber, cycleList, startDate, endDate, lockData]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  /// 删除二维码。
+  ///
+  /// [qrCodeNumber] 二维码编号。
+  /// [endDate] 二维码有效期结束时间，毫秒时间戳。
+  /// [lockData] 锁凭证。
+  Future<void> deleteQrCode(String qrCodeNumber, int endDate, String lockData) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.deleteQrCode$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[qrCodeNumber, endDate, lockData]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  /// 清除所有二维码。
+  ///
+  /// [lockData] 锁凭证。
+  Future<void> clearAllQrCodes(String lockData) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.clearAllQrCodes$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[lockData]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  /// 获取所有有效二维码。
+  ///
+  /// [lockData] 锁凭证。
+  Future<List<TTQrCodeModel>> getAllValidQrCodes(String lockData) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.getAllValidQrCodes$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[lockData]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: false,
+    )
+    ;
+    return (pigeonVar_replyValue! as List<Object?>).cast<TTQrCodeModel>();
   }
 
   /// 设置电机扭矩等级。
