@@ -760,6 +760,9 @@ enum TTLockFunction {
   urlFace,
   /// 人体存在传感器。
   humanPresenceSensor,
+  /// 左右开门方向设置（cloud featureValue bit 36 / FeatureValue.UNLOCK_DIRECTION）。
+  /// 与 [autoSetUnlockDirection]（自动校准）不同。
+  unlockDirection,
 }
 
 /// 人脸录入状态。

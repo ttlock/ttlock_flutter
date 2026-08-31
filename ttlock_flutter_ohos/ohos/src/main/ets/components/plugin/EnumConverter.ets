@@ -429,6 +429,8 @@ export function featureValueConvert(lockFunction: TTLockFunction): SdkTTLockFeat
     case TTLockFunction.URL_FACE:
     case TTLockFunction.HUMAN_PRESENCE_SENSOR:
       return null;
+    case TTLockFunction.UNLOCK_DIRECTION:
+      return SdkTTLockFeatureValue.unlockDirection;
     case TTLockFunction.WIFI_POWER_SAVING_TIME:
       return SdkTTLockFeatureValue.wifiPowerSavingTime;
     case TTLockFunction.MULTI_FUNCTION_KEYPAD:

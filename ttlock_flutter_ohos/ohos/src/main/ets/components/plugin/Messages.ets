@@ -1186,7 +1186,12 @@ export enum TTLockFunction {
   /* 通过 URL 添加人脸。*/
   URL_FACE,
   /* 人体存在传感器。*/
-  HUMAN_PRESENCE_SENSOR
+  HUMAN_PRESENCE_SENSOR,
+  /*
+  *  左右开门方向设置（cloud featureValue bit 36 / FeatureValue.UNLOCK_DIRECTION）。
+  *  与 [autoSetUnlockDirection]（自动校准）不同。
+  */
+  UNLOCK_DIRECTION
 }
 
 /*
