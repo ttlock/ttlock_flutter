@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:ttlock_flutter/src/ble_guard.dart';
-import 'package:ttlock_flutter_platform_interface/pigeon/messages.g.dart' as pigeon;
+import 'package:ttlock_flutter_platform_interface/pigeon/messages.g.dart'
+    as pigeon;
 
 import 'pigeon_errors.dart';
 
@@ -19,65 +20,104 @@ class TTWaterMeterApi {
   pigeon.TTAccessoryHostApi get host => _host;
 
   Stream<pigeon.TTMeterScanModel> accessoryWaterMeterStartScan() =>
-      Stream<void>.fromFuture(runBleGate(TTBleOperation.scanDevice)).asyncExpand(
-          (_) => mapRemoteAccessoryStreamErrors(
+      Stream<void>.fromFuture(runBleGate(TTBleOperation.scanDevice))
+          .asyncExpand((_) => mapRemoteAccessoryStreamErrors(
               pigeon.accessoryWaterMeterStartScan()));
 
   Future<void> waterMeterConfigServer(
-    String url,
-    String clientId,
-    String accessToken,
-  ) =>
-      runRemoteAccessoryApi(() => _host.waterMeterConfigServer(url, clientId, accessToken));
+          String url, String clientId, String accessToken,
+          {Duration? timeout}) =>
+      runRemoteAccessoryApi(
+          () => _host.waterMeterConfigServer(url, clientId, accessToken),
+          timeout: timeout,
+          method: 'waterMeterConfigServer');
 
-  Future<void> waterMeterConnect(String mac) =>
-      runRemoteAccessoryApi(() => _host.waterMeterConnect(mac));
+  Future<void> waterMeterConnect(String mac, {Duration? timeout}) =>
+      runRemoteAccessoryApi(() => _host.waterMeterConnect(mac),
+          timeout: timeout, method: 'waterMeterConnect');
 
-  Future<void> waterMeterDisconnect(String mac) =>
-      runRemoteAccessoryApi(() => _host.waterMeterDisconnect(mac));
+  Future<void> waterMeterDisconnect(String mac, {Duration? timeout}) =>
+      runRemoteAccessoryApi(() => _host.waterMeterDisconnect(mac),
+          timeout: timeout, method: 'waterMeterDisconnect');
 
-  Future<pigeon.TTWaterMeterInitResult> waterMeterInit(pigeon.TTWaterMeterInitParam params) =>
-      runRemoteAccessoryApi(() => _host.waterMeterInit(params));
+  Future<pigeon.TTWaterMeterInitResult> waterMeterInit(
+          pigeon.TTWaterMeterInitParam params,
+          {Duration? timeout}) =>
+      runRemoteAccessoryApi(() => _host.waterMeterInit(params),
+          timeout: timeout, method: 'waterMeterInit');
 
-  Future<void> waterMeterDelete(String mac) =>
-      runRemoteAccessoryApi(() => _host.waterMeterDelete(mac));
+  Future<void> waterMeterDelete(String mac, {Duration? timeout}) =>
+      runRemoteAccessoryApi(() => _host.waterMeterDelete(mac),
+          timeout: timeout, method: 'waterMeterDelete');
 
-  Future<void> waterMeterSetPowerOnOff(String mac, bool isOn) =>
-      runRemoteAccessoryApi(() => _host.waterMeterSetPowerOnOff(mac, isOn));
+  Future<void> waterMeterSetPowerOnOff(String mac, bool isOn,
+          {Duration? timeout}) =>
+      runRemoteAccessoryApi(() => _host.waterMeterSetPowerOnOff(mac, isOn),
+          timeout: timeout, method: 'waterMeterSetPowerOnOff');
 
-  Future<void> waterMeterSetRemainderM3(String mac, double remainderM3) =>
-      runRemoteAccessoryApi(() => _host.waterMeterSetRemainderM3(mac, remainderM3));
+  Future<void> waterMeterSetRemainderM3(String mac, double remainderM3,
+          {Duration? timeout}) =>
+      runRemoteAccessoryApi(
+          () => _host.waterMeterSetRemainderM3(mac, remainderM3),
+          timeout: timeout,
+          method: 'waterMeterSetRemainderM3');
 
-  Future<void> waterMeterClearRemainderM3(String mac) =>
-      runRemoteAccessoryApi(() => _host.waterMeterClearRemainderM3(mac));
+  Future<void> waterMeterClearRemainderM3(String mac, {Duration? timeout}) =>
+      runRemoteAccessoryApi(() => _host.waterMeterClearRemainderM3(mac),
+          timeout: timeout, method: 'waterMeterClearRemainderM3');
 
-  Future<void> waterMeterReadData(String mac) =>
-      runRemoteAccessoryApi(() => _host.waterMeterReadData(mac));
+  Future<void> waterMeterReadData(String mac, {Duration? timeout}) =>
+      runRemoteAccessoryApi(() => _host.waterMeterReadData(mac),
+          timeout: timeout, method: 'waterMeterReadData');
 
-  Future<void> waterMeterSetPayMode(String mac, pigeon.TTMeterPayMode payMode, double price) =>
-      runRemoteAccessoryApi(() => _host.waterMeterSetPayMode(mac, payMode, price));
+  Future<void> waterMeterSetPayMode(
+          String mac, pigeon.TTMeterPayMode payMode, double price,
+          {Duration? timeout}) =>
+      runRemoteAccessoryApi(
+          () => _host.waterMeterSetPayMode(mac, payMode, price),
+          timeout: timeout,
+          method: 'waterMeterSetPayMode');
 
-  Future<void> waterMeterCharge(String mac, double amount, double m3) =>
-      runRemoteAccessoryApi(() => _host.waterMeterCharge(mac, amount, m3));
+  Future<void> waterMeterCharge(String mac, double amount, double m3,
+          {Duration? timeout}) =>
+      runRemoteAccessoryApi(() => _host.waterMeterCharge(mac, amount, m3),
+          timeout: timeout, method: 'waterMeterCharge');
 
-  Future<void> waterMeterSetTotalUsage(String mac, double totalM3) =>
-      runRemoteAccessoryApi(() => _host.waterMeterSetTotalUsage(mac, totalM3));
+  Future<void> waterMeterSetTotalUsage(String mac, double totalM3,
+          {Duration? timeout}) =>
+      runRemoteAccessoryApi(() => _host.waterMeterSetTotalUsage(mac, totalM3),
+          timeout: timeout, method: 'waterMeterSetTotalUsage');
 
-  Future<String> waterMeterGetFeatureValue(String mac) =>
-      runRemoteAccessoryApi(() => _host.waterMeterGetFeatureValue(mac));
+  Future<String> waterMeterGetFeatureValue(String mac, {Duration? timeout}) =>
+      runRemoteAccessoryApi(() => _host.waterMeterGetFeatureValue(mac),
+          timeout: timeout, method: 'waterMeterGetFeatureValue');
 
-  Future<pigeon.WaterMeterDeviceInfo> waterMeterGetDeviceInfo(String mac) =>
-      runRemoteAccessoryApi(() => _host.waterMeterGetDeviceInfo(mac));
+  Future<pigeon.WaterMeterDeviceInfo> waterMeterGetDeviceInfo(String mac,
+          {Duration? timeout}) =>
+      runRemoteAccessoryApi(() => _host.waterMeterGetDeviceInfo(mac),
+          timeout: timeout, method: 'waterMeterGetDeviceInfo');
 
-  Future<bool> waterMeterIsSupportFunction(String featureValue, pigeon.TTWaterMeterFeature function) =>
-      runRemoteAccessoryApi(() => _host.waterMeterIsSupportFunction(featureValue, function));
+  Future<bool> waterMeterIsSupportFunction(
+          String featureValue, pigeon.TTWaterMeterFeature function,
+          {Duration? timeout}) =>
+      runRemoteAccessoryApi(
+          () => _host.waterMeterIsSupportFunction(featureValue, function),
+          timeout: timeout,
+          method: 'waterMeterIsSupportFunction');
 
-  Future<void> waterMeterConfigApn(String mac, String apn) =>
-      runRemoteAccessoryApi(() => _host.waterMeterConfigApn(mac, apn));
+  Future<void> waterMeterConfigApn(String mac, String apn,
+          {Duration? timeout}) =>
+      runRemoteAccessoryApi(() => _host.waterMeterConfigApn(mac, apn),
+          timeout: timeout, method: 'waterMeterConfigApn');
 
-  Future<void> waterMeterConfigMeterServer(String mac, String ip, String port) =>
-      runRemoteAccessoryApi(() => _host.waterMeterConfigMeterServer(mac, ip, port));
+  Future<void> waterMeterConfigMeterServer(String mac, String ip, String port,
+          {Duration? timeout}) =>
+      runRemoteAccessoryApi(
+          () => _host.waterMeterConfigMeterServer(mac, ip, port),
+          timeout: timeout,
+          method: 'waterMeterConfigMeterServer');
 
-  Future<void> waterMeterReset(String mac) =>
-      runRemoteAccessoryApi(() => _host.waterMeterReset(mac));
+  Future<void> waterMeterReset(String mac, {Duration? timeout}) =>
+      runRemoteAccessoryApi(() => _host.waterMeterReset(mac),
+          timeout: timeout, method: 'waterMeterReset');
 }

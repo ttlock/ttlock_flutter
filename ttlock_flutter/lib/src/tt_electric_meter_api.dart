@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:ttlock_flutter/src/ble_guard.dart';
-import 'package:ttlock_flutter_platform_interface/pigeon/messages.g.dart' as pigeon;
+import 'package:ttlock_flutter_platform_interface/pigeon/messages.g.dart'
+    as pigeon;
 
 import 'pigeon_errors.dart';
 
@@ -19,65 +20,106 @@ class TTElectricMeterApi {
   pigeon.TTAccessoryHostApi get host => _host;
 
   Stream<pigeon.TTMeterScanModel> accessoryElectricMeterStartScan() =>
-      Stream<void>.fromFuture(runBleGate(TTBleOperation.scanDevice)).asyncExpand(
-          (_) => mapRemoteAccessoryStreamErrors(
+      Stream<void>.fromFuture(runBleGate(TTBleOperation.scanDevice))
+          .asyncExpand((_) => mapRemoteAccessoryStreamErrors(
               pigeon.accessoryElectricMeterStartScan()));
 
   Future<void> electricMeterConfigServer(
-    String url,
-    String clientId,
-    String accessToken,
-  ) =>
-      runRemoteAccessoryApi(() => _host.electricMeterConfigServer(url, clientId, accessToken));
+          String url, String clientId, String accessToken,
+          {Duration? timeout}) =>
+      runRemoteAccessoryApi(
+          () => _host.electricMeterConfigServer(url, clientId, accessToken),
+          timeout: timeout,
+          method: 'electricMeterConfigServer');
 
-  Future<void> electricMeterConnect(String mac) =>
-      runRemoteAccessoryApi(() => _host.electricMeterConnect(mac));
+  Future<void> electricMeterConnect(String mac, {Duration? timeout}) =>
+      runRemoteAccessoryApi(() => _host.electricMeterConnect(mac),
+          timeout: timeout, method: 'electricMeterConnect');
 
-  Future<void> electricMeterDisconnect(String mac) =>
-      runRemoteAccessoryApi(() => _host.electricMeterDisconnect(mac));
+  Future<void> electricMeterDisconnect(String mac, {Duration? timeout}) =>
+      runRemoteAccessoryApi(() => _host.electricMeterDisconnect(mac),
+          timeout: timeout, method: 'electricMeterDisconnect');
 
-  Future<pigeon.TTElectricMeterInitResult> electricMeterInit(pigeon.TTElectricMeterInitParam params) =>
-      runRemoteAccessoryApi(() => _host.electricMeterInit(params));
+  Future<pigeon.TTElectricMeterInitResult> electricMeterInit(
+          pigeon.TTElectricMeterInitParam params,
+          {Duration? timeout}) =>
+      runRemoteAccessoryApi(() => _host.electricMeterInit(params),
+          timeout: timeout, method: 'electricMeterInit');
 
-  Future<void> electricMeterDelete(String mac) =>
-      runRemoteAccessoryApi(() => _host.electricMeterDelete(mac));
+  Future<void> electricMeterDelete(String mac, {Duration? timeout}) =>
+      runRemoteAccessoryApi(() => _host.electricMeterDelete(mac),
+          timeout: timeout, method: 'electricMeterDelete');
 
-  Future<void> electricMeterSetPowerOnOff(String mac, bool isOn) =>
-      runRemoteAccessoryApi(() => _host.electricMeterSetPowerOnOff(mac, isOn));
+  Future<void> electricMeterSetPowerOnOff(String mac, bool isOn,
+          {Duration? timeout}) =>
+      runRemoteAccessoryApi(() => _host.electricMeterSetPowerOnOff(mac, isOn),
+          timeout: timeout, method: 'electricMeterSetPowerOnOff');
 
-  Future<void> electricMeterSetRemainderKwh(String mac, double remainderKwh) =>
-      runRemoteAccessoryApi(() => _host.electricMeterSetRemainderKwh(mac, remainderKwh));
+  Future<void> electricMeterSetRemainderKwh(String mac, double remainderKwh,
+          {Duration? timeout}) =>
+      runRemoteAccessoryApi(
+          () => _host.electricMeterSetRemainderKwh(mac, remainderKwh),
+          timeout: timeout,
+          method: 'electricMeterSetRemainderKwh');
 
-  Future<void> electricMeterClearRemainderKwh(String mac) =>
-      runRemoteAccessoryApi(() => _host.electricMeterClearRemainderKwh(mac));
+  Future<void> electricMeterClearRemainderKwh(String mac,
+          {Duration? timeout}) =>
+      runRemoteAccessoryApi(() => _host.electricMeterClearRemainderKwh(mac),
+          timeout: timeout, method: 'electricMeterClearRemainderKwh');
 
-  Future<void> electricMeterReadData(String mac) =>
-      runRemoteAccessoryApi(() => _host.electricMeterReadData(mac));
+  Future<void> electricMeterReadData(String mac, {Duration? timeout}) =>
+      runRemoteAccessoryApi(() => _host.electricMeterReadData(mac),
+          timeout: timeout, method: 'electricMeterReadData');
 
-  Future<void> electricMeterSetPayMode(String mac, pigeon.TTMeterPayMode payMode, double price) =>
-      runRemoteAccessoryApi(() => _host.electricMeterSetPayMode(mac, payMode, price));
+  Future<void> electricMeterSetPayMode(
+          String mac, pigeon.TTMeterPayMode payMode, double price,
+          {Duration? timeout}) =>
+      runRemoteAccessoryApi(
+          () => _host.electricMeterSetPayMode(mac, payMode, price),
+          timeout: timeout,
+          method: 'electricMeterSetPayMode');
 
-  Future<void> electricMeterCharge(String mac, double amount, double kwh) =>
-      runRemoteAccessoryApi(() => _host.electricMeterCharge(mac, amount, kwh));
+  Future<void> electricMeterCharge(String mac, double amount, double kwh,
+          {Duration? timeout}) =>
+      runRemoteAccessoryApi(() => _host.electricMeterCharge(mac, amount, kwh),
+          timeout: timeout, method: 'electricMeterCharge');
 
-  Future<void> electricMeterSetMaxPower(String mac, double maxPower) =>
-      runRemoteAccessoryApi(() => _host.electricMeterSetMaxPower(mac, maxPower));
+  Future<void> electricMeterSetMaxPower(String mac, double maxPower,
+          {Duration? timeout}) =>
+      runRemoteAccessoryApi(() => _host.electricMeterSetMaxPower(mac, maxPower),
+          timeout: timeout, method: 'electricMeterSetMaxPower');
 
-  Future<String> electricMeterGetFeatureValue(String mac) =>
-      runRemoteAccessoryApi(() => _host.electricMeterGetFeatureValue(mac));
+  Future<String> electricMeterGetFeatureValue(String mac,
+          {Duration? timeout}) =>
+      runRemoteAccessoryApi(() => _host.electricMeterGetFeatureValue(mac),
+          timeout: timeout, method: 'electricMeterGetFeatureValue');
 
-  Future<bool> electricMeterIsSupportFunction(String featureValue, pigeon.TTElectricMeterFeature function) =>
-      runRemoteAccessoryApi(() => _host.electricMeterIsSupportFunction(featureValue, function));
+  Future<bool> electricMeterIsSupportFunction(
+          String featureValue, pigeon.TTElectricMeterFeature function,
+          {Duration? timeout}) =>
+      runRemoteAccessoryApi(
+          () => _host.electricMeterIsSupportFunction(featureValue, function),
+          timeout: timeout,
+          method: 'electricMeterIsSupportFunction');
 
-  Future<pigeon.ElectricMeterDeviceInfo> electricMeterGetDeviceInfo(String mac) =>
-      runRemoteAccessoryApi(() => _host.electricMeterGetDeviceInfo(mac));
+  Future<pigeon.ElectricMeterDeviceInfo> electricMeterGetDeviceInfo(String mac,
+          {Duration? timeout}) =>
+      runRemoteAccessoryApi(() => _host.electricMeterGetDeviceInfo(mac),
+          timeout: timeout, method: 'electricMeterGetDeviceInfo');
 
-  Future<void> electricMeterConfigApn(String mac, String apn) =>
-      runRemoteAccessoryApi(() => _host.electricMeterConfigApn(mac, apn));
+  Future<void> electricMeterConfigApn(String mac, String apn,
+          {Duration? timeout}) =>
+      runRemoteAccessoryApi(() => _host.electricMeterConfigApn(mac, apn),
+          timeout: timeout, method: 'electricMeterConfigApn');
 
-  Future<void> electricMeterConfigMeterServer(String mac, String ip, String port) =>
-      runRemoteAccessoryApi(() => _host.electricMeterConfigMeterServer(mac, ip, port));
+  Future<void> electricMeterConfigMeterServer(
+          String mac, String ip, String port, {Duration? timeout}) =>
+      runRemoteAccessoryApi(
+          () => _host.electricMeterConfigMeterServer(mac, ip, port),
+          timeout: timeout,
+          method: 'electricMeterConfigMeterServer');
 
-  Future<void> electricMeterReset(String mac) =>
-      runRemoteAccessoryApi(() => _host.electricMeterReset(mac));
+  Future<void> electricMeterReset(String mac, {Duration? timeout}) =>
+      runRemoteAccessoryApi(() => _host.electricMeterReset(mac),
+          timeout: timeout, method: 'electricMeterReset');
 }

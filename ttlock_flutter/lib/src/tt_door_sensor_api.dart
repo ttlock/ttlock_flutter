@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:ttlock_flutter/src/ble_guard.dart';
-import 'package:ttlock_flutter_platform_interface/pigeon/messages.g.dart' as pigeon;
+import 'package:ttlock_flutter_platform_interface/pigeon/messages.g.dart'
+    as pigeon;
 
 import 'pigeon_errors.dart';
 
@@ -19,8 +20,8 @@ class TTDoorSensorApi {
   pigeon.TTAccessoryHostApi get host => _host;
 
   Stream<pigeon.TTRemoteAccessoryScanModel> accessoryStartScanDoorSensor() =>
-      Stream<void>.fromFuture(runBleGate(TTBleOperation.scanDevice)).asyncExpand(
-          (_) => mapRemoteAccessoryStreamErrors(
+      Stream<void>.fromFuture(runBleGate(TTBleOperation.scanDevice))
+          .asyncExpand((_) => mapRemoteAccessoryStreamErrors(
               pigeon.accessoryStartScanDoorSensor()));
 
   Stream<pigeon.TTStandaloneDoorSensorScanModel>
@@ -29,22 +30,30 @@ class TTDoorSensorApi {
               .asyncExpand((_) => mapStandaloneDoorSensorStreamErrors(
                   pigeon.accessoryStandaloneDoorSensorStartScan()));
 
-  Future<pigeon.TTLockSystemModel> initDoorSensor(String mac, String lockData) =>
-      runRemoteAccessoryApi(() => _host.initDoorSensor(mac, lockData));
+  Future<pigeon.TTLockSystemModel> initDoorSensor(String mac, String lockData,
+          {Duration? timeout}) =>
+      runRemoteAccessoryApi(() => _host.initDoorSensor(mac, lockData),
+          timeout: timeout, method: 'initDoorSensor');
 
   Future<pigeon.TTStandaloneDoorSensorInfo> standaloneDoorSensorInit(
-    pigeon.TTStandaloneDoorSensorInitParams params,
-  ) =>
-      runStandaloneDoorSensorApi(() => _host.standaloneDoorSensorInit(params));
+          pigeon.TTStandaloneDoorSensorInitParams params,
+          {Duration? timeout}) =>
+      runStandaloneDoorSensorApi(() => _host.standaloneDoorSensorInit(params),
+          timeout: timeout, method: 'standaloneDoorSensorInit');
 
-  Future<String> standaloneDoorSensorReadFeatureValue(String mac) =>
-      runStandaloneDoorSensorApi(() => _host.standaloneDoorSensorReadFeatureValue(mac));
+  Future<String> standaloneDoorSensorReadFeatureValue(String mac,
+          {Duration? timeout}) =>
+      runStandaloneDoorSensorApi(
+          () => _host.standaloneDoorSensorReadFeatureValue(mac),
+          timeout: timeout,
+          method: 'standaloneDoorSensorReadFeatureValue');
 
   Future<bool> standaloneDoorSensorIsSupportFunction(
-    String featureValue,
-    pigeon.TTStandaloneDoorSensorFeature function,
-  ) =>
+          String featureValue, pigeon.TTStandaloneDoorSensorFeature function,
+          {Duration? timeout}) =>
       runStandaloneDoorSensorApi(
-        () => _host.standaloneDoorSensorIsSupportFunction(featureValue, function),
-      );
+          () => _host.standaloneDoorSensorIsSupportFunction(
+              featureValue, function),
+          timeout: timeout,
+          method: 'standaloneDoorSensorIsSupportFunction');
 }

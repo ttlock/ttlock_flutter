@@ -21,8 +21,8 @@ class TTRemoteKeypadApi {
   pigeon.TTAccessoryHostApi get host => _host;
 
   Stream<pigeon.TTRemoteAccessoryScanModel> accessoryStartScanRemoteKeypad() =>
-      Stream<void>.fromFuture(runBleGate(TTBleOperation.scanDevice)).asyncExpand(
-          (_) => mapRemoteAccessoryStreamErrors(
+      Stream<void>.fromFuture(runBleGate(TTBleOperation.scanDevice))
+          .asyncExpand((_) => mapRemoteAccessoryStreamErrors(
               pigeon.accessoryStartScanRemoteKeypad()));
 
   /// 订阅前调用 [setAccessoryAddKeypadFingerprintParam]。
@@ -52,7 +52,8 @@ class TTRemoteKeypadApi {
         .asyncExpand(
       (_) => Stream<void>.fromFuture(
         runRemoteAccessoryApi(
-            () => _host.setAccessoryAddKeypadFingerprintParam(param)),
+            () => _host.setAccessoryAddKeypadFingerprintParam(param),
+            method: 'setAccessoryAddKeypadFingerprintParam'),
       ).asyncExpand((_) => mapKeypadCredentialStreamErrors(
           pigeon.accessoryAddKeypadFingerprint())),
     );
@@ -84,15 +85,17 @@ class TTRemoteKeypadApi {
     return Stream<void>.fromFuture(runBleGate(TTBleOperation.deviceOperation))
         .asyncExpand(
       (_) => Stream<void>.fromFuture(
-        runRemoteAccessoryApi(() => _host.setAccessoryAddKeypadCardParam(param)),
+        runRemoteAccessoryApi(() => _host.setAccessoryAddKeypadCardParam(param),
+            method: 'setAccessoryAddKeypadCardParam'),
       ).asyncExpand((_) =>
           mapKeypadCredentialStreamErrors(pigeon.accessoryAddKeypadCard())),
     );
   }
 
   Future<pigeon.RemoteKeypadInitResult> initRemoteKeypad(
-          String mac, String lockMac) =>
-      runRemoteAccessoryApi(() => _host.initRemoteKeypad(mac, lockMac));
+          String mac, String lockMac, {Duration? timeout}) =>
+      runRemoteAccessoryApi(() => _host.initRemoteKeypad(mac, lockMac),
+          timeout: timeout, method: 'initRemoteKeypad');
 
   Future<pigeon.MultifunctionalKeypadInitResult> initMultifunctionalKeypad(
     String mac,
@@ -102,10 +105,12 @@ class TTRemoteKeypadApi {
         () => _host.initMultifunctionalKeypad(mac, lockData),
       );
 
-  Future<void> deleteStoredLock(String mac, int slotNumber) =>
-      runMultifunctionalKeypadApi(
-          () => _host.deleteStoredLock(mac, slotNumber));
+  Future<void> deleteStoredLock(String mac, int slotNumber,
+          {Duration? timeout}) =>
+      runMultifunctionalKeypadApi(() => _host.deleteStoredLock(mac, slotNumber),
+          timeout: timeout, method: 'deleteStoredLock');
 
-  Future<List<String>> getStoredLocks(String mac) =>
-      runMultifunctionalKeypadApi(() => _host.getStoredLocks(mac));
+  Future<List<String>> getStoredLocks(String mac, {Duration? timeout}) =>
+      runMultifunctionalKeypadApi(() => _host.getStoredLocks(mac),
+          timeout: timeout, method: 'getStoredLocks');
 }
