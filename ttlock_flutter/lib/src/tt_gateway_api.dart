@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:ttlock_flutter/src/ble_guard.dart';
 import 'package:ttlock_flutter_platform_interface/pigeon/messages.g.dart' as pigeon;
 
 import 'pigeon_errors.dart';
@@ -21,16 +22,20 @@ class TTGatewayApi {
   //     runGatewayApi(() => _host.setEventGatewayMac(mac));
 
   Stream<pigeon.TTGatewayScanModel> gatewayStartScan() =>
-      mapGatewayStreamErrors(pigeon.gatewayStartScan());
+      Stream<void>.fromFuture(runBleGate(TTBleOperation.scanDevice))
+          .asyncExpand((_) => mapGatewayStreamErrors(pigeon.gatewayStartScan()));
 
   /// 订阅前会先调用 [setGatewayGetNearbyWifiParam]；[gatewayMac] 不能为空字符串。
   Stream<pigeon.TTWifiScanResult> gatewayGetNearbyWifi({required String gatewayMac}) {
     if (gatewayMac.isEmpty) {
       throw ArgumentError.value(gatewayMac, 'gatewayMac', 'must not be empty');
     }
-    return Stream<void>.fromFuture(
-      runGatewayApi(() => _host.setGatewayGetNearbyWifiParam(gatewayMac)),
-    ).asyncExpand((_) => mapGatewayStreamErrors(pigeon.gatewayGetNearbyWifi()));
+    return Stream<void>.fromFuture(runBleGate(TTBleOperation.deviceOperation))
+        .asyncExpand(
+      (_) => Stream<void>.fromFuture(
+        runGatewayApi(() => _host.setGatewayGetNearbyWifiParam(gatewayMac)),
+      ).asyncExpand((_) => mapGatewayStreamErrors(pigeon.gatewayGetNearbyWifi())),
+    );
   }
 
   Future<pigeon.TTGatewayConnectStatus> connect(String mac) =>
