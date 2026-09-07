@@ -16,6 +16,7 @@
 library ttlock_flutter;
 
 export 'package:ttlock_flutter/src/add_credential_event.dart';
+export 'package:ttlock_flutter/src/ble_guard.dart';
 export 'package:ttlock_flutter/src/tt_door_sensor_api.dart';
 export 'package:ttlock_flutter/src/tt_electric_meter_api.dart';
 export 'package:ttlock_flutter/src/tt_gateway_api.dart';
@@ -28,6 +29,7 @@ export 'package:ttlock_flutter_platform_interface/pigeon/messages.g.dart' hide T
 export 'package:ttlock_flutter/errors/errors.dart';
 
 import 'package:flutter/services.dart';
+import 'package:ttlock_flutter/src/ble_guard.dart';
 import 'package:ttlock_flutter/src/tt_door_sensor_api.dart';
 import 'package:ttlock_flutter/src/tt_electric_meter_api.dart';
 import 'package:ttlock_flutter/src/tt_gateway_api.dart';
@@ -114,6 +116,13 @@ class TTLock {
     _waterMeter = null;
     _electricMeter = null;
   }
+
+  /// 注册蓝牙门卫；传 null / 不注册 → 所有调用直接放行（向后兼容）。
+  /// 门卫在每次 BLE 调用前自动执行，使用方无需方法级包裹。
+  static void setBleGuard(TTBleGuard? guard) => BleGuard.set(guard);
+
+  /// 让某个操作跳过门卫（使用方 opt-out，如无需权限的 stateQuery）。
+  static void skipBleOperation(TTBleOperation op) => BleGuard.skip(op);
 
   /// 兼容占位；日志由原生 Pigeon 实现侧处理。
   static bool printLog = false;
