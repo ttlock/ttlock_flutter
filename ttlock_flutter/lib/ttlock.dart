@@ -17,6 +17,7 @@ library ttlock_flutter;
 
 export 'package:ttlock_flutter/src/add_credential_event.dart';
 export 'package:ttlock_flutter/src/ble_guard.dart';
+export 'package:ttlock_flutter/src/ble_timeout.dart';
 export 'package:ttlock_flutter/src/tt_door_sensor_api.dart';
 export 'package:ttlock_flutter/src/tt_electric_meter_api.dart';
 export 'package:ttlock_flutter/src/tt_gateway_api.dart';
@@ -30,6 +31,7 @@ export 'package:ttlock_flutter/errors/errors.dart';
 
 import 'package:flutter/services.dart';
 import 'package:ttlock_flutter/src/ble_guard.dart';
+import 'package:ttlock_flutter/src/ble_timeout.dart';
 import 'package:ttlock_flutter/src/tt_door_sensor_api.dart';
 import 'package:ttlock_flutter/src/tt_electric_meter_api.dart';
 import 'package:ttlock_flutter/src/tt_gateway_api.dart';
@@ -123,6 +125,12 @@ class TTLock {
 
   /// 让某个操作跳过门卫（使用方 opt-out，如无需权限的 stateQuery）。
   static void skipBleOperation(TTBleOperation op) => BleGuard.skip(op);
+
+  /// 注册操作超时配置；传 null 恢复内置默认（30s + 长操作 map）。
+  static void setTimeouts(TTLockTimeouts? timeouts) => BleTimeout.set(timeouts);
+
+  /// 当前超时配置。
+  static TTLockTimeouts get timeouts => BleTimeout.config;
 
   /// 兼容占位；日志由原生 Pigeon 实现侧处理。
   static bool printLog = false;
