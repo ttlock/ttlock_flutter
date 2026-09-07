@@ -492,6 +492,8 @@ enum TTRemoteAccessoryError {
   deviceIsBusy,
   /// 数据格式错误。
   dataFormatError,
+  /// 操作超时（含 Dart 层 Future.timeout）。
+  timeout,
 }
 
 /// 多功能键盘操作错误码。
@@ -512,6 +514,8 @@ enum TTMultifunctionalKeypadError {
   keypadConnectFailed,
   /// 数据格式错误。
   dataFormatError,
+  /// 操作超时（含 Dart 层 Future.timeout）。
+  timeout,
 }
 
 /// 远程配件类型。

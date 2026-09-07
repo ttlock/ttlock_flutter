@@ -799,7 +799,9 @@ export enum TTRemoteAccessoryError {
   /* 设备正忙。*/
   DEVICE_IS_BUSY,
   /* 数据格式错误。*/
-  DATA_FORMAT_ERROR
+  DATA_FORMAT_ERROR,
+  /* 操作超时（含 Dart 层 Future.timeout）。*/
+  TIMEOUT
 }
 
 /*
@@ -836,7 +838,9 @@ export enum TTMultifunctionalKeypadError {
   /* 键盘连接失败。*/
   KEYPAD_CONNECT_FAILED,
   /* 数据格式错误。*/
-  DATA_FORMAT_ERROR
+  DATA_FORMAT_ERROR,
+  /* 操作超时（含 Dart 层 Future.timeout）。*/
+  TIMEOUT
 }
 
 /*
