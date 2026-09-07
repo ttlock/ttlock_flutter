@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:ttlock_flutter/src/ble_guard.dart';
 import 'package:ttlock_flutter_platform_interface/pigeon/messages.g.dart' as pigeon;
 
 import 'pigeon_errors.dart';
@@ -18,10 +19,15 @@ class TTDoorSensorApi {
   pigeon.TTAccessoryHostApi get host => _host;
 
   Stream<pigeon.TTRemoteAccessoryScanModel> accessoryStartScanDoorSensor() =>
-      mapRemoteAccessoryStreamErrors(pigeon.accessoryStartScanDoorSensor());
+      Stream<void>.fromFuture(runBleGate(TTBleOperation.scanDevice)).asyncExpand(
+          (_) => mapRemoteAccessoryStreamErrors(
+              pigeon.accessoryStartScanDoorSensor()));
 
-  Stream<pigeon.TTStandaloneDoorSensorScanModel> accessoryStandaloneDoorSensorStartScan() =>
-      mapStandaloneDoorSensorStreamErrors(pigeon.accessoryStandaloneDoorSensorStartScan());
+  Stream<pigeon.TTStandaloneDoorSensorScanModel>
+      accessoryStandaloneDoorSensorStartScan() =>
+          Stream<void>.fromFuture(runBleGate(TTBleOperation.scanDevice))
+              .asyncExpand((_) => mapStandaloneDoorSensorStreamErrors(
+                  pigeon.accessoryStandaloneDoorSensorStartScan()));
 
   Future<pigeon.TTLockSystemModel> initDoorSensor(String mac, String lockData) =>
       runRemoteAccessoryApi(() => _host.initDoorSensor(mac, lockData));

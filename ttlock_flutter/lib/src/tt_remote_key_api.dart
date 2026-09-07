@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:ttlock_flutter/src/ble_guard.dart';
 import 'package:ttlock_flutter_platform_interface/pigeon/messages.g.dart' as pigeon;
 
 import 'pigeon_errors.dart';
@@ -18,7 +19,9 @@ class TTRemoteKeyApi {
   pigeon.TTAccessoryHostApi get host => _host;
 
   Stream<pigeon.TTRemoteAccessoryScanModel> accessoryStartScanRemoteKey() =>
-      mapRemoteAccessoryStreamErrors(pigeon.accessoryStartScanRemoteKey());
+      Stream<void>.fromFuture(runBleGate(TTBleOperation.scanDevice)).asyncExpand(
+          (_) => mapRemoteAccessoryStreamErrors(
+              pigeon.accessoryStartScanRemoteKey()));
 
   Future<pigeon.TTLockSystemModel> initRemoteKey(String mac, String lockData) =>
       runRemoteAccessoryApi(() => _host.initRemoteKey(mac, lockData));

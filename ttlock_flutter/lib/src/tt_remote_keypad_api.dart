@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:ttlock_flutter/src/ble_guard.dart';
 import 'package:ttlock_flutter_platform_interface/pigeon/messages.g.dart'
     as pigeon;
 
@@ -20,7 +21,9 @@ class TTRemoteKeypadApi {
   pigeon.TTAccessoryHostApi get host => _host;
 
   Stream<pigeon.TTRemoteAccessoryScanModel> accessoryStartScanRemoteKeypad() =>
-      mapRemoteAccessoryStreamErrors(pigeon.accessoryStartScanRemoteKeypad());
+      Stream<void>.fromFuture(runBleGate(TTBleOperation.scanDevice)).asyncExpand(
+          (_) => mapRemoteAccessoryStreamErrors(
+              pigeon.accessoryStartScanRemoteKeypad()));
 
   /// 订阅前调用 [setAccessoryAddKeypadFingerprintParam]。
   Stream<pigeon.AddFingerprintEvent> accessoryAddKeypadFingerprint({
@@ -45,11 +48,14 @@ class TTRemoteKeypadApi {
       startDate: startDate,
       endDate: endDate,
     );
-    return Stream<void>.fromFuture(
-      runRemoteAccessoryApi(
-          () => _host.setAccessoryAddKeypadFingerprintParam(param)),
-    ).asyncExpand((_) => mapKeypadCredentialStreamErrors(
-        pigeon.accessoryAddKeypadFingerprint()));
+    return Stream<void>.fromFuture(runBleGate(TTBleOperation.deviceOperation))
+        .asyncExpand(
+      (_) => Stream<void>.fromFuture(
+        runRemoteAccessoryApi(
+            () => _host.setAccessoryAddKeypadFingerprintParam(param)),
+      ).asyncExpand((_) => mapKeypadCredentialStreamErrors(
+          pigeon.accessoryAddKeypadFingerprint())),
+    );
   }
 
   /// 订阅前调用 [setAccessoryAddKeypadCardParam]。
@@ -75,10 +81,13 @@ class TTRemoteKeypadApi {
       startDate: startDate,
       endDate: endDate,
     );
-    return Stream<void>.fromFuture(
-      runRemoteAccessoryApi(() => _host.setAccessoryAddKeypadCardParam(param)),
-    ).asyncExpand((_) =>
-        mapKeypadCredentialStreamErrors(pigeon.accessoryAddKeypadCard()));
+    return Stream<void>.fromFuture(runBleGate(TTBleOperation.deviceOperation))
+        .asyncExpand(
+      (_) => Stream<void>.fromFuture(
+        runRemoteAccessoryApi(() => _host.setAccessoryAddKeypadCardParam(param)),
+      ).asyncExpand((_) =>
+          mapKeypadCredentialStreamErrors(pigeon.accessoryAddKeypadCard())),
+    );
   }
 
   Future<pigeon.RemoteKeypadInitResult> initRemoteKeypad(

@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:ttlock_flutter/src/ble_guard.dart';
 import 'package:ttlock_flutter_platform_interface/pigeon/messages.g.dart' as pigeon;
 
 import 'pigeon_errors.dart';
@@ -18,7 +19,9 @@ class TTWaterMeterApi {
   pigeon.TTAccessoryHostApi get host => _host;
 
   Stream<pigeon.TTMeterScanModel> accessoryWaterMeterStartScan() =>
-      mapRemoteAccessoryStreamErrors(pigeon.accessoryWaterMeterStartScan());
+      Stream<void>.fromFuture(runBleGate(TTBleOperation.scanDevice)).asyncExpand(
+          (_) => mapRemoteAccessoryStreamErrors(
+              pigeon.accessoryWaterMeterStartScan()));
 
   Future<void> waterMeterConfigServer(
     String url,
