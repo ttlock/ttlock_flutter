@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:ttlock_flutter/errors/errors.dart';
+import 'package:ttlock_flutter/src/ble_guard.dart';
 import 'package:ttlock_flutter_platform_interface/pigeon/messages.g.dart';
 
 Never throwLockError(PlatformException e) {
@@ -83,45 +84,44 @@ Future<T> runMultifunctionalKeypadInit<T>(Future<T> Function() fn) async {
   }
 }
 
-Future<T> runLockApi<T>(Future<T> Function() fn) async {
+/// 供流方法在链头触发门卫：返回一个在订阅时执行 gate 的 Future。
+Future<void> runBleGate(TTBleOperation op) async {
+  final err = await BleGuard.gate(op);
+  if (err != null) throw TTLockException(err);
+}
+
+Future<T> _runGated<T>(
+  TTBleOperation op,
+  Future<T> Function() fn,
+  Never Function(PlatformException) convert,
+) async {
+  await runBleGate(op);
   try {
     return await fn();
   } on PlatformException catch (e) {
-    throwLockError(e);
+    convert(e);
   }
 }
 
-Future<T> runGatewayApi<T>(Future<T> Function() fn) async {
-  try {
-    return await fn();
-  } on PlatformException catch (e) {
-    throwGatewayError(e);
-  }
-}
+Future<T> runLockApi<T>(Future<T> Function() fn,
+        {TTBleOperation op = TTBleOperation.deviceOperation}) =>
+    _runGated(op, fn, throwLockError);
 
-Future<T> runRemoteAccessoryApi<T>(Future<T> Function() fn) async {
-  try {
-    return await fn();
-  } on PlatformException catch (e) {
-    throwRemoteAccessoryError(e);
-  }
-}
+Future<T> runGatewayApi<T>(Future<T> Function() fn,
+        {TTBleOperation op = TTBleOperation.deviceOperation}) =>
+    _runGated(op, fn, throwGatewayError);
 
-Future<T> runMultifunctionalKeypadApi<T>(Future<T> Function() fn) async {
-  try {
-    return await fn();
-  } on PlatformException catch (e) {
-    throwMultifunctionalKeypadError(e);
-  }
-}
+Future<T> runRemoteAccessoryApi<T>(Future<T> Function() fn,
+        {TTBleOperation op = TTBleOperation.deviceOperation}) =>
+    _runGated(op, fn, throwRemoteAccessoryError);
 
-Future<T> runStandaloneDoorSensorApi<T>(Future<T> Function() fn) async {
-  try {
-    return await fn();
-  } on PlatformException catch (e) {
-    throwStandaloneDoorSensorError(e);
-  }
-}
+Future<T> runMultifunctionalKeypadApi<T>(Future<T> Function() fn,
+        {TTBleOperation op = TTBleOperation.deviceOperation}) =>
+    _runGated(op, fn, throwMultifunctionalKeypadError);
+
+Future<T> runStandaloneDoorSensorApi<T>(Future<T> Function() fn,
+        {TTBleOperation op = TTBleOperation.deviceOperation}) =>
+    _runGated(op, fn, throwStandaloneDoorSensorError);
 
 Object _mapPlatformException(PlatformException e, Never Function(PlatformException) convert) {
   try {
