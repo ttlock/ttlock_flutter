@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:ttlock_flutter/errors/errors.dart';
 import 'package:ttlock_flutter/src/ble_guard.dart';
+import 'package:ttlock_flutter/src/ble_timeout.dart';
 import 'package:ttlock_flutter_platform_interface/pigeon/messages.g.dart';
 
 Never throwLockError(PlatformException e) {
@@ -94,34 +95,100 @@ Future<T> _runGated<T>(
   TTBleOperation op,
   Future<T> Function() fn,
   Never Function(PlatformException) convert,
-) async {
+  Never Function() onTimeout, {
+  Duration? timeout,
+  String? method,
+}) async {
   await runBleGate(op);
+  final effective =
+      BleTimeout.resolve(callTimeout: timeout, method: method);
   try {
-    return await fn();
+    final future = fn();
+    if (effective == null) return await future;
+    return await future.timeout(effective);
+  } on TimeoutException {
+    onTimeout();
   } on PlatformException catch (e) {
     convert(e);
   }
 }
 
-Future<T> runLockApi<T>(Future<T> Function() fn,
-        {TTBleOperation op = TTBleOperation.deviceOperation}) =>
-    _runGated(op, fn, throwLockError);
+Future<T> runLockApi<T>(
+  Future<T> Function() fn, {
+  TTBleOperation op = TTBleOperation.deviceOperation,
+  Duration? timeout,
+  String? method,
+}) =>
+    _runGated(
+      op,
+      fn,
+      throwLockError,
+      () => throw TTLockException(TTLockError.bluetoothConnectTimeount),
+      timeout: timeout,
+      method: method,
+    );
 
-Future<T> runGatewayApi<T>(Future<T> Function() fn,
-        {TTBleOperation op = TTBleOperation.deviceOperation}) =>
-    _runGated(op, fn, throwGatewayError);
+Future<T> runGatewayApi<T>(
+  Future<T> Function() fn, {
+  TTBleOperation op = TTBleOperation.deviceOperation,
+  Duration? timeout,
+  String? method,
+}) =>
+    _runGated(
+      op,
+      fn,
+      throwGatewayError,
+      () => throw TTGatewayException(TTGatewayError.timeOut),
+      timeout: timeout,
+      method: method,
+    );
 
-Future<T> runRemoteAccessoryApi<T>(Future<T> Function() fn,
-        {TTBleOperation op = TTBleOperation.deviceOperation}) =>
-    _runGated(op, fn, throwRemoteAccessoryError);
+Future<T> runRemoteAccessoryApi<T>(
+  Future<T> Function() fn, {
+  TTBleOperation op = TTBleOperation.deviceOperation,
+  Duration? timeout,
+  String? method,
+}) =>
+    _runGated(
+      op,
+      fn,
+      throwRemoteAccessoryError,
+      () => throw TTRemoteAccessoryException(TTRemoteAccessoryError.timeout),
+      timeout: timeout,
+      method: method,
+    );
 
-Future<T> runMultifunctionalKeypadApi<T>(Future<T> Function() fn,
-        {TTBleOperation op = TTBleOperation.deviceOperation}) =>
-    _runGated(op, fn, throwMultifunctionalKeypadError);
+Future<T> runMultifunctionalKeypadApi<T>(
+  Future<T> Function() fn, {
+  TTBleOperation op = TTBleOperation.deviceOperation,
+  Duration? timeout,
+  String? method,
+}) =>
+    _runGated(
+      op,
+      fn,
+      throwMultifunctionalKeypadError,
+      () => throw TTMultifunctionalKeypadException(
+            TTMultifunctionalKeypadError.timeout),
+      timeout: timeout,
+      method: method,
+    );
 
-Future<T> runStandaloneDoorSensorApi<T>(Future<T> Function() fn,
-        {TTBleOperation op = TTBleOperation.deviceOperation}) =>
-    _runGated(op, fn, throwStandaloneDoorSensorError);
+Future<T> runStandaloneDoorSensorApi<T>(
+  Future<T> Function() fn, {
+  TTBleOperation op = TTBleOperation.deviceOperation,
+  Duration? timeout,
+  String? method,
+}) =>
+    _runGated(
+      op,
+      fn,
+      throwStandaloneDoorSensorError,
+      () => throw TTStandaloneDoorSensorException(
+            TTStandaloneDoorSensorError.connectTimeout),
+      timeout: timeout,
+      method: method,
+    );
 
 Object _mapPlatformException(PlatformException e, Never Function(PlatformException) convert) {
   try {
