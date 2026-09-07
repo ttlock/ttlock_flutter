@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:ttlock_flutter/src/ble_guard.dart';
 import 'package:ttlock_flutter_platform_interface/pigeon/messages.g.dart' as pigeon;
 import 'package:ttlock_flutter_platform_interface/pigeon/messages.g.dart';
 
@@ -20,20 +21,24 @@ class TTLockApi {
   pigeon.TTLockHostApi get host => _host;
 
   Stream<pigeon.TTLockScanModel> lockScanLock() =>
-      mapLockStreamErrors(pigeon.lockScanLock());
+      Stream<void>.fromFuture(runBleGate(TTBleOperation.scanDevice))
+          .asyncExpand((_) => mapLockStreamErrors(pigeon.lockScanLock()));
 
   /// 订阅前调用 [setLockScanWifiParam]；[lockData] 不能为空字符串。
   Stream<TTWifiScanResult> lockScanWifi(String lockData) {
     if (lockData.isEmpty) {
       throw ArgumentError.value(lockData, 'lockData', 'must not be empty');
     }
-    return Stream<void>.fromFuture(
-      runLockApi(
-        () => _host.setLockScanWifiParam(
-          pigeon.TTLockScanWifiEventParam(lockData: lockData),
+    return Stream<void>.fromFuture(runBleGate(TTBleOperation.deviceOperation))
+        .asyncExpand(
+      (_) => Stream<void>.fromFuture(
+        runLockApi(
+          () => _host.setLockScanWifiParam(
+            pigeon.TTLockScanWifiEventParam(lockData: lockData),
+          ),
         ),
-      ),
-    ).asyncExpand((_) => mapLockStreamErrors(pigeon.lockScanWifi()));
+      ).asyncExpand((_) => mapLockStreamErrors(pigeon.lockScanWifi())),
+    );
   }
 
   /// 订阅前调用 [setLockAddCardParam]。
@@ -52,9 +57,12 @@ class TTLockApi {
       startDate: startDate,
       endDate: endDate,
     );
-    return Stream<void>.fromFuture(
-      runLockApi(() => _host.setLockAddCardParam(param)),
-    ).asyncExpand((_) => mapLockStreamErrors(pigeon.lockAddCard()));
+    return Stream<void>.fromFuture(runBleGate(TTBleOperation.deviceOperation))
+        .asyncExpand(
+      (_) => Stream<void>.fromFuture(
+        runLockApi(() => _host.setLockAddCardParam(param)),
+      ).asyncExpand((_) => mapLockStreamErrors(pigeon.lockAddCard())),
+    );
   }
 
   /// 订阅前调用 [setLockAddFingerprintParam]。
@@ -73,9 +81,12 @@ class TTLockApi {
       startDate: startDate,
       endDate: endDate,
     );
-    return Stream<void>.fromFuture(
-      runLockApi(() => _host.setLockAddFingerprintParam(param)),
-    ).asyncExpand((_) => mapLockStreamErrors(pigeon.lockAddFingerprint()));
+    return Stream<void>.fromFuture(runBleGate(TTBleOperation.deviceOperation))
+        .asyncExpand(
+      (_) => Stream<void>.fromFuture(
+        runLockApi(() => _host.setLockAddFingerprintParam(param)),
+      ).asyncExpand((_) => mapLockStreamErrors(pigeon.lockAddFingerprint())),
+    );
   }
 
   /// 订阅前调用 [setLockAddFaceParam]。
@@ -94,9 +105,12 @@ class TTLockApi {
       startDate: startDate,
       endDate: endDate,
     );
-    return Stream<void>.fromFuture(
-      runLockApi(() => _host.setLockAddFaceParam(param)),
-    ).asyncExpand((_) => mapLockStreamErrors(pigeon.lockAddFace()));
+    return Stream<void>.fromFuture(runBleGate(TTBleOperation.deviceOperation))
+        .asyncExpand(
+      (_) => Stream<void>.fromFuture(
+        runLockApi(() => _host.setLockAddFaceParam(param)),
+      ).asyncExpand((_) => mapLockStreamErrors(pigeon.lockAddFace())),
+    );
   }
 
   /// 订阅前调用 [setLockAddPalmVeinParam]。
@@ -115,13 +129,17 @@ class TTLockApi {
       startDate: startDate,
       endDate: endDate,
     );
-    return Stream<void>.fromFuture(
-      runLockApi(() => _host.setLockAddPalmVeinParam(param)),
-    ).asyncExpand((_) => mapLockStreamErrors(pigeon.lockAddPalmVein()));
+    return Stream<void>.fromFuture(runBleGate(TTBleOperation.deviceOperation))
+        .asyncExpand(
+      (_) => Stream<void>.fromFuture(
+        runLockApi(() => _host.setLockAddPalmVeinParam(param)),
+      ).asyncExpand((_) => mapLockStreamErrors(pigeon.lockAddPalmVein())),
+    );
   }
 
   Future<pigeon.TTBluetoothState> getBluetoothState() =>
-      runLockApi(() => _host.getBluetoothState());
+      runLockApi(() => _host.getBluetoothState(),
+          op: TTBleOperation.getBluetoothState);
 
   Future<String> initLock(pigeon.TTLockInitParams params) =>
       runLockApi(() => _host.initLock(params));
@@ -151,7 +169,8 @@ class TTLockApi {
     pigeon.TTLockFunction function,
     String lockData,
   ) =>
-      runLockApi(() => _host.supportFunction(function, lockData));
+      runLockApi(() => _host.supportFunction(function, lockData),
+          op: TTBleOperation.stateQuery);
 
   Future<void> createCustomPasscode(
     String passcode,
