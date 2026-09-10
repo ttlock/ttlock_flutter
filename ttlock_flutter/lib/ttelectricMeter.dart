@@ -15,7 +15,7 @@ typedef TTElectricMeterInitCallback = void Function(TTElectricMeterInitResult in
 @Deprecated('Use TTLock.electricMeter.* APIs instead.')
 class TTElectricMeter {
   @Deprecated('Use TTCommands from package:ttlock_flutter/src/constants/commands.dart')
-  static const String COMMAND_CONFIG_SERVER = 'electricMeterConfigServer';
+  static const String COMMAND_CONFIG_SERVER = 'electricMeterSetClientParam';
   @Deprecated('Use TTCommands from package:ttlock_flutter/src/constants/commands.dart')
   static const String COMMAND_START_SCAN = 'electricMeterStartScan';
   @Deprecated('Use TTCommands from package:ttlock_flutter/src/constants/commands.dart')
@@ -23,13 +23,13 @@ class TTElectricMeter {
 
   static StreamSubscription<TTMeterScanModel>? _scanSub;
 
-  @Deprecated('Use TTLock.electricMeter.electricMeterConfigServer(...) instead.')
+  @Deprecated('Use TTLock.electricMeter.electricMeterSetClientParam(...) instead.')
   static void configServer({
     required String url,
     required String clientId,
     required String accessToken,
   }) {
-    new_ttlock.TTLock.electricMeter.electricMeterConfigServer(
+    new_ttlock.TTLock.electricMeter.electricMeterSetClientParam(
       url,
       clientId,
       accessToken,

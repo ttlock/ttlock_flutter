@@ -24,13 +24,13 @@ class TTWaterMeterApi {
           .asyncExpand((_) => mapRemoteAccessoryStreamErrors(
               pigeon.accessoryWaterMeterStartScan()));
 
-  Future<void> waterMeterConfigServer(
+  Future<void> waterMeterSetClientParam(
           String url, String clientId, String accessToken,
           {Duration? timeout}) =>
       runRemoteAccessoryApi(
-          () => _host.waterMeterConfigServer(url, clientId, accessToken),
+          () => _host.waterMeterSetClientParam(url, clientId, accessToken),
           timeout: timeout,
-          method: 'waterMeterConfigServer');
+          method: 'waterMeterSetClientParam');
 
   Future<void> waterMeterConnect(String mac, {Duration? timeout}) =>
       runRemoteAccessoryApi(() => _host.waterMeterConnect(mac),
@@ -110,12 +110,12 @@ class TTWaterMeterApi {
       runRemoteAccessoryApi(() => _host.waterMeterConfigApn(mac, apn),
           timeout: timeout, method: 'waterMeterConfigApn');
 
-  Future<void> waterMeterConfigMeterServer(String mac, String ip, String port,
+  Future<void> waterMeterConfigServer(String mac, String ip, String port,
           {Duration? timeout}) =>
       runRemoteAccessoryApi(
-          () => _host.waterMeterConfigMeterServer(mac, ip, port),
+          () => _host.waterMeterConfigServer(mac, ip, port),
           timeout: timeout,
-          method: 'waterMeterConfigMeterServer');
+          method: 'waterMeterConfigServer');
 
   Future<void> waterMeterReset(String mac, {Duration? timeout}) =>
       runRemoteAccessoryApi(() => _host.waterMeterReset(mac),

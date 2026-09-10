@@ -10817,7 +10817,7 @@ export abstract class TTAccessoryHostApi {
   *  [clientId] 客户端 ID。
   *  [accessToken] 访问令牌。
   */
-  abstract electricMeterConfigServer(url: string , clientId: string , accessToken: string ): void;
+  abstract electricMeterSetClientParam(url: string , clientId: string , accessToken: string ): void;
   /*
   *  连接电表。
   * 
@@ -10924,7 +10924,7 @@ export abstract class TTAccessoryHostApi {
   *  [ip] 服务器 IP。
   *  [port] 服务器端口。
   */
-  abstract electricMeterConfigMeterServer(mac: string , ip: string , port: string , result: Result<void>): void;
+  abstract electricMeterConfigServer(mac: string , ip: string , port: string , result: Result<void>): void;
   /*
   *  重置电表。
   * 
@@ -10938,7 +10938,7 @@ export abstract class TTAccessoryHostApi {
   *  [clientId] 客户端 ID。
   *  [accessToken] 访问令牌。
   */
-  abstract waterMeterConfigServer(url: string , clientId: string , accessToken: string ): void;
+  abstract waterMeterSetClientParam(url: string , clientId: string , accessToken: string ): void;
   /*
   *  连接水表。
   * 
@@ -11045,7 +11045,7 @@ export abstract class TTAccessoryHostApi {
   *  [ip] 服务器 IP。
   *  [port] 服务器端口。
   */
-  abstract waterMeterConfigMeterServer(mac: string , ip: string , port: string , result: Result<void>): void;
+  abstract waterMeterConfigServer(mac: string , ip: string , port: string , result: Result<void>): void;
   /*
   *  重置水表。
   * 
@@ -11443,7 +11443,7 @@ export abstract class TTAccessoryHostApi {
     {
       let channel: BasicMessageChannel<Object> =
           new BasicMessageChannel(
-              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterConfigServer' + separatedMessageChannelSuffix, TTAccessoryHostApi.getCodec());
+              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterSetClientParam' + separatedMessageChannelSuffix, TTAccessoryHostApi.getCodec());
       if (api != null) {
         channel.setMessageHandler({
             onMessage(message: Object ,reply: Reply<Object> ) {
@@ -11458,7 +11458,7 @@ export abstract class TTAccessoryHostApi {
               }
               let res: Array<Object | null> = [];
               try {
-                api!.electricMeterConfigServer(args[0] as string, args[1] as string, args[2] as string);
+                api!.electricMeterSetClientParam(args[0] as string, args[1] as string, args[2] as string);
                 res.push(null);
               }
  catch (error) {
@@ -12004,7 +12004,7 @@ export abstract class TTAccessoryHostApi {
     {
       let channel: BasicMessageChannel<Object> =
           new BasicMessageChannel(
-              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterConfigMeterServer' + separatedMessageChannelSuffix, TTAccessoryHostApi.getCodec());
+              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterConfigServer' + separatedMessageChannelSuffix, TTAccessoryHostApi.getCodec());
       if (api != null) {
         channel.setMessageHandler({
             onMessage(message: Object ,reply: Reply<Object> ) {
@@ -12031,7 +12031,7 @@ export abstract class TTAccessoryHostApi {
               }
               let resultCallback: Result<void> = new ResultImp();
 
-              api!.electricMeterConfigMeterServer(args[0] as string, args[1] as string, args[2] as string, resultCallback);
+              api!.electricMeterConfigServer(args[0] as string, args[1] as string, args[2] as string, resultCallback);
             } });
       } else {
         channel.setMessageHandler(null);
@@ -12076,7 +12076,7 @@ export abstract class TTAccessoryHostApi {
     {
       let channel: BasicMessageChannel<Object> =
           new BasicMessageChannel(
-              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterConfigServer' + separatedMessageChannelSuffix, TTAccessoryHostApi.getCodec());
+              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterSetClientParam' + separatedMessageChannelSuffix, TTAccessoryHostApi.getCodec());
       if (api != null) {
         channel.setMessageHandler({
             onMessage(message: Object ,reply: Reply<Object> ) {
@@ -12091,7 +12091,7 @@ export abstract class TTAccessoryHostApi {
               }
               let res: Array<Object | null> = [];
               try {
-                api!.waterMeterConfigServer(args[0] as string, args[1] as string, args[2] as string);
+                api!.waterMeterSetClientParam(args[0] as string, args[1] as string, args[2] as string);
                 res.push(null);
               }
  catch (error) {
@@ -12637,7 +12637,7 @@ export abstract class TTAccessoryHostApi {
     {
       let channel: BasicMessageChannel<Object> =
           new BasicMessageChannel(
-              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterConfigMeterServer' + separatedMessageChannelSuffix, TTAccessoryHostApi.getCodec());
+              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterConfigServer' + separatedMessageChannelSuffix, TTAccessoryHostApi.getCodec());
       if (api != null) {
         channel.setMessageHandler({
             onMessage(message: Object ,reply: Reply<Object> ) {
@@ -12664,7 +12664,7 @@ export abstract class TTAccessoryHostApi {
               }
               let resultCallback: Result<void> = new ResultImp();
 
-              api!.waterMeterConfigMeterServer(args[0] as string, args[1] as string, args[2] as string, resultCallback);
+              api!.waterMeterConfigServer(args[0] as string, args[1] as string, args[2] as string, resultCallback);
             } });
       } else {
         channel.setMessageHandler(null);

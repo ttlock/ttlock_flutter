@@ -297,7 +297,7 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
     return TTWiFiDoorMagnetic.supportFunction(sdkFeature, featureValue);
   }
 
-  waterMeterConfigServer(url: string, clientId: string, accessToken: string): void {
+  waterMeterSetClientParam(url: string, clientId: string, accessToken: string): void {
     TTWaterMeter.setClientParam(url, clientId, accessToken);
   }
 
@@ -465,13 +465,13 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
     });
   }
 
-  waterMeterConfigMeterServer(mac: string, ip: string, port: string, result: Result<void>): void {
+  waterMeterConfigServer(mac: string, ip: string, port: string, result: Result<void>): void {
     TTWaterMeter.configServer(mac, ip, port, {
       success: (_: void): void => {
         result.success(undefined);
       },
       failure: (err: SNError): void => {
-        result.error(makeWaterMeterApiError('waterMeterConfigMeterServer', err));
+        result.error(makeWaterMeterApiError('waterMeterConfigServer', err));
       },
     });
   }
@@ -487,7 +487,7 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
     });
   }
 
-  electricMeterConfigServer(url: string, clientId: string, accessToken: string): void {
+  electricMeterSetClientParam(url: string, clientId: string, accessToken: string): void {
     TTElectricMeter.setClientParam(url, clientId, accessToken);
   }
 
@@ -656,13 +656,13 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
     });
   }
 
-  electricMeterConfigMeterServer(mac: string, ip: string, port: string, result: Result<void>): void {
+  electricMeterConfigServer(mac: string, ip: string, port: string, result: Result<void>): void {
     TTElectricMeter.setElectricMeterServer(mac, ip, port, {
       success: (_: void): void => {
         result.success(undefined);
       },
       failure: (err: SNError): void => {
-        result.error(makeElectricMeterApiError('electricMeterConfigMeterServer', err));
+        result.error(makeElectricMeterApiError('electricMeterConfigServer', err));
       },
     });
   }

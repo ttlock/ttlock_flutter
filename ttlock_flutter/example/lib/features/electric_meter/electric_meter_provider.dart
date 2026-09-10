@@ -20,7 +20,7 @@ class ElectricMeterNotifier extends _$ElectricMeterNotifier {
     final api = TTLock.electricMeter;
     state = ElectricMeterState(isLoading: true, error: null);
     try {
-      await api.electricMeterConfigMeterServer(mac, ip, port);
+      await api.electricMeterConfigServer(mac, ip, port);
       state = ElectricMeterState(result: 'Meter server configured');
     } on TTRemoteAccessoryException catch (e) {
       state = ElectricMeterState(error: e.toString());
@@ -31,7 +31,7 @@ class ElectricMeterNotifier extends _$ElectricMeterNotifier {
     final api = TTLock.electricMeter;
     state = ElectricMeterState(isLoading: true, error: null);
     try {
-      await api.electricMeterConfigServer(url, clientId, accessToken);
+      await api.electricMeterSetClientParam(url, clientId, accessToken);
       state = ElectricMeterState(result: 'Server configured');
     } on TTRemoteAccessoryException catch (e) {
       state = ElectricMeterState(error: e.toString());

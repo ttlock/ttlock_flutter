@@ -6635,8 +6635,8 @@ class TTAccessoryHostApi {
   /// [url] 服务器地址。
   /// [clientId] 客户端 ID。
   /// [accessToken] 访问令牌。
-  Future<void> electricMeterConfigServer(String url, String clientId, String accessToken) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterConfigServer$pigeonVar_messageChannelSuffix';
+  Future<void> electricMeterSetClientParam(String url, String clientId, String accessToken) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterSetClientParam$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -6986,8 +6986,8 @@ class TTAccessoryHostApi {
   /// [mac] 电表 MAC 地址。
   /// [ip] 服务器 IP。
   /// [port] 服务器端口。
-  Future<void> electricMeterConfigMeterServer(String mac, String ip, String port) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterConfigMeterServer$pigeonVar_messageChannelSuffix';
+  Future<void> electricMeterConfigServer(String mac, String ip, String port) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.electricMeterConfigServer$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -7030,8 +7030,8 @@ class TTAccessoryHostApi {
   /// [url] 服务器地址。
   /// [clientId] 客户端 ID。
   /// [accessToken] 访问令牌。
-  Future<void> waterMeterConfigServer(String url, String clientId, String accessToken) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterConfigServer$pigeonVar_messageChannelSuffix';
+  Future<void> waterMeterSetClientParam(String url, String clientId, String accessToken) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterSetClientParam$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -7381,8 +7381,8 @@ class TTAccessoryHostApi {
   /// [mac] 水表 MAC 地址。
   /// [ip] 服务器 IP。
   /// [port] 服务器端口。
-  Future<void> waterMeterConfigMeterServer(String mac, String ip, String port) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterConfigMeterServer$pigeonVar_messageChannelSuffix';
+  Future<void> waterMeterConfigServer(String mac, String ip, String port) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.waterMeterConfigServer$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,

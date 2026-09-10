@@ -17,7 +17,7 @@ typedef TTWaterDeviceInfoCallback = void Function(Map<String, Object?> deviceInf
 @Deprecated('Use TTLock.waterMeter.* APIs instead.')
 class TTWaterMeter {
   @Deprecated('Use TTCommands from package:ttlock_flutter/src/constants/commands.dart')
-  static const String COMMAND_CONFIG_SERVER = 'waterMeterConfigServer';
+  static const String COMMAND_CONFIG_SERVER = 'waterMeterSetClientParam';
   @Deprecated('Use TTCommands from package:ttlock_flutter/src/constants/commands.dart')
   static const String COMMAND_START_SCAN = 'waterMeterStartScan';
   @Deprecated('Use TTCommands from package:ttlock_flutter/src/constants/commands.dart')
@@ -25,13 +25,13 @@ class TTWaterMeter {
 
   static StreamSubscription<TTMeterScanModel>? _scanSub;
 
-  @Deprecated('Use TTLock.waterMeter.waterMeterConfigServer(...) instead.')
+  @Deprecated('Use TTLock.waterMeter.waterMeterSetClientParam(...) instead.')
   static void configServer({
     required String url,
     required String clientId,
     required String accessToken,
   }) {
-    new_ttlock.TTLock.waterMeter.waterMeterConfigServer(
+    new_ttlock.TTLock.waterMeter.waterMeterSetClientParam(
       url,
       clientId,
       accessToken,
@@ -164,10 +164,10 @@ class TTWaterMeter {
         .catchError((e, _) => _fail(e, failedCallback));
   }
 
-  @Deprecated('Use TTLock.waterMeter.waterMeterConfigMeterServer(...) instead.')
+  @Deprecated('Use TTLock.waterMeter.waterMeterConfigServer(...) instead.')
   static void configMeterServer(String mac, String ip, String port, TTSuccessCallback callback, TTRemoteFailedCallback failedCallback) {
     new_ttlock.TTLock.waterMeter
-        .waterMeterConfigMeterServer(mac, ip, port)
+        .waterMeterConfigServer(mac, ip, port)
         .then((_) => callback())
         .catchError((e, _) => _fail(e, failedCallback));
   }

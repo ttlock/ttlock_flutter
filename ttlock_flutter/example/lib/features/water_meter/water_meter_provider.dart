@@ -20,7 +20,7 @@ class WaterMeterNotifier extends _$WaterMeterNotifier {
     final api = TTLock.waterMeter;
     state = WaterMeterState(isLoading: true, error: null);
     try {
-      await api.waterMeterConfigMeterServer(mac, ip, port);
+      await api.waterMeterConfigServer(mac, ip, port);
       state = WaterMeterState(result: 'Meter server configured');
     } on TTRemoteAccessoryException catch (e) {
       state = WaterMeterState(error: e.toString());
@@ -31,7 +31,7 @@ class WaterMeterNotifier extends _$WaterMeterNotifier {
     final api = TTLock.waterMeter;
     state = WaterMeterState(isLoading: true, error: null);
     try {
-      await api.waterMeterConfigServer(url, clientId, accessToken);
+      await api.waterMeterSetClientParam(url, clientId, accessToken);
       state = WaterMeterState(result: 'Server configured');
     } on TTRemoteAccessoryException catch (e) {
       state = WaterMeterState(error: e.toString());

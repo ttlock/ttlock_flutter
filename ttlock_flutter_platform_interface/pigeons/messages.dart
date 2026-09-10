@@ -3035,7 +3035,7 @@ abstract class TTAccessoryHostApi {
   /// [url] 服务器地址。
   /// [clientId] 客户端 ID。
   /// [accessToken] 访问令牌。
-  void electricMeterConfigServer(String url, String clientId, String accessToken);
+  void electricMeterSetClientParam(String url, String clientId, String accessToken);
 
   /// 连接电表。
   ///
@@ -3140,7 +3140,7 @@ abstract class TTAccessoryHostApi {
   /// [ip] 服务器 IP。
   /// [port] 服务器端口。
   @async
-  void electricMeterConfigMeterServer(String mac, String ip, String port);
+  void electricMeterConfigServer(String mac, String ip, String port);
 
   /// 重置电表。
   ///
@@ -3153,7 +3153,7 @@ abstract class TTAccessoryHostApi {
   /// [url] 服务器地址。
   /// [clientId] 客户端 ID。
   /// [accessToken] 访问令牌。
-  void waterMeterConfigServer(String url, String clientId, String accessToken);
+  void waterMeterSetClientParam(String url, String clientId, String accessToken);
 
   /// 连接水表。
   ///
@@ -3258,7 +3258,7 @@ abstract class TTAccessoryHostApi {
   /// [ip] 服务器 IP。
   /// [port] 服务器端口。
   @async
-  void waterMeterConfigMeterServer(String mac, String ip, String port);
+  void waterMeterConfigServer(String mac, String ip, String port);
 
   /// 重置水表。
   ///

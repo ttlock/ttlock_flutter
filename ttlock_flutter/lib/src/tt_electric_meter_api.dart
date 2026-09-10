@@ -24,13 +24,13 @@ class TTElectricMeterApi {
           .asyncExpand((_) => mapRemoteAccessoryStreamErrors(
               pigeon.accessoryElectricMeterStartScan()));
 
-  Future<void> electricMeterConfigServer(
+  Future<void> electricMeterSetClientParam(
           String url, String clientId, String accessToken,
           {Duration? timeout}) =>
       runRemoteAccessoryApi(
-          () => _host.electricMeterConfigServer(url, clientId, accessToken),
+          () => _host.electricMeterSetClientParam(url, clientId, accessToken),
           timeout: timeout,
-          method: 'electricMeterConfigServer');
+          method: 'electricMeterSetClientParam');
 
   Future<void> electricMeterConnect(String mac, {Duration? timeout}) =>
       runRemoteAccessoryApi(() => _host.electricMeterConnect(mac),
@@ -112,12 +112,12 @@ class TTElectricMeterApi {
       runRemoteAccessoryApi(() => _host.electricMeterConfigApn(mac, apn),
           timeout: timeout, method: 'electricMeterConfigApn');
 
-  Future<void> electricMeterConfigMeterServer(
+  Future<void> electricMeterConfigServer(
           String mac, String ip, String port, {Duration? timeout}) =>
       runRemoteAccessoryApi(
-          () => _host.electricMeterConfigMeterServer(mac, ip, port),
+          () => _host.electricMeterConfigServer(mac, ip, port),
           timeout: timeout,
-          method: 'electricMeterConfigMeterServer');
+          method: 'electricMeterConfigServer');
 
   Future<void> electricMeterReset(String mac, {Duration? timeout}) =>
       runRemoteAccessoryApi(() => _host.electricMeterReset(mac),
