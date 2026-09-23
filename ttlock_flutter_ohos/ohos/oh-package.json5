@@ -6,6 +6,6 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "@sciener/ttlock": "/Users/chuyi/StudioProjects/ttlockhm/TTLockSDK/build/default/outputs/default/TTLockSDK.har"
+    "@sciener/ttlock": "/libs/TTLockSDK.har"
   }
 }
