@@ -125,12 +125,13 @@ function toConfigWiFiParameters(params: TTStandaloneDoorSensorInitParams): Confi
     wifiPwd: params.getWifiPassword(),
     serverAddress: params.getServerAddress(),
     portNumber: `${params.getPortNumber()}`,
+    doorSensorNumber: params.getDoorSensorName(),
   };
 }
 
 function toStandaloneDoorSensorInfo(info: TTDeviceInfoModel): TTStandaloneDoorSensorInfo {
   return new TTStandaloneDoorSensorInfo(
-    undefined,
+    info.doorSensorData,
     info.electricQuantity,
     info.featureValue,
     info.wifiMac,
