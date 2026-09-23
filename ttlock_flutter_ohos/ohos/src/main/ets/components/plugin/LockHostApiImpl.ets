@@ -1132,7 +1132,7 @@ export class LockHostApiImpl extends TTLockHostApi {
     result.error(makeNotImplementedError('setNBServerAddress'));
   }
 
-  configWifi(wifiName: string, wifiPassword: string, lockData: string, result: Result<void>): void {
+  configWifi(wifiName: string , wifiPassword: string , lockMac: string, lockData: string, result: Result<void>): void {
     TTLock.lockConfigWifi(lockData, wifiName, wifiPassword, {
       success: (_: void): void => {
         result.success(undefined);
