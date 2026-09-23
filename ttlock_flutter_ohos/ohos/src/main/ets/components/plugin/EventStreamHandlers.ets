@@ -262,9 +262,10 @@ class AddLockCardImpl extends LockAddCardStreamHandler implements DisposableStre
     TTLock.addICCard(lockData, range.start, range.end, cyclic, {
       success: (model: ITTLockAddICCardModel): void => {
         if (model.status === 1) {
-          sink.success(new AddCardEvent(TTAddCardPhase.WAITING, undefined));
-        } else {
           sink.success(new AddCardEvent(TTAddCardPhase.SUCCESS, model.cardNumber));
+
+        } else if (model.status == 2) {
+          sink.success(new AddCardEvent(TTAddCardPhase.WAITING, undefined));
         }
       },
       failure: (err: SNError): void => {

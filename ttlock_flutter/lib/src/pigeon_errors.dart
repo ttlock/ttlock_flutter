@@ -10,65 +10,65 @@ Never throwLockError(PlatformException e) {
   final code = e.code;
   final msg = e.message;
   if (code == 'channel-error' || code == 'null-error') {
-    throw TTPigeonException(code, msg);
+    throw TTLockException(TTLockError.fail, msg);
   }
   final i = int.tryParse(code);
   if (i != null && i >= 0 && i < TTLockError.values.length) {
     throw TTLockException(TTLockError.values[i], msg);
   }
-  throw TTPigeonException(code, msg);
+  throw TTLockException(TTLockError.fail, msg);
 }
 
 Never throwGatewayError(PlatformException e) {
   final code = e.code;
   final msg = e.message;
   if (code == 'channel-error' || code == 'null-error') {
-    throw TTPigeonException(code, msg);
+    throw TTGatewayException(TTGatewayError.failed, msg);
   }
   final i = int.tryParse(code);
   if (i != null && i >= 0 && i < TTGatewayError.values.length) {
     throw TTGatewayException(TTGatewayError.values[i], msg);
   }
-  throw TTPigeonException(code, msg);
+  throw TTGatewayException(TTGatewayError.failed, msg);
 }
 
 Never throwRemoteAccessoryError(PlatformException e) {
   final code = e.code;
   final msg = e.message;
   if (code == 'channel-error' || code == 'null-error') {
-    throw TTPigeonException(code, msg);
+    throw TTRemoteAccessoryException(TTRemoteAccessoryError.failed, msg);
   }
   final i = int.tryParse(code);
   if (i != null && i >= 0 && i < TTRemoteAccessoryError.values.length) {
     throw TTRemoteAccessoryException(TTRemoteAccessoryError.values[i], msg);
   }
-  throw TTPigeonException(code, msg);
+  throw TTRemoteAccessoryException(TTRemoteAccessoryError.failed, msg);
 }
 
 Never throwMultifunctionalKeypadError(PlatformException e) {
   final code = e.code;
   final msg = e.message;
   if (code == 'channel-error' || code == 'null-error') {
-    throw TTPigeonException(code, msg);
+    throw TTMultifunctionalKeypadException(TTMultifunctionalKeypadError.failed, msg);
   }
   final i = int.tryParse(code);
   if (i != null && i >= 0 && i < TTMultifunctionalKeypadError.values.length) {
     throw TTMultifunctionalKeypadException(TTMultifunctionalKeypadError.values[i], msg);
   }
-  throw TTPigeonException(code, msg);
+  throw TTMultifunctionalKeypadException(TTMultifunctionalKeypadError.failed, msg);
 }
 
 Never throwStandaloneDoorSensorError(PlatformException e) {
   final code = e.code;
   final msg = e.message;
   if (code == 'channel-error' || code == 'null-error') {
-    throw TTPigeonException(code, msg);
+    throw TTStandaloneDoorSensorException(TTStandaloneDoorSensorError.failed, msg);
   }
   final i = int.tryParse(code);
   if (i != null && i >= 0 && i < TTStandaloneDoorSensorError.values.length) {
     throw TTStandaloneDoorSensorException(TTStandaloneDoorSensorError.values[i], msg);
   }
-  throw TTPigeonException(code, msg);
+  throw TTStandaloneDoorSensorException(TTStandaloneDoorSensorError.failed, msg);
 }
 
 /// [initMultifunctionalKeypad] 在原生侧可能回调锁错误或键盘错误；二者 `raw` 可能重叠，
