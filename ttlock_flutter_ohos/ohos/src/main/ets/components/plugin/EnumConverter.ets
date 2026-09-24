@@ -63,9 +63,8 @@ import {
 
 /**
  * Pigeon TTLockConfig → SDK TTLockConfigType。
- * SDK 中没有 publicMode/lowBatteryAutoUnlock，使用就近字段做兜底。
  */
-export function lockConfigConvert(config: TTLockConfig): SdkTTLockConfigType | null {
+export function lockConfigConvert(config: TTLockConfig): SdkTTLockConfigType {
   switch (config) {
     case TTLockConfig.AUDIO:
       return SdkTTLockConfigType.sound;
@@ -84,12 +83,17 @@ export function lockConfigConvert(config: TTLockConfig): SdkTTLockConfigType | n
     case TTLockConfig.WIFI_LOCK_POWER_SAVING_MODE:
       return SdkTTLockConfigType.wifiPowerSavingMode;
     case TTLockConfig.DOUBLE_AUTH:
+      return SdkTTLockConfigType.doubleAuth;
     case TTLockConfig.PUBLIC_MODE:
+      return SdkTTLockConfigType.publicMode;
     case TTLockConfig.LOW_BATTERY_AUTO_UNLOCK:
+      return SdkTTLockConfigType.lowBatteryAutoUnlock;
     case TTLockConfig.SECURITY_M1CARD:
+      return SdkTTLockConfigType.securityM1Card;
     case TTLockConfig.SEMI_AUTOMATIC_MODE_CONTROL:
+      return SdkTTLockConfigType.semiAutomaticModeControl;
     case TTLockConfig.LOCK_SUPERVISION:
-      return null;
+      return SdkTTLockConfigType.lockSupervision;
   }
 }
 
@@ -398,10 +402,18 @@ export function featureValueConvert(lockFunction: TTLockFunction): SdkTTLockFeat
       return SdkTTLockFeatureValue.controlLatchBolt;
     case TTLockFunction.AUTO_SET_UNLOCK_DIRECTION:
       return SdkTTLockFeatureValue.TTLockFeatureValueAutoSetUnlockDirection;
+    case TTLockFunction.PUBLIC_MODE:
+      return SdkTTLockFeatureValue.publicMode;
+    case TTLockFunction.LOW_BATTERY_AUTO_UNLOCK:
+      return SdkTTLockFeatureValue.lowBatteryAutoUnlock;
+    case TTLockFunction.SECURITY_M1CARD:
+      return SdkTTLockFeatureValue.securityM1Card;
+    case TTLockFunction.SEMI_AUTOMATIC_MODE_CONTROL:
+      return SdkTTLockFeatureValue.semiAutomaticModeControl;
+    case TTLockFunction.SUPPORT_SUPERVISION:
+      return SdkTTLockFeatureValue.proofCapture;
     case TTLockFunction.IC_CARD_SECURITY_SETTING:
     case TTLockFunction.DO_NOT_SUPPORT_TURN_OFF_LATCH_BOLT:
-    case TTLockFunction.PUBLIC_MODE:
-    case TTLockFunction.LOW_BATTERY_AUTO_UNLOCK:
     case TTLockFunction.MOTOR_DRIVE_TIME:
     case TTLockFunction.MODIFY_FEATURE_VALUE:
     case TTLockFunction.MODIFY_LOCK_NAME_PREFIX:
@@ -417,14 +429,11 @@ export function featureValueConvert(lockFunction: TTLockFunction): SdkTTLockFeat
     case TTLockFunction.SUPPORT_DEAD_LOCKING:
     case TTLockFunction.WORKING_TIME:
     case TTLockFunction.CUSTOM_QRCODE:
-    case TTLockFunction.SECURITY_M1CARD:
     case TTLockFunction.YI_SHENG_PHOTO_FACE:
     case TTLockFunction.PICTURE_FACE_DELIVERY:
     case TTLockFunction.SUPPORT_SET_ALIAS:
     case TTLockFunction.HIDE_WIFI_CAT_ONE_SLEEP_MODE_SETTING:
-    case TTLockFunction.SEMI_AUTOMATIC_MODE_CONTROL:
     case TTLockFunction.SUPPORT_SET_USER_ATTRIBUTES:
-    case TTLockFunction.SUPPORT_SUPERVISION:
     case TTLockFunction.YI_NUO_PHOTO_FACE:
     case TTLockFunction.URL_FACE:
     case TTLockFunction.HUMAN_PRESENCE_SENSOR:

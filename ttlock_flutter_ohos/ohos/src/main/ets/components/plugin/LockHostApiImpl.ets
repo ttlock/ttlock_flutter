@@ -863,12 +863,7 @@ export class LockHostApiImpl extends TTLockHostApi {
   }
 
   getLockConfig(config: TTLockConfig, lockData: string, result: Result<boolean>): void {
-    const sdkConfig = lockConfigConvert(config);
-    if (sdkConfig === null) {
-      result.error(makeInvalidValueError(`锁配置 ${config} 在 OpenHarmony SDK 中无对应项`));
-      return;
-    }
-    TTLock.getLockConfigWithType(lockData, sdkConfig, {
+    TTLock.getLockConfigWithType(lockData, lockConfigConvert(config), {
       success: (model: ITTPublicSwitchModel): void => {
         result.success(model.isOn);
       },
@@ -879,12 +874,7 @@ export class LockHostApiImpl extends TTLockHostApi {
   }
 
   setLockConfig(config: TTLockConfig, isOn: boolean, lockData: string, result: Result<void>): void {
-    const sdkConfig = lockConfigConvert(config);
-    if (sdkConfig === null) {
-      result.error(makeInvalidValueError(`锁配置 ${config} 在 OpenHarmony SDK 中无对应项`));
-      return;
-    }
-    TTLock.setLockConfigWithType(lockData, isOn, sdkConfig, {
+    TTLock.setLockConfigWithType(lockData, isOn, lockConfigConvert(config), {
       success: (_: void): void => {
         result.success(undefined);
       },
