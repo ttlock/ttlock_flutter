@@ -65,7 +65,7 @@ docs/                                    # 架构、开发规范、对比文档
 
 - `TTException` — 插件侧统一异常基类
 - `TTLockException` / `TTGatewayException` / `TTRemoteAccessoryException` / `TTMultifunctionalKeypadException` / `TTFaceException` — 各领域异常
-- `TTPigeonException` — Pigeon 平台异常（channel-error, null-error）
+- 平台通道异常（`channel-error` / `null-error` / 非数字码）统一映射为对应领域 `fail`/`failed`，不向业务暴露独立 Pigeon 异常类型
 - `src/pigeon_errors.dart` 中的 `throwLockError` / `runLockApi` 等实现 `PlatformException` → 业务异常转换
 
 ### 错误映射模式

@@ -217,23 +217,23 @@ Stream<T> _mapStreamErrors<T>(
   );
 }
 
-/// EventChannel 流上的 [PlatformException] → [TTLockException] / [TTPigeonException]。
+/// EventChannel 流上的 [PlatformException] → [TTLockException]。
 Stream<T> mapLockStreamErrors<T>(Stream<T> stream) =>
     _mapStreamErrors(stream, throwLockError);
 
-/// EventChannel 流上的 [PlatformException] → [TTGatewayException] / [TTPigeonException]。
+/// EventChannel 流上的 [PlatformException] → [TTGatewayException]。
 Stream<T> mapGatewayStreamErrors<T>(Stream<T> stream) =>
     _mapStreamErrors(stream, throwGatewayError);
 
-/// EventChannel 流上的 [PlatformException] → [TTRemoteAccessoryException] / [TTPigeonException]。
+/// EventChannel 流上的 [PlatformException] → [TTRemoteAccessoryException]。
 Stream<T> mapRemoteAccessoryStreamErrors<T>(Stream<T> stream) =>
     _mapStreamErrors(stream, throwRemoteAccessoryError);
 
-/// EventChannel 流上的 [PlatformException] → [TTMultifunctionalKeypadException] / [TTPigeonException]。
+/// EventChannel 流上的 [PlatformException] → [TTMultifunctionalKeypadException]。
 Stream<T> mapMultifunctionalKeypadStreamErrors<T>(Stream<T> stream) =>
     _mapStreamErrors(stream, throwMultifunctionalKeypadError);
 
-/// EventChannel 流上的 [PlatformException] → [TTStandaloneDoorSensorException] / [TTPigeonException]。
+/// EventChannel 流上的 [PlatformException] → [TTStandaloneDoorSensorException]。
 Stream<T> mapStandaloneDoorSensorStreamErrors<T>(Stream<T> stream) =>
     _mapStreamErrors(stream, throwStandaloneDoorSensorError);
 

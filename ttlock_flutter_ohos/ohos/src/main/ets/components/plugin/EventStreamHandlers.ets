@@ -50,6 +50,9 @@ import {
   TTStandaloneDoorSensorScanModel,
   TTWifiScanEntry,
   TTWifiScanResult,
+  TTLockError,
+  TTGatewayError,
+  TTMultifunctionalKeypadError,
 } from './Messages';
 
 import {
@@ -61,7 +64,6 @@ import {
   emitKeypadSinkError,
   emitLockSinkError,
   lockVersionFromJsonString,
-  NOT_IMPLEMENTED_CODE,
 } from './TtlockPremiseSupport';
 
 import {
@@ -81,9 +83,9 @@ import {
   TTGatewayScanModel as SdkTTGatewayScanModel,
   TTWaterMeterScanModel } from '@sciener/ttlock/src/main/ets/TTLock/d/e/f';
 
-const NO_LOCK_DATA = 'NO_LOCK_DATA';
-const NO_GATEWAY_MAC = 'NO_GATEWAY_MAC';
-const NO_KEYPAD = 'NO_KEYPAD';
+const NO_LOCK_DATA = `${TTLockError.INVALID_PARAMETER}`;
+const NO_GATEWAY_MAC = `${TTGatewayError.INVALID_PARAMETER}`;
+const NO_KEYPAD = `${TTMultifunctionalKeypadError.INVALID_PARAMETER}`;
 
 function readScanWifiEntry(item: Map<string, Object>): TTWifiScanEntry {
   const ssidVal = item.get('SSID') ?? item.get('ssid');

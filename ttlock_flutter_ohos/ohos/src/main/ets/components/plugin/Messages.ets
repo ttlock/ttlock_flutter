@@ -34,13 +34,14 @@ function wrapError(error: Error): Array<Object | null> {
   let errorList: Array<Object | null> = new Array<Object | null>(3);
   if (error instanceof FlutterError) {
     let err: FlutterError = error as FlutterError;
+    // Align with Android: [code, message, details]
     errorList[0] = err.code;
-    errorList[1] = err.name;
-    errorList[2] = err.message;
+    errorList[1] = err.message;
+    errorList[2] = err.name;
   } else {
     errorList[0] = error.toString();
-    errorList[1] = error.name;
-    errorList[2] = "Cause: " + error.message + ", Stacktrace: " + error.stack;
+    errorList[1] = error.message;
+    errorList[2] = "Cause: " + error.name + ", Stacktrace: " + error.stack;
   }
   return errorList;
 }
@@ -762,7 +763,9 @@ export enum TTGatewayError {
   /* 配置 IP 失败。*/
   FAILED_CONFIG_IP,
   /* 无效 IP。*/
-  INVALID_IP
+  INVALID_IP,
+  /* 无效参数（含缺参、上下文未设置等）。*/
+  INVALID_PARAMETER
 }
 
 /*
@@ -801,7 +804,9 @@ export enum TTRemoteAccessoryError {
   /* 数据格式错误。*/
   DATA_FORMAT_ERROR,
   /* 操作超时（含 Dart 层 Future.timeout）。*/
-  TIMEOUT
+  TIMEOUT,
+  /* 无效参数（含缺参、上下文未设置等）。*/
+  INVALID_PARAMETER
 }
 
 /*
@@ -840,7 +845,9 @@ export enum TTMultifunctionalKeypadError {
   /* 数据格式错误。*/
   DATA_FORMAT_ERROR,
   /* 操作超时（含 Dart 层 Future.timeout）。*/
-  TIMEOUT
+  TIMEOUT,
+  /* 无效参数（含缺参、上下文未设置等）。*/
+  INVALID_PARAMETER
 }
 
 /*
@@ -1317,7 +1324,9 @@ export enum TTStandaloneDoorSensorError {
   /* 设备正忙。*/
   DEVICE_IS_BUSY,
   /* 数据格式错误。*/
-  DATA_FORMAT_ERROR
+  DATA_FORMAT_ERROR,
+  /* 无效参数（含缺参、上下文未设置等）。*/
+  INVALID_PARAMETER
 }
 
 /*

@@ -22,7 +22,7 @@ import {
 import {
   EventContextStore,
   TTResultBridge,
-  makeInvalidValueError,
+  makeGatewayInvalidValueError,
   makeGatewayApiError,
 } from './TtlockPremiseSupport';
 import { gatewayConnectStatusRevert, gatewayTypeConvert } from './EnumConverter';
@@ -46,7 +46,7 @@ export class GatewayHostApiImpl extends TTGatewayHostApi {
   connect(mac: string, result: Result<TTGatewayConnectStatus>): void {
     EventContextStore.shared.gatewayGetNearbyWifi.gatewayMac = mac;
     if (mac.length === 0) {
-      result.error(makeInvalidValueError('mac is required'));
+      result.error(makeGatewayInvalidValueError('mac is required'));
       return;
     }
 
@@ -75,7 +75,7 @@ export class GatewayHostApiImpl extends TTGatewayHostApi {
 
     if (uid === undefined || userPwd === undefined || gatewayName === undefined ||
       gatewayType === undefined || portNumber === undefined) {
-      result.error(makeInvalidValueError(
+      result.error(makeGatewayInvalidValueError(
         '`ttlockUid`, `ttlockLoginPassword`, `gatewayName`, `type`, `serverPort` are required',
       ));
       return;
@@ -83,7 +83,7 @@ export class GatewayHostApiImpl extends TTGatewayHostApi {
 
     const portTrim = portNumber.trim();
     if (portTrim.length === 0 || !/^[0-9]+$/.test(portTrim)) {
-      result.error(makeInvalidValueError('`serverPort` must be numeric'));
+      result.error(makeGatewayInvalidValueError('`serverPort` must be numeric'));
       return;
     }
 
@@ -94,11 +94,11 @@ export class GatewayHostApiImpl extends TTGatewayHostApi {
     const wifi: string | undefined = params.getWifi();
     const wifiPwd: string | undefined = params.getWifiPassword();
     if (needsWifi && (wifi === undefined || wifi.trim().length === 0)) {
-      result.error(makeInvalidValueError('`wifi` is required for this gateway type'));
+      result.error(makeGatewayInvalidValueError('`wifi` is required for this gateway type'));
       return;
     }
     if (needsWifi && (wifiPwd === undefined || wifiPwd.trim().length === 0)) {
-      result.error(makeInvalidValueError('`wifiPassword` is required for this gateway type'));
+      result.error(makeGatewayInvalidValueError('`wifiPassword` is required for this gateway type'));
       return;
     }
 

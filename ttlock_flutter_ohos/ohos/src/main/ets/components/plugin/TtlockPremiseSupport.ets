@@ -11,12 +11,8 @@ import {
   standaloneDoorSensorErrorRevert,
 } from './EnumConverter';
 
-export const NOT_IMPLEMENTED_CODE = 'NOT_IMPLEMENTED';
-const INVALID_VALUE_CODE = 'INVALID_VALUE';
-const NO_LOCK_DATA_CODE = 'NO_LOCK_DATA';
-const NO_GATEWAY_CODE = 'NO_GATEWAY';
-const NO_KEYPAD_CODE = 'NO_KEYPAD';
-const NO_METER_MAC_CODE = 'NO_METER_MAC';
+/** @deprecated 仅兼容旧引用；新代码请用领域枚举 raw。 */
+export const NOT_IMPLEMENTED_CODE = `${TTLockError.FAIL}`;
 
 /**
  * `ITTLockResult<T>` 的 class 化适配，绕开 ArkTS 严格模式
@@ -41,19 +37,23 @@ export function noopFailureBridge<T>(success: (arg: T) => void): TTResultBridge<
 
 export function makeNotImplementedError(operation: string): FlutterError {
   return new FlutterError(
-    NOT_IMPLEMENTED_CODE,
+    `${TTLockError.FAIL}`,
     'notImplemented',
     `${operation} is not implemented on OpenHarmony`,
   );
 }
 
 export function makeInvalidValueError(message: string): FlutterError {
-  return new FlutterError(INVALID_VALUE_CODE, 'invalidValue', message);
+  return new FlutterError(`${TTLockError.INVALID_PARAMETER}`, 'invalidValue', message);
+}
+
+export function makeGatewayInvalidValueError(message: string): FlutterError {
+  return new FlutterError(`${TTGatewayError.INVALID_PARAMETER}`, 'invalidValue', message);
 }
 
 export function makeNoLockDataError(operation: string): FlutterError {
   return new FlutterError(
-    NO_LOCK_DATA_CODE,
+    `${TTLockError.INVALID_PARAMETER}`,
     'noLockData',
     `请先通过 set*Param 设置参数后再使用 ${operation}`,
   );
@@ -61,7 +61,7 @@ export function makeNoLockDataError(operation: string): FlutterError {
 
 export function makeNoGatewayError(operation: string): FlutterError {
   return new FlutterError(
-    NO_GATEWAY_CODE,
+    `${TTGatewayError.INVALID_PARAMETER}`,
     'noGateway',
     `请先通过 setGatewayGetNearbyWifiParam 设置网关 MAC 后再使用 ${operation}`,
   );
@@ -69,7 +69,7 @@ export function makeNoGatewayError(operation: string): FlutterError {
 
 export function makeNoKeypadError(operation: string): FlutterError {
   return new FlutterError(
-    NO_KEYPAD_CODE,
+    `${TTMultifunctionalKeypadError.INVALID_PARAMETER}`,
     'noKeypad',
     `请先通过 setAccessoryAddKeypad*Param 设置键盘参数后再使用 ${operation}`,
   );
@@ -77,7 +77,7 @@ export function makeNoKeypadError(operation: string): FlutterError {
 
 export function makeNoMeterMacError(operation: string): FlutterError {
   return new FlutterError(
-    NO_METER_MAC_CODE,
+    `${TTRemoteAccessoryError.INVALID_PARAMETER}`,
     'noMeterMac',
     `请先连接表具后再使用 ${operation}`,
   );

@@ -86,16 +86,34 @@ void main() {
   });
 
   group('unknown stream error codes', () {
-    test('maps string code to TTPigeonException', () async {
+    test('maps non-numeric code to TTLockException.fail', () async {
       final stream = mapLockStreamErrors<int>(
         Stream<int>.error(PlatformException(code: 'NO_LOCK_DATA', message: 'missing')),
       );
       await expectLater(
         stream,
         emitsError(
-          isA<TTPigeonException>()
-              .having((e) => e.code, 'code', 'NO_LOCK_DATA')
+          isA<TTLockException>()
+              .having((e) => e.code, 'code', TTLockError.fail)
               .having((e) => e.message, 'message', 'missing'),
+        ),
+      );
+    });
+
+    test('maps invalidParameter raw to TTLockException', () async {
+      final stream = mapLockStreamErrors<int>(
+        Stream<int>.error(
+          PlatformException(
+            code: '${TTLockError.invalidParameter.index}',
+            message: 'missing lockData',
+          ),
+        ),
+      );
+      await expectLater(
+        stream,
+        emitsError(
+          isA<TTLockException>()
+              .having((e) => e.code, 'code', TTLockError.invalidParameter),
         ),
       );
     });
