@@ -180,6 +180,29 @@ function keyboardToRemoteAccessoryScanModel(
   );
 }
 
+/** OHOS SDK 水电表扫描模型无 type/scanTime，分别对应 version/timestamp。 */
+function waterMeterToMeterScanModel(model: TTWaterMeterScanModel): TTMeterScanModel {
+  return new TTMeterScanModel(
+    model.name,
+    model.mac,
+    model.rssi,
+    model.isInited,
+    model.version,
+    model.timestamp,
+  );
+}
+
+function electricMeterToMeterScanModel(model: TTElectricMeterScanModel): TTMeterScanModel {
+  return new TTMeterScanModel(
+    model.name,
+    model.mac,
+    model.rssi,
+    model.isInited,
+    model.version,
+    model.timestamp,
+  );
+}
+
 interface DisposableStreamHandler {
   onCancel(args: Object): void;
 }
@@ -627,15 +650,7 @@ class AccessoryWaterMeterStartScanImpl extends AccessoryWaterMeterStartScanStrea
 
   onListen(_args: Object, sink: PigeonEventSink<TTMeterScanModel>): void {
     TTWaterMeter.startScanWaterMeter((m: TTWaterMeterScanModel): void => {
-      const out = new TTMeterScanModel(
-        m.name,
-        m.mac,
-        m.rssi,
-        m.isInited,
-        m.type,
-        m.scanTime
-      );
-      sink.success(out);
+      sink.success(waterMeterToMeterScanModel(m));
     });
   }
 
@@ -653,15 +668,7 @@ class AccessoryElectricMeterStartScanImpl extends AccessoryElectricMeterStartSca
 
   onListen(_args: Object, sink: PigeonEventSink<TTMeterScanModel>): void {
     TTElectricMeter.startScanElectricMeter((m: TTElectricMeterScanModel): void => {
-      const out = new TTMeterScanModel(
-        m.name,
-        m.mac,
-        m.rssi,
-        m.isInited,
-        m.type,
-        m.scanTime
-      );
-      sink.success(out);
+      sink.success(electricMeterToMeterScanModel(m));
     });
   }
 
