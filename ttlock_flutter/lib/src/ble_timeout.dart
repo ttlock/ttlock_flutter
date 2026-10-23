@@ -3,13 +3,13 @@ import 'package:flutter/foundation.dart' show visibleForTesting;
 /// SDK 操作超时配置。
 class TTLockTimeouts {
   const TTLockTimeouts({
-    this.defaultTimeout = const Duration(seconds: 30),
+    this.defaultTimeout = const Duration(seconds: 45),
     this.methodTimeouts = const {},
   });
 
   /// 内置默认（对齐 ttaccess_shared 历史约定）。
   static const builtin = TTLockTimeouts(
-    defaultTimeout: Duration(seconds: 30),
+    defaultTimeout: Duration(seconds: 45),
     methodTimeouts: {
       'initLock': Duration(seconds: 300),
       'configWifi': Duration(minutes: 2),

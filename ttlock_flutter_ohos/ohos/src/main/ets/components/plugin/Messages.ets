@@ -34,14 +34,13 @@ function wrapError(error: Error): Array<Object | null> {
   let errorList: Array<Object | null> = new Array<Object | null>(3);
   if (error instanceof FlutterError) {
     let err: FlutterError = error as FlutterError;
-    // Align with Android: [code, message, details]
     errorList[0] = err.code;
-    errorList[1] = err.message;
-    errorList[2] = err.name;
+    errorList[1] = err.name;
+    errorList[2] = err.message;
   } else {
     errorList[0] = error.toString();
-    errorList[1] = error.message;
-    errorList[2] = "Cause: " + error.name + ", Stacktrace: " + error.stack;
+    errorList[1] = error.name;
+    errorList[2] = "Cause: " + error.message + ", Stacktrace: " + error.stack;
   }
   return errorList;
 }
@@ -1003,210 +1002,241 @@ export class TTAliasTypeEnum {
 }
 
 /*
-*  锁功能能力位。
+*  锁功能特性（按原生 featureValue bit id 升序排列；注释中的 id 即 bit 位）。
 * 
 *  Generated enum from Pigeon that represents data sent in messages.
 */
 export enum TTLockFunction {
-  /* 密码。*/
+  /* id: 0 — 密码。*/
   PASSCODE,
-  /* IC 卡。*/
+  /* id: 1 — IC 卡。*/
   IC_CARD,
-  /* 指纹。*/
+  /* id: 2 — 指纹。*/
   FINGERPRINT,
-  /* 手环。*/
+  /* id: 3 — 手环。*/
   WRISTBAND,
-  /* 自动闭锁。*/
+  /* id: 4 — 自动闭锁。*/
   AUTO_LOCK,
-  /* 删除密码。*/
+  /* id: 5 — 删除密码。*/
   DELETE_PASSCODE,
-  /* 管理密码。*/
+  /* id: 6 — 固件设置。*/
+  FIRMWARE_SETTING,
+  /* id: 7 — 管理密码。*/
   MANAGE_PASSCODE,
-  /* 锁定。*/
+  /* id: 8 — 锁定。*/
   LOCKING,
-  /* 密码可见。*/
+  /* id: 9 — 密码可见。*/
   PASSCODE_VISIBLE,
-  /* 网关开锁。*/
+  /* id: 10 — 网关开锁。*/
   GATEWAY_UNLOCK,
-  /* 锁冻结。*/
+  /* id: 11 — 锁冻结。*/
   LOCK_FREEZE,
-  /* 周期密码。*/
+  /* id: 12 — 周期密码。*/
   CYCLE_PASSWORD,
-  /* 开锁开关。*/
+  /* id: 13 — 磁力计。*/
+  MAGNETOMETER,
+  /* id: 14 — 远程开锁开关。*/
   UNLOCK_SWITCH,
-  /* 声音开关。*/
+  /* id: 15 — 声音开关。*/
   AUDIO_SWITCH,
-  /* NB-IoT。*/
+  /* id: 16 — NB-IoT。*/
   NB_IO_T,
-  /* 获取管理员密码。*/
+  /* id: 18 — 获取管理员密码。*/
   GET_ADMIN_PASSCODE,
-  /* 酒店卡。*/
+  /* id: 19 — 酒店卡。*/
   HOTEL_CARD,
-  /* 无时钟。*/
+  /* id: 20 — 无时钟。*/
   NO_CLOCK,
-  /* 正常模式不广播。*/
+  /* id: 21 — 正常模式不广播。*/
   NO_BROADCAST_IN_NORMAL,
-  /* 通行模式。*/
+  /* id: 22 — 通行模式。*/
   PASSAGE_MODE,
-  /* 关闭自动闭锁。*/
+  /* id: 23 — 关闭自动闭锁。*/
   TURN_OFF_AUTO_LOCK,
-  /* 无线键盘。*/
+  /* id: 24 — 无线键盘。*/
   WIRELESS_KEYPAD,
-  /* 灯光。*/
+  /* id: 25 — 灯光。*/
   LIGHT,
-  /* 酒店卡黑名单。*/
+  /* id: 26 — 酒店卡黑名单。*/
   HOTEL_CARD_BLACKLIST,
-  /* 身份证。*/
+  /* id: 27 — 身份证。*/
   IDENTITY_CARD,
-  /* 防撬警报。*/
+  /* id: 28 — 防撬警报。*/
   TAMPER_ALERT,
-  /* 重置按钮。*/
+  /* id: 29 — 重置按钮。*/
   RESET_BUTTON,
-  /* 隐私锁。*/
+  /* id: 30 — 隐私锁。*/
   PRIVACY_LOCK,
-  /* 死锁。*/
+  /* id: 32 — 死锁。*/
   DEAD_LOCK,
-  /* 周期卡或指纹。*/
+  /* id: 34 — 周期卡或指纹。*/
   CYCLIC_CARD_OR_FINGERPRINT,
-  /* 指静脉。*/
+  /* id: 36 — 左右开门方向设置（与 [autoSetUnlockDirection] 不同）。*/
+  UNLOCK_DIRECTION,
+  /* id: 37 — 指静脉。*/
   FINGER_VEIN,
-  /* BLE 5.0。*/
+  /* id: 38 — BLE 5.0 / Telink。*/
   BLE5G,
-  /* NB 唤醒。*/
+  /* id: 39 — NB 唤醒。*/
   NB_AWAKE,
-  /* 恢复周期密码。*/
+  /* id: 40 — 恢复周期密码。*/
   RECOVER_CYCLE_PASSCODE,
-  /* 遥控钥匙。*/
+  /* id: 41 — 遥控钥匙。*/
   REMOTE_KEY,
-  /* 获取配件电量。*/
+  /* id: 42 — 获取配件电量。*/
   GET_ACCESSORY_ELECTRIC_QUANTITY,
-  /* 音量和语言设置。*/
+  /* id: 43 — 音量和语言设置。*/
   SOUND_VOLUME_AND_LANGUAGE_SETTING,
-  /* 二维码。*/
+  /* id: 44 — 二维码。*/
   QR_CODE,
-  /* 门磁状态。*/
+  /* id: 45 — 门磁状态。*/
   DOOR_SENSOR_STATE,
-  /* 通行模式自动开锁设置。*/
+  /* id: 46 — 通行模式自动开锁设置。*/
   PASSAGE_MODE_AUTO_UNLOCK_SETTING,
-  /* 门磁。*/
+  /* id: 47 — 指纹下发。*/
+  FINGERPRINT_DISTRIBUTION,
+  /* id: 48 — 中正。*/
+  ZHONG_ZHENG,
+  /* id: 49 — 群晖。*/
+  SYNO,
+  /* id: 50 — 无线门磁。*/
   DOOR_SENSOR,
-  /* 门磁警报。*/
+  /* id: 51 — 门磁警报。*/
   DOOR_SENSOR_ALERT,
-  /* 灵敏度。*/
+  /* id: 52 — 灵敏度。*/
   SENSITIVITY,
-  /* 人脸。*/
+  /* id: 53 — 人脸。*/
   FACE,
-  /* CPU 卡。*/
+  /* id: 54 — 电机扭力设置。*/
+  MOTOR_TORQUE,
+  /* id: 55 — CPU 卡。*/
   CPU_CARD,
-  /* WiFi 锁。*/
+  /* id: 56 — WiFi 锁。*/
   WIFI_LOCK,
-  /* WiFi 锁静态 IP。*/
+  /* id: 58 — WiFi 锁静态 IP。*/
   WIFI_LOCK_STATIC_IP,
-  /* 密码按键数量。*/
+  /* id: 60 — 密码按键数量。*/
   PASSCODE_KEY_NUMBER,
-  /* 独立激活。*/
+  /* id: 61 — 觅睿可视对讲。*/
+  MEARI_CAMERA,
+  /* id: 62 — 独立激活。*/
   STAND_ALONE_ACTIVATION,
-  /* 双重认证。*/
+  /* id: 63 — 双重认证。*/
   DOUBLE_AUTH,
-  /* 授权开锁。*/
+  /* id: 64 — 授权开锁。*/
   AUTHORIZED_UNLOCK,
-  /* 网关授权开锁。*/
+  /* id: 65 — 网关授权开锁。*/
   GATEWAY_AUTHORIZED_UNLOCK,
-  /* 无电子钥匙开锁。*/
+  /* id: 66 — 无电子钥匙开锁。*/
   NO_EKEY_UNLOCK,
-  /* 指安拍照人脸。*/
+  /* id: 67 — 雄迈可视对讲。*/
+  XIONG_MAI_CAMERA,
+  /* id: 68 — 昂瑞微芯片。*/
+  ON_MICRO_CHIP,
+  /* id: 69 — 指安拍照人脸。*/
   ZHI_AN_PHOTO_FACE,
-  /* 掌静脉。*/
+  /* id: 70 — 掌静脉。*/
   PALM_VEIN,
-  /* WiFi 区域。*/
+  /* id: 71 — WiFi 区域。*/
   WIFI_AREA,
-  /* 小草摄像头。*/
+  /* id: 75 — 小草摄像头。*/
   XIAO_CAO_CAMERA,
-  /* 通过编码重置锁。*/
+  /* id: 76 — 通过编码重置锁。*/
   RESET_LOCK_BY_CODE,
-  /* 第三方蓝牙设备。*/
+  /* id: 77 — 第三方蓝牙设备。*/
   THIRD_PARTY_BLUETOOTH_DEVICE,
-  /* 自动设置角度。*/
+  /* id: 78 — 自动设置角度。*/
   AUTO_SET_ANGLE,
-  /* 手动设置角度。*/
+  /* id: 79 — 手动设置角度。*/
   MANUAL_SET_ANGLE,
-  /* 控制斜舌。*/
+  /* id: 80 — 控制斜舌。*/
   CONTROL_LATCH_BOLT,
-  /* 自动设置开锁方向。*/
+  /* id: 81 — 自动设置开锁方向。*/
   AUTO_SET_UNLOCK_DIRECTION,
-  /* IC 卡安全设置。*/
+  /* id: 82 — IC 卡安全设置。*/
   IC_CARD_SECURITY_SETTING,
-  /* WiFi 省电时间。*/
+  /* id: 83 — WiFi 省电时间。*/
   WIFI_POWER_SAVING_TIME,
-  /* 多功能键盘。*/
+  /* id: 84 — 多功能键盘。*/
   MULTI_FUNCTION_KEYPAD,
-  /* 不支持关闭斜舌。*/
+  /* id: 85 — 不支持关闭斜舌 / 全自动。*/
   DO_NOT_SUPPORT_TURN_OFF_LATCH_BOLT,
-  /* 公共模式。*/
+  /* id: 86 — 公共模式。*/
   PUBLIC_MODE,
-  /* 低电量自动开锁。*/
+  /* id: 87 — 低电量自动开锁。*/
   LOW_BATTERY_AUTO_UNLOCK,
-  /* 电机驱动时间。*/
+  /* id: 88 — 电机驱动时间。*/
   MOTOR_DRIVE_TIME,
-  /* 修改特征值。*/
+  /* id: 89 — 修改特征值。*/
   MODIFY_FEATURE_VALUE,
-  /* 修改锁名前缀。*/
+  /* id: 90 — 修改锁名前缀。*/
   MODIFY_LOCK_NAME_PREFIX,
-  /* 授权码。*/
+  /* id: 91 — 密码开反锁。*/
+  PASSCODE_WITH_OPEN_PRIVACY_LOCK,
+  /* id: 92 — 授权码。*/
   AUTH_CODE,
-  /* 未授权尝试警报。*/
+  /* id: 93 — 未授权尝试警报。*/
   UNAUTHORIZED_ATTEMPT_ALARM,
-  /* 省电模式支持 WiFi。*/
+  /* id: 94 — 关联锁。*/
+  LINK_LOCK,
+  /* id: 95 — 清空密码与动态密码设置。*/
+  CLEAR_PASSCODE_AND_DYNAMIC_PASSCODE_SETTING,
+  /* id: 96 — 省电模式支持 WiFi。*/
   POWER_SAVER_SUPPORT_WIFI,
-  /* 蓝牙广播设置。*/
+  /* id: 97 — 蓝牙广播设置。*/
   BLUETOOTH_ADVERTISING_SETTING,
-  /* 工作模式。*/
+  /* id: 98 — 工作模式。*/
   WORKING_MODE,
-  /* 供应商代码。*/
+  /* id: 99 — 供应商代码。*/
   SUPPLIER_CODE,
-  /* Cat.1。*/
+  /* id: 100 — Cat.1。*/
   CAT_ONE,
-  /* 强制开门警报。*/
+  /* id: 102 — 强制开门警报。*/
   FORCED_OPENING_DOOR_ALARM,
-  /* 指安人脸特征第二代。*/
+  /* id: 103 — 指安人脸特征第二代。*/
   ZHI_AN_FACE_FEATURE_SECOND_GENERATION,
-  /* 支持死锁。*/
+  /* id: 104 — WiFi 固件版本。*/
+  WIFI_FIRMWARE_VERSION,
+  /* id: 106 — 支持死锁。*/
   SUPPORT_DEAD_LOCKING,
-  /* 工作时间。*/
+  /* id: 107 — 工作时间。*/
   WORKING_TIME,
-  /* 自定义二维码。*/
+  /* id: 108 — 自定义二维码。*/
   CUSTOM_QRCODE,
-  /* 安全 M1 卡。*/
+  /* id: 109 — 安全 M1 卡。*/
   SECURITY_M1CARD,
-  /* 易盛人脸。*/
+  /* id: 110 — 易盛人脸。*/
   YI_SHENG_PHOTO_FACE,
-  /* 图片人脸传输。*/
+  /* id: 112 — 图片人脸传输。*/
   PICTURE_FACE_DELIVERY,
-  /* 支持设置别名。*/
-  SUPPORT_SET_ALIAS,
-  /* 隐藏 WiFi/Cat.1 休眠模式设置。*/
-  HIDE_WIFI_CAT_ONE_SLEEP_MODE_SETTING,
-  /* 半自动模式控制。*/
-  SEMI_AUTOMATIC_MODE_CONTROL,
-  /* 支持设置用户属性。*/
-  SUPPORT_SET_USER_ATTRIBUTES,
-  /* 支持监管。*/
-  SUPPORT_SUPERVISION,
-  /* 易诺拍照人脸。*/
+  /* id: 112 — 易诺拍照人脸（与 [pictureFaceDelivery] 同 bit）。*/
   YI_NUO_PHOTO_FACE,
-  /* 通过 URL 添加人脸。*/
+  /* id: 114 — 支持设置别名。*/
+  SUPPORT_SET_ALIAS,
+  /* id: 117 — 隐藏 WiFi/Cat.1 休眠模式设置。*/
+  HIDE_WIFI_CAT_ONE_SLEEP_MODE_SETTING,
+  /* id: 119 — 半自动模式控制。*/
+  SEMI_AUTOMATIC_MODE_CONTROL,
+  /* id: 120 — 支持设置用户属性。*/
+  SUPPORT_SET_USER_ATTRIBUTES,
+  /* id: 122 — 电机驱动板固件版本。*/
+  MOTOR_DRIVE_BOARD_FIRMWARE_VERSION,
+  /* id: 123 — 通过 URL 添加指纹。*/
+  URL_FINGER,
+  /* id: 124 — 通过 URL 添加人脸。*/
   URL_FACE,
-  /* 人体存在传感器。*/
+  /* id: 125 — 通过 URL 添加掌静脉。*/
+  URL_PALM_VEIN,
+  /* id: 126 — 支持监管。*/
+  SUPPORT_SUPERVISION,
+  /* id: 128 — 人体存在传感器。*/
   HUMAN_PRESENCE_SENSOR,
-  /*
-  *  左右开门方向设置（cloud featureValue bit 36 / FeatureValue.UNLOCK_DIRECTION）。
-  *  与 [autoSetUnlockDirection]（自动校准）不同。
-  */
-  UNLOCK_DIRECTION
+  /* id: 132 — 人脸模组数据类型。*/
+  FACE_FEATURE_DATA_TYPE
 }
 
 /*
-*  锁功能能力位。
+*  锁功能特性（按原生 featureValue bit id 升序排列；注释中的 id 即 bit 位）。
 * 
 *  Generated enum Companion class from Pigeon that represents data sent 
    in messages.Do not delete otherwise enum type data transfer will be failed
@@ -4463,6 +4493,10 @@ export class TTStandaloneDoorSensorInfo {
 /*
 *  水电表扫描结果（通用）。
 * 
+*  字段对齐 iOS `TTWaterMeterModel` / `TTElectricMeterModel` 与 Android
+*  `WaterMeter` / `ElectricMeter` 中添加流程所需的公共扫描属性。
+*  `type == 1` 时广播中才带有开关/付费/用量等运行态字段，不在此模型中暴露。
+* 
 *  Generated class from Pigeon that represents data sent in messages.
 */
 export class TTMeterScanModel {
@@ -4496,10 +4530,43 @@ export class TTMeterScanModel {
     return this.rssi;
   }
 
-  constructor(name: string, mac: string, rssi: number) {
+  private isInited: boolean;
+
+  public setIsInited(isInited: boolean): void {
+    this.isInited = isInited;
+  }
+
+  getIsInited(): boolean{
+    return this.isInited;
+  }
+
+  private type: number;
+
+  public setType(type: number): void {
+    this.type = type;
+  }
+
+  getType(): number{
+    return this.type;
+  }
+
+  private scanTime?: number;
+
+  public setScanTime(scanTime: number | undefined): void {
+    this.scanTime = scanTime;
+  }
+
+  getScanTime(): number | undefined{
+    return this.scanTime;
+  }
+
+  constructor(name: string, mac: string, rssi: number, isInited: boolean, type: number, scanTime?: number) {
     this.name = name;
     this.mac = mac;
     this.rssi = rssi;
+    this.isInited = isInited;
+    this.type = type;
+    this.scanTime = scanTime;
   }
 
   toList(): Array<Object | null> {
@@ -4519,6 +4586,21 @@ export class TTMeterScanModel {
     } else {
       arr.push(this.rssi);
     }
+    if (this.isInited === undefined || this.isInited === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.isInited);
+    }
+    if (this.type === undefined || this.type === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.type);
+    }
+    if (this.scanTime === undefined || this.scanTime === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.scanTime);
+    }
     return arr;
   }
 
@@ -4529,7 +4611,16 @@ export class TTMeterScanModel {
     const mac: string = macObject as string;
     let rssiObject: Object = arr[2];
     const rssi: number = rssiObject as number;
-    return new TTMeterScanModel(name, mac, rssi);
+    let isInitedObject: Object = arr[3];
+    const isInited: boolean = isInitedObject as boolean;
+    let typeObject: Object = arr[4];
+    const type: number = typeObject as number;
+    let scanTime: number | undefined = undefined;
+    if (arr[5] !== null && arr[5] !== undefined) {
+      let scanTimeObject: Object = arr[5];
+      scanTime = scanTimeObject as number | undefined;
+    }
+    return new TTMeterScanModel(name, mac, rssi, isInited, type, scanTime);
   }
 }
 
@@ -6635,12 +6726,13 @@ export abstract class TTLockHostApi {
   */
   abstract setMotorTorqueLevel(torqueLevel: number , lockData: string , result: Result<void>): void;
   /*
-  *  设置锁斜舌保持时间。
+  *  设置锁斜舌参数。
   * 
-  *  [keepTime] 斜舌保持时间（秒）。
+  *  [driveLevel] 斜舌回转距离/驱动等级。有效范围 1–20；0 表示不控制；-1 表示不修改。
+  *  [keepTime] 斜舌保持时间（秒）。有效范围 2–10；-1 表示不修改。
   *  [lockData] 锁凭证。
   */
-  abstract setLockLatchBolt(keepTime: number , lockData: string , result: Result<void>): void;
+  abstract setLockLatchBolt(driveLevel: number , keepTime: number , lockData: string , result: Result<void>): void;
   /*
   *  设置锁时间。
   * 
@@ -6745,6 +6837,24 @@ export abstract class TTLockHostApi {
   *  [lockData] 锁凭证。
   */
   abstract setLightTime(seconds: number , lockData: string , result: Result<void>): void;
+  /*
+  *  获取蓝牙广播间隔。
+  * 
+  *  需要能力位 [TTLockFunction.bluetoothAdvertisingSetting]。
+  *  返回值单位为秒，有效范围约 0.1–1。
+  * 
+  *  [lockData] 锁凭证。
+  */
+  abstract getBluetoothAdvertisingInterval(lockData: string , result: Result<number>): void;
+  /*
+  *  设置蓝牙广播间隔。
+  * 
+  *  需要能力位 [TTLockFunction.bluetoothAdvertisingSetting]。
+  * 
+  *  [interval] 广播间隔（秒），有效范围约 0.1–1。
+  *  [lockData] 锁凭证。
+  */
+  abstract setBluetoothAdvertisingInterval(interval: number , lockData: string , result: Result<void>): void;
   /*
   *  获取锁方向。
   * 
@@ -8742,8 +8852,8 @@ export abstract class TTLockHostApi {
                   return;
               }
               let args: Array<Object> = message as Array<Object>;
-              if (args.length < 2) {
-                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected at least 2 argument(s).')));
+              if (args.length < 3) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected at least 3 argument(s).')));
                   return;
               }
               class ResultImp implements Result<void>{
@@ -8760,7 +8870,7 @@ export abstract class TTLockHostApi {
               }
               let resultCallback: Result<void> = new ResultImp();
 
-              api!.setLockLatchBolt(args[0] as number, args[1] as string, resultCallback);
+              api!.setLockLatchBolt(args[0] as number, args[1] as number, args[2] as string, resultCallback);
             } });
       } else {
         channel.setMessageHandler(null);
@@ -9301,6 +9411,78 @@ export abstract class TTLockHostApi {
               let resultCallback: Result<void> = new ResultImp();
 
               api!.setLightTime(args[0] as number, args[1] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.getBluetoothAdvertisingInterval' + separatedMessageChannelSuffix, TTLockHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              if (!(Array.isArray(message))) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected List.')));
+                  return;
+              }
+              let args: Array<Object> = message as Array<Object>;
+              if (args.length < 1) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected at least 1 argument(s).')));
+                  return;
+              }
+              class ResultImp implements Result<number>{
+                    success(result: number): void {
+                      let res: Array<Object | null> = [];
+                      res.push(result);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object | null> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<number> = new ResultImp();
+
+              api!.getBluetoothAdvertisingInterval(args[0] as string, resultCallback);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTLockHostApi.setBluetoothAdvertisingInterval' + separatedMessageChannelSuffix, TTLockHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              if (!(Array.isArray(message))) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected List.')));
+                  return;
+              }
+              let args: Array<Object> = message as Array<Object>;
+              if (args.length < 2) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected at least 2 argument(s).')));
+                  return;
+              }
+              class ResultImp implements Result<void>{
+                    success(result: void): void {
+                      let res: Array<Object | null> = [];
+                      res.push(null);
+                      reply.reply(res);
+                    }
+
+                    error(error: Error): void {
+                      let wrappedError: Array<Object | null> = wrapError(error);
+                      reply.reply(wrappedError);
+                    }
+              }
+              let resultCallback: Result<void> = new ResultImp();
+
+              api!.setBluetoothAdvertisingInterval(args[0] as number, args[1] as string, resultCallback);
             } });
       } else {
         channel.setMessageHandler(null);

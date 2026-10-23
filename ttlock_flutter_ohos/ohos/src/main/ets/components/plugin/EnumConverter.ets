@@ -272,7 +272,7 @@ export function remoteAccessoryConvert(accessory: TTRemoteAccessory): SdkTTAcces
 
 /**
  * Pigeon TTLockFunction → SDK TTLockFeatureValue。
- * 无对应能力的条目返回 null（调用方需短路）。
+ * 仅映射鸿蒙 SDK 已声明的枚举；其余返回 null（调用方需短路）。
  */
 export function featureValueConvert(lockFunction: TTLockFunction): SdkTTLockFeatureValue | null {
   switch (lockFunction) {
@@ -336,6 +336,8 @@ export function featureValueConvert(lockFunction: TTLockFunction): SdkTTLockFeat
       return SdkTTLockFeatureValue.deadLock;
     case TTLockFunction.CYCLIC_CARD_OR_FINGERPRINT:
       return SdkTTLockFeatureValue.cyclicCardOrFingerprint;
+    case TTLockFunction.UNLOCK_DIRECTION:
+      return SdkTTLockFeatureValue.unlockDirection;
     case TTLockFunction.FINGER_VEIN:
       return SdkTTLockFeatureValue.fingerVein;
     case TTLockFunction.BLE5G:
@@ -364,6 +366,8 @@ export function featureValueConvert(lockFunction: TTLockFunction): SdkTTLockFeat
       return SdkTTLockFeatureValue.sensitivity;
     case TTLockFunction.FACE:
       return SdkTTLockFeatureValue.face;
+    case TTLockFunction.MOTOR_TORQUE:
+      return SdkTTLockFeatureValue.motorTorque;
     case TTLockFunction.CPU_CARD:
       return SdkTTLockFeatureValue.cpuCard;
     case TTLockFunction.WIFI_LOCK:
@@ -372,6 +376,8 @@ export function featureValueConvert(lockFunction: TTLockFunction): SdkTTLockFeat
       return SdkTTLockFeatureValue.wifiLockStaticIP;
     case TTLockFunction.PASSCODE_KEY_NUMBER:
       return SdkTTLockFeatureValue.passcodeKeyNumber;
+    case TTLockFunction.MEARI_CAMERA:
+      return SdkTTLockFeatureValue.meariCamera;
     case TTLockFunction.STAND_ALONE_ACTIVATION:
       return SdkTTLockFeatureValue.standAloneActivation;
     case TTLockFunction.DOUBLE_AUTH:
@@ -382,6 +388,8 @@ export function featureValueConvert(lockFunction: TTLockFunction): SdkTTLockFeat
       return SdkTTLockFeatureValue.gatewayAuthorizedUnlock;
     case TTLockFunction.NO_EKEY_UNLOCK:
       return SdkTTLockFeatureValue.TTLockFeatureValueNoEkeyUnlock;
+    case TTLockFunction.XIONG_MAI_CAMERA:
+      return SdkTTLockFeatureValue.TTLockFeatureValueXiongMaiCamera;
     case TTLockFunction.ZHI_AN_PHOTO_FACE:
       return SdkTTLockFeatureValue.TTLockFeatureValueZhiAnPhotoFace;
     case TTLockFunction.PALM_VEIN:
@@ -402,23 +410,43 @@ export function featureValueConvert(lockFunction: TTLockFunction): SdkTTLockFeat
       return SdkTTLockFeatureValue.controlLatchBolt;
     case TTLockFunction.AUTO_SET_UNLOCK_DIRECTION:
       return SdkTTLockFeatureValue.TTLockFeatureValueAutoSetUnlockDirection;
+    case TTLockFunction.WIFI_POWER_SAVING_TIME:
+      return SdkTTLockFeatureValue.wifiPowerSavingTime;
+    case TTLockFunction.MULTI_FUNCTION_KEYPAD:
+      return SdkTTLockFeatureValue.multifunctionalKeypad;
     case TTLockFunction.PUBLIC_MODE:
       return SdkTTLockFeatureValue.publicMode;
     case TTLockFunction.LOW_BATTERY_AUTO_UNLOCK:
       return SdkTTLockFeatureValue.lowBatteryAutoUnlock;
+    case TTLockFunction.WIFI_FIRMWARE_VERSION:
+      return SdkTTLockFeatureValue.wifiFirmwareVersion;
     case TTLockFunction.SECURITY_M1CARD:
       return SdkTTLockFeatureValue.securityM1Card;
     case TTLockFunction.SEMI_AUTOMATIC_MODE_CONTROL:
       return SdkTTLockFeatureValue.semiAutomaticModeControl;
+    case TTLockFunction.MOTOR_DRIVE_BOARD_FIRMWARE_VERSION:
+      return SdkTTLockFeatureValue.motorDriveBoardFirmwareVersion;
     case TTLockFunction.SUPPORT_SUPERVISION:
       return SdkTTLockFeatureValue.proofCapture;
+    case TTLockFunction.FACE_FEATURE_DATA_TYPE:
+      return SdkTTLockFeatureValue.faceFeatureDataType;
+    // SDK 未声明的 featureValue：短路为 null
+    case TTLockFunction.FIRMWARE_SETTING:
+    case TTLockFunction.MAGNETOMETER:
+    case TTLockFunction.FINGERPRINT_DISTRIBUTION:
+    case TTLockFunction.ZHONG_ZHENG:
+    case TTLockFunction.SYNO:
+    case TTLockFunction.ON_MICRO_CHIP:
     case TTLockFunction.IC_CARD_SECURITY_SETTING:
     case TTLockFunction.DO_NOT_SUPPORT_TURN_OFF_LATCH_BOLT:
     case TTLockFunction.MOTOR_DRIVE_TIME:
     case TTLockFunction.MODIFY_FEATURE_VALUE:
     case TTLockFunction.MODIFY_LOCK_NAME_PREFIX:
+    case TTLockFunction.PASSCODE_WITH_OPEN_PRIVACY_LOCK:
     case TTLockFunction.AUTH_CODE:
     case TTLockFunction.UNAUTHORIZED_ATTEMPT_ALARM:
+    case TTLockFunction.LINK_LOCK:
+    case TTLockFunction.CLEAR_PASSCODE_AND_DYNAMIC_PASSCODE_SETTING:
     case TTLockFunction.POWER_SAVER_SUPPORT_WIFI:
     case TTLockFunction.BLUETOOTH_ADVERTISING_SETTING:
     case TTLockFunction.WORKING_MODE:
@@ -431,19 +459,15 @@ export function featureValueConvert(lockFunction: TTLockFunction): SdkTTLockFeat
     case TTLockFunction.CUSTOM_QRCODE:
     case TTLockFunction.YI_SHENG_PHOTO_FACE:
     case TTLockFunction.PICTURE_FACE_DELIVERY:
+    case TTLockFunction.YI_NUO_PHOTO_FACE:
     case TTLockFunction.SUPPORT_SET_ALIAS:
     case TTLockFunction.HIDE_WIFI_CAT_ONE_SLEEP_MODE_SETTING:
     case TTLockFunction.SUPPORT_SET_USER_ATTRIBUTES:
-    case TTLockFunction.YI_NUO_PHOTO_FACE:
+    case TTLockFunction.URL_FINGER:
     case TTLockFunction.URL_FACE:
+    case TTLockFunction.URL_PALM_VEIN:
     case TTLockFunction.HUMAN_PRESENCE_SENSOR:
       return null;
-    case TTLockFunction.UNLOCK_DIRECTION:
-      return SdkTTLockFeatureValue.unlockDirection;
-    case TTLockFunction.WIFI_POWER_SAVING_TIME:
-      return SdkTTLockFeatureValue.wifiPowerSavingTime;
-    case TTLockFunction.MULTI_FUNCTION_KEYPAD:
-      return SdkTTLockFeatureValue.multifunctionalKeypad;
   }
 }
 

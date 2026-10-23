@@ -627,7 +627,14 @@ class AccessoryWaterMeterStartScanImpl extends AccessoryWaterMeterStartScanStrea
 
   onListen(_args: Object, sink: PigeonEventSink<TTMeterScanModel>): void {
     TTWaterMeter.startScanWaterMeter((m: TTWaterMeterScanModel): void => {
-      const out = new TTMeterScanModel(m.name, m.mac, m.rssi);
+      const out = new TTMeterScanModel(
+        m.name,
+        m.mac,
+        m.rssi,
+        m.isInited,
+        m.type,
+        m.scanTime
+      );
       sink.success(out);
     });
   }
@@ -646,7 +653,14 @@ class AccessoryElectricMeterStartScanImpl extends AccessoryElectricMeterStartSca
 
   onListen(_args: Object, sink: PigeonEventSink<TTMeterScanModel>): void {
     TTElectricMeter.startScanElectricMeter((m: TTElectricMeterScanModel): void => {
-      const out = new TTMeterScanModel(m.name, m.mac, m.rssi);
+      const out = new TTMeterScanModel(
+        m.name,
+        m.mac,
+        m.rssi,
+        m.isInited,
+        m.type,
+        m.scanTime
+      );
       sink.success(out);
     });
   }

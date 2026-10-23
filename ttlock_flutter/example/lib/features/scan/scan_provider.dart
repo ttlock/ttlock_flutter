@@ -219,7 +219,9 @@ class ScanNotifier extends _$ScanNotifier {
               name: m.name,
               mac: m.mac,
               rssi: m.rssi,
+              isInited: m.isInited,
             ));
+            devices.sort((a, b) => (a.isInited ? 1 : 0) - (b.isInited ? 1 : 0));
             update();
           },
           onError: onError,
@@ -235,7 +237,9 @@ class ScanNotifier extends _$ScanNotifier {
               name: m.name,
               mac: m.mac,
               rssi: m.rssi,
+              isInited: m.isInited,
             ));
+            devices.sort((a, b) => (a.isInited ? 1 : 0) - (b.isInited ? 1 : 0));
             update();
           },
           onError: onError,

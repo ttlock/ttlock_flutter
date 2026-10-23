@@ -708,9 +708,9 @@ export class LockHostApiImpl extends TTLockHostApi {
     });
   }
 
-  setLockLatchBolt(keepTime: number, lockData: string, result: Result<void>): void {
-    // 与 Android 对齐：isControl=true，driveLevel 使用 SDK 默认值（-1）。
-    TTLock.setLatchBolt(lockData, true, keepTime, -1, {
+  setLockLatchBolt(driveLevel: number, keepTime: number, lockData: string, result: Result<void>): void {
+    // 与 Android 对齐：isControl=true。
+    TTLock.setLatchBolt(lockData, true, keepTime, driveLevel, {
       success: (_: void): void => {
         result.success(undefined);
       },
@@ -904,6 +904,14 @@ export class LockHostApiImpl extends TTLockHostApi {
         result.error(makeLockApiError('setLightTime', err));
       },
     });
+  }
+
+  getBluetoothAdvertisingInterval(lockData: string, result: Result<number>): void {
+    result.error(makeNotImplementedError('getBluetoothAdvertisingInterval'));
+  }
+
+  setBluetoothAdvertisingInterval(interval: number, lockData: string, result: Result<void>): void {
+    result.error(makeNotImplementedError('setBluetoothAdvertisingInterval'));
   }
 
   getLockDirection(lockData: string, result: Result<TTLockDirection>): void {

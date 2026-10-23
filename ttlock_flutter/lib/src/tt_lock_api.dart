@@ -476,9 +476,9 @@ class TTLockApi {
       runLockApi(() => _host.setMotorTorqueLevel(torqueLevel, lockData),
           timeout: timeout, method: 'setMotorTorqueLevel');
 
-  Future<void> setLockLatchBolt(int keepTime, String lockData,
+  Future<void> setLockLatchBolt(int driveLevel, int keepTime, String lockData,
           {Duration? timeout}) =>
-      runLockApi(() => _host.setLockLatchBolt(keepTime, lockData),
+      runLockApi(() => _host.setLockLatchBolt(driveLevel, keepTime, lockData),
           timeout: timeout, method: 'setLockLatchBolt');
 
   Future<void> setLockTime(int timestamp, String lockData,
@@ -734,6 +734,19 @@ class TTLockApi {
           {Duration? timeout}) =>
       runLockApi(() => _host.setLightTime(seconds, lockData),
           timeout: timeout, method: 'setLightTime');
+
+  Future<double> getBluetoothAdvertisingInterval(String lockData,
+          {Duration? timeout}) =>
+      runLockApi(() => _host.getBluetoothAdvertisingInterval(lockData),
+          timeout: timeout, method: 'getBluetoothAdvertisingInterval');
+
+  Future<void> setBluetoothAdvertisingInterval(
+          double interval, String lockData,
+          {Duration? timeout}) =>
+      runLockApi(
+          () => _host.setBluetoothAdvertisingInterval(interval, lockData),
+          timeout: timeout,
+          method: 'setBluetoothAdvertisingInterval');
 
   Future<List<pigeon.TTPassageModeModel>> getPassageModes(String lockData,
           {Duration? timeout}) =>

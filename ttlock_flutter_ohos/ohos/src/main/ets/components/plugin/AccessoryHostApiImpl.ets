@@ -324,11 +324,13 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
   }
 
   waterMeterInit(params: TTWaterMeterInitParam, result: Result<TTWaterMeterInitResult>): void {
+    // 计能模式（postpaid / 0）不传 price，与 Android SDK BATCH_BIND 行为一致。
+    const payMode: number = payModeConvert(params.getPayMode());
     const model: AddElectricMeterModel = {
       number: params.getName(),
       mac: params.getMac(),
-      payMode: payModeConvert(params.getPayMode()),
-      price: `${params.getPrice()}`,
+      payMode: payMode,
+      price: payMode === 1 ? ('' + params.getPrice()) : '',
     };
     TTWaterMeter.addWaterMeter(model, {
       success: (info: TTWaterMeterAddResult): void => {
@@ -396,7 +398,10 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
   }
 
   waterMeterSetPayMode(mac: string, payMode: TTMeterPayMode, price: number, result: Result<void>): void {
-    TTWaterMeter.setWaterPayMode(mac, payModeConvert(payMode), `${price}`, {
+    // 计能模式（postpaid / 0）不传 price。
+    const mode: number = payModeConvert(payMode);
+    const priceStr: string = mode === 1 ? ('' + price) : '';
+    TTWaterMeter.setWaterPayMode(mac, mode, priceStr, {
       success: (_: WaterMeterStatusModel): void => {
         result.success(undefined);
       },
@@ -514,11 +519,13 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
   }
 
   electricMeterInit(params: TTElectricMeterInitParam, result: Result<TTElectricMeterInitResult>): void {
+    // 计能模式（postpaid / 0）不传 price，与 Android SDK BATCH_BIND 行为一致。
+    const payMode: number = payModeConvert(params.getPayMode());
     const model: AddElectricMeterModel = {
       number: params.getName(),
       mac: params.getMac(),
-      payMode: payModeConvert(params.getPayMode()),
-      price: `${params.getPrice()}`,
+      payMode: payMode,
+      price: payMode === 1 ? ('' + params.getPrice()) : '',
     };
     TTElectricMeter.addElectricMeter(model, {
       success: (info: TTElectricMeterAddResult): void => {
@@ -587,7 +594,10 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
   }
 
   electricMeterSetPayMode(mac: string, payMode: TTMeterPayMode, price: number, result: Result<void>): void {
-    TTElectricMeter.setPayMode(mac, payModeConvert(payMode), `${price}`, {
+    // 计能模式（postpaid / 0）不传 price。
+    const mode: number = payModeConvert(payMode);
+    const priceStr: string = mode === 1 ? ('' + price) : '';
+    TTElectricMeter.setPayMode(mac, mode, priceStr, {
       success: (_: ElectricMeterStatusModel): void => {
         result.success(undefined);
       },
