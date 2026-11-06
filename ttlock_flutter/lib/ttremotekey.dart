@@ -31,15 +31,16 @@ class TTRemoteKey {
   }
 
   /// Legacy: init remote key via callbacks. Prefer [new_ttlock.TTLock.remoteKey.initRemoteKey].
-  @Deprecated('Use TTLock.remoteKey.initRemoteKey(mac, lockData) instead.')
+  @Deprecated('Use TTLock.remoteKey.initRemoteKey(mac, lockData, connectAddress: ...) instead.')
   static void init(
     String mac,
     String lockData,
     TTGetLockSystemCallback callback,
-    TTRemoteFailedCallback failedCallback,
-  ) {
+    TTRemoteFailedCallback failedCallback, {
+    String? connectAddress,
+  }) {
     new_ttlock.TTLock.remoteKey
-        .initRemoteKey(mac, lockData)
+        .initRemoteKey(mac, lockData, connectAddress: connectAddress)
         .then(callback).catchError((e, _) {
       if (e is TTRemoteAccessoryException) {
         failedCallback(e.code, e.message ?? '');

@@ -24,8 +24,19 @@ class TTRemoteKeyApi {
           .asyncExpand((_) => mapRemoteAccessoryStreamErrors(
               pigeon.accessoryStartScanRemoteKey()));
 
-  Future<pigeon.TTLockSystemModel> initRemoteKey(String mac, String lockData,
-          {Duration? timeout}) =>
-      runRemoteAccessoryApi(() => _host.initRemoteKey(mac, lockData),
-          timeout: timeout, method: 'initRemoteKey');
+  /// 初始化遥控器。
+  ///
+  /// [mac] 逻辑 MAC（广播解析地址）。
+  /// [connectAddress] R2 用于 BLE 连接的地址；为空则原生侧回退使用 [mac]。
+  Future<pigeon.TTLockSystemModel> initRemoteKey(
+    String mac,
+    String lockData, {
+    String? connectAddress,
+    Duration? timeout,
+  }) =>
+      runRemoteAccessoryApi(
+        () => _host.initRemoteKey(mac, lockData, connectAddress),
+        timeout: timeout,
+        method: 'initRemoteKey',
+      );
 }

@@ -122,6 +122,19 @@ function hashMapToMap(map: HashMap<string, Object>): Map<string, Object> {
   return out;
 }
 
+function isNumericQrCodeNumber(qrCodeNumber: string): boolean {
+  if (qrCodeNumber.length === 0) {
+    return false;
+  }
+  for (let i = 0; i < qrCodeNumber.length; i++) {
+    const c = qrCodeNumber.charCodeAt(i);
+    if (c < 48 || c > 57) {
+      return false;
+    }
+  }
+  return true;
+}
+
 /**
  * `TTLockHostApi` 的 OpenHarmony 实现：包装 `@sciener/ttlock` 提供的静态方法，
  * 将 SDK 的 `ITTLockResult<T>` 适配到 Pigeon 的 `Result<T>`。
@@ -659,38 +672,82 @@ export class LockHostApiImpl extends TTLockHostApi {
   }
 
   addQrCode(
-    _qrCodeNumber: string,
-    _cycleList: Array<TTCycleModel> | undefined,
-    _startDate: number,
-    _endDate: number,
-    _lockData: string,
+    qrCodeNumber: string,
+    cycleList: Array<TTCycleModel> | undefined,
+    startDate: number,
+    endDate: number,
+    lockData: string,
     result: Result<void>,
   ): void {
-    result.error(makeNotImplementedError('addQrCode'));
+    if (!isNumericQrCodeNumber(qrCodeNumber)) {
+      result.error(makeInvalidValueError('qrCodeNumber is not a number'));
+      return;
+    }
+    const cyclic: ITTLockCyclicConfig[] | null =
+      cycleListToConfig(cycleList) as ITTLockCyclicConfig[] | null;
+    TTLock.addQRCode(lockData, qrCodeNumber, startDate, endDate, cyclic, {
+      success: (_: void): void => {
+        result.success(undefined);
+      },
+      failure: (err: SNError): void => {
+        result.error(makeLockApiError('addQrCode', err));
+      },
+    });
   }
 
   modifyQrCodeValidityPeriod(
-    _qrCodeNumber: string,
-    _cycleList: Array<TTCycleModel> | undefined,
-    _startDate: number,
-    _endDate: number,
-    _lockData: string,
+    qrCodeNumber: string,
+    cycleList: Array<TTCycleModel> | undefined,
+    startDate: number,
+    endDate: number,
+    lockData: string,
     result: Result<void>,
   ): void {
-    result.error(makeNotImplementedError('modifyQrCodeValidityPeriod'));
+    if (!isNumericQrCodeNumber(qrCodeNumber)) {
+      result.error(makeInvalidValueError('qrCodeNumber is not a number'));
+      return;
+    }
+    const cyclic: ITTLockCyclicConfig[] | null =
+      cycleListToConfig(cycleList) as ITTLockCyclicConfig[] | null;
+    TTLock.modifyQRCode(lockData, qrCodeNumber, startDate, endDate, cyclic, {
+      success: (_: void): void => {
+        result.success(undefined);
+      },
+      failure: (err: SNError): void => {
+        result.error(makeLockApiError('modifyQrCodeValidityPeriod', err));
+      },
+    });
   }
 
   deleteQrCode(
-    _qrCodeNumber: string,
-    _endDate: number,
-    _lockData: string,
+    qrCodeNumber: string,
+    endDate: number,
+    lockData: string,
     result: Result<void>,
   ): void {
-    result.error(makeNotImplementedError('deleteQrCode'));
+    if (!isNumericQrCodeNumber(qrCodeNumber)) {
+      result.error(makeInvalidValueError('qrCodeNumber is not a number'));
+      return;
+    }
+    TTLock.deleteQRCode(lockData, qrCodeNumber, endDate, {
+      success: (_: void): void => {
+        result.success(undefined);
+      },
+      failure: (err: SNError): void => {
+        result.error(makeLockApiError('deleteQrCode', err));
+      },
+    });
   }
 
-  clearAllQrCodes(_lockData: string, result: Result<void>): void {
-    result.error(makeNotImplementedError('clearAllQrCodes'));
+  clearAllQrCodes(lockData: string, result: Result<void>): void {
+    TTLock.clearAllQRCode(lockData, {
+      success: (_: void): void => {
+        result.success(undefined);
+      },
+      failure: (err: SNError): void => {
+        result.error(makeLockApiError('clearAllQrCodes', err));
+      },
+    });
   }
 
   getAllValidQrCodes(_lockData: string, result: Result<Array<TTQrCodeModel>>): void {
@@ -1217,7 +1274,9 @@ export class LockHostApiImpl extends TTLockHostApi {
   }
 
   setSoundVolume(type: TTSoundVolumeType, lockData: string, result: Result<void>): void {
-    TTLock.setLockSound(lockData, true, soundVolumeConvert(type), defaultLanguage(), {
+    // SDK 第二参 enable：OFF 必须传 false；volume=0 表示不修改音量档位
+    const enable: boolean = type !== TTSoundVolumeType.OFF;
+    TTLock.setLockSound(lockData, enable, soundVolumeConvert(type), defaultLanguage(), {
       success: (_: void): void => {
         result.success(undefined);
       },
@@ -1230,6 +1289,10 @@ export class LockHostApiImpl extends TTLockHostApi {
   getSoundVolume(lockData: string, result: Result<TTSoundVolumeType>): void {
     TTLock.getLockSound(lockData, {
       success: (model: ITTAudioModel): void => {
+        if (!model.enable) {
+          result.success(TTSoundVolumeType.OFF);
+          return;
+        }
         result.success(soundVolumeRevert(model.volume));
       },
       failure: (err: SNError): void => {

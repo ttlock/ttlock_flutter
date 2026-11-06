@@ -112,6 +112,8 @@ export function passageModeTypeRevert(type: SdkTTPassageModeType): TTPassageMode
       return TTPassageModeType.WEEKLY;
     case SdkTTPassageModeType.month:
       return TTPassageModeType.MONTHLY;
+    default:
+      return TTPassageModeType.WEEKLY;
   }
 }
 
@@ -230,6 +232,8 @@ export function lockDirectionRevert(direction: TTUnlockDirection): TTLockDirecti
       return TTLockDirection.LEFT;
     case TTUnlockDirection.right:
       return TTLockDirection.RIGHT;
+    default:
+      return TTLockDirection.LEFT;
   }
 }
 
@@ -420,6 +424,8 @@ export function featureValueConvert(lockFunction: TTLockFunction): SdkTTLockFeat
       return SdkTTLockFeatureValue.lowBatteryAutoUnlock;
     case TTLockFunction.WIFI_FIRMWARE_VERSION:
       return SdkTTLockFeatureValue.wifiFirmwareVersion;
+    case TTLockFunction.CUSTOM_QRCODE:
+      return SdkTTLockFeatureValue.customQRCode;
     case TTLockFunction.SECURITY_M1CARD:
       return SdkTTLockFeatureValue.securityM1Card;
     case TTLockFunction.SEMI_AUTOMATIC_MODE_CONTROL:
@@ -456,7 +462,6 @@ export function featureValueConvert(lockFunction: TTLockFunction): SdkTTLockFeat
     case TTLockFunction.ZHI_AN_FACE_FEATURE_SECOND_GENERATION:
     case TTLockFunction.SUPPORT_DEAD_LOCKING:
     case TTLockFunction.WORKING_TIME:
-    case TTLockFunction.CUSTOM_QRCODE:
     case TTLockFunction.YI_SHENG_PHOTO_FACE:
     case TTLockFunction.PICTURE_FACE_DELIVERY:
     case TTLockFunction.YI_NUO_PHOTO_FACE:
@@ -796,6 +801,8 @@ export function gatewayTypeRevert(nativeGatewayType: SdkTTGatewayType): TTGatewa
       return TTGatewayType.G5;
     case SdkTTGatewayType.g6:
       return TTGatewayType.G6;
+    default:
+      return TTGatewayType.G2;
   }
 }
 
@@ -820,6 +827,8 @@ export function palmVeinErrorRevert(code: SdkTTPalmVeinErrorCode): TTPalmVeinErr
       return TTPalmVeinErrorCode.PALM_BLUR;
     case SdkTTPalmVeinErrorCode.palmBack:
       return TTPalmVeinErrorCode.PALM_BACK;
+    default:
+      return TTPalmVeinErrorCode.UNKNOWN_STATUS;
   }
 }
 
@@ -980,6 +989,8 @@ export function bluetoothStateRevert(code: BLEState): TTBluetoothState {
       return TTBluetoothState.TURN_OFF;
     case BLEState.turnOn:
       return TTBluetoothState.TURN_ON;
+    default:
+      return TTBluetoothState.UNKNOW;
   }
 }
 

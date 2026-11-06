@@ -108,22 +108,32 @@ function readScanWifiEntry(item: Map<string, Object>): TTWifiScanEntry {
 
 function buildLockScanWifiResult(model: ITTLockScanWifiModel): TTWifiScanResult {
   const entries: Array<TTWifiScanEntry> = [];
-  for (const item of model.wifiList) {
-    entries.push(readScanWifiEntry(item));
+  const wifiList: Array<Map<string, Object>> = model.wifiList;
+  for (let i = 0; i < wifiList.length; i++) {
+    entries.push(readScanWifiEntry(wifiList[i]));
   }
   return new TTWifiScanResult(entries);
 }
 
+/**
+ * 鸿蒙 TTLock.scanWiFiByGateway 每次 success 回调返回单条 WiFi：
+ * Map { 'SSID' => string, 'RSSI' => number, 'status' => boolean }
+ * status === true 表示扫描结束（通常无 SSID/RSSI）。
+ */
 function buildGatewayWifiScanResult(map: HashMap<string, Object>): TTWifiScanResult {
   const entries: Array<TTWifiScanEntry> = [];
-  const list = map.get('wifiList');
-  if (Array.isArray(list)) {
-    for (const item of list as Object[]) {
-      if (item instanceof Map) {
-        entries.push(readScanWifiEntry(item as Map<string, Object>));
-      }
-    }
+  const ssidVal = map.get('SSID') ?? map.get('ssid');
+  if (ssidVal === undefined || ssidVal === null) {
+    return new TTWifiScanResult(entries);
   }
+  // HashMap / ES Map 均有 get；统一拷到 Map 再复用 readScanWifiEntry
+  const item = new Map<string, Object>();
+  item.set('SSID', ssidVal);
+  const rssiVal = map.get('RSSI') ?? map.get('rssi');
+  if (rssiVal !== undefined && rssiVal !== null) {
+    item.set('RSSI', rssiVal);
+  }
+  entries.push(readScanWifiEntry(item));
   return new TTWifiScanResult(entries);
 }
 
@@ -137,6 +147,7 @@ function doorMagneticToRemoteAccessoryScanModel(
     model.rssi,
     isMultifunctionalKeypad,
     new Map<string, Object>(),
+    model.deviceId,
     model.timestamp,
   );
 }
@@ -162,6 +173,7 @@ function keyToRemoteAccessoryScanModel(
     model.rssi,
     isMultifunctionalKeypad,
     new Map<string, Object>(),
+    model.deviceId,
     model.timestamp,
   );
 }
@@ -176,6 +188,7 @@ function keyboardToRemoteAccessoryScanModel(
     model.rssi,
     isMultifunctionalKeypad,
     new Map<string, Object>(),
+    model.deviceId,
     model.timestamp,
   );
 }
@@ -457,12 +470,14 @@ class GatewayGetNearbyWifiImpl extends GatewayGetNearbyWifiStreamHandler impleme
     TTLock.scanWiFiByGateway({
       success: (info: HashMap<String, Object>): void => {
         const map = info as HashMap<String, Object> as HashMap<string, Object>;
-        const finishedRaw = map.get('finished') ?? map.get('isFinished');
-        const finished: boolean = finishedRaw === true || finishedRaw === 1;
-        sink.success(buildGatewayWifiScanResult(map));
+        // 原生 SDK 用 status 标记结束（见 TTGateway 0x01 / gatewayScanWifi）
+        const statusRaw = map.get('status');
+        const finished: boolean = statusRaw === true || statusRaw === 1;
         if (finished) {
           sink.endOfStream();
+          return;
         }
+        sink.success(buildGatewayWifiScanResult(map));
       },
       failure: (err: SNError): void => {
         emitGatewaySinkError(sink, 'gatewayGetNearbyWifi', err);

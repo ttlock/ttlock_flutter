@@ -599,8 +599,13 @@ class TTRemoteAccessoryScanModel {
   /// 设备名称。
   final String name;
 
-  /// 蓝牙 MAC 地址。
+  /// 设备逻辑 MAC 地址（广播解析出的地址，用于业务标识）。
   final String mac;
+
+  /// BLE 连接地址。
+  ///
+  /// R2 遥控器初始化连接须使用此字段替代[mac]，其他设备不使用此字段；
+  final String? connectAddress;
 
   /// 蓝牙信号强度。
   final int rssi;
@@ -617,6 +622,7 @@ class TTRemoteAccessoryScanModel {
   TTRemoteAccessoryScanModel({
     required this.name,
     required this.mac,
+    this.connectAddress,
     required this.rssi,
     this.scanTime,
     required this.isMultifunctionalKeypad,
@@ -3067,10 +3073,15 @@ abstract class TTAccessoryHostApi {
 
   /// 初始化遥控器。
   ///
-  /// [mac] 遥控器 MAC 地址。
+  /// [mac] 遥控器逻辑 MAC 地址（广播解析出的地址）。
   /// [lockData] 关联锁凭证。
+  /// [connectAddress] R2 初始化时用于 BLE 连接的地址；为空则回退使用 [mac]。
   @async
-  TTLockSystemModel initRemoteKey(String mac, String lockData);
+  TTLockSystemModel initRemoteKey(
+    String mac,
+    String lockData,
+    String? connectAddress,
+  );
 
   /// 初始化无线键盘。
   ///

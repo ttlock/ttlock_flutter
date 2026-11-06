@@ -3999,6 +3999,16 @@ export class TTRemoteAccessoryScanModel {
     return this.mac;
   }
 
+  private connectAddress?: string;
+
+  public setConnectAddress(connectAddress: string | undefined): void {
+    this.connectAddress = connectAddress;
+  }
+
+  getConnectAddress(): string | undefined{
+    return this.connectAddress;
+  }
+
   private rssi: number;
 
   public setRssi(rssi: number): void {
@@ -4039,9 +4049,10 @@ export class TTRemoteAccessoryScanModel {
     return this.advertisementData;
   }
 
-  constructor(name: string, mac: string, rssi: number, isMultifunctionalKeypad: boolean, advertisementData: Map<string, Object | undefined>, scanTime?: number) {
+  constructor(name: string, mac: string, rssi: number, isMultifunctionalKeypad: boolean, advertisementData: Map<string, Object | undefined>, connectAddress?: string, scanTime?: number) {
     this.name = name;
     this.mac = mac;
+    this.connectAddress = connectAddress;
     this.rssi = rssi;
     this.scanTime = scanTime;
     this.isMultifunctionalKeypad = isMultifunctionalKeypad;
@@ -4059,6 +4070,11 @@ export class TTRemoteAccessoryScanModel {
       arr.push(null);
     } else {
       arr.push(this.mac);
+    }
+    if (this.connectAddress === undefined || this.connectAddress === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.connectAddress);
     }
     if (this.rssi === undefined || this.rssi === null) {
       arr.push(null);
@@ -4088,18 +4104,23 @@ export class TTRemoteAccessoryScanModel {
     const name: string = nameObject as string;
     let macObject: Object = arr[1];
     const mac: string = macObject as string;
-    let rssiObject: Object = arr[2];
+    let connectAddress: string | undefined = undefined;
+    if (arr[2] !== null && arr[2] !== undefined) {
+      let connectAddressObject: Object = arr[2];
+      connectAddress = connectAddressObject as string | undefined;
+    }
+    let rssiObject: Object = arr[3];
     const rssi: number = rssiObject as number;
     let scanTime: number | undefined = undefined;
-    if (arr[3] !== null && arr[3] !== undefined) {
-      let scanTimeObject: Object = arr[3];
+    if (arr[4] !== null && arr[4] !== undefined) {
+      let scanTimeObject: Object = arr[4];
       scanTime = scanTimeObject as number | undefined;
     }
-    let isMultifunctionalKeypadObject: Object = arr[4];
+    let isMultifunctionalKeypadObject: Object = arr[5];
     const isMultifunctionalKeypad: boolean = isMultifunctionalKeypadObject as boolean;
-    let advertisementDataObject: Object = arr[5];
+    let advertisementDataObject: Object = arr[6];
     const advertisementData: Map<string, Object | undefined> = advertisementDataObject as Map<string, Object | undefined>;
-    return new TTRemoteAccessoryScanModel(name, mac, rssi, isMultifunctionalKeypad, advertisementData, scanTime);
+    return new TTRemoteAccessoryScanModel(name, mac, rssi, isMultifunctionalKeypad, advertisementData, connectAddress, scanTime);
   }
 }
 
@@ -10944,10 +10965,11 @@ export abstract class TTAccessoryHostApi {
   /*
   *  初始化遥控器。
   * 
-  *  [mac] 遥控器 MAC 地址。
+  *  [mac] 遥控器逻辑 MAC 地址（广播解析出的地址）。
   *  [lockData] 关联锁凭证。
+  *  [connectAddress] R2 初始化时用于 BLE 连接的地址；为空则回退使用 [mac]。
   */
-  abstract initRemoteKey(mac: string , lockData: string , result: Result<TTLockSystemModel>): void;
+  abstract initRemoteKey(mac: string , lockData: string , connectAddress: string | undefined , result: Result<TTLockSystemModel>): void;
   /*
   *  初始化无线键盘。
   * 
@@ -11324,8 +11346,8 @@ export abstract class TTAccessoryHostApi {
                   return;
               }
               let args: Array<Object> = message as Array<Object>;
-              if (args.length < 2) {
-                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected at least 2 argument(s).')));
+              if (args.length < 3) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected at least 3 argument(s).')));
                   return;
               }
               class ResultImp implements Result<TTLockSystemModel>{
@@ -11342,7 +11364,7 @@ export abstract class TTAccessoryHostApi {
               }
               let resultCallback: Result<TTLockSystemModel> = new ResultImp();
 
-              api!.initRemoteKey(args[0] as string, args[1] as string, resultCallback);
+              api!.initRemoteKey(args[0] as string, args[1] as string, args[2] as string | undefined, resultCallback);
             } });
       } else {
         channel.setMessageHandler(null);

@@ -153,7 +153,14 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
     EventContextStore.shared.accessoryAddKeypadCard.apply(param);
   }
 
-  initRemoteKey(mac: string, lockData: string, result: Result<TTLockSystemModel>): void {
+  initRemoteKey(
+    mac: string,
+    lockData: string,
+    connectAddress: string | undefined,
+    result: Result<TTLockSystemModel>,
+  ): void {
+    // OHOS SDK 按逻辑 mac 查找已扫描设备（内部用 deviceId 建连）；connectAddress 保留契约对齐。
+    void connectAddress;
     TTLock.initializeWirelessKey(mac, lockData, {
       success: (info: TTDeviceInfoModel): void => {
         const out = new TTLockSystemModel(
@@ -483,14 +490,7 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
   }
 
   waterMeterReset(mac: string, result: Result<void>): void {
-    TTWaterMeter.waterMeterEnterUpgradeMode(mac, {
-      success: (_: void): void => {
-        result.success(undefined);
-      },
-      failure: (err: SNError): void => {
-        result.error(makeWaterMeterApiError('waterMeterReset', err));
-      },
-    });
+    result.error(makeNotImplementedError('waterMeterReset'));
   }
 
   electricMeterSetClientParam(url: string, clientId: string, accessToken: string): void {
@@ -679,13 +679,6 @@ export class AccessoryHostApiImpl extends TTAccessoryHostApi {
   }
 
   electricMeterReset(mac: string, result: Result<void>): void {
-    TTElectricMeter.enterUpgradeMode(mac, {
-      success: (_: void): void => {
-        result.success(undefined);
-      },
-      failure: (err: SNError): void => {
-        result.error(makeElectricMeterApiError('electricMeterReset', err));
-      },
-    });
+    result.error(makeNotImplementedError('electricMeterReset'));
   }
 }

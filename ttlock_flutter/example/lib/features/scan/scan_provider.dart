@@ -28,6 +28,8 @@ class DiscoveredDevice {
   final DeviceType type;
   final String name;
   final String mac;
+  /// R2 遥控器 BLE 连接地址；为空时 init 回退 [mac]。
+  final String? connectAddress;
   final int rssi;
   final bool isInited;
   final TTLockVersion? lockVersion;
@@ -38,6 +40,7 @@ class DiscoveredDevice {
     required this.type,
     required this.name,
     required this.mac,
+    this.connectAddress,
     required this.rssi,
     this.isInited = false,
     this.lockVersion,
@@ -187,6 +190,7 @@ class ScanNotifier extends _$ScanNotifier {
               type: DeviceType.remoteKey,
               name: m.name,
               mac: m.mac,
+              connectAddress: m.connectAddress,
               rssi: m.rssi,
             ));
             update();
@@ -322,7 +326,11 @@ class ScanNotifier extends _$ScanNotifier {
           final lockData = state.config.lockData!;
           final lockMac = state.config.lockMac!;
           try {
-            await TTLock.remoteKey.initRemoteKey(device.mac, lockData);
+            await TTLock.remoteKey.initRemoteKey(
+              device.mac,
+              lockData,
+              connectAddress: device.connectAddress,
+            );
           } on TTRemoteAccessoryException catch (e) {
             return InitResult.failure('${e.code.name}: ${e.message}');
           } catch (e) {

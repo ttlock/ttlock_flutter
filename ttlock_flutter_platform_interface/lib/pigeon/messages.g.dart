@@ -2421,6 +2421,7 @@ class TTRemoteAccessoryScanModel {
   TTRemoteAccessoryScanModel({
     required this.name,
     required this.mac,
+    this.connectAddress,
     required this.rssi,
     this.scanTime,
     required this.isMultifunctionalKeypad,
@@ -2430,8 +2431,14 @@ class TTRemoteAccessoryScanModel {
   /// 设备名称。
   String name;
 
-  /// 蓝牙 MAC 地址。
+  /// 设备逻辑 MAC 地址（广播解析出的地址，用于业务标识）。
   String mac;
+
+  /// BLE 连接地址。
+  ///
+  /// R2 遥控器初始化连接须使用此字段，不可用 [mac] 替代；
+  /// R1 / 键盘 / 门磁等可与 [mac] 相同，或为空（回退使用 [mac]）。
+  String? connectAddress;
 
   /// 蓝牙信号强度。
   int rssi;
@@ -2449,6 +2456,7 @@ class TTRemoteAccessoryScanModel {
     return <Object?>[
       name,
       mac,
+      connectAddress,
       rssi,
       scanTime,
       isMultifunctionalKeypad,
@@ -2464,10 +2472,11 @@ class TTRemoteAccessoryScanModel {
     return TTRemoteAccessoryScanModel(
       name: result[0]! as String,
       mac: result[1]! as String,
-      rssi: result[2]! as int,
-      scanTime: result[3] as int?,
-      isMultifunctionalKeypad: result[4]! as bool,
-      advertisementData: (result[5]! as Map<Object?, Object?>).cast<String, Object?>(),
+      connectAddress: result[2] as String?,
+      rssi: result[3]! as int,
+      scanTime: result[4] as int?,
+      isMultifunctionalKeypad: result[5]! as bool,
+      advertisementData: (result[6]! as Map<Object?, Object?>).cast<String, Object?>(),
     );
   }
 
@@ -2480,7 +2489,7 @@ class TTRemoteAccessoryScanModel {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(name, other.name) && _deepEquals(mac, other.mac) && _deepEquals(rssi, other.rssi) && _deepEquals(scanTime, other.scanTime) && _deepEquals(isMultifunctionalKeypad, other.isMultifunctionalKeypad) && _deepEquals(advertisementData, other.advertisementData);
+    return _deepEquals(name, other.name) && _deepEquals(mac, other.mac) && _deepEquals(connectAddress, other.connectAddress) && _deepEquals(rssi, other.rssi) && _deepEquals(scanTime, other.scanTime) && _deepEquals(isMultifunctionalKeypad, other.isMultifunctionalKeypad) && _deepEquals(advertisementData, other.advertisementData);
   }
 
   @override
@@ -6542,16 +6551,17 @@ class TTAccessoryHostApi {
 
   /// 初始化遥控器。
   ///
-  /// [mac] 遥控器 MAC 地址。
+  /// [mac] 遥控器逻辑 MAC 地址（广播解析出的地址）。
   /// [lockData] 关联锁凭证。
-  Future<TTLockSystemModel> initRemoteKey(String mac, String lockData) async {
+  /// [connectAddress] R2 初始化时用于 BLE 连接的地址；为空则回退使用 [mac]。
+  Future<TTLockSystemModel> initRemoteKey(String mac, String lockData, String? connectAddress) async {
     final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTAccessoryHostApi.initRemoteKey$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac, lockData]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mac, lockData, connectAddress]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
