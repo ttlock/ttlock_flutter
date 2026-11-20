@@ -97,8 +97,3 @@ git submodule update --remote ttlock_flutter_android
 
 - **子模块目录有改动但切不了分支**：先 `git status`，处理未提交变更或先 `stash` / 提交。
 - **主仓库显示子模块 modified**：通常表示子模块当前 HEAD 与主仓库记录的 commit 不一致；要么在子模块切回记录提交，要么在子模块提交并 push 后在主仓库提交指针更新。
-
-## 相关文档
-
-- 架构详解：`docs/architecture.md`
-- 与旧框架对比：`docs/compare-with-ttlock_flutter_premise.md`
