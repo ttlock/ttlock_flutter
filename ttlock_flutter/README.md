@@ -29,6 +29,8 @@ import 'package:ttlock_flutter/ttlock.dart';
 
 ## 示例
 
+示例应用为独立仓库 `ttlock_flutter_demo`，以 Git submodule 挂在 `example/`：
+
 ```bash
 cd example
 fvm flutter pub get

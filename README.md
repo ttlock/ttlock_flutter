@@ -15,6 +15,7 @@
 ## 仓库结构（Monorepo）
 
 - `ttlock_flutter`：对外聚合包（业务侧主入口）
+- `ttlock_flutter/example`：示例应用（`ttlock_flutter_demo`），**独立 Git 仓库，以 submodule 挂在本路径**（远程见 `.gitmodules`）
 - `ttlock_flutter_platform_interface`：Pigeon 契约定义与生成代码
 - `ttlock_flutter_android`：Android 原生实现（Kotlin），**独立 Git 仓库，以 [Git submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules) 挂在本仓库**（远程见 `.gitmodules`）
 - `ttlock_flutter_ios`：iOS 原生实现（Swift），**同上，为 submodule**
@@ -37,10 +38,10 @@
 
 ## 快速开始（开发）
 
-1. **首次克隆**：请一并拉取子模块，否则 `ttlock_flutter_android` / `ttlock_flutter_ios` 目录为空或过时。
+1. **首次克隆**：请一并拉取子模块，否则 `ttlock_flutter_android` / `ttlock_flutter_ios` / `ttlock_flutter/example` 目录为空或过时。
    - 推荐：`git clone --recurse-submodules <本仓库 URL>`
    - 若已克隆未带子模块：`git submodule update --init --recursive`
-2. 进入子包并安装依赖（示例）：
+2. 进入示例应用并安装依赖：
    - `cd ttlock_flutter/example`
    - `fvm flutter pub get`
 3. 运行示例应用：
@@ -59,7 +60,7 @@
 子模块目录内是完整 Git 仓库，与普通仓库相同：
 
 ```bash
-cd ttlock_flutter_android   # 或 ttlock_flutter_ios
+cd ttlock_flutter_android   # 或 ttlock_flutter_ios / ttlock_flutter/example
 git fetch
 git checkout <分支名>
 # 可选：git pull
@@ -69,10 +70,10 @@ git checkout <分支名>
 
 ### 在子模块内改代码并提交
 
-1. 在 `ttlock_flutter_android` / `ttlock_flutter_ios` 内修改、`git add`、`git commit`、`git push` 到**子模块自己的远程**。
+1. 在 `ttlock_flutter_android` / `ttlock_flutter_ios` / `ttlock_flutter/example` 内修改、`git add`、`git commit`、`git push` 到**子模块自己的远程**。
 2. 回到主仓库根目录，主仓库会显示子模块「已变更」（新 commit 指针）：
-   - `git add ttlock_flutter_android ttlock_flutter_ios`（按需）
-   - `git commit -m "chore: bump android/ios submodule"`
+   - `git add ttlock_flutter_android ttlock_flutter_ios ttlock_flutter/example`（按需）
+   - `git commit -m "chore: bump android/ios/example submodule"`
    - `git push`
 
 团队其他人 `git pull` 主仓库后，需再执行 `git submodule update --init --recursive` 以检出对应提交。
@@ -90,7 +91,7 @@ git submodule update --remote ttlock_flutter_android
 
 ### CI / 自动化
 
-- 流水线检出代码时需初始化子模块（例如 GitHub Actions 使用 `submodules: recursive`，或脚本中执行 `git submodule update --init --recursive`），否则 Android/iOS 实现目录缺失会导致构建失败。
+- 流水线检出代码时需初始化子模块（例如 GitHub Actions 使用 `submodules: recursive`，或脚本中执行 `git submodule update --init --recursive`），否则 Android/iOS 实现或 `ttlock_flutter/example` 目录缺失会导致构建/联调失败。
 
 ### 常见问题
 

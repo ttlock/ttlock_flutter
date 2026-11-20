@@ -21,7 +21,8 @@ ttlock_flutter/                          # 聚合包（业务侧主入口）
     src/*_api.dart                       # 按领域封装的 API（锁、网关、配件等）
     src/pigeon_errors.dart               # PlatformException → 业务异常转换（runLockApi, runGatewayApi 等）
     errors/                              # 统一异常模型（TTLockException 等）
-  example/                               # 示例应用（Riverpod + go_router + hooks）
+  example/                               # 示例应用（ttlock_flutter_demo，Git Submodule）
+    # 远程：https://github.com/2000Heart/ttlock_flutter_demo.git
     lib/
       core/                              # 路由、主题、存储、环境、通用组件
       features/                          # 按设备领域拆分页面（lock, gateway, scan, settings 等）
@@ -157,11 +158,11 @@ Pigeon 使用**自定义 fork**（基于 OHOS 兼容版本），来自 `https://
 - **持久化**: `shared_preferences`
 - **生成**: `build_runner` 驱动（freezed, json_serializable, riverpod_generator, go_router_builder）
 
-本地开发时，example 通过 `dependency_overrides` 使用本地子模块的 premise 分支。
+本地开发时，example 通过 `dependency_overrides` 将 `ttlock_flutter_*` 覆盖为 monorepo 内 path（见 `example/pubspec_overrides.yaml`）。
 
 ## Git Submodule 工作流
 
-Android 和 iOS 实现包是独立的 Git 子模块（参见 `.gitmodules`）：
+Android、iOS 实现包以及示例应用 `ttlock_flutter/example`（`ttlock_flutter_demo`）均为独立 Git 子模块（参见 `.gitmodules`）：
 
 ```bash
 # 首次克隆
@@ -171,7 +172,7 @@ git clone --recurse-submodules <repo-url>
 git submodule update --init --recursive
 
 # 在子模块内开发
-cd ttlock_flutter_android   # 或 ttlock_flutter_ios
+cd ttlock_flutter_android   # 或 ttlock_flutter_ios / ttlock_flutter/example
 git fetch
 git checkout <branch>
 
