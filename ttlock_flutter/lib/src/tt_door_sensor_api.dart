@@ -5,7 +5,7 @@ import 'package:ttlock_flutter_platform_interface/pigeon/messages.g.dart'
 
 import 'pigeon_errors.dart';
 
-/// 门磁：挂锁门磁初始化、独立门磁及扫描流。
+/// 门磁：普通门磁初始化、独立门磁及扫描流。
 class TTDoorSensorApi {
   TTDoorSensorApi({
     BinaryMessenger? binaryMessenger,

@@ -15,7 +15,10 @@
 ```yaml
 dependencies:
   ttlock_flutter:
-    path: ../ttlock_flutter
+    git:
+      url: https://github.com/ttlock/ttlock_flutter.git
+      path: ttlock_flutter
+      ref: mix
 ```
 
 ```dart

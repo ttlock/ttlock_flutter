@@ -1,99 +1,226 @@
-# TTLock Flutter（On-Premise）项目介绍
+# TTLock Flutter SDK
 
-`ttlock_flutter` 是 TTLock 本地化（On-Premise）场景下的 Flutter 插件工程，提供智能门锁、网关及配件设备（如遥控器、门磁、水电表等）的统一跨平台接入能力。
+[中文文档](./README_ZH.md)
 
-项目采用 **Federated Plugin（联邦插件）** 架构，使用 **Pigeon** 维护 Flutter 与原生端的强类型通信契约，目标是提升接口一致性、可维护性与扩展效率。
+`ttlock_flutter` is the TTLock Flutter plugin for on-premise deployments. It uses a **Federated Plugin + Pigeon** stack to expose typed `Future` / `Stream` APIs for smart locks, gateways, remote keys / keypads, door sensors, and electric / water meters.
 
-## 核心能力
+> Plugin version: **0.0.3** (see `ttlock_flutter/pubspec.yaml`).  
+> Use `package:ttlock_flutter/ttlock.dart` only. Legacy callback entry points (`ttlock_classic.dart`, etc.) are Deprecated.
 
-- 门锁能力：扫描、初始化、开关锁、密码/卡/指纹/人脸管理、配置项读写等
-- 网关能力：扫描、连接、初始化、网络配置
-- 配件能力：遥控器、键盘、门磁、水表、电表等接入与管理
-- 事件能力：基于 EventChannel 的持续事件流（扫描进度、添加卡/指纹/人脸过程等）
-- 错误治理：统一错误码与 Flutter 异常模型，降低业务层适配复杂度
+## Features
 
-## 仓库结构（Monorepo）
+| Module | Entry | Capabilities |
+|--------|-------|--------------|
+| Lock | `TTLock.lock` | Scan, init, lock/unlock, passcode / card / fingerprint / face / palm vein / QR, config, Wi-Fi lock, lift / hotel, accessory binding |
+| Gateway | `TTLock.gateway` | Scan, connect, init, nearby Wi-Fi, IP / APN config |
+| Remote key | `TTLock.remoteKey` | Scan, init remote |
+| Remote keypad | `TTLock.remoteKeypad` | Scan, init (standard / multifunctional), enroll fingerprint / card on keypad, stored-lock management |
+| Door sensor | `TTLock.doorSensor` | Standard door-sensor scan & init; standalone door-sensor scan, init & feature query |
+| Electric meter | `TTLock.electricMeter` | Scan, connect, init, power on/off / balance / top-up / pay mode, Cat.1 |
+| Water meter | `TTLock.waterMeter` | Scan, connect, init, valve / balance / top-up / pay mode, cumulative usage, Cat.1 |
 
-- `ttlock_flutter`：对外聚合包（业务侧主入口）
-- `ttlock_flutter/example`：示例应用（`ttlock_flutter_demo`），**独立 Git 仓库，以 submodule 挂在本路径**（远程见 `.gitmodules`）
-- `ttlock_flutter_platform_interface`：Pigeon 契约定义与生成代码
-- `ttlock_flutter_android`：Android 原生实现（Kotlin），**独立 Git 仓库，以 [Git submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules) 挂在本仓库**（远程见 `.gitmodules`）
-- `ttlock_flutter_ios`：iOS 原生实现（Swift），**同上，为 submodule**
-- `ttlock_flutter_ohos`：OHOS 预留实现（当前阶段未纳入默认聚合）
+## Integration
 
-子模块 URL 与路径由根目录 `.gitmodules` 维护；主仓库**只记录子模块当前检出的提交（commit）**，不记录分支名。
+### 1. Add dependency
 
-## 技术方案亮点
+The plugin is not published to pub.dev (`publish_to: none`). Add a Git dependency.
 
-- **联邦化分层**：Dart API / 契约层 / 平台实现解耦，平台演进互不阻塞
-- **强类型通信**：通过 Pigeon 生成 Dart/Kotlin/Swift 代码，减少字符串协议错误
-- **事件上下文治理**：扫描类与添加类流式接口在订阅前显式设置上下文参数
-- **平滑兼容**：保留经典 API 适配入口（如 `ttlock_classic.dart`），降低迁移成本
+#### Online / cloud (default)
 
-## 适用场景
+`ttlock_flutter` pulls `ttlock_flutter_android` / `ttlock_flutter_ios` without an explicit `ref` (default branch = online packaging, e.g. `ttlock-release` / CocoaPod `TTLock`).
 
-- 物业/公寓/酒店等本地化部署门禁系统
-- 需要 Flutter 统一接入 Android + iOS 的设备控制能力
-- 需要从老版 MethodChannel 插件逐步迁移到强类型新架构
-
-## 快速开始（开发）
-
-1. **首次克隆**：请一并拉取子模块，否则 `ttlock_flutter_android` / `ttlock_flutter_ios` / `ttlock_flutter/example` 目录为空或过时。
-   - 推荐：`git clone --recurse-submodules <本仓库 URL>`
-   - 若已克隆未带子模块：`git submodule update --init --recursive`
-2. 进入示例应用并安装依赖：
-   - `cd ttlock_flutter/example`
-   - `fvm flutter pub get`
-3. 运行示例应用：
-   - `fvm flutter run`
-
-## Git 子模块（Submodule）
-
-### 日常同步
-
-- 拉取主仓库后，更新子模块到主仓库记录的提交：
-  - `git submodule update --init --recursive`
-- 若主仓库某次提交**抬升了子模块指针**，`git pull` 后同样需要执行上述命令（或 `git pull --recurse-submodules`，需 Git 配置/版本支持习惯用法）。
-
-### 在子模块内切换分支开发
-
-子模块目录内是完整 Git 仓库，与普通仓库相同：
-
-```bash
-cd ttlock_flutter_android   # 或 ttlock_flutter_ios / ttlock_flutter/example
-git fetch
-git checkout <分支名>
-# 可选：git pull
+```yaml
+dependencies:
+  ttlock_flutter:
+    git:
+      url: https://github.com/ttlock/ttlock_flutter.git
+      path: ttlock_flutter
+      ref: mix   # use the release branch / tag your team ships
 ```
 
-说明：初次进入子模块可能是 **detached HEAD**（停在某个具体 commit），`git checkout` 到分支后即可正常开发。
+#### On-premise
 
-### 在子模块内改代码并提交
+Keep the same `ttlock_flutter` dependency, then **override** the Android / iOS implementations to the **`premise`** branch (local AAR `TTLockOnPremise` / CocoaPod `TTLockOnPremise`):
 
-1. 在 `ttlock_flutter_android` / `ttlock_flutter_ios` / `ttlock_flutter/example` 内修改、`git add`、`git commit`、`git push` 到**子模块自己的远程**。
-2. 回到主仓库根目录，主仓库会显示子模块「已变更」（新 commit 指针）：
-   - `git add ttlock_flutter_android ttlock_flutter_ios ttlock_flutter/example`（按需）
-   - `git commit -m "chore: bump android/ios/example submodule"`
-   - `git push`
+```yaml
+dependencies:
+  ttlock_flutter:
+    git:
+      url: https://github.com/ttlock/ttlock_flutter.git
+      path: ttlock_flutter
+      ref: mix
 
-团队其他人 `git pull` 主仓库后，需再执行 `git submodule update --init --recursive` 以检出对应提交。
-
-### 跟踪子模块远程某分支（可选）
-
-若希望在主仓库侧用一条命令把子模块拉到远程分支**最新提交**（仍会生成主仓库里的一次指针提交），可在 `.gitmodules` 中为对应 submodule 增加 `branch = <分支名>`，然后：
-
-```bash
-git submodule update --remote ttlock_flutter_android
-# 或 ttlock_flutter_ios
+dependency_overrides:
+  ttlock_flutter_android:
+    git:
+      url: https://github.com/2000Heart/ttlock_flutter_android.git
+      ref: premise
+  ttlock_flutter_ios:
+    git:
+      url: https://github.com/2000Heart/ttlock_flutter_ios.git
+      ref: premise
 ```
 
-之后勿忘在主仓库提交子模块指针变更。
+> Overrides must use the same git URLs as in `ttlock_flutter/pubspec.yaml`. After switching to `premise`, place the matching on-premise AAR (see §2.1) and re-run `pod install` on iOS.
 
-### CI / 自动化
+Then:
 
-- 流水线检出代码时需初始化子模块（例如 GitHub Actions 使用 `submodules: recursive`，或脚本中执行 `git submodule update --init --recursive`），否则 Android/iOS 实现或 `ttlock_flutter/example` 目录缺失会导致构建/联调失败。
+```bash
+flutter pub get
+```
 
-### 常见问题
+### 2. Android
 
-- **子模块目录有改动但切不了分支**：先 `git status`，处理未提交变更或先 `stash` / 提交。
-- **主仓库显示子模块 modified**：通常表示子模块当前 HEAD 与主仓库记录的 commit 不一致；要么在子模块切回记录提交，要么在子模块提交并 push 后在主仓库提交指针更新。
+#### 2.1 Native SDK AAR
+
+`ttlock_flutter_android` depends on the TTLock native Android SDK **as a local AAR** (via `flatDir`), not Maven Central.
+
+| Scenario | AAR file name | Typical source |
+|----------|---------------|----------------|
+| On-premise | `TTLockOnPremise.aar` | On-premise delivery package from TTLock |
+| Online / cloud SDK packaging | `ttlock-release.aar` | Matching Android SDK release |
+
+**What you need to do**
+
+1. Confirm which AAR your plugin branch expects in `ttlock_flutter_android/android/build.gradle`, for example:
+   - On-premise: `implementation(name: 'TTLockOnPremise', ext: 'aar')`
+   - Online packaging: `implementation(name: 'ttlock-release', ext: 'aar')`
+2. Place that AAR under the plugin path if you maintain the submodule yourself:
+   - `ttlock_flutter_android/android/libs/<AAR_NAME>.aar`
+3. **Also copy the same AAR into the host app** (required for many Flutter builds; `flatDir { dirs 'libs' }` is resolved against the app project):
+
+```text
+your_app/android/app/libs/TTLockOnPremise.aar
+# or
+your_app/android/app/libs/ttlock-release.aar
+```
+
+Create the `libs` directory if it does not exist. The file **base name** (without `.aar`) must match the `implementation(name: '...')` entry.
+
+If Gradle fails with `Could not find :TTLockOnPremise:` or `Could not find :ttlock-release:`, the host `android/app/libs/` copy is missing or misnamed.
+
+**Notes**
+
+- Do not mix on-premise and online AARs in one build unless you intentionally dual-depend and understand API overlap.
+- The plugin already pulls Nordic DFU (`no.nordicsemi.android:dfu`) because flatDir AARs do not bring Maven transitive deps.
+- Release builds: the plugin ships `consumer-rules.pro` so R8 does not strip SDK classes; keep minify/R8 rules intact.
+
+#### 2.2 Permissions
+
+Declare permissions in `android/app/src/main/AndroidManifest.xml` (root `<manifest>` needs `xmlns:tools` if you use `tools:targetApi`):
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+<!-- Location is often required for BLE scan on Android 9–11; request at runtime -->
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+<uses-permission
+    android:name="android.permission.BLUETOOTH"
+    android:maxSdkVersion="30" />
+<uses-permission
+    android:name="android.permission.BLUETOOTH_ADMIN"
+    android:maxSdkVersion="30" />
+
+<!-- Android 12+ -->
+<uses-permission
+    android:name="android.permission.BLUETOOTH_SCAN"
+    android:usesPermissionFlags="neverForLocation"
+    tools:targetApi="s" />
+<uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+```
+
+Request `BLUETOOTH_SCAN` / `BLUETOOTH_CONNECT` (and location where required) **before** scan / connect. Add `CAMERA` if you use face enrollment.
+
+Suggested `minSdk`: **26+**.
+
+### 3. iOS
+
+Add usage descriptions in `ios/Runner/Info.plist`:
+
+```xml
+<key>NSBluetoothAlwaysUsageDescription</key>
+<string>Bluetooth is required to connect smart locks and gateways</string>
+<key>NSBluetoothPeripheralUsageDescription</key>
+<string>Bluetooth is required to connect smart locks and gateways</string>
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>Location permission is required to scan nearby Bluetooth devices</string>
+```
+
+Add camera / photo library keys if you enroll faces. The system prompts on first Bluetooth use.
+
+### 4. OpenHarmony (OHOS)
+
+Declare permissions in the entry module `module.json5` `requestPermissions` (align with your product copy / `string` resources):
+
+```json5
+"requestPermissions": [
+  { "name": "ohos.permission.INTERNET" },
+  { "name": "ohos.permission.GET_NETWORK_INFO" },
+  { "name": "ohos.permission.GET_WIFI_INFO" },
+  { "name": "ohos.permission.USE_BLUETOOTH" },
+  { "name": "ohos.permission.DISCOVER_BLUETOOTH" },
+  {
+    "name": "ohos.permission.ACCESS_BLUETOOTH",
+    "reason": "$string:bluetooth_reason",
+    "usedScene": { "abilities": ["EntryAbility"], "when": "inuse" }
+  },
+  {
+    "name": "ohos.permission.APPROXIMATELY_LOCATION",
+    "reason": "$string:location_reason",
+    "usedScene": { "abilities": ["EntryAbility"], "when": "inuse" }
+  },
+  {
+    "name": "ohos.permission.LOCATION",
+    "reason": "$string:location_reason",
+    "usedScene": { "abilities": ["EntryAbility"], "when": "inuse" }
+  }
+]
+```
+
+`ACCESS_BLUETOOTH` / location are **user_grant** — request them at runtime before BLE work. Add `ohos.permission.CAMERA` when using face features.
+
+### 5. Import
+
+```dart
+import 'package:ttlock_flutter/ttlock.dart';
+```
+
+Native BLE setup runs when the plugin registers; you do **not** need legacy `prepareBTService`-style calls. Ensure permissions (and optionally Bluetooth power) before scanning or operating devices. You can wrap checks with `TTLock.setBleGuard(...)`.
+
+## Minimal example
+
+```dart
+import 'package:ttlock_flutter/ttlock.dart';
+
+Future<void> unlock(String lockData) async {
+  try {
+    final result = await TTLock.lock.controlLock(
+      lockData,
+      TTControlAction.unlock,
+    );
+    print('Unlocked, battery: ${result.electricQuantity}');
+  } on TTLockException catch (e) {
+    print('Failed: ${e.code} ${e.message}');
+  }
+}
+```
+
+## Platform support
+
+| Platform | Status |
+|----------|--------|
+| Android | Supported (`ttlock_flutter_android`) |
+| iOS | Supported (`ttlock_flutter_ios`) |
+| OHOS | Supported (`ttlock_flutter_ohos`) |
+
+## Documentation
+
+Integration details (BleGuard, timeouts), conventions, error codes, models, API reference, and scenario guides: see the open-platform **Flutter SDK** docs.
+
+## Resources
+
+- Plugin repo: <https://github.com/ttlock/ttlock_flutter>
+- Cloud REST APIs: open-platform `cloud/` docs (lock init / lockData updates must pair with BLE operations)

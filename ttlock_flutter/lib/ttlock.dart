@@ -79,7 +79,7 @@ class TTLock {
         messageChannelSuffix: _messageChannelSuffix,
       );
 
-  /// 门磁（挂锁门磁、独立门磁）。
+  /// 门磁（普通门磁、独立门磁）。
   static TTDoorSensorApi get doorSensor => _doorSensor ??= TTDoorSensorApi(
         binaryMessenger: _binaryMessenger,
         messageChannelSuffix: _messageChannelSuffix,
