@@ -149,3 +149,16 @@ Pigeon 只写到当前 checkout，未切 premise：
 T4/T6 做 premise 原生前，把同一份 `Messages.kt` / `Messages.swift` **整文件**合并或 cherry-pick 进 android / ios 的 **premise**。不要在 premise 上另跑一份 schema，也不要只拣升级相关 hunk。
 
 新增 4 个 enum 后，Pigeon 把既有 data class 的 codec id 整体 +4（例如 `TTLockVersion` 166→170）。四端生成物必须成套使用；旧 Messages 与新 `messages.g.dart` 不能混用。
+
+## T8 遗留（2026-11-26）
+
+未当场修（均为既有缺口或本轮非目标）：
+
+1. **iOS main 整 target 编不过**：`EnumConverter.swift:538` 无 `setOpenTypeAttributes`；`AccessoryHostApiImpl.swift:21` 无 `initializeKeyFob`。升级 5 文件单独 typecheck 通过。
+2. **iOS premise 整 target 编不过**：`EnumConverter.swift` 缺 `bluetoothAdvertisingInterval` / `setOpenTypeAttributes`（`TTLockOnPremise` 2.2.6）。升级文件通过。
+3. **Android premise `compileDebugKotlin` 失败**：`Remote.connectAddress`、`get/setBluetoothAdvertisingInterval` 在 `TTLockOnPremise.aar` 上不存在。升级 Kotlin 无报错。
+4. **Android main example 默认找不到 AAR**：`flatDir` 解析到 `example/android/app/libs`，插件 AAR 在 `android/libs`。临时 symlink 后 `:ttlock_flutter_android:compileDebugKotlin` / `flutter build apk --debug` 通过。
+5. **未做真机 DFU**（Spec §6 不做）。
+6. **OHOS HAR 未用 DevEco/hvigor 编译**（无 Harmony 工具链）；源码空实现与通道已注册。
+7. **全部升级提交未 push**（主仓 `mix`、android/ios `main` 与 `premise`）。
+8. 既有小问题未改：网关固定回调迟到竞态（T3）；`UpgradeOprationSetLockTimeError` 落入 `upgradeFail`（T0）。

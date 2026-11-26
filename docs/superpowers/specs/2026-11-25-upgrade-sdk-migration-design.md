@@ -3,7 +3,7 @@
 > 日期：2026-11-25（修订：2026-11-26，吸收设计审查 Critical / Important）  
 > 仓库：`ttlock_flutter`（主仓 `mix` + 子模块 `ttlock_flutter_android` / `ttlock_flutter_ios` 的 `main` 与 `premise`）  
 > 源仓库：在线 `ttlock_upgrade_flutter`；本地化对照 `ttlock_opensourse_zezamii/plugins/ttlock_upgrade_flutter-premise`  
-> 状态：**待实现**（Task 0 spike 已于 2026-11-26 完成；DFU 版本见 §5.2，类名/枚举/premise Gateway 见 spike-notes）  
+> 状态：**已实现**（2026-11-26 T0–T8 落地；遗留见 spike-notes「T8 遗留」：premise/iOS 整 target 既有编译缺口、未做真机 DFU、子模块未推远程）  
 > 已确认：API 形态 = Pigeon Future/Stream；其它设备**按设备拆方法**；结构 = 独立 `TTUpgradeHostApi`；example 本轮不改；**main / premise 能力表拆分（非同一代码路径）**
 
 ## 1. 目标与范围
@@ -295,17 +295,17 @@ class TTUpgradeEvent {
 
 ## 8. 项目规范检查项（本迁移）
 
-- [ ] 升级入口仅通过 `TTLock.upgrade`，无旧 MethodChannel 公共 API
-- [ ] 进度用 Stream；失败用 `TTUpgradeException` / notImplemented 特例；禁止 null 当成功
-- [ ] iOS：业务编排尽量共用；DFU 入口允许 premise 薄包装；Pod 名为 `TTLockDFUOnPremise`
-- [ ] Android AAR 文件名不变；premise 已补 dfu + okhttp
-- [ ] main/premise 能力按 §1.2 表实现，不把网络网关 DFU / 表计键盘强行编进 premise
-- [ ] OHOS 空实现可编译、通道注册齐全，错误对齐 `makeNotImplementedError`
-- [ ] `onCancel` / 显式 `stop*` 均中止对应原生 DFU；成功/失败后 `endOfStream`
-- [ ] 互斥：第二路升级失败，不静默杀第一路
-- [ ] 升级 Stream 不套用 45s 默认超时
-- [ ] 本轮不改 example、不改开放平台文档
-- [ ] 子模块 main 与 premise 均合入后才算完成
+- [x] 升级入口仅通过 `TTLock.upgrade`，无旧 MethodChannel 公共 API
+- [x] 进度用 Stream；失败用 `TTUpgradeException` / notImplemented 特例；禁止 null 当成功
+- [x] iOS：业务编排尽量共用；DFU 入口允许 premise 薄包装；Pod 名为 `TTLockDFUOnPremise`
+- [x] Android AAR 文件名不变；premise 已补 dfu + okhttp
+- [x] main/premise 能力按 §1.2 表实现，不把网络网关 DFU / 表计键盘强行编进 premise
+- [x] OHOS 空实现可编译、通道注册齐全，错误对齐 `makeNotImplementedError`（本机无 DevEco，未编 HAR）
+- [x] `onCancel` / 显式 `stop*` 均中止对应原生 DFU；成功/失败后 `endOfStream`（源码已实现，未做真机 DFU）
+- [x] 互斥：第二路升级失败，不静默杀第一路
+- [x] 升级 Stream 不套用 45s 默认超时
+- [x] 本轮不改 example、不改开放平台文档
+- [x] 子模块 main 与 premise 均合入后才算完成（本地已合入；**未 push**）
 
 ## 9. 风险与 Task 0 spike 清单
 
