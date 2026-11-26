@@ -1,4 +1,18 @@
-import { FlutterError, PigeonEventSink, TTCycleModel, TTGatewayError, TTKeypadCredentialEventParam, TTLockCredentialEventParam, TTLockError, TTLockVersion, TTMultifunctionalKeypadError, TTRemoteAccessoryError, TTStandaloneDoorSensorError } from './Messages';
+import {
+  FlutterError,
+  PigeonEventSink,
+  TTCycleModel,
+  TTGatewayError,
+  TTKeypadCredentialEventParam,
+  TTLockCredentialEventParam,
+  TTLockError,
+  TTLockVersion,
+  TTMultifunctionalKeypadError,
+  TTRemoteAccessoryError,
+  TTStandaloneDoorSensorError,
+  TTUpgradeGatewayParam,
+  TTUpgradeLockParam,
+} from './Messages';
 import { ITTLockResult, SNError, TTLockFeatureValue } from '@sciener/ttlock';
 import {
   electricMeterErrorRevert,
@@ -292,6 +306,10 @@ export class EventContextStore {
   accessoryAddKeypadFingerprint: KeypadCredentialSlot = new KeypadCredentialSlot();
   accessoryAddKeypadCard: KeypadCredentialSlot = new KeypadCredentialSlot();
 
+  /** 升级流参数槽；由 UpgradeHostApi `setUpgrade*Param` 写入。 */
+  upgradeLock: TTUpgradeLockParam | null = null;
+  upgradeGateway: TTUpgradeGatewayParam | null = null;
+
   /** 由最近一次 gatewayInit 缓存，供 getNetworkMac 复用（OHOS SDK 没有独立接口）。*/
   cachedNetworkMac: string | null = null;
 
@@ -308,6 +326,8 @@ export class EventContextStore {
     this.gatewayGetNearbyWifi = new GatewayNearbyWifiSlot();
     this.accessoryAddKeypadFingerprint = new KeypadCredentialSlot();
     this.accessoryAddKeypadCard = new KeypadCredentialSlot();
+    this.upgradeLock = null;
+    this.upgradeGateway = null;
     this.cachedNetworkMac = null;
     this.latestWaterMeterMac = null;
     this.latestElectricMeterMac = null;

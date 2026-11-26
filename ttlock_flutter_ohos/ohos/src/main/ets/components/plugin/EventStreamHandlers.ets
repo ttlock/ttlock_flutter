@@ -11,6 +11,7 @@ import {
   IAddFingerprintProgressModel,
   TTAddState as SdkTTAddState,
   TTKeypadStatus as SdkTTKeypadStatus,
+  TTGatewayDFUType,
   SNError,
 } from '@sciener/ttlock';
 
@@ -49,6 +50,8 @@ import {
   TTRemoteAccessoryScanModel,
   TTStandaloneDoorSensorScanModel,
   TTUpgradeEvent,
+  TTUpgradeGatewayParam,
+  TTUpgradeLockParam,
   TTWifiScanEntry,
   TTWifiScanResult,
   TTLockError,
@@ -67,6 +70,7 @@ import {
 
 import {
   EventContextStore,
+  TTResultBridge,
   ValidityRange,
   cycleListToConfig,
   CycleConfigEntry,
@@ -76,6 +80,15 @@ import {
   lockVersionFromJsonString,
   makeNotImplementedError,
 } from './TtlockPremiseSupport';
+import {
+  UPGRADE_KIND_GATEWAY,
+  UPGRADE_KIND_LOCK,
+  UpgradeListenGate,
+  emitUpgradeProgress,
+  failUpgrade,
+  gatewayDfuTypeConvert,
+  succeedUpgrade,
+} from './UpgradeSupport';
 
 import {
   faceErrorRevert,
@@ -715,30 +728,94 @@ class AccessoryElectricMeterStartScanImpl extends AccessoryElectricMeterStartSca
 }
 
 class UpgradeLockImpl extends UpgradeLockStreamHandler implements DisposableStreamHandler {
+  private gate: UpgradeListenGate = new UpgradeListenGate(UPGRADE_KIND_LOCK);
+
   constructor(messenger: BinaryMessenger) {
     super();
     UpgradeLockStreamHandler.register(messenger, this);
   }
 
   onListen(_args: Object, sink: PigeonEventSink<TTUpgradeEvent>): void {
-    emitUpgradeNotImplemented(sink, 'upgradeLock');
+    const param: TTUpgradeLockParam | null = EventContextStore.shared.upgradeLock;
+    const ok: boolean = this.gate.begin(
+      sink,
+      param !== null,
+      '请先通过 setUpgradeLockParam 设置参数后再订阅 upgradeLock',
+    );
+    if (!ok || param === null) {
+      return;
+    }
+    const generation: number = this.gate.generation;
+    const firmwarePackage: string = param.getFirmwarePackage();
+    const lockData: string = param.getLockData();
+    TTLock.startLockDfuWithPackage(
+      firmwarePackage,
+      lockData,
+      (percent: number): void => {
+        emitUpgradeProgress(UPGRADE_KIND_LOCK, generation, percent);
+      },
+      new TTResultBridge<string>(
+        (refreshed: string): void => {
+          succeedUpgrade(UPGRADE_KIND_LOCK, generation, refreshed);
+        },
+        (err: SNError): void => {
+          failUpgrade(UPGRADE_KIND_LOCK, generation, err, 'upgradeLock failed');
+        },
+      ),
+    );
   }
 
   onCancel(_args: Object): void {
+    this.gate.cancel();
   }
 }
 
 class UpgradeGatewayImpl extends UpgradeGatewayStreamHandler implements DisposableStreamHandler {
+  private gate: UpgradeListenGate = new UpgradeListenGate(UPGRADE_KIND_GATEWAY);
+
   constructor(messenger: BinaryMessenger) {
     super();
     UpgradeGatewayStreamHandler.register(messenger, this);
   }
 
   onListen(_args: Object, sink: PigeonEventSink<TTUpgradeEvent>): void {
-    emitUpgradeNotImplemented(sink, 'upgradeGateway');
+    const param: TTUpgradeGatewayParam | null = EventContextStore.shared.upgradeGateway;
+    const ok: boolean = this.gate.begin(
+      sink,
+      param !== null,
+      '请先通过 setUpgradeGatewayParam 设置参数后再订阅 upgradeGateway',
+    );
+    if (!ok || param === null) {
+      return;
+    }
+    const generation: number = this.gate.generation;
+    const dfuType: TTGatewayDFUType = gatewayDfuTypeConvert(param.getDfuType());
+    const clientId: string = param.getClientId();
+    const accessToken: string = param.getAccessToken();
+    const gatewayId: number = param.getGatewayId();
+    const gatewayMac: string = param.getGatewayMac();
+    TTLock.startGatewayDfu(
+      dfuType,
+      clientId,
+      accessToken,
+      gatewayId,
+      gatewayMac,
+      (percent: number): void => {
+        emitUpgradeProgress(UPGRADE_KIND_GATEWAY, generation, percent);
+      },
+      new TTResultBridge<void>(
+        (_: void): void => {
+          succeedUpgrade(UPGRADE_KIND_GATEWAY, generation);
+        },
+        (err: SNError): void => {
+          failUpgrade(UPGRADE_KIND_GATEWAY, generation, err, 'upgradeGateway failed');
+        },
+      ),
+    );
   }
 
   onCancel(_args: Object): void {
+    this.gate.cancel();
   }
 }
 
@@ -850,7 +927,8 @@ const STREAM_CANCEL_ARGS: Object = new Object();
 /**
  * 在 plugin 启动时实例化 25 条 Pigeon EventChannel 实现类；
  * 各实现类在构造时通过 `*StreamHandler.register` 完成注册，
- * 与 Android `StreamHandlers.kt` 模式一致。升级 9 路为空实现。
+ * 与 Android `StreamHandlers.kt` 模式一致。
+ * 升级已接入 lock / gateway；其余 7 路为空实现。
  */
 export class EventStreamHandlers {
   private handlers: Array<DisposableStreamHandler> = [];
