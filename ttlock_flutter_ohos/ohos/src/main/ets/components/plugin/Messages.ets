@@ -6098,6 +6098,115 @@ export class TTUpgradeEvent {
 *  Generated class from Pigeon that represents data sent in messages.
 */
 export class TTUpgradeLockParam {
+  private clientId: string;
+
+  public setClientId(clientId: string): void {
+    this.clientId = clientId;
+  }
+
+  getClientId(): string{
+    return this.clientId;
+  }
+
+  private accessToken: string;
+
+  public setAccessToken(accessToken: string): void {
+    this.accessToken = accessToken;
+  }
+
+  getAccessToken(): string{
+    return this.accessToken;
+  }
+
+  private lockId: number;
+
+  public setLockId(lockId: number): void {
+    this.lockId = lockId;
+  }
+
+  getLockId(): number{
+    return this.lockId;
+  }
+
+  private lockData: string;
+
+  public setLockData(lockData: string): void {
+    this.lockData = lockData;
+  }
+
+  getLockData(): string{
+    return this.lockData;
+  }
+
+  private lockMac: string;
+
+  public setLockMac(lockMac: string): void {
+    this.lockMac = lockMac;
+  }
+
+  getLockMac(): string{
+    return this.lockMac;
+  }
+
+  constructor(clientId: string, accessToken: string, lockId: number, lockData: string, lockMac: string) {
+    this.clientId = clientId;
+    this.accessToken = accessToken;
+    this.lockId = lockId;
+    this.lockData = lockData;
+    this.lockMac = lockMac;
+  }
+
+  toList(): Array<Object | null> {
+    let arr: Array<Object | null> = new Array<Object | null>();
+    if (this.clientId === undefined || this.clientId === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.clientId);
+    }
+    if (this.accessToken === undefined || this.accessToken === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.accessToken);
+    }
+    if (this.lockId === undefined || this.lockId === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.lockId);
+    }
+    if (this.lockData === undefined || this.lockData === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.lockData);
+    }
+    if (this.lockMac === undefined || this.lockMac === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.lockMac);
+    }
+    return arr;
+  }
+
+  static fromList(arr: Object[]): TTUpgradeLockParam {
+    let clientIdObject: Object = arr[0];
+    const clientId: string = clientIdObject as string;
+    let accessTokenObject: Object = arr[1];
+    const accessToken: string = accessTokenObject as string;
+    let lockIdObject: Object = arr[2];
+    const lockId: number = lockIdObject as number;
+    let lockDataObject: Object = arr[3];
+    const lockData: string = lockDataObject as string;
+    let lockMacObject: Object = arr[4];
+    const lockMac: string = lockMacObject as string;
+    return new TTUpgradeLockParam(clientId, accessToken, lockId, lockData, lockMac);
+  }
+}
+
+/*
+*  [TTEventChannelApi.upgradeLockByPackage] 订阅前通过 [TTUpgradeHostApi.setUpgradeLockByPackageParam] 写入。
+* 
+*  Generated class from Pigeon that represents data sent in messages.
+*/
+export class TTUpgradeLockByPackageParam {
   private lockMac: string;
 
   public setLockMac(lockMac: string): void {
@@ -6154,14 +6263,14 @@ export class TTUpgradeLockParam {
     return arr;
   }
 
-  static fromList(arr: Object[]): TTUpgradeLockParam {
+  static fromList(arr: Object[]): TTUpgradeLockByPackageParam {
     let lockMacObject: Object = arr[0];
     const lockMac: string = lockMacObject as string;
     let lockDataObject: Object = arr[1];
     const lockData: string = lockDataObject as string;
     let firmwarePackageObject: Object = arr[2];
     const firmwarePackage: string = firmwarePackageObject as string;
-    return new TTUpgradeLockParam(lockMac, lockData, firmwarePackage);
+    return new TTUpgradeLockByPackageParam(lockMac, lockData, firmwarePackage);
   }
 }
 
@@ -7223,20 +7332,22 @@ export class PigeonCodec extends StandardMessageCodec {
       case this.getByte(213):
         return TTUpgradeLockParam.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(214):
-        return TTUpgradeGatewayParam.fromList(super.readValue(buffer) as Object[]);
+        return TTUpgradeLockByPackageParam.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(215):
-        return TTUpgradeGatewayByPackageParam.fromList(super.readValue(buffer) as Object[]);
+        return TTUpgradeGatewayParam.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(216):
-        return TTUpgradeWaterMeterParam.fromList(super.readValue(buffer) as Object[]);
+        return TTUpgradeGatewayByPackageParam.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(217):
-        return TTUpgradeWaterMeterByPackageParam.fromList(super.readValue(buffer) as Object[]);
+        return TTUpgradeWaterMeterParam.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(218):
-        return TTUpgradeElectricMeterParam.fromList(super.readValue(buffer) as Object[]);
+        return TTUpgradeWaterMeterByPackageParam.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(219):
-        return TTUpgradeElectricMeterByPackageParam.fromList(super.readValue(buffer) as Object[]);
+        return TTUpgradeElectricMeterParam.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(220):
-        return TTUpgradeKeypadParam.fromList(super.readValue(buffer) as Object[]);
+        return TTUpgradeElectricMeterByPackageParam.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(221):
+        return TTUpgradeKeypadParam.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(222):
         return TTUpgradeKeypadByPackageParam.fromList(super.readValue(buffer) as Object[]);
       default:
         return super.readValueOfType(type, buffer);
@@ -7499,29 +7610,32 @@ export class PigeonCodec extends StandardMessageCodec {
     } else if (value instanceof TTUpgradeLockParam) {
       stream.writeUint8(this.getByte(213));
       this.writeValue(stream, (value as TTUpgradeLockParam).toList());
-    } else if (value instanceof TTUpgradeGatewayParam) {
+    } else if (value instanceof TTUpgradeLockByPackageParam) {
       stream.writeUint8(this.getByte(214));
+      this.writeValue(stream, (value as TTUpgradeLockByPackageParam).toList());
+    } else if (value instanceof TTUpgradeGatewayParam) {
+      stream.writeUint8(this.getByte(215));
       this.writeValue(stream, (value as TTUpgradeGatewayParam).toList());
     } else if (value instanceof TTUpgradeGatewayByPackageParam) {
-      stream.writeUint8(this.getByte(215));
+      stream.writeUint8(this.getByte(216));
       this.writeValue(stream, (value as TTUpgradeGatewayByPackageParam).toList());
     } else if (value instanceof TTUpgradeWaterMeterParam) {
-      stream.writeUint8(this.getByte(216));
+      stream.writeUint8(this.getByte(217));
       this.writeValue(stream, (value as TTUpgradeWaterMeterParam).toList());
     } else if (value instanceof TTUpgradeWaterMeterByPackageParam) {
-      stream.writeUint8(this.getByte(217));
+      stream.writeUint8(this.getByte(218));
       this.writeValue(stream, (value as TTUpgradeWaterMeterByPackageParam).toList());
     } else if (value instanceof TTUpgradeElectricMeterParam) {
-      stream.writeUint8(this.getByte(218));
+      stream.writeUint8(this.getByte(219));
       this.writeValue(stream, (value as TTUpgradeElectricMeterParam).toList());
     } else if (value instanceof TTUpgradeElectricMeterByPackageParam) {
-      stream.writeUint8(this.getByte(219));
+      stream.writeUint8(this.getByte(220));
       this.writeValue(stream, (value as TTUpgradeElectricMeterByPackageParam).toList());
     } else if (value instanceof TTUpgradeKeypadParam) {
-      stream.writeUint8(this.getByte(220));
+      stream.writeUint8(this.getByte(221));
       this.writeValue(stream, (value as TTUpgradeKeypadParam).toList());
     } else if (value instanceof TTUpgradeKeypadByPackageParam) {
-      stream.writeUint8(this.getByte(221));
+      stream.writeUint8(this.getByte(222));
       this.writeValue(stream, (value as TTUpgradeKeypadByPackageParam).toList());
     } else {
       super.writeValue(stream, value);
@@ -14097,9 +14211,15 @@ export abstract class TTUpgradeHostApi {
   /*
   *  订阅 [TTEventChannelApi.upgradeLock] 前调用。
   * 
-  *  [param] 锁固件包升级参数。
+  *  [param] 锁网络 DFU 参数。
   */
   abstract setUpgradeLockParam(param: TTUpgradeLockParam ): void;
+  /*
+  *  订阅 [TTEventChannelApi.upgradeLockByPackage] 前调用。
+  * 
+  *  [param] 锁固件包升级参数。
+  */
+  abstract setUpgradeLockByPackageParam(param: TTUpgradeLockByPackageParam ): void;
   /*
   *  订阅 [TTEventChannelApi.upgradeGateway] 前调用。
   * 
@@ -14178,6 +14298,37 @@ export abstract class TTUpgradeHostApi {
               let res: Array<Object | null> = [];
               try {
                 api!.setUpgradeLockParam(args[0] as TTUpgradeLockParam);
+                res.push(null);
+              }
+ catch (error) {
+                let wrappedError: Array<Object | null> = wrapError(error);
+                res = wrappedError;
+              }
+              reply.reply(res);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.setUpgradeLockByPackageParam' + separatedMessageChannelSuffix, TTUpgradeHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              if (!(Array.isArray(message))) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected List.')));
+                  return;
+              }
+              let args: Array<Object> = message as Array<Object>;
+              if (args.length < 1) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected at least 1 argument(s).')));
+                  return;
+              }
+              let res: Array<Object | null> = [];
+              try {
+                api!.setUpgradeLockByPackageParam(args[0] as TTUpgradeLockByPackageParam);
                 res.push(null);
               }
  catch (error) {
@@ -14817,6 +14968,26 @@ export abstract class AccessoryElectricMeterStartScanStreamHandler implements Pi
 export abstract class UpgradeLockStreamHandler implements PigeonEventChannelWrapper<TTUpgradeEvent> {
   static register(binaryMessenger: BinaryMessenger, streamHandler: UpgradeLockStreamHandler, instanceName: string = ''): void {
     let channelName: string = 'dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.upgradeLock';
+    if (instanceName !== '') {
+      channelName += '.' + instanceName;
+    }
+    const internalStreamHandler: PigeonStreamHandler<TTUpgradeEvent> =
+        new PigeonStreamHandler<TTUpgradeEvent>(streamHandler);
+    const channel: EventChannel = new EventChannel(binaryMessenger, channelName, PigeonMethodChannelCodec);
+    channel.setStreamHandler(internalStreamHandler);
+  }
+
+  onListen(args: Object, sink: PigeonEventSink<TTUpgradeEvent>): void {
+  }
+
+  onCancel(args: Object): void {
+  }
+}
+
+
+export abstract class UpgradeLockByPackageStreamHandler implements PigeonEventChannelWrapper<TTUpgradeEvent> {
+  static register(binaryMessenger: BinaryMessenger, streamHandler: UpgradeLockByPackageStreamHandler, instanceName: string = ''): void {
+    let channelName: string = 'dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.upgradeLockByPackage';
     if (instanceName !== '') {
       channelName += '.' + instanceName;
     }

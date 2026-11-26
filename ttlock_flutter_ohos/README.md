@@ -1,15 +1,34 @@
 # ttlock_flutter_ohos
 
-A new Flutter plugin project.
+[`ttlock_flutter`](https://github.com/ttlock/ttlock_flutter) 联邦插件的 **OpenHarmony（OHOS）平台实现**。宿主 App 通常只依赖 **`ttlock_flutter`**，由它在 OHOS 上选用本包。
 
-## Getting Started
+## 在技术栈中的位置
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/to/develop-plugins),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+```text
+App  →  ttlock_flutter（Dart API）
+     →  ttlock_flutter_platform_interface（Pigeon）
+     →  ttlock_flutter_ohos（本包）  →  TTLock OHOS SDK
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+对外 Dart API 在父插件（`package:ttlock_flutter/ttlock.dart`）。
 
+## 固件升级
+
+升级等模块在 OHOS 上的可用范围见父仓库 [PLATFORM_API_ZH.md](../PLATFORM_API_ZH.md)。
+
+## 通过父插件接入
+
+```yaml
+dependencies:
+  ttlock_flutter:
+    git:
+      url: https://github.com/ttlock/ttlock_flutter.git
+      path: ttlock_flutter
+      ref: mix
+```
+
+```dart
+import 'package:ttlock_flutter/ttlock.dart';
+```
+
+权限与 OHOS 接入步骤见父仓库 README。

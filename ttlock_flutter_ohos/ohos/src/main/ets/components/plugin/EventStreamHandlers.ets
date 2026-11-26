@@ -51,6 +51,7 @@ import {
   TTStandaloneDoorSensorScanModel,
   TTUpgradeEvent,
   TTUpgradeGatewayParam,
+  TTUpgradeLockByPackageParam,
   TTUpgradeLockParam,
   TTWifiScanEntry,
   TTWifiScanResult,
@@ -63,6 +64,7 @@ import {
   UpgradeGatewayStreamHandler,
   UpgradeKeypadByPackageStreamHandler,
   UpgradeKeypadStreamHandler,
+  UpgradeLockByPackageStreamHandler,
   UpgradeLockStreamHandler,
   UpgradeWaterMeterByPackageStreamHandler,
   UpgradeWaterMeterStreamHandler,
@@ -746,6 +748,56 @@ class UpgradeLockImpl extends UpgradeLockStreamHandler implements DisposableStre
       return;
     }
     const generation: number = this.gate.generation;
+    const clientId: string = param.getClientId();
+    const accessToken: string = param.getAccessToken();
+    const lockId: number = param.getLockId();
+    const lockData: string = param.getLockData();
+    // startLockDfu 为 fire-and-forget；abort 依赖 SDK 在 start 前挂 active。
+    TTLock.startLockDfu(
+      clientId,
+      accessToken,
+      lockId,
+      lockData,
+      (percent: number): void => {
+        emitUpgradeProgress(UPGRADE_KIND_LOCK, generation, percent);
+      },
+      new TTResultBridge<string>(
+        (refreshed: string): void => {
+          succeedUpgrade(UPGRADE_KIND_LOCK, generation, refreshed);
+        },
+        (err: SNError): void => {
+          failUpgrade(UPGRADE_KIND_LOCK, generation, err, 'upgradeLock failed');
+        },
+      ),
+    );
+  }
+
+  onCancel(_args: Object): void {
+    this.gate.cancel();
+  }
+}
+
+class UpgradeLockByPackageImpl extends UpgradeLockByPackageStreamHandler
+  implements DisposableStreamHandler {
+  private gate: UpgradeListenGate = new UpgradeListenGate(UPGRADE_KIND_LOCK);
+
+  constructor(messenger: BinaryMessenger) {
+    super();
+    UpgradeLockByPackageStreamHandler.register(messenger, this);
+  }
+
+  onListen(_args: Object, sink: PigeonEventSink<TTUpgradeEvent>): void {
+    const param: TTUpgradeLockByPackageParam | null =
+      EventContextStore.shared.upgradeLockByPackage;
+    const ok: boolean = this.gate.begin(
+      sink,
+      param !== null,
+      '请先通过 setUpgradeLockByPackageParam 设置参数后再订阅 upgradeLockByPackage',
+    );
+    if (!ok || param === null) {
+      return;
+    }
+    const generation: number = this.gate.generation;
     const firmwarePackage: string = param.getFirmwarePackage();
     const lockData: string = param.getLockData();
     TTLock.startLockDfuWithPackage(
@@ -759,7 +811,7 @@ class UpgradeLockImpl extends UpgradeLockStreamHandler implements DisposableStre
           succeedUpgrade(UPGRADE_KIND_LOCK, generation, refreshed);
         },
         (err: SNError): void => {
-          failUpgrade(UPGRADE_KIND_LOCK, generation, err, 'upgradeLock failed');
+          failUpgrade(UPGRADE_KIND_LOCK, generation, err, 'upgradeLockByPackage failed');
         },
       ),
     );
@@ -928,7 +980,7 @@ const STREAM_CANCEL_ARGS: Object = new Object();
  * 在 plugin 启动时实例化 25 条 Pigeon EventChannel 实现类；
  * 各实现类在构造时通过 `*StreamHandler.register` 完成注册，
  * 与 Android `StreamHandlers.kt` 模式一致。
- * 升级已接入 lock / gateway；其余 7 路为空实现。
+ * 升级已接入 lock 网络 / lock 包 / gateway 网络；其余为空实现。
  */
 export class EventStreamHandlers {
   private handlers: Array<DisposableStreamHandler> = [];
@@ -958,6 +1010,7 @@ export class EventStreamHandlers {
       new AccessoryWaterMeterStartScanImpl(messenger),
       new AccessoryElectricMeterStartScanImpl(messenger),
       new UpgradeLockImpl(messenger),
+      new UpgradeLockByPackageImpl(messenger),
       new UpgradeGatewayImpl(messenger),
       new UpgradeGatewayByPackageImpl(messenger),
       new UpgradeWaterMeterImpl(messenger),

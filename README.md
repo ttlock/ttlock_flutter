@@ -2,7 +2,7 @@
 
 [中文文档](./README_ZH.md)
 
-`ttlock_flutter` is the TTLock Flutter plugin for on-premise deployments. It uses a **Federated Plugin + Pigeon** stack to expose typed `Future` / `Stream` APIs for smart locks, gateways, remote keys / keypads, door sensors, and electric / water meters.
+`ttlock_flutter` is the TTLock Flutter plugin for on-premise deployments. It uses a **Federated Plugin + Pigeon** stack to expose typed `Future` / `Stream` APIs for smart locks, gateways, remote keys / keypads, door sensors, electric / water meters, and **firmware upgrade**.
 
 > Plugin version: **0.0.3** (see `ttlock_flutter/pubspec.yaml`).  
 > Use `package:ttlock_flutter/ttlock.dart` only. Legacy callback entry points (`ttlock_classic.dart`, etc.) are Deprecated.
@@ -18,6 +18,7 @@
 | Door sensor | `TTLock.doorSensor` | Standard door-sensor scan & init; standalone door-sensor scan, init & feature query |
 | Electric meter | `TTLock.electricMeter` | Scan, connect, init, power on/off / balance / top-up / pay mode, Cat.1 |
 | Water meter | `TTLock.waterMeter` | Scan, connect, init, valve / balance / top-up / pay mode, cumulative usage, Cat.1 |
+| Firmware upgrade | `TTLock.upgrade` | Lock / gateway / water meter / electric meter / keypad: network DFU or firmware-package DFU; progress via `Stream<TTUpgradeEvent>` |
 
 ## Integration
 
@@ -208,6 +209,44 @@ Future<void> unlock(String lockData) async {
 }
 ```
 
+## Firmware upgrade
+
+Entry: `TTLock.upgrade` (`TTUpgradeApi`). All upgrade APIs return `Stream<TTUpgradeEvent>` (progress / success). Failures throw `TTUpgradeException` (`TTLockUpgradeError`); unsupported platforms throw `TTUpgradeNotImplementedException`.
+
+| Method | Notes |
+|--------|--------|
+| `upgradeLock` | Lock network DFU; success may include refreshed `lockData` |
+| `upgradeLockByPackage` | Lock firmware-package DFU; success may include refreshed `lockData` |
+| `upgradeGateway` | Gateway network DFU; Android: re-subscribe the same `gatewayMac` to retry by `TTDfuType` |
+| `upgradeGatewayByPackage` | Gateway firmware-package DFU |
+| `upgradeWaterMeter` / `upgradeElectricMeter` | Meter network DFU |
+| `upgradeWaterMeterByPackage` / `upgradeElectricMeterByPackage` | Meter package DFU — call `waterMeterSetClientParam` / `electricMeterSetClientParam` first |
+| `upgradeKeypad` / `upgradeKeypadByPackage` | Keypad network / package DFU; `lockData` / `slotNumber` / `featureValue` optional |
+
+Cancel the subscription (`StreamSubscription.cancel`) to abort. Platform / on-premise availability: [PLATFORM_API.md](./PLATFORM_API.md).
+
+```dart
+final sub = TTLock.upgrade.upgradeLockByPackage(
+  lockMac: lockMac,
+  lockData: lockData,
+  firmwarePackage: firmwarePackage,
+).listen(
+  (event) {
+    if (event.phase == TTUpgradePhase.progress) {
+      print('progress: ${event.progress}% (${event.status})');
+    } else if (event.phase == TTUpgradePhase.success) {
+      print('done, lockData: ${event.lockData}');
+    }
+  },
+  onError: (e) {
+    if (e is TTUpgradeException) {
+      print('upgrade failed: ${e.code} ${e.message}');
+    }
+  },
+);
+// Abort: await sub.cancel();
+```
+
 ## Platform support
 
 | Platform | Status |
@@ -218,7 +257,8 @@ Future<void> unlock(String lockData) async {
 
 ## Documentation
 
-Integration details (BleGuard, timeouts), conventions, error codes, models, API reference, and scenario guides: see the open-platform **Flutter SDK** docs.
+- Platform API differences (unavailable APIs only): [PLATFORM_API.md](./PLATFORM_API.md)
+- Integration details (BleGuard, timeouts), conventions, error codes, models, API reference, and scenario guides: see the open-platform **Flutter SDK** docs.
 
 ## Resources
 

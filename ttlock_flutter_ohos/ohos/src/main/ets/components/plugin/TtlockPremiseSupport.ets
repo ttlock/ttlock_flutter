@@ -11,6 +11,7 @@ import {
   TTRemoteAccessoryError,
   TTStandaloneDoorSensorError,
   TTUpgradeGatewayParam,
+  TTUpgradeLockByPackageParam,
   TTUpgradeLockParam,
 } from './Messages';
 import { ITTLockResult, SNError, TTLockFeatureValue } from '@sciener/ttlock';
@@ -308,6 +309,7 @@ export class EventContextStore {
 
   /** 升级流参数槽；由 UpgradeHostApi `setUpgrade*Param` 写入。 */
   upgradeLock: TTUpgradeLockParam | null = null;
+  upgradeLockByPackage: TTUpgradeLockByPackageParam | null = null;
   upgradeGateway: TTUpgradeGatewayParam | null = null;
 
   /** 由最近一次 gatewayInit 缓存，供 getNetworkMac 复用（OHOS SDK 没有独立接口）。*/
@@ -327,6 +329,7 @@ export class EventContextStore {
     this.accessoryAddKeypadFingerprint = new KeypadCredentialSlot();
     this.accessoryAddKeypadCard = new KeypadCredentialSlot();
     this.upgradeLock = null;
+    this.upgradeLockByPackage = null;
     this.upgradeGateway = null;
     this.cachedNetworkMac = null;
     this.latestWaterMeterMac = null;

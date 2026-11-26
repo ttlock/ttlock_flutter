@@ -6,6 +6,7 @@ import {
   TTUpgradeHostApi,
   TTUpgradeKeypadByPackageParam,
   TTUpgradeKeypadParam,
+  TTUpgradeLockByPackageParam,
   TTUpgradeLockParam,
   TTUpgradeWaterMeterByPackageParam,
   TTUpgradeWaterMeterParam,
@@ -16,7 +17,7 @@ import { EventContextStore, makeNotImplementedError } from './TtlockPremiseSuppo
 /**
  * `TTUpgradeHostApi` 的 OpenHarmony 实现。
  *
- * 已接入：锁固件包 / 网关网络 DFU（参数写入 EventContextStore，流在 EventStreamHandlers）。
+ * 已接入：锁网络 / 锁固件包 / 网关网络 DFU（参数写入 EventContextStore，流在 EventStreamHandlers）。
  * 其余仍 `notImplemented`（鸿蒙 SDK 无完整 DFU）。
  *
  * 生成物无 `@async`：方法是同步 `void`，错误靠 throw，由 Pigeon `wrapError` 转成
@@ -27,6 +28,10 @@ import { EventContextStore, makeNotImplementedError } from './TtlockPremiseSuppo
 export class UpgradeHostApiImpl extends TTUpgradeHostApi {
   setUpgradeLockParam(param: TTUpgradeLockParam): void {
     EventContextStore.shared.upgradeLock = param;
+  }
+
+  setUpgradeLockByPackageParam(param: TTUpgradeLockByPackageParam): void {
+    EventContextStore.shared.upgradeLockByPackage = param;
   }
 
   setUpgradeGatewayParam(param: TTUpgradeGatewayParam): void {

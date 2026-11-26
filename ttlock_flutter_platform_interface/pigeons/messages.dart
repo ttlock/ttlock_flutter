@@ -2308,7 +2308,37 @@ class TTUpgradeEvent {
 
 /// [TTEventChannelApi.upgradeLock] 订阅前通过 [TTUpgradeHostApi.setUpgradeLockParam] 写入。
 class TTUpgradeLockParam {
+  /// 开放平台 clientId。
+  final String clientId;
+
+  /// 访问令牌。
+  final String accessToken;
+
+  /// 锁 ID。
+  final int lockId;
+
+  /// 锁凭证。
+  final String lockData;
+
   /// 锁蓝牙 MAC 地址。
+  ///
+  /// Android 网络 DFU 与成功后刷新 `lockData` 需要；iOS / OHOS 原生网络 DFU 不使用。
+  final String lockMac;
+
+  TTUpgradeLockParam({
+    required this.clientId,
+    required this.accessToken,
+    required this.lockId,
+    required this.lockData,
+    required this.lockMac,
+  });
+}
+
+/// [TTEventChannelApi.upgradeLockByPackage] 订阅前通过 [TTUpgradeHostApi.setUpgradeLockByPackageParam] 写入。
+class TTUpgradeLockByPackageParam {
+  /// 锁蓝牙 MAC 地址。
+  ///
+  /// Android 成功后刷新 `lockData` 需要；iOS / OHOS 包升级入口不使用。
   final String lockMac;
 
   /// 锁凭证。
@@ -2317,7 +2347,7 @@ class TTUpgradeLockParam {
   /// 固件包，不透明字符串（通常为服务端下发的 Base64），不是本地文件路径。
   final String firmwarePackage;
 
-  TTUpgradeLockParam({
+  TTUpgradeLockByPackageParam({
     required this.lockMac,
     required this.lockData,
     required this.firmwarePackage,
@@ -3686,8 +3716,13 @@ abstract class TTAccessoryHostApi {
 abstract class TTUpgradeHostApi {
   /// 订阅 [TTEventChannelApi.upgradeLock] 前调用。
   ///
-  /// [param] 锁固件包升级参数。
+  /// [param] 锁网络 DFU 参数。
   void setUpgradeLockParam(TTUpgradeLockParam param);
+
+  /// 订阅 [TTEventChannelApi.upgradeLockByPackage] 前调用。
+  ///
+  /// [param] 锁固件包升级参数。
+  void setUpgradeLockByPackageParam(TTUpgradeLockByPackageParam param);
 
   /// 订阅 [TTEventChannelApi.upgradeGateway] 前调用。
   ///
@@ -3810,10 +3845,15 @@ abstract class TTEventChannelApi {
   /// 扫描附近电表，持续推送 [TTMeterScanModel]。
   TTMeterScanModel accessoryElectricMeterStartScan();
 
-  /// 锁固件包升级进度流。
+  /// 锁网络 DFU 进度流。
   ///
   /// 订阅前须调用 [TTUpgradeHostApi.setUpgradeLockParam]。
   TTUpgradeEvent upgradeLock();
+
+  /// 锁固件包升级进度流。
+  ///
+  /// 订阅前须调用 [TTUpgradeHostApi.setUpgradeLockByPackageParam]。
+  TTUpgradeEvent upgradeLockByPackage();
 
   /// 网关网络 DFU 进度流。
   ///

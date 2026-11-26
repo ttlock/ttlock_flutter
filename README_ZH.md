@@ -2,7 +2,7 @@
 
 [English](./README.md)
 
-`ttlock_flutter` 是通通锁（TTLock）本地化（On-Premise）场景下的 Flutter 插件，基于 **Federated Plugin + Pigeon** 提供强类型 `Future` / `Stream` API，统一覆盖智能锁、网关、无线钥匙 / 键盘、门磁以及水电表等设备能力。
+`ttlock_flutter` 是通通锁（TTLock）本地化（On-Premise）场景下的 Flutter 插件，基于 **Federated Plugin + Pigeon** 提供强类型 `Future` / `Stream` API，统一覆盖智能锁、网关、无线钥匙 / 键盘、门磁、水电表以及**固件升级**等设备能力。
 
 > 当前版本对应插件 **0.0.3**（以 `ttlock_flutter/pubspec.yaml` 为准）。  
 > 仅使用新版入口 `package:ttlock_flutter/ttlock.dart`；旧版 callback 风格（`ttlock_classic.dart` 等）已标记 Deprecated。
@@ -18,6 +18,7 @@
 | 门磁 | `TTLock.doorSensor` | 普通门磁扫描与初始化；独立门磁扫描、初始化与特性查询 |
 | 电表 | `TTLock.electricMeter` | 扫描、连接、初始化、通断 / 余量 / 充值 / 付费模式、Cat.1 等 |
 | 水表 | `TTLock.waterMeter` | 扫描、连接、初始化、通断 / 余量 / 充值 / 付费模式、累计用量、Cat.1 等 |
+| 固件升级 | `TTLock.upgrade` | 锁 / 网关 / 水表 / 电表 / 键盘：网络 DFU 或固件包 DFU；进度以 `Stream<TTUpgradeEvent>` 推送 |
 
 ## 接入配置
 
@@ -206,6 +207,44 @@ Future<void> unlock(String lockData) async {
 }
 ```
 
+## 固件升级
+
+入口：`TTLock.upgrade`（`TTUpgradeApi`）。升级 API 均返回 `Stream<TTUpgradeEvent>`（进度 / 成功）。失败抛 `TTUpgradeException`（`TTLockUpgradeError`）；平台未实现抛 `TTUpgradeNotImplementedException`。
+
+| 方法 | 说明 |
+|------|------|
+| `upgradeLock` | 锁网络 DFU；成功时可能带回刷新后的 `lockData` |
+| `upgradeLockByPackage` | 锁固件包升级；成功时可能带回刷新后的 `lockData` |
+| `upgradeGateway` | 网关网络 DFU；Android：同一 `gatewayMac` 再次订阅可按 `TTDfuType` 重试 |
+| `upgradeGatewayByPackage` | 网关固件包升级 |
+| `upgradeWaterMeter` / `upgradeElectricMeter` | 水电表网络升级 |
+| `upgradeWaterMeterByPackage` / `upgradeElectricMeterByPackage` | 水电表固件包升级——须先调用 `waterMeterSetClientParam` / `electricMeterSetClientParam` |
+| `upgradeKeypad` / `upgradeKeypadByPackage` | 键盘网络 / 固件包升级；`lockData` / `slotNumber` / `featureValue` 可选 |
+
+取消订阅（`StreamSubscription.cancel`）即中止升级。三端 / 本地化可用范围见 [PLATFORM_API_ZH.md](./PLATFORM_API_ZH.md)。
+
+```dart
+final sub = TTLock.upgrade.upgradeLockByPackage(
+  lockMac: lockMac,
+  lockData: lockData,
+  firmwarePackage: firmwarePackage,
+).listen(
+  (event) {
+    if (event.phase == TTUpgradePhase.progress) {
+      print('进度: ${event.progress}% (${event.status})');
+    } else if (event.phase == TTUpgradePhase.success) {
+      print('完成，lockData: ${event.lockData}');
+    }
+  },
+  onError: (e) {
+    if (e is TTUpgradeException) {
+      print('升级失败: ${e.code} ${e.message}');
+    }
+  },
+);
+// 中止：await sub.cancel();
+```
+
 ## 平台支持
 
 | 平台 | 状态 |
@@ -216,7 +255,8 @@ Future<void> unlock(String lockData) async {
 
 ## 详细文档
 
-BleGuard、超时、通用约定、错误码、模型、各模块 API 与场景示例，见开放平台 **Flutter SDK** 文档。
+- 三端 API 差异（仅列不可用项）：[PLATFORM_API_ZH.md](./PLATFORM_API_ZH.md)
+- BleGuard、超时、通用约定、错误码、模型、各模块 API 与场景示例，见开放平台 **Flutter SDK** 文档。
 
 ## 相关资源
 

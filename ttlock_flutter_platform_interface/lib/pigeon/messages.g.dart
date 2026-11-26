@@ -3701,12 +3701,82 @@ class TTUpgradeEvent {
 /// [TTEventChannelApi.upgradeLock] 订阅前通过 [TTUpgradeHostApi.setUpgradeLockParam] 写入。
 class TTUpgradeLockParam {
   TTUpgradeLockParam({
+    required this.clientId,
+    required this.accessToken,
+    required this.lockId,
+    required this.lockData,
+    required this.lockMac,
+  });
+
+  /// 开放平台 clientId。
+  String clientId;
+
+  /// 访问令牌。
+  String accessToken;
+
+  /// 锁 ID。
+  int lockId;
+
+  /// 锁凭证。
+  String lockData;
+
+  /// 锁蓝牙 MAC 地址。
+  ///
+  /// Android 网络 DFU 与成功后刷新 `lockData` 需要；iOS / OHOS 原生网络 DFU 不使用。
+  String lockMac;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      clientId,
+      accessToken,
+      lockId,
+      lockData,
+      lockMac,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static TTUpgradeLockParam decode(Object result) {
+    result as List<Object?>;
+    return TTUpgradeLockParam(
+      clientId: result[0]! as String,
+      accessToken: result[1]! as String,
+      lockId: result[2]! as int,
+      lockData: result[3]! as String,
+      lockMac: result[4]! as String,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! TTUpgradeLockParam || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(clientId, other.clientId) && _deepEquals(accessToken, other.accessToken) && _deepEquals(lockId, other.lockId) && _deepEquals(lockData, other.lockData) && _deepEquals(lockMac, other.lockMac);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+/// [TTEventChannelApi.upgradeLockByPackage] 订阅前通过 [TTUpgradeHostApi.setUpgradeLockByPackageParam] 写入。
+class TTUpgradeLockByPackageParam {
+  TTUpgradeLockByPackageParam({
     required this.lockMac,
     required this.lockData,
     required this.firmwarePackage,
   });
 
   /// 锁蓝牙 MAC 地址。
+  ///
+  /// Android 成功后刷新 `lockData` 需要；iOS / OHOS 包升级入口不使用。
   String lockMac;
 
   /// 锁凭证。
@@ -3726,9 +3796,9 @@ class TTUpgradeLockParam {
   Object encode() {
     return _toList();  }
 
-  static TTUpgradeLockParam decode(Object result) {
+  static TTUpgradeLockByPackageParam decode(Object result) {
     result as List<Object?>;
-    return TTUpgradeLockParam(
+    return TTUpgradeLockByPackageParam(
       lockMac: result[0]! as String,
       lockData: result[1]! as String,
       firmwarePackage: result[2]! as String,
@@ -3738,7 +3808,7 @@ class TTUpgradeLockParam {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! TTUpgradeLockParam || other.runtimeType != runtimeType) {
+    if (other is! TTUpgradeLockByPackageParam || other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -4515,29 +4585,32 @@ class _PigeonCodec extends StandardMessageCodec {
     }    else if (value is TTUpgradeLockParam) {
       buffer.putUint8(213);
       writeValue(buffer, value.encode());
-    }    else if (value is TTUpgradeGatewayParam) {
+    }    else if (value is TTUpgradeLockByPackageParam) {
       buffer.putUint8(214);
       writeValue(buffer, value.encode());
-    }    else if (value is TTUpgradeGatewayByPackageParam) {
+    }    else if (value is TTUpgradeGatewayParam) {
       buffer.putUint8(215);
       writeValue(buffer, value.encode());
-    }    else if (value is TTUpgradeWaterMeterParam) {
+    }    else if (value is TTUpgradeGatewayByPackageParam) {
       buffer.putUint8(216);
       writeValue(buffer, value.encode());
-    }    else if (value is TTUpgradeWaterMeterByPackageParam) {
+    }    else if (value is TTUpgradeWaterMeterParam) {
       buffer.putUint8(217);
       writeValue(buffer, value.encode());
-    }    else if (value is TTUpgradeElectricMeterParam) {
+    }    else if (value is TTUpgradeWaterMeterByPackageParam) {
       buffer.putUint8(218);
       writeValue(buffer, value.encode());
-    }    else if (value is TTUpgradeElectricMeterByPackageParam) {
+    }    else if (value is TTUpgradeElectricMeterParam) {
       buffer.putUint8(219);
       writeValue(buffer, value.encode());
-    }    else if (value is TTUpgradeKeypadParam) {
+    }    else if (value is TTUpgradeElectricMeterByPackageParam) {
       buffer.putUint8(220);
       writeValue(buffer, value.encode());
-    }    else if (value is TTUpgradeKeypadByPackageParam) {
+    }    else if (value is TTUpgradeKeypadParam) {
       buffer.putUint8(221);
+      writeValue(buffer, value.encode());
+    }    else if (value is TTUpgradeKeypadByPackageParam) {
+      buffer.putUint8(222);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -4759,20 +4832,22 @@ class _PigeonCodec extends StandardMessageCodec {
       case 213:
         return TTUpgradeLockParam.decode(readValue(buffer)!);
       case 214:
-        return TTUpgradeGatewayParam.decode(readValue(buffer)!);
+        return TTUpgradeLockByPackageParam.decode(readValue(buffer)!);
       case 215:
-        return TTUpgradeGatewayByPackageParam.decode(readValue(buffer)!);
+        return TTUpgradeGatewayParam.decode(readValue(buffer)!);
       case 216:
-        return TTUpgradeWaterMeterParam.decode(readValue(buffer)!);
+        return TTUpgradeGatewayByPackageParam.decode(readValue(buffer)!);
       case 217:
-        return TTUpgradeWaterMeterByPackageParam.decode(readValue(buffer)!);
+        return TTUpgradeWaterMeterParam.decode(readValue(buffer)!);
       case 218:
-        return TTUpgradeElectricMeterParam.decode(readValue(buffer)!);
+        return TTUpgradeWaterMeterByPackageParam.decode(readValue(buffer)!);
       case 219:
-        return TTUpgradeElectricMeterByPackageParam.decode(readValue(buffer)!);
+        return TTUpgradeElectricMeterParam.decode(readValue(buffer)!);
       case 220:
-        return TTUpgradeKeypadParam.decode(readValue(buffer)!);
+        return TTUpgradeElectricMeterByPackageParam.decode(readValue(buffer)!);
       case 221:
+        return TTUpgradeKeypadParam.decode(readValue(buffer)!);
+      case 222:
         return TTUpgradeKeypadByPackageParam.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -8302,9 +8377,30 @@ class TTUpgradeHostApi {
 
   /// 订阅 [TTEventChannelApi.upgradeLock] 前调用。
   ///
-  /// [param] 锁固件包升级参数。
+  /// [param] 锁网络 DFU 参数。
   Future<void> setUpgradeLockParam(TTUpgradeLockParam param) async {
     final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.setUpgradeLockParam$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[param]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  /// 订阅 [TTEventChannelApi.upgradeLockByPackage] 前调用。
+  ///
+  /// [param] 锁固件包升级参数。
+  Future<void> setUpgradeLockByPackageParam(TTUpgradeLockByPackageParam param) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.setUpgradeLockByPackageParam$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -8681,6 +8777,17 @@ Stream<TTUpgradeEvent> upgradeLock( {String instanceName = ''}) {
   final EventChannel upgradeLockChannel =
       EventChannel('dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.upgradeLock$instanceName', pigeonMethodCodec);
   return upgradeLockChannel.receiveBroadcastStream().map((dynamic event) {
+    return event as TTUpgradeEvent;
+  });
+}
+    
+Stream<TTUpgradeEvent> upgradeLockByPackage( {String instanceName = ''}) {
+  if (instanceName.isNotEmpty) {
+    instanceName = '.$instanceName';
+  }
+  final EventChannel upgradeLockByPackageChannel =
+      EventChannel('dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.upgradeLockByPackage$instanceName', pigeonMethodCodec);
+  return upgradeLockByPackageChannel.receiveBroadcastStream().map((dynamic event) {
     return event as TTUpgradeEvent;
   });
 }

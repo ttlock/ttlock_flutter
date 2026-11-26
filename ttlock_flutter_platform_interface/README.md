@@ -29,4 +29,5 @@ fvm dart run pigeon --input pigeons/messages.dart
 ## 说明
 
 - `dartPackageName` 固定为 `ttlock_flutter`，保持通道名前缀兼容。
-- 本阶段不生成 OHOS `arkTSOut`。
+- 本阶段不生成 OHOS `arkTSOut`（OHOS 侧手工维护对齐的 Messages）。
+- 固件升级契约：`TTUpgradeHostApi`（`setUpgrade*Param`）+ `TTEventChannelApi` 下 `upgradeLock` / `upgradeLockByPackage` / `upgradeGateway` / `upgradeGatewayByPackage` / `upgradeWaterMeter` / `upgradeWaterMeterByPackage` / `upgradeElectricMeter` / `upgradeElectricMeterByPackage` / `upgradeKeypad` / `upgradeKeypadByPackage`；事件模型为 `TTUpgradeEvent`（`TTUpgradePhase` / `TTUpgradeStatus`），错误码为 `TTLockUpgradeError`。

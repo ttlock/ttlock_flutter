@@ -39,21 +39,43 @@ class TTUpgradeApi {
     );
   }
 
-  /// 锁固件包升级。流无默认 45s 超时。
+  /// 锁网络 DFU。流无默认 45s 超时。
   Stream<pigeon.TTUpgradeEvent> upgradeLock({
-    required String lockMac,
+    required String clientId,
+    required String accessToken,
+    required int lockId,
     required String lockData,
-    required String firmwarePackage,
+    required String lockMac,
   }) {
     final param = pigeon.TTUpgradeLockParam(
-      lockMac: lockMac,
+      clientId: clientId,
+      accessToken: accessToken,
+      lockId: lockId,
       lockData: lockData,
-      firmwarePackage: firmwarePackage,
+      lockMac: lockMac,
     );
     return _open(
       () => _host.setUpgradeLockParam(param),
       'setUpgradeLockParam',
       pigeon.upgradeLock,
+    );
+  }
+
+  /// 锁固件包升级。流无默认 45s 超时。
+  Stream<pigeon.TTUpgradeEvent> upgradeLockByPackage({
+    required String lockMac,
+    required String lockData,
+    required String firmwarePackage,
+  }) {
+    final param = pigeon.TTUpgradeLockByPackageParam(
+      lockMac: lockMac,
+      lockData: lockData,
+      firmwarePackage: firmwarePackage,
+    );
+    return _open(
+      () => _host.setUpgradeLockByPackageParam(param),
+      'setUpgradeLockByPackageParam',
+      pigeon.upgradeLockByPackage,
     );
   }
 
