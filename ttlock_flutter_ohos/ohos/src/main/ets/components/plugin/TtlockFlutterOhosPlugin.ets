@@ -11,10 +11,12 @@ import {
   TTAccessoryHostApi,
   TTGatewayHostApi,
   TTLockHostApi,
+  TTUpgradeHostApi,
 } from './Messages';
 import { LockHostApiImpl } from './LockHostApiImpl';
 import { GatewayHostApiImpl } from './GatewayHostApiImpl';
 import { AccessoryHostApiImpl } from './AccessoryHostApiImpl';
+import { UpgradeHostApiImpl } from './UpgradeHostApiImpl';
 import { EventStreamHandlers } from './EventStreamHandlers';
 import { EventContextStore } from './TtlockPremiseSupport';
 
@@ -22,8 +24,8 @@ import { EventContextStore } from './TtlockPremiseSupport';
  * Ttlock Flutter 插件的 OpenHarmony 入口。
  *
  * 在 `onAttachedToEngine` 中：
- *   1. 实例化 3 个 HostApi 实现并通过 Pigeon 生成的 `setup` 注册到 BinaryMessenger；
- *   2. 注册 14 条 EventChannel（与 iOS / Android 对齐）；
+ *   1. 实例化 4 个 HostApi 实现并通过 Pigeon 生成的 `setup` 注册到 BinaryMessenger；
+ *   2. 注册 25 条 EventChannel（与 iOS / Android 对齐；升级 9 路为空实现）；
  *   3. 保留一个旧的 `MethodChannel("ttlock_flutter_ohos")` 用于 `getPlatformVersion`，
  *      避免破坏存量 Dart 调用方。
  */
@@ -41,6 +43,7 @@ export default class TtlockFlutterOhosPlugin implements FlutterPlugin, MethodCal
     TTLockHostApi.setup(messenger, new LockHostApiImpl());
     TTGatewayHostApi.setup(messenger, new GatewayHostApiImpl());
     TTAccessoryHostApi.setup(messenger, new AccessoryHostApiImpl());
+    TTUpgradeHostApi.setup(messenger, new UpgradeHostApiImpl());
 
     this.streamHandlers = new EventStreamHandlers(messenger);
     this.streamHandlers.register();
@@ -54,6 +57,7 @@ export default class TtlockFlutterOhosPlugin implements FlutterPlugin, MethodCal
     TTLockHostApi.setup(messenger, null);
     TTGatewayHostApi.setup(messenger, null);
     TTAccessoryHostApi.setup(messenger, null);
+    TTUpgradeHostApi.setup(messenger, null);
 
     if (this.streamHandlers !== null) {
       this.streamHandlers.dispose();

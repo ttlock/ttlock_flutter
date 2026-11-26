@@ -48,11 +48,21 @@ import {
   TTMeterScanModel,
   TTRemoteAccessoryScanModel,
   TTStandaloneDoorSensorScanModel,
+  TTUpgradeEvent,
   TTWifiScanEntry,
   TTWifiScanResult,
   TTLockError,
   TTGatewayError,
   TTMultifunctionalKeypadError,
+  UpgradeElectricMeterByPackageStreamHandler,
+  UpgradeElectricMeterStreamHandler,
+  UpgradeGatewayByPackageStreamHandler,
+  UpgradeGatewayStreamHandler,
+  UpgradeKeypadByPackageStreamHandler,
+  UpgradeKeypadStreamHandler,
+  UpgradeLockStreamHandler,
+  UpgradeWaterMeterByPackageStreamHandler,
+  UpgradeWaterMeterStreamHandler,
 } from './Messages';
 
 import {
@@ -64,6 +74,7 @@ import {
   emitKeypadSinkError,
   emitLockSinkError,
   lockVersionFromJsonString,
+  makeNotImplementedError,
 } from './TtlockPremiseSupport';
 
 import {
@@ -86,6 +97,17 @@ import {
 const NO_LOCK_DATA = `${TTLockError.INVALID_PARAMETER}`;
 const NO_GATEWAY_MAC = `${TTGatewayError.INVALID_PARAMETER}`;
 const NO_KEYPAD = `${TTMultifunctionalKeypadError.INVALID_PARAMETER}`;
+
+/**
+ * 升级流空实现：立即 error + endOfStream。
+ * EventChannel 的 message 走 FlutterError.name（`notImplemented`），
+ * 与 Host throw + wrapError 形态对齐，供 Dart `mapUpgradeStreamErrors` 识别。
+ */
+function emitUpgradeNotImplemented(sink: PigeonEventSink<TTUpgradeEvent>, operation: string): void {
+  const err = makeNotImplementedError(operation);
+  sink.error(err.code, err.name, err.message);
+  sink.endOfStream();
+}
 
 function readScanWifiEntry(item: Map<string, Object>): TTWifiScanEntry {
   const ssidVal = item.get('SSID') ?? item.get('ssid');
@@ -692,12 +714,143 @@ class AccessoryElectricMeterStartScanImpl extends AccessoryElectricMeterStartSca
   }
 }
 
+class UpgradeLockImpl extends UpgradeLockStreamHandler implements DisposableStreamHandler {
+  constructor(messenger: BinaryMessenger) {
+    super();
+    UpgradeLockStreamHandler.register(messenger, this);
+  }
+
+  onListen(_args: Object, sink: PigeonEventSink<TTUpgradeEvent>): void {
+    emitUpgradeNotImplemented(sink, 'upgradeLock');
+  }
+
+  onCancel(_args: Object): void {
+  }
+}
+
+class UpgradeGatewayImpl extends UpgradeGatewayStreamHandler implements DisposableStreamHandler {
+  constructor(messenger: BinaryMessenger) {
+    super();
+    UpgradeGatewayStreamHandler.register(messenger, this);
+  }
+
+  onListen(_args: Object, sink: PigeonEventSink<TTUpgradeEvent>): void {
+    emitUpgradeNotImplemented(sink, 'upgradeGateway');
+  }
+
+  onCancel(_args: Object): void {
+  }
+}
+
+class UpgradeGatewayByPackageImpl extends UpgradeGatewayByPackageStreamHandler
+  implements DisposableStreamHandler {
+  constructor(messenger: BinaryMessenger) {
+    super();
+    UpgradeGatewayByPackageStreamHandler.register(messenger, this);
+  }
+
+  onListen(_args: Object, sink: PigeonEventSink<TTUpgradeEvent>): void {
+    emitUpgradeNotImplemented(sink, 'upgradeGatewayByPackage');
+  }
+
+  onCancel(_args: Object): void {
+  }
+}
+
+class UpgradeWaterMeterImpl extends UpgradeWaterMeterStreamHandler implements DisposableStreamHandler {
+  constructor(messenger: BinaryMessenger) {
+    super();
+    UpgradeWaterMeterStreamHandler.register(messenger, this);
+  }
+
+  onListen(_args: Object, sink: PigeonEventSink<TTUpgradeEvent>): void {
+    emitUpgradeNotImplemented(sink, 'upgradeWaterMeter');
+  }
+
+  onCancel(_args: Object): void {
+  }
+}
+
+class UpgradeWaterMeterByPackageImpl extends UpgradeWaterMeterByPackageStreamHandler
+  implements DisposableStreamHandler {
+  constructor(messenger: BinaryMessenger) {
+    super();
+    UpgradeWaterMeterByPackageStreamHandler.register(messenger, this);
+  }
+
+  onListen(_args: Object, sink: PigeonEventSink<TTUpgradeEvent>): void {
+    emitUpgradeNotImplemented(sink, 'upgradeWaterMeterByPackage');
+  }
+
+  onCancel(_args: Object): void {
+  }
+}
+
+class UpgradeElectricMeterImpl extends UpgradeElectricMeterStreamHandler
+  implements DisposableStreamHandler {
+  constructor(messenger: BinaryMessenger) {
+    super();
+    UpgradeElectricMeterStreamHandler.register(messenger, this);
+  }
+
+  onListen(_args: Object, sink: PigeonEventSink<TTUpgradeEvent>): void {
+    emitUpgradeNotImplemented(sink, 'upgradeElectricMeter');
+  }
+
+  onCancel(_args: Object): void {
+  }
+}
+
+class UpgradeElectricMeterByPackageImpl extends UpgradeElectricMeterByPackageStreamHandler
+  implements DisposableStreamHandler {
+  constructor(messenger: BinaryMessenger) {
+    super();
+    UpgradeElectricMeterByPackageStreamHandler.register(messenger, this);
+  }
+
+  onListen(_args: Object, sink: PigeonEventSink<TTUpgradeEvent>): void {
+    emitUpgradeNotImplemented(sink, 'upgradeElectricMeterByPackage');
+  }
+
+  onCancel(_args: Object): void {
+  }
+}
+
+class UpgradeKeypadImpl extends UpgradeKeypadStreamHandler implements DisposableStreamHandler {
+  constructor(messenger: BinaryMessenger) {
+    super();
+    UpgradeKeypadStreamHandler.register(messenger, this);
+  }
+
+  onListen(_args: Object, sink: PigeonEventSink<TTUpgradeEvent>): void {
+    emitUpgradeNotImplemented(sink, 'upgradeKeypad');
+  }
+
+  onCancel(_args: Object): void {
+  }
+}
+
+class UpgradeKeypadByPackageImpl extends UpgradeKeypadByPackageStreamHandler
+  implements DisposableStreamHandler {
+  constructor(messenger: BinaryMessenger) {
+    super();
+    UpgradeKeypadByPackageStreamHandler.register(messenger, this);
+  }
+
+  onListen(_args: Object, sink: PigeonEventSink<TTUpgradeEvent>): void {
+    emitUpgradeNotImplemented(sink, 'upgradeKeypadByPackage');
+  }
+
+  onCancel(_args: Object): void {
+  }
+}
+
 const STREAM_CANCEL_ARGS: Object = new Object();
 
 /**
- * 在 plugin 启动时实例化 16 条 Pigeon EventChannel 实现类；
+ * 在 plugin 启动时实例化 25 条 Pigeon EventChannel 实现类；
  * 各实现类在构造时通过 `*StreamHandler.register` 完成注册，
- * 与 Android `StreamHandlers.kt` 模式一致。
+ * 与 Android `StreamHandlers.kt` 模式一致。升级 9 路为空实现。
  */
 export class EventStreamHandlers {
   private handlers: Array<DisposableStreamHandler> = [];
@@ -726,6 +879,15 @@ export class EventStreamHandlers {
       new AccessoryStandaloneDoorSensorStartScanImpl(messenger),
       new AccessoryWaterMeterStartScanImpl(messenger),
       new AccessoryElectricMeterStartScanImpl(messenger),
+      new UpgradeLockImpl(messenger),
+      new UpgradeGatewayImpl(messenger),
+      new UpgradeGatewayByPackageImpl(messenger),
+      new UpgradeWaterMeterImpl(messenger),
+      new UpgradeWaterMeterByPackageImpl(messenger),
+      new UpgradeElectricMeterImpl(messenger),
+      new UpgradeElectricMeterByPackageImpl(messenger),
+      new UpgradeKeypadImpl(messenger),
+      new UpgradeKeypadByPackageImpl(messenger),
     ];
   }
 
