@@ -32,3 +32,9 @@ docs/superpowers/
 .codegraph/.gitignore
 .codegraph/daemon.pid
 docs/
+
+# AI tooling / agent docs (do not commit)
+.codex/
+.superpowers/
+**/docs/superpowers/
+ttlock_flutter/docs/
