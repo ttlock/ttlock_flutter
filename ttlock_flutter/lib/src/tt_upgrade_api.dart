@@ -7,8 +7,9 @@ import 'pigeon_errors.dart';
 
 /// 固件升级。
 ///
-/// 进度流本身不加默认 45s 超时；仅 `setUpgrade*Param` 与 `stopUpgrade*`
-/// 经 [runUpgradeApi] 使用 BleTimeout 短超时。
+/// 进度流本身不加默认 45s 超时；仅 `setUpgrade*Param` 经 [runUpgradeApi]
+/// 使用 BleTimeout 短超时。取消订阅（`StreamSubscription.cancel`）会触发原生
+/// `onCancel` 并中止 DFU，与扫描类 API 一致；无独立 `stop*` 方法。
 ///
 /// Android 上 [upgradeGateway] 对同一 `gatewayMac` 再次订阅表示按 `dfuType` 重试。
 /// 水电表固件包升级须先调用 `waterMeterSetClientParam` / `electricMeterSetClientParam`。
@@ -232,34 +233,4 @@ class TTUpgradeApi {
       pigeon.upgradeKeypadByPackage,
     );
   }
-
-  /// 停止锁升级。短超时，不作用于进度流。
-  Future<void> stopUpgradeLock() => runUpgradeApi(
-        () => _host.stopUpgradeLock(),
-        method: 'stopUpgradeLock',
-      );
-
-  /// 停止网关升级（网络 DFU 与固件包共用）。短超时，不作用于进度流。
-  Future<void> stopUpgradeGateway() => runUpgradeApi(
-        () => _host.stopUpgradeGateway(),
-        method: 'stopUpgradeGateway',
-      );
-
-  /// 停止水表升级。不得 abort 锁或网关 DFU。
-  Future<void> stopUpgradeWaterMeter() => runUpgradeApi(
-        () => _host.stopUpgradeWaterMeter(),
-        method: 'stopUpgradeWaterMeter',
-      );
-
-  /// 停止电表升级。不得 abort 锁或网关 DFU。
-  Future<void> stopUpgradeElectricMeter() => runUpgradeApi(
-        () => _host.stopUpgradeElectricMeter(),
-        method: 'stopUpgradeElectricMeter',
-      );
-
-  /// 停止键盘升级。不得 abort 锁或网关 DFU。
-  Future<void> stopUpgradeKeypad() => runUpgradeApi(
-        () => _host.stopUpgradeKeypad(),
-        method: 'stopUpgradeKeypad',
-      );
 }

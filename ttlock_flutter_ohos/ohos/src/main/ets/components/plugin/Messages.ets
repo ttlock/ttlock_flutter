@@ -14152,16 +14152,6 @@ export abstract class TTUpgradeHostApi {
   *  [param] 键盘固件包升级参数。
   */
   abstract setUpgradeKeypadByPackageParam(param: TTUpgradeKeypadByPackageParam ): void;
-  /* 停止锁升级。*/
-  abstract stopUpgradeLock(): void;
-  /* 停止网关升级（网络 DFU 与固件包共用）。*/
-  abstract stopUpgradeGateway(): void;
-  /* 停止水表升级。不得 abort 锁或网关 DFU。*/
-  abstract stopUpgradeWaterMeter(): void;
-  /* 停止电表升级。不得 abort 锁或网关 DFU。*/
-  abstract stopUpgradeElectricMeter(): void;
-  /* 停止键盘升级。不得 abort 锁或网关 DFU。*/
-  abstract stopUpgradeKeypad(): void;
   /** The codec used by TTUpgradeHostApi. */
   static getCodec(): MessageCodec<Object>{
     return PigeonCodec.INSTANCE;
@@ -14436,116 +14426,6 @@ export abstract class TTUpgradeHostApi {
               let res: Array<Object | null> = [];
               try {
                 api!.setUpgradeKeypadByPackageParam(args[0] as TTUpgradeKeypadByPackageParam);
-                res.push(null);
-              }
- catch (error) {
-                let wrappedError: Array<Object | null> = wrapError(error);
-                res = wrappedError;
-              }
-              reply.reply(res);
-            } });
-      } else {
-        channel.setMessageHandler(null);
-      }
-    }
-    {
-      let channel: BasicMessageChannel<Object> =
-          new BasicMessageChannel(
-              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.stopUpgradeLock' + separatedMessageChannelSuffix, TTUpgradeHostApi.getCodec());
-      if (api != null) {
-        channel.setMessageHandler({
-            onMessage(message: Object ,reply: Reply<Object> ) {
-              let res: Array<Object | null> = [];
-              try {
-                api!.stopUpgradeLock();
-                res.push(null);
-              }
- catch (error) {
-                let wrappedError: Array<Object | null> = wrapError(error);
-                res = wrappedError;
-              }
-              reply.reply(res);
-            } });
-      } else {
-        channel.setMessageHandler(null);
-      }
-    }
-    {
-      let channel: BasicMessageChannel<Object> =
-          new BasicMessageChannel(
-              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.stopUpgradeGateway' + separatedMessageChannelSuffix, TTUpgradeHostApi.getCodec());
-      if (api != null) {
-        channel.setMessageHandler({
-            onMessage(message: Object ,reply: Reply<Object> ) {
-              let res: Array<Object | null> = [];
-              try {
-                api!.stopUpgradeGateway();
-                res.push(null);
-              }
- catch (error) {
-                let wrappedError: Array<Object | null> = wrapError(error);
-                res = wrappedError;
-              }
-              reply.reply(res);
-            } });
-      } else {
-        channel.setMessageHandler(null);
-      }
-    }
-    {
-      let channel: BasicMessageChannel<Object> =
-          new BasicMessageChannel(
-              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.stopUpgradeWaterMeter' + separatedMessageChannelSuffix, TTUpgradeHostApi.getCodec());
-      if (api != null) {
-        channel.setMessageHandler({
-            onMessage(message: Object ,reply: Reply<Object> ) {
-              let res: Array<Object | null> = [];
-              try {
-                api!.stopUpgradeWaterMeter();
-                res.push(null);
-              }
- catch (error) {
-                let wrappedError: Array<Object | null> = wrapError(error);
-                res = wrappedError;
-              }
-              reply.reply(res);
-            } });
-      } else {
-        channel.setMessageHandler(null);
-      }
-    }
-    {
-      let channel: BasicMessageChannel<Object> =
-          new BasicMessageChannel(
-              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.stopUpgradeElectricMeter' + separatedMessageChannelSuffix, TTUpgradeHostApi.getCodec());
-      if (api != null) {
-        channel.setMessageHandler({
-            onMessage(message: Object ,reply: Reply<Object> ) {
-              let res: Array<Object | null> = [];
-              try {
-                api!.stopUpgradeElectricMeter();
-                res.push(null);
-              }
- catch (error) {
-                let wrappedError: Array<Object | null> = wrapError(error);
-                res = wrappedError;
-              }
-              reply.reply(res);
-            } });
-      } else {
-        channel.setMessageHandler(null);
-      }
-    }
-    {
-      let channel: BasicMessageChannel<Object> =
-          new BasicMessageChannel(
-              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.stopUpgradeKeypad' + separatedMessageChannelSuffix, TTUpgradeHostApi.getCodec());
-      if (api != null) {
-        channel.setMessageHandler({
-            onMessage(message: Object ,reply: Reply<Object> ) {
-              let res: Array<Object | null> = [];
-              try {
-                api!.stopUpgradeKeypad();
                 res.push(null);
               }
  catch (error) {

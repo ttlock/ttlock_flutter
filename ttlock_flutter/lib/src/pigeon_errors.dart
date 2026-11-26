@@ -267,7 +267,7 @@ Never throwUpgradeError(PlatformException e) {
 Stream<T> mapUpgradeStreamErrors<T>(Stream<T> stream) =>
     _mapStreamErrors(stream, throwUpgradeError);
 
-/// `setUpgrade*Param` / `stopUpgrade*` 的短超时入口。
+/// `setUpgrade*Param` 的短超时入口。
 ///
 /// 使用 [BleTimeout.resolve]（默认 45s）。不要把该超时套到升级进度流上。
 /// [op] 非空时先走蓝牙门卫；进度流通常在外层单独 [runBleGate]。

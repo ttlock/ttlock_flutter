@@ -16,12 +16,12 @@
 
 | 能力 | main（在线） | premise（本地化） |
 |------|--------------|-------------------|
-| `upgradeLock` / `stopUpgradeLock`（固件包） | ✅ | ✅ |
+| `upgradeLock`（固件包；取消订阅即中止） | ✅ | ✅ |
 | `upgradeGateway`（网络 DFU：clientId/token/gatewayId + **同 MAC 重试**） | ✅ | ❌ → `unsupported` / `notImplemented` |
-| `upgradeGatewayByPackage` / `stopUpgradeGateway` | ✅ | ✅ |
-| `upgradeWaterMeter*` / `stopUpgradeWaterMeter` | ✅ | ❌ → `unsupported`（旧 premise 插件无此 API；AAR/Pod 若后续确认可用可另开） |
-| `upgradeElectricMeter*` / `stopUpgradeElectricMeter` | ✅ | ❌ → 同上 |
-| `upgradeKeypad*` / `stopUpgradeKeypad` | ✅ | ❌ → 同上 |
+| `upgradeGatewayByPackage` | ✅ | ✅ |
+| `upgradeWaterMeter*` | ✅ | ❌ → `unsupported`（旧 premise 插件无此 API；AAR/Pod 若后续确认可用可另开） |
+| `upgradeElectricMeter*` | ✅ | ❌ → 同上 |
+| `upgradeKeypad*` | ✅ | ❌ → 同上 |
 
 依据：
 
@@ -73,8 +73,8 @@
 Dart: TTLock.upgrade (TTUpgradeApi)
         ↓ Pigeon
 platform_interface:
-  TTUpgradeHostApi（set*Param / stop*）
-  TTEventChannelApi 新增 upgrade* 流
+  TTUpgradeHostApi（仅 set*Param；无 stop*）
+  TTEventChannelApi 新增 upgrade* 流（onCancel 中止 DFU，对齐扫描）
         ↓
 Android: UpgradeApi.kt
   main → 全量 DFU API
@@ -106,25 +106,21 @@ OHOS: UpgradeHostApiImpl 空实现（makeNotImplementedError）
 | 方法 | 返回 | main | premise | 对应旧 API |
 |------|------|------|---------|------------|
 | `upgradeLock({lockMac, lockData, firmwarePackage})` | `Stream<TTUpgradeEvent>` | ✅ | ✅ | `startUpgradeLock` |
-| `stopUpgradeLock()` | `Future<void>` | ✅ | ✅ | `stopUpgradeLock` |
 | `upgradeGateway({dfuType, clientId, accessToken, gatewayId, gatewayMac})` | `Stream<TTUpgradeEvent>` | ✅（含同 MAC 重试，§4.7） | ❌ | `startUpgradeGateway` |
 | `upgradeGatewayByPackage({firmwarePackage, gatewayMac})` | `Stream<TTUpgradeEvent>` | ✅ | ✅ | `startUpgradeGatewayByFirmwarePackage`（premise 旧 API 名 `startUpgradeGateway`） |
-| `stopUpgradeGateway()` | `Future<void>` | ✅ | ✅ | `stopUpgradeGateway` |
 | `upgradeWaterMeter({clientId, accessToken, deviceId, deviceMac})` | `Stream<TTUpgradeEvent>` | ✅ | ❌ | `startUpgradeOtherDevice` WATER_METER |
 | `upgradeWaterMeterByPackage({deviceId, deviceMac, firmwarePackage})` | `Stream<TTUpgradeEvent>` | ✅ | ❌ | WithPackage WATER_METER |
-| `stopUpgradeWaterMeter()` | `Future<void>` | ✅ | ❌ | `stopUpgradeOtherDevice` |
 | `upgradeElectricMeter({clientId, accessToken, deviceId, deviceMac})` | `Stream<TTUpgradeEvent>` | ✅ | ❌ | ELECTRIC_METER |
 | `upgradeElectricMeterByPackage({deviceId, deviceMac, firmwarePackage})` | `Stream<TTUpgradeEvent>` | ✅ | ❌ | WithPackage ELECTRIC_METER |
-| `stopUpgradeElectricMeter()` | `Future<void>` | ✅ | ❌ | stop other |
 | `upgradeKeypad({clientId, accessToken, deviceId, deviceMac, lockData?, slotNumber?, featureValue?})` | `Stream<TTUpgradeEvent>` | ✅ | ❌ | KEYPAD |
 | `upgradeKeypadByPackage({deviceId, deviceMac, firmwarePackage, lockData?, slotNumber?, featureValue?})` | `Stream<TTUpgradeEvent>` | ✅ | ❌ | WithPackage KEYPAD |
-| `stopUpgradeKeypad()` | `Future<void>` | ✅ | ❌ | stop other |
 
 说明：
 
 - **不再**对外暴露合并的 `upgradeOtherDevice` / `deviceType`
+- **无显式 `stop*`**：对齐扫描，调用方 `cancel` 订阅即可；原生仅在 Stream `onCancel` 中 `abortDfu` / `endUpgrade`
 - 水表 / 电表不含 `lockData` / `slotNumber` / `featureValue`；键盘保留这三项可选（缺省：空串 / 0）
-- 三个设备 `stop*` 原生可落到同一 `DeviceDfu` abort，但 **不得** abort 锁或网关 DFU（`LockDfuClient` / `GatewayDfuClient` 独立）
+- 设备类升级的 `onCancel` 只 abort `DeviceDfu`，不得 abort 锁或网关 DFU
 - 水表 / 电表包升级：调用方须已对对应表计调用过 `waterMeterSetClientParam` / `electricMeterSetClientParam`（与联邦表计 API 一致）；Spec 在文档注释中写明前置条件。旧插件注释提过但未强制调用
 - 参数对外用 camelCase（`lockMac`）；Android 刷新 lockData 仍需 mac
 
@@ -164,7 +160,7 @@ class TTUpgradeEvent {
 
 ### 4.4 Pigeon 约定
 
-1. `@HostApi() TTUpgradeHostApi`：各 `setUpgrade*Param` + 各 `stopUpgrade*`
+1. `@HostApi() TTUpgradeHostApi`：仅各 `setUpgrade*Param`（**无** `stopUpgrade*`）
 2. 并入唯一 `@EventChannelApi() TTEventChannelApi` 的升级流方法（与 §4.2 Stream 一一对应）
 3. 重新生成 Dart / Kotlin / Swift / ArkTS Messages，并提交到 **android/ios 的 main 与 premise** 以及 ohos
 4. 参数槽：对齐现网 `EventContextStore`（iOS/OHOS）与 `LockStreamParams` 类仓库（Android）— 新增 Upgrade 专用 param 槽，勿与 lock addCard 槽混用
@@ -172,6 +168,7 @@ class TTUpgradeEvent {
    - `runBleGate(TTBleOperation.deviceOperation)`
    - `set*Param`（可走短超时，对齐 `runLockApi`）
    - 订阅 Stream；**流本身不加** `TTLockTimeouts` 默认 45s（DFU 可持续数分钟）
+   - `subscription.cancel` → 原生 `onCancel` → abort（对齐扫描；无 Dart `stop*`）
    - `mapUpgradeStreamErrors`：须先识别 OHOS/`notImplemented`/`unsupported`，再解析业务 `TTLockUpgradeError`；禁止数字码误落入 `success`
 6. 注册点：
    - Android：`TtlockFlutterPlugin.initModules` → `UpgradeApi` + StreamHandlers
@@ -190,13 +187,12 @@ class TTUpgradeEvent {
 | 事件 | 行为 |
 |------|------|
 | Stream `onListen` | 读取已 set 的 param，调用原生 `startDfu` |
-| Stream `onCancel`（含 Dart `subscription.cancel`） | 调用对应 `abortDfu` / `endUpgrade` |
-| 显式 `stop*()` | 完成 Future（void）；若仍有监听中的同路 Stream → `endOfStream`（不 error）；并 abort 原生 |
+| Stream `onCancel`（含 Dart `subscription.cancel`） | 调用对应 `abortDfu` / `endUpgrade`（**唯一**中止入口，对齐扫描） |
 | 成功 / 业务失败 | 推送 success 事件或 `addError` 后 **`endOfStream`**；避免结束后 cancel 再 abort |
 | 第二路升级 `onListen`（任一路已在进行） | 立即失败：`TTUpgradeException(upgradeFail, 'upgrade already in progress')`（或专用 busy）；**不**静默 abort 第一路 |
-| `stopUpgradeWaterMeter` 等 | 只 abort DeviceDfu；不影响 Lock/Gateway DFU |
+| 设备类升级 `onCancel` | 只 abort DeviceDfu；不影响 Lock/Gateway DFU |
 
-说明：旧插件 EventChannel `onCancel` **不停** DFU；新行为是有意修复。
+说明：旧插件 EventChannel `onCancel` **不停** DFU，且另有显式 stop；新行为对齐扫描——仅 `onCancel` 中止，**无** Host `stop*`。
 
 ### 4.7 网关网络 DFU 与同 MAC 重试（仅 main）
 
@@ -301,7 +297,7 @@ class TTUpgradeEvent {
 - [x] Android AAR 文件名不变；premise 已补 dfu + okhttp
 - [x] main/premise 能力按 §1.2 表实现，不把网络网关 DFU / 表计键盘强行编进 premise
 - [x] OHOS 空实现可编译、通道注册齐全，错误对齐 `makeNotImplementedError`（本机无 DevEco，未编 HAR）
-- [x] `onCancel` / 显式 `stop*` 均中止对应原生 DFU；成功/失败后 `endOfStream`（源码已实现，未做真机 DFU）
+- [x] `onCancel` 中止对应原生 DFU（无显式 `stop*`）；成功/失败后 `endOfStream`（源码已实现，未做真机 DFU）
 - [x] 互斥：第二路升级失败，不静默杀第一路
 - [x] 升级 Stream 不套用 45s 默认超时
 - [x] 本轮不改 example、不改开放平台文档

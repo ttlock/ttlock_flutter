@@ -3732,21 +3732,6 @@ abstract class TTUpgradeHostApi {
   ///
   /// [param] 键盘固件包升级参数。
   void setUpgradeKeypadByPackageParam(TTUpgradeKeypadByPackageParam param);
-
-  /// 停止锁升级。
-  void stopUpgradeLock();
-
-  /// 停止网关升级（网络 DFU 与固件包共用）。
-  void stopUpgradeGateway();
-
-  /// 停止水表升级。不得 abort 锁或网关 DFU。
-  void stopUpgradeWaterMeter();
-
-  /// 停止电表升级。不得 abort 锁或网关 DFU。
-  void stopUpgradeElectricMeter();
-
-  /// 停止键盘升级。不得 abort 锁或网关 DFU。
-  void stopUpgradeKeypad();
 }
 
 // -----------------------------

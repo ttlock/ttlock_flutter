@@ -19,6 +19,8 @@ import { makeNotImplementedError } from './TtlockPremiseSupport';
  *
  * 生成物无 `@async`：方法是同步 `void`，错误靠 throw，由 Pigeon `wrapError` 转成
  * code=`TTLockError.FAIL`、message=`notImplemented`。
+ *
+ * 中止 DFU 仅在 Stream `onCancel`（本空实现无原生会话）。
  */
 export class UpgradeHostApiImpl extends TTUpgradeHostApi {
   setUpgradeLockParam(_param: TTUpgradeLockParam): void {
@@ -55,25 +57,5 @@ export class UpgradeHostApiImpl extends TTUpgradeHostApi {
 
   setUpgradeKeypadByPackageParam(_param: TTUpgradeKeypadByPackageParam): void {
     throw makeNotImplementedError('setUpgradeKeypadByPackageParam');
-  }
-
-  stopUpgradeLock(): void {
-    throw makeNotImplementedError('stopUpgradeLock');
-  }
-
-  stopUpgradeGateway(): void {
-    throw makeNotImplementedError('stopUpgradeGateway');
-  }
-
-  stopUpgradeWaterMeter(): void {
-    throw makeNotImplementedError('stopUpgradeWaterMeter');
-  }
-
-  stopUpgradeElectricMeter(): void {
-    throw makeNotImplementedError('stopUpgradeElectricMeter');
-  }
-
-  stopUpgradeKeypad(): void {
-    throw makeNotImplementedError('stopUpgradeKeypad');
   }
 }
