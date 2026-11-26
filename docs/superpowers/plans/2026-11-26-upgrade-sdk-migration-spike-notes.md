@@ -137,3 +137,15 @@ main 3.6.14 与 premise 2.2.6 的 `TTDFUMacros.h` 文本一致。下面的整型
 - premise 插件：`ttlock_opensourse_zezamii/plugins/ttlock_upgrade_flutter-premise`（podspec 2.1.3，刷新用 `getLockFeatureValueWithLockData`）
 - AAR：`git show premise:android/libs/TTLockOnPremise.aar`；main `ttlock_flutter_android/android/libs/ttlock-release.aar`
 - iOS 锁头：已安装的 `TTLockOnPremise` 2.2.6 `TTLock.h` / `TTSystemInfoModel.h`
+
+## Task 1 生成物需进 premise
+
+Pigeon 只写到当前 checkout，未切 premise：
+
+- `ttlock_flutter_android` **main**：`android/src/main/kotlin/com/ttlock/ttlock_flutter/Messages.kt`
+- `ttlock_flutter_ios` **main**：`ios/Classes/Messages.swift`
+- 主仓 `mix`（ohos 非子模块）：`ttlock_flutter_platform_interface/lib/pigeon/messages.g.dart`、`ttlock_flutter_ohos/ohos/src/main/ets/components/plugin/Messages.ets`
+
+T4/T6 做 premise 原生前，把同一份 `Messages.kt` / `Messages.swift` **整文件**合并或 cherry-pick 进 android / ios 的 **premise**。不要在 premise 上另跑一份 schema，也不要只拣升级相关 hunk。
+
+新增 4 个 enum 后，Pigeon 把既有 data class 的 codec id 整体 +4（例如 `TTLockVersion` 166→170）。四端生成物必须成套使用；旧 Messages 与新 `messages.g.dart` 不能混用。

@@ -2214,6 +2214,309 @@ enum TTPalmVeinErrorCode {
 }
 
 // -----------------------------
+// Upgrade (DFU)
+// 枚举值顺序即 ordinal，禁止在中间插值。
+// -----------------------------
+
+/// 升级进度状态。按名称映射，禁止用 iOS `UpgradeOpration` raw 值当下标。
+enum TTUpgradeStatus {
+  /// 准备中。
+  preparing,
+
+  /// 升级中。
+  upgrading,
+
+  /// 恢复中。
+  recovering,
+}
+
+/// 升级流阶段。`success` 对应完成，不是 [TTUpgradeStatus]。
+enum TTUpgradePhase {
+  /// 进度更新，见 [TTUpgradeEvent.status] / [TTUpgradeEvent.progress]。
+  progress,
+
+  /// 升级成功。锁升级时 [TTUpgradeEvent.lockData] 可能有值。
+  success,
+}
+
+/// 网关网络 DFU 类型。
+enum TTDfuType {
+  /// 网络升级。
+  net,
+
+  /// 蓝牙升级。
+  bluetooth,
+}
+
+/// 升级错误码。`success` 仅为占位，对齐旧 ordinal，业务失败不用。
+enum TTLockUpgradeError {
+  /// 占位成功，业务失败不用。
+  success,
+
+  /// 外设蓝牙关闭。
+  peripheralPoweredOff,
+
+  /// 连接超时。
+  connectTimeout,
+
+  /// 网络失败。
+  netFail,
+
+  /// 无需升级。
+  noNeedUpgrade,
+
+  /// 未知升级版本。
+  unknownUpgradeVersion,
+
+  /// 进入升级状态失败。
+  enterUpgradeState,
+
+  /// 锁升级失败。
+  upgradeLockFail,
+
+  /// 准备阶段错误。
+  preparingError,
+
+  /// 读取特征值失败。
+  getSpecialValueError,
+
+  /// 升级失败。
+  upgradeFail,
+}
+
+/// 固件升级进度事件。
+class TTUpgradeEvent {
+  /// 流阶段。
+  final TTUpgradePhase phase;
+
+  /// 进度状态。仅 [TTUpgradePhase.progress] 时有值。
+  final TTUpgradeStatus? status;
+
+  /// 进度百分比，0–100。
+  final int? progress;
+
+  /// 锁升级成功后刷新得到的锁凭证。仅锁升级 success 时有值。
+  final String? lockData;
+
+  TTUpgradeEvent({
+    required this.phase,
+    this.status,
+    this.progress,
+    this.lockData,
+  });
+}
+
+/// [TTEventChannelApi.upgradeLock] 订阅前通过 [TTUpgradeHostApi.setUpgradeLockParam] 写入。
+class TTUpgradeLockParam {
+  /// 锁蓝牙 MAC 地址。
+  final String lockMac;
+
+  /// 锁凭证。
+  final String lockData;
+
+  /// 固件包，不透明字符串（通常为服务端下发的 Base64），不是本地文件路径。
+  final String firmwarePackage;
+
+  TTUpgradeLockParam({
+    required this.lockMac,
+    required this.lockData,
+    required this.firmwarePackage,
+  });
+}
+
+/// [TTEventChannelApi.upgradeGateway] 订阅前通过 [TTUpgradeHostApi.setUpgradeGatewayParam] 写入。
+class TTUpgradeGatewayParam {
+  /// 网关 DFU 类型。
+  final TTDfuType dfuType;
+
+  /// 开放平台 clientId。
+  final String clientId;
+
+  /// 访问令牌。
+  final String accessToken;
+
+  /// 网关 ID。
+  final int gatewayId;
+
+  /// 网关 MAC 地址。
+  final String gatewayMac;
+
+  TTUpgradeGatewayParam({
+    required this.dfuType,
+    required this.clientId,
+    required this.accessToken,
+    required this.gatewayId,
+    required this.gatewayMac,
+  });
+}
+
+/// [TTEventChannelApi.upgradeGatewayByPackage] 订阅前写入。
+class TTUpgradeGatewayByPackageParam {
+  /// 固件包，不透明字符串（通常为服务端下发的 Base64），不是本地文件路径。
+  final String firmwarePackage;
+
+  /// 网关 MAC 地址。
+  final String gatewayMac;
+
+  TTUpgradeGatewayByPackageParam({
+    required this.firmwarePackage,
+    required this.gatewayMac,
+  });
+}
+
+/// [TTEventChannelApi.upgradeWaterMeter] 订阅前写入。
+class TTUpgradeWaterMeterParam {
+  /// 开放平台 clientId。
+  final String clientId;
+
+  /// 访问令牌。
+  final String accessToken;
+
+  /// 水表设备 ID。
+  final int deviceId;
+
+  /// 水表 MAC 地址。
+  final String deviceMac;
+
+  TTUpgradeWaterMeterParam({
+    required this.clientId,
+    required this.accessToken,
+    required this.deviceId,
+    required this.deviceMac,
+  });
+}
+
+/// [TTEventChannelApi.upgradeWaterMeterByPackage] 订阅前写入。
+///
+/// 调用方须已对该水表调用过 [TTAccessoryHostApi.waterMeterSetClientParam]。
+class TTUpgradeWaterMeterByPackageParam {
+  /// 水表设备 ID。
+  final int deviceId;
+
+  /// 水表 MAC 地址。
+  final String deviceMac;
+
+  /// 固件包，不透明字符串（通常为服务端下发的 Base64），不是本地文件路径。
+  final String firmwarePackage;
+
+  TTUpgradeWaterMeterByPackageParam({
+    required this.deviceId,
+    required this.deviceMac,
+    required this.firmwarePackage,
+  });
+}
+
+/// [TTEventChannelApi.upgradeElectricMeter] 订阅前写入。
+class TTUpgradeElectricMeterParam {
+  /// 开放平台 clientId。
+  final String clientId;
+
+  /// 访问令牌。
+  final String accessToken;
+
+  /// 电表设备 ID。
+  final int deviceId;
+
+  /// 电表 MAC 地址。
+  final String deviceMac;
+
+  TTUpgradeElectricMeterParam({
+    required this.clientId,
+    required this.accessToken,
+    required this.deviceId,
+    required this.deviceMac,
+  });
+}
+
+/// [TTEventChannelApi.upgradeElectricMeterByPackage] 订阅前写入。
+///
+/// 调用方须已对该电表调用过 [TTAccessoryHostApi.electricMeterSetClientParam]。
+class TTUpgradeElectricMeterByPackageParam {
+  /// 电表设备 ID。
+  final int deviceId;
+
+  /// 电表 MAC 地址。
+  final String deviceMac;
+
+  /// 固件包，不透明字符串（通常为服务端下发的 Base64），不是本地文件路径。
+  final String firmwarePackage;
+
+  TTUpgradeElectricMeterByPackageParam({
+    required this.deviceId,
+    required this.deviceMac,
+    required this.firmwarePackage,
+  });
+}
+
+/// [TTEventChannelApi.upgradeKeypad] 订阅前写入。
+///
+/// [lockData] / [slotNumber] / [featureValue] 可选，缺省按空串 / 0 处理。
+class TTUpgradeKeypadParam {
+  /// 开放平台 clientId。
+  final String clientId;
+
+  /// 访问令牌。
+  final String accessToken;
+
+  /// 键盘设备 ID。
+  final int deviceId;
+
+  /// 键盘 MAC 地址。
+  final String deviceMac;
+
+  /// 关联锁凭证。缺省空串。
+  final String? lockData;
+
+  /// 槽位号。缺省 0。
+  final int? slotNumber;
+
+  /// 特征值。缺省空串。
+  final String? featureValue;
+
+  TTUpgradeKeypadParam({
+    required this.clientId,
+    required this.accessToken,
+    required this.deviceId,
+    required this.deviceMac,
+    this.lockData,
+    this.slotNumber,
+    this.featureValue,
+  });
+}
+
+/// [TTEventChannelApi.upgradeKeypadByPackage] 订阅前写入。
+///
+/// [lockData] / [slotNumber] / [featureValue] 可选，缺省按空串 / 0 处理。
+class TTUpgradeKeypadByPackageParam {
+  /// 键盘设备 ID。
+  final int deviceId;
+
+  /// 键盘 MAC 地址。
+  final String deviceMac;
+
+  /// 固件包，不透明字符串（通常为服务端下发的 Base64），不是本地文件路径。
+  final String firmwarePackage;
+
+  /// 关联锁凭证。缺省空串。
+  final String? lockData;
+
+  /// 槽位号。缺省 0。
+  final int? slotNumber;
+
+  /// 特征值。缺省空串。
+  final String? featureValue;
+
+  TTUpgradeKeypadByPackageParam({
+    required this.deviceId,
+    required this.deviceMac,
+    required this.firmwarePackage,
+    this.lockData,
+    this.slotNumber,
+    this.featureValue,
+  });
+}
+
+// -----------------------------
 // Host APIs (called from Flutter)
 // -----------------------------
 @HostApi()
@@ -3375,6 +3678,77 @@ abstract class TTAccessoryHostApi {
   void waterMeterReset(String mac);
 }
 
+/// 固件升级参数槽与停止。
+///
+/// 订阅 [TTEventChannelApi] 对应升级流之前调用 `setUpgrade*Param`。
+/// 停止方法只结束本路升级，不得 abort 其他设备的 DFU。
+@HostApi()
+abstract class TTUpgradeHostApi {
+  /// 订阅 [TTEventChannelApi.upgradeLock] 前调用。
+  ///
+  /// [param] 锁固件包升级参数。
+  void setUpgradeLockParam(TTUpgradeLockParam param);
+
+  /// 订阅 [TTEventChannelApi.upgradeGateway] 前调用。
+  ///
+  /// [param] 网关网络 DFU 参数。
+  void setUpgradeGatewayParam(TTUpgradeGatewayParam param);
+
+  /// 订阅 [TTEventChannelApi.upgradeGatewayByPackage] 前调用。
+  ///
+  /// [param] 网关固件包升级参数。
+  void setUpgradeGatewayByPackageParam(TTUpgradeGatewayByPackageParam param);
+
+  /// 订阅 [TTEventChannelApi.upgradeWaterMeter] 前调用。
+  ///
+  /// [param] 水表网络升级参数。
+  void setUpgradeWaterMeterParam(TTUpgradeWaterMeterParam param);
+
+  /// 订阅 [TTEventChannelApi.upgradeWaterMeterByPackage] 前调用。
+  ///
+  /// 调用方须已对该水表调用过 [TTAccessoryHostApi.waterMeterSetClientParam]。
+  ///
+  /// [param] 水表固件包升级参数。
+  void setUpgradeWaterMeterByPackageParam(TTUpgradeWaterMeterByPackageParam param);
+
+  /// 订阅 [TTEventChannelApi.upgradeElectricMeter] 前调用。
+  ///
+  /// [param] 电表网络升级参数。
+  void setUpgradeElectricMeterParam(TTUpgradeElectricMeterParam param);
+
+  /// 订阅 [TTEventChannelApi.upgradeElectricMeterByPackage] 前调用。
+  ///
+  /// 调用方须已对该电表调用过 [TTAccessoryHostApi.electricMeterSetClientParam]。
+  ///
+  /// [param] 电表固件包升级参数。
+  void setUpgradeElectricMeterByPackageParam(TTUpgradeElectricMeterByPackageParam param);
+
+  /// 订阅 [TTEventChannelApi.upgradeKeypad] 前调用。
+  ///
+  /// [param] 键盘网络升级参数。
+  void setUpgradeKeypadParam(TTUpgradeKeypadParam param);
+
+  /// 订阅 [TTEventChannelApi.upgradeKeypadByPackage] 前调用。
+  ///
+  /// [param] 键盘固件包升级参数。
+  void setUpgradeKeypadByPackageParam(TTUpgradeKeypadByPackageParam param);
+
+  /// 停止锁升级。
+  void stopUpgradeLock();
+
+  /// 停止网关升级（网络 DFU 与固件包共用）。
+  void stopUpgradeGateway();
+
+  /// 停止水表升级。不得 abort 锁或网关 DFU。
+  void stopUpgradeWaterMeter();
+
+  /// 停止电表升级。不得 abort 锁或网关 DFU。
+  void stopUpgradeElectricMeter();
+
+  /// 停止键盘升级。不得 abort 锁或网关 DFU。
+  void stopUpgradeKeypad();
+}
+
 // -----------------------------
 // EventChannel（Pigeon 限制：同一 .dart 输入文件内只能有 1 个 @EventChannelApi）
 // 因此将「各路流」拆成多个无参方法；每个方法对应一条独立 EventChannel。
@@ -3384,7 +3758,7 @@ abstract class TTAccessoryHostApi {
 /// 持续事件流接口。
 ///
 /// 订阅任一流方法前，须通过对应 [TTLockHostApi] / [TTGatewayHostApi] /
-/// [TTAccessoryHostApi] 的 `set*Param` 方法写入上下文参数。
+/// [TTAccessoryHostApi] / [TTUpgradeHostApi] 的 `set*Param` 方法写入上下文参数。
 @EventChannelApi()
 abstract class TTEventChannelApi {
   /// 扫描附近智能锁，持续推送 [TTLockScanModel]。
@@ -3450,5 +3824,52 @@ abstract class TTEventChannelApi {
 
   /// 扫描附近电表，持续推送 [TTMeterScanModel]。
   TTMeterScanModel accessoryElectricMeterStartScan();
+
+  /// 锁固件包升级进度流。
+  ///
+  /// 订阅前须调用 [TTUpgradeHostApi.setUpgradeLockParam]。
+  TTUpgradeEvent upgradeLock();
+
+  /// 网关网络 DFU 进度流。
+  ///
+  /// 订阅前须调用 [TTUpgradeHostApi.setUpgradeGatewayParam]。
+  TTUpgradeEvent upgradeGateway();
+
+  /// 网关固件包升级进度流。
+  ///
+  /// 订阅前须调用 [TTUpgradeHostApi.setUpgradeGatewayByPackageParam]。
+  TTUpgradeEvent upgradeGatewayByPackage();
+
+  /// 水表网络升级进度流。
+  ///
+  /// 订阅前须调用 [TTUpgradeHostApi.setUpgradeWaterMeterParam]。
+  TTUpgradeEvent upgradeWaterMeter();
+
+  /// 水表固件包升级进度流。
+  ///
+  /// 订阅前须调用 [TTUpgradeHostApi.setUpgradeWaterMeterByPackageParam]。
+  /// 调用方须已对该水表调用过 [TTAccessoryHostApi.waterMeterSetClientParam]。
+  TTUpgradeEvent upgradeWaterMeterByPackage();
+
+  /// 电表网络升级进度流。
+  ///
+  /// 订阅前须调用 [TTUpgradeHostApi.setUpgradeElectricMeterParam]。
+  TTUpgradeEvent upgradeElectricMeter();
+
+  /// 电表固件包升级进度流。
+  ///
+  /// 订阅前须调用 [TTUpgradeHostApi.setUpgradeElectricMeterByPackageParam]。
+  /// 调用方须已对该电表调用过 [TTAccessoryHostApi.electricMeterSetClientParam]。
+  TTUpgradeEvent upgradeElectricMeterByPackage();
+
+  /// 键盘网络升级进度流。
+  ///
+  /// 订阅前须调用 [TTUpgradeHostApi.setUpgradeKeypadParam]。
+  TTUpgradeEvent upgradeKeypad();
+
+  /// 键盘固件包升级进度流。
+  ///
+  /// 订阅前须调用 [TTUpgradeHostApi.setUpgradeKeypadByPackageParam]。
+  TTUpgradeEvent upgradeKeypadByPackage();
 }
 

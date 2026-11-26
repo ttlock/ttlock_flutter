@@ -1529,6 +1529,126 @@ export class TTPalmVeinErrorCodeEnum {
 }
 
 /*
+*  升级进度状态。按名称映射，禁止用 iOS `UpgradeOpration` raw 值当下标。
+* 
+*  Generated enum from Pigeon that represents data sent in messages.
+*/
+export enum TTUpgradeStatus {
+  /* 准备中。*/
+  PREPARING,
+  /* 升级中。*/
+  UPGRADING,
+  /* 恢复中。*/
+  RECOVERING
+}
+
+/*
+*  升级进度状态。按名称映射，禁止用 iOS `UpgradeOpration` raw 值当下标。
+* 
+*  Generated enum Companion class from Pigeon that represents data sent 
+   in messages.Do not delete otherwise enum type data transfer will be failed
+*/
+export class TTUpgradeStatusEnum {
+  index: string|null = null;
+	constructor(index: string){
+    this.index = index;
+  }
+}
+
+/*
+*  升级流阶段。`success` 对应完成，不是 [TTUpgradeStatus]。
+* 
+*  Generated enum from Pigeon that represents data sent in messages.
+*/
+export enum TTUpgradePhase {
+  /* 进度更新，见 [TTUpgradeEvent.status] / [TTUpgradeEvent.progress]。*/
+  PROGRESS,
+  /* 升级成功。锁升级时 [TTUpgradeEvent.lockData] 可能有值。*/
+  SUCCESS
+}
+
+/*
+*  升级流阶段。`success` 对应完成，不是 [TTUpgradeStatus]。
+* 
+*  Generated enum Companion class from Pigeon that represents data sent 
+   in messages.Do not delete otherwise enum type data transfer will be failed
+*/
+export class TTUpgradePhaseEnum {
+  index: string|null = null;
+	constructor(index: string){
+    this.index = index;
+  }
+}
+
+/*
+*  网关网络 DFU 类型。
+* 
+*  Generated enum from Pigeon that represents data sent in messages.
+*/
+export enum TTDfuType {
+  /* 网络升级。*/
+  NET,
+  /* 蓝牙升级。*/
+  BLUETOOTH
+}
+
+/*
+*  网关网络 DFU 类型。
+* 
+*  Generated enum Companion class from Pigeon that represents data sent 
+   in messages.Do not delete otherwise enum type data transfer will be failed
+*/
+export class TTDfuTypeEnum {
+  index: string|null = null;
+	constructor(index: string){
+    this.index = index;
+  }
+}
+
+/*
+*  升级错误码。`success` 仅为占位，对齐旧 ordinal，业务失败不用。
+* 
+*  Generated enum from Pigeon that represents data sent in messages.
+*/
+export enum TTLockUpgradeError {
+  /* 占位成功，业务失败不用。*/
+  SUCCESS,
+  /* 外设蓝牙关闭。*/
+  PERIPHERAL_POWERED_OFF,
+  /* 连接超时。*/
+  CONNECT_TIMEOUT,
+  /* 网络失败。*/
+  NET_FAIL,
+  /* 无需升级。*/
+  NO_NEED_UPGRADE,
+  /* 未知升级版本。*/
+  UNKNOWN_UPGRADE_VERSION,
+  /* 进入升级状态失败。*/
+  ENTER_UPGRADE_STATE,
+  /* 锁升级失败。*/
+  UPGRADE_LOCK_FAIL,
+  /* 准备阶段错误。*/
+  PREPARING_ERROR,
+  /* 读取特征值失败。*/
+  GET_SPECIAL_VALUE_ERROR,
+  /* 升级失败。*/
+  UPGRADE_FAIL
+}
+
+/*
+*  升级错误码。`success` 仅为占位，对齐旧 ordinal，业务失败不用。
+* 
+*  Generated enum Companion class from Pigeon that represents data sent 
+   in messages.Do not delete otherwise enum type data transfer will be failed
+*/
+export class TTLockUpgradeErrorEnum {
+  index: string|null = null;
+	constructor(index: string){
+    this.index = index;
+  }
+}
+
+/*
 *  锁版本信息。
 * 
 *  Generated class from Pigeon that represents data sent in messages.
@@ -5870,6 +5990,972 @@ export class AddPalmVeinEvent {
   }
 }
 
+/*
+*  固件升级进度事件。
+* 
+*  Generated class from Pigeon that represents data sent in messages.
+*/
+export class TTUpgradeEvent {
+  private phase: TTUpgradePhase;
+
+  public setPhase(phase: TTUpgradePhase): void {
+    this.phase = phase;
+  }
+
+  getPhase(): TTUpgradePhase{
+    return this.phase;
+  }
+
+  private status?: TTUpgradeStatus;
+
+  public setStatus(status: TTUpgradeStatus | undefined): void {
+    this.status = status;
+  }
+
+  getStatus(): TTUpgradeStatus | undefined{
+    return this.status;
+  }
+
+  private progress?: number;
+
+  public setProgress(progress: number | undefined): void {
+    this.progress = progress;
+  }
+
+  getProgress(): number | undefined{
+    return this.progress;
+  }
+
+  private lockData?: string;
+
+  public setLockData(lockData: string | undefined): void {
+    this.lockData = lockData;
+  }
+
+  getLockData(): string | undefined{
+    return this.lockData;
+  }
+
+  constructor(phase: TTUpgradePhase, status?: TTUpgradeStatus, progress?: number, lockData?: string) {
+    this.phase = phase;
+    this.status = status;
+    this.progress = progress;
+    this.lockData = lockData;
+  }
+
+  toList(): Array<Object | null> {
+    let arr: Array<Object | null> = new Array<Object | null>();
+    if (this.phase === undefined || this.phase === null) {
+      arr.push(null);
+    } else {
+      const phaseStr = TTUpgradePhase[this.phase as number];
+      arr.push(new TTUpgradePhaseEnum(phaseStr));
+    }
+    if (this.status === undefined || this.status === null) {
+      arr.push(null);
+    } else {
+      const statusStr = TTUpgradeStatus[this.status as number];
+      arr.push(new TTUpgradeStatusEnum(statusStr));
+    }
+    if (this.progress === undefined || this.progress === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.progress);
+    }
+    if (this.lockData === undefined || this.lockData === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.lockData);
+    }
+    return arr;
+  }
+
+  static fromList(arr: Object[]): TTUpgradeEvent {
+    const phaseStr: string = arr[0] as string;
+    const phase: TTUpgradePhase = TTUpgradePhase[phaseStr];
+    let status: TTUpgradeStatus | undefined = undefined;
+    if (arr[1] !== null && arr[1] !== undefined) {
+      const statusStr: string = arr[1] as string;
+      status = TTUpgradeStatus[statusStr];
+    }
+    let progress: number | undefined = undefined;
+    if (arr[2] !== null && arr[2] !== undefined) {
+      let progressObject: Object = arr[2];
+      progress = progressObject as number | undefined;
+    }
+    let lockData: string | undefined = undefined;
+    if (arr[3] !== null && arr[3] !== undefined) {
+      let lockDataObject: Object = arr[3];
+      lockData = lockDataObject as string | undefined;
+    }
+    return new TTUpgradeEvent(phase, status, progress, lockData);
+  }
+}
+
+/*
+*  [TTEventChannelApi.upgradeLock] 订阅前通过 [TTUpgradeHostApi.setUpgradeLockParam] 写入。
+* 
+*  Generated class from Pigeon that represents data sent in messages.
+*/
+export class TTUpgradeLockParam {
+  private lockMac: string;
+
+  public setLockMac(lockMac: string): void {
+    this.lockMac = lockMac;
+  }
+
+  getLockMac(): string{
+    return this.lockMac;
+  }
+
+  private lockData: string;
+
+  public setLockData(lockData: string): void {
+    this.lockData = lockData;
+  }
+
+  getLockData(): string{
+    return this.lockData;
+  }
+
+  private firmwarePackage: string;
+
+  public setFirmwarePackage(firmwarePackage: string): void {
+    this.firmwarePackage = firmwarePackage;
+  }
+
+  getFirmwarePackage(): string{
+    return this.firmwarePackage;
+  }
+
+  constructor(lockMac: string, lockData: string, firmwarePackage: string) {
+    this.lockMac = lockMac;
+    this.lockData = lockData;
+    this.firmwarePackage = firmwarePackage;
+  }
+
+  toList(): Array<Object | null> {
+    let arr: Array<Object | null> = new Array<Object | null>();
+    if (this.lockMac === undefined || this.lockMac === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.lockMac);
+    }
+    if (this.lockData === undefined || this.lockData === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.lockData);
+    }
+    if (this.firmwarePackage === undefined || this.firmwarePackage === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.firmwarePackage);
+    }
+    return arr;
+  }
+
+  static fromList(arr: Object[]): TTUpgradeLockParam {
+    let lockMacObject: Object = arr[0];
+    const lockMac: string = lockMacObject as string;
+    let lockDataObject: Object = arr[1];
+    const lockData: string = lockDataObject as string;
+    let firmwarePackageObject: Object = arr[2];
+    const firmwarePackage: string = firmwarePackageObject as string;
+    return new TTUpgradeLockParam(lockMac, lockData, firmwarePackage);
+  }
+}
+
+/*
+*  [TTEventChannelApi.upgradeGateway] 订阅前通过 [TTUpgradeHostApi.setUpgradeGatewayParam] 写入。
+* 
+*  Generated class from Pigeon that represents data sent in messages.
+*/
+export class TTUpgradeGatewayParam {
+  private dfuType: TTDfuType;
+
+  public setDfuType(dfuType: TTDfuType): void {
+    this.dfuType = dfuType;
+  }
+
+  getDfuType(): TTDfuType{
+    return this.dfuType;
+  }
+
+  private clientId: string;
+
+  public setClientId(clientId: string): void {
+    this.clientId = clientId;
+  }
+
+  getClientId(): string{
+    return this.clientId;
+  }
+
+  private accessToken: string;
+
+  public setAccessToken(accessToken: string): void {
+    this.accessToken = accessToken;
+  }
+
+  getAccessToken(): string{
+    return this.accessToken;
+  }
+
+  private gatewayId: number;
+
+  public setGatewayId(gatewayId: number): void {
+    this.gatewayId = gatewayId;
+  }
+
+  getGatewayId(): number{
+    return this.gatewayId;
+  }
+
+  private gatewayMac: string;
+
+  public setGatewayMac(gatewayMac: string): void {
+    this.gatewayMac = gatewayMac;
+  }
+
+  getGatewayMac(): string{
+    return this.gatewayMac;
+  }
+
+  constructor(dfuType: TTDfuType, clientId: string, accessToken: string, gatewayId: number, gatewayMac: string) {
+    this.dfuType = dfuType;
+    this.clientId = clientId;
+    this.accessToken = accessToken;
+    this.gatewayId = gatewayId;
+    this.gatewayMac = gatewayMac;
+  }
+
+  toList(): Array<Object | null> {
+    let arr: Array<Object | null> = new Array<Object | null>();
+    if (this.dfuType === undefined || this.dfuType === null) {
+      arr.push(null);
+    } else {
+      const dfuTypeStr = TTDfuType[this.dfuType as number];
+      arr.push(new TTDfuTypeEnum(dfuTypeStr));
+    }
+    if (this.clientId === undefined || this.clientId === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.clientId);
+    }
+    if (this.accessToken === undefined || this.accessToken === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.accessToken);
+    }
+    if (this.gatewayId === undefined || this.gatewayId === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.gatewayId);
+    }
+    if (this.gatewayMac === undefined || this.gatewayMac === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.gatewayMac);
+    }
+    return arr;
+  }
+
+  static fromList(arr: Object[]): TTUpgradeGatewayParam {
+    const dfuTypeStr: string = arr[0] as string;
+    const dfuType: TTDfuType = TTDfuType[dfuTypeStr];
+    let clientIdObject: Object = arr[1];
+    const clientId: string = clientIdObject as string;
+    let accessTokenObject: Object = arr[2];
+    const accessToken: string = accessTokenObject as string;
+    let gatewayIdObject: Object = arr[3];
+    const gatewayId: number = gatewayIdObject as number;
+    let gatewayMacObject: Object = arr[4];
+    const gatewayMac: string = gatewayMacObject as string;
+    return new TTUpgradeGatewayParam(dfuType, clientId, accessToken, gatewayId, gatewayMac);
+  }
+}
+
+/*
+*  [TTEventChannelApi.upgradeGatewayByPackage] 订阅前写入。
+* 
+*  Generated class from Pigeon that represents data sent in messages.
+*/
+export class TTUpgradeGatewayByPackageParam {
+  private firmwarePackage: string;
+
+  public setFirmwarePackage(firmwarePackage: string): void {
+    this.firmwarePackage = firmwarePackage;
+  }
+
+  getFirmwarePackage(): string{
+    return this.firmwarePackage;
+  }
+
+  private gatewayMac: string;
+
+  public setGatewayMac(gatewayMac: string): void {
+    this.gatewayMac = gatewayMac;
+  }
+
+  getGatewayMac(): string{
+    return this.gatewayMac;
+  }
+
+  constructor(firmwarePackage: string, gatewayMac: string) {
+    this.firmwarePackage = firmwarePackage;
+    this.gatewayMac = gatewayMac;
+  }
+
+  toList(): Array<Object | null> {
+    let arr: Array<Object | null> = new Array<Object | null>();
+    if (this.firmwarePackage === undefined || this.firmwarePackage === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.firmwarePackage);
+    }
+    if (this.gatewayMac === undefined || this.gatewayMac === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.gatewayMac);
+    }
+    return arr;
+  }
+
+  static fromList(arr: Object[]): TTUpgradeGatewayByPackageParam {
+    let firmwarePackageObject: Object = arr[0];
+    const firmwarePackage: string = firmwarePackageObject as string;
+    let gatewayMacObject: Object = arr[1];
+    const gatewayMac: string = gatewayMacObject as string;
+    return new TTUpgradeGatewayByPackageParam(firmwarePackage, gatewayMac);
+  }
+}
+
+/*
+*  [TTEventChannelApi.upgradeWaterMeter] 订阅前写入。
+* 
+*  Generated class from Pigeon that represents data sent in messages.
+*/
+export class TTUpgradeWaterMeterParam {
+  private clientId: string;
+
+  public setClientId(clientId: string): void {
+    this.clientId = clientId;
+  }
+
+  getClientId(): string{
+    return this.clientId;
+  }
+
+  private accessToken: string;
+
+  public setAccessToken(accessToken: string): void {
+    this.accessToken = accessToken;
+  }
+
+  getAccessToken(): string{
+    return this.accessToken;
+  }
+
+  private deviceId: number;
+
+  public setDeviceId(deviceId: number): void {
+    this.deviceId = deviceId;
+  }
+
+  getDeviceId(): number{
+    return this.deviceId;
+  }
+
+  private deviceMac: string;
+
+  public setDeviceMac(deviceMac: string): void {
+    this.deviceMac = deviceMac;
+  }
+
+  getDeviceMac(): string{
+    return this.deviceMac;
+  }
+
+  constructor(clientId: string, accessToken: string, deviceId: number, deviceMac: string) {
+    this.clientId = clientId;
+    this.accessToken = accessToken;
+    this.deviceId = deviceId;
+    this.deviceMac = deviceMac;
+  }
+
+  toList(): Array<Object | null> {
+    let arr: Array<Object | null> = new Array<Object | null>();
+    if (this.clientId === undefined || this.clientId === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.clientId);
+    }
+    if (this.accessToken === undefined || this.accessToken === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.accessToken);
+    }
+    if (this.deviceId === undefined || this.deviceId === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.deviceId);
+    }
+    if (this.deviceMac === undefined || this.deviceMac === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.deviceMac);
+    }
+    return arr;
+  }
+
+  static fromList(arr: Object[]): TTUpgradeWaterMeterParam {
+    let clientIdObject: Object = arr[0];
+    const clientId: string = clientIdObject as string;
+    let accessTokenObject: Object = arr[1];
+    const accessToken: string = accessTokenObject as string;
+    let deviceIdObject: Object = arr[2];
+    const deviceId: number = deviceIdObject as number;
+    let deviceMacObject: Object = arr[3];
+    const deviceMac: string = deviceMacObject as string;
+    return new TTUpgradeWaterMeterParam(clientId, accessToken, deviceId, deviceMac);
+  }
+}
+
+/*
+*  [TTEventChannelApi.upgradeWaterMeterByPackage] 订阅前写入。
+* 
+*  调用方须已对该水表调用过 [TTAccessoryHostApi.waterMeterSetClientParam]。
+* 
+*  Generated class from Pigeon that represents data sent in messages.
+*/
+export class TTUpgradeWaterMeterByPackageParam {
+  private deviceId: number;
+
+  public setDeviceId(deviceId: number): void {
+    this.deviceId = deviceId;
+  }
+
+  getDeviceId(): number{
+    return this.deviceId;
+  }
+
+  private deviceMac: string;
+
+  public setDeviceMac(deviceMac: string): void {
+    this.deviceMac = deviceMac;
+  }
+
+  getDeviceMac(): string{
+    return this.deviceMac;
+  }
+
+  private firmwarePackage: string;
+
+  public setFirmwarePackage(firmwarePackage: string): void {
+    this.firmwarePackage = firmwarePackage;
+  }
+
+  getFirmwarePackage(): string{
+    return this.firmwarePackage;
+  }
+
+  constructor(deviceId: number, deviceMac: string, firmwarePackage: string) {
+    this.deviceId = deviceId;
+    this.deviceMac = deviceMac;
+    this.firmwarePackage = firmwarePackage;
+  }
+
+  toList(): Array<Object | null> {
+    let arr: Array<Object | null> = new Array<Object | null>();
+    if (this.deviceId === undefined || this.deviceId === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.deviceId);
+    }
+    if (this.deviceMac === undefined || this.deviceMac === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.deviceMac);
+    }
+    if (this.firmwarePackage === undefined || this.firmwarePackage === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.firmwarePackage);
+    }
+    return arr;
+  }
+
+  static fromList(arr: Object[]): TTUpgradeWaterMeterByPackageParam {
+    let deviceIdObject: Object = arr[0];
+    const deviceId: number = deviceIdObject as number;
+    let deviceMacObject: Object = arr[1];
+    const deviceMac: string = deviceMacObject as string;
+    let firmwarePackageObject: Object = arr[2];
+    const firmwarePackage: string = firmwarePackageObject as string;
+    return new TTUpgradeWaterMeterByPackageParam(deviceId, deviceMac, firmwarePackage);
+  }
+}
+
+/*
+*  [TTEventChannelApi.upgradeElectricMeter] 订阅前写入。
+* 
+*  Generated class from Pigeon that represents data sent in messages.
+*/
+export class TTUpgradeElectricMeterParam {
+  private clientId: string;
+
+  public setClientId(clientId: string): void {
+    this.clientId = clientId;
+  }
+
+  getClientId(): string{
+    return this.clientId;
+  }
+
+  private accessToken: string;
+
+  public setAccessToken(accessToken: string): void {
+    this.accessToken = accessToken;
+  }
+
+  getAccessToken(): string{
+    return this.accessToken;
+  }
+
+  private deviceId: number;
+
+  public setDeviceId(deviceId: number): void {
+    this.deviceId = deviceId;
+  }
+
+  getDeviceId(): number{
+    return this.deviceId;
+  }
+
+  private deviceMac: string;
+
+  public setDeviceMac(deviceMac: string): void {
+    this.deviceMac = deviceMac;
+  }
+
+  getDeviceMac(): string{
+    return this.deviceMac;
+  }
+
+  constructor(clientId: string, accessToken: string, deviceId: number, deviceMac: string) {
+    this.clientId = clientId;
+    this.accessToken = accessToken;
+    this.deviceId = deviceId;
+    this.deviceMac = deviceMac;
+  }
+
+  toList(): Array<Object | null> {
+    let arr: Array<Object | null> = new Array<Object | null>();
+    if (this.clientId === undefined || this.clientId === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.clientId);
+    }
+    if (this.accessToken === undefined || this.accessToken === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.accessToken);
+    }
+    if (this.deviceId === undefined || this.deviceId === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.deviceId);
+    }
+    if (this.deviceMac === undefined || this.deviceMac === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.deviceMac);
+    }
+    return arr;
+  }
+
+  static fromList(arr: Object[]): TTUpgradeElectricMeterParam {
+    let clientIdObject: Object = arr[0];
+    const clientId: string = clientIdObject as string;
+    let accessTokenObject: Object = arr[1];
+    const accessToken: string = accessTokenObject as string;
+    let deviceIdObject: Object = arr[2];
+    const deviceId: number = deviceIdObject as number;
+    let deviceMacObject: Object = arr[3];
+    const deviceMac: string = deviceMacObject as string;
+    return new TTUpgradeElectricMeterParam(clientId, accessToken, deviceId, deviceMac);
+  }
+}
+
+/*
+*  [TTEventChannelApi.upgradeElectricMeterByPackage] 订阅前写入。
+* 
+*  调用方须已对该电表调用过 [TTAccessoryHostApi.electricMeterSetClientParam]。
+* 
+*  Generated class from Pigeon that represents data sent in messages.
+*/
+export class TTUpgradeElectricMeterByPackageParam {
+  private deviceId: number;
+
+  public setDeviceId(deviceId: number): void {
+    this.deviceId = deviceId;
+  }
+
+  getDeviceId(): number{
+    return this.deviceId;
+  }
+
+  private deviceMac: string;
+
+  public setDeviceMac(deviceMac: string): void {
+    this.deviceMac = deviceMac;
+  }
+
+  getDeviceMac(): string{
+    return this.deviceMac;
+  }
+
+  private firmwarePackage: string;
+
+  public setFirmwarePackage(firmwarePackage: string): void {
+    this.firmwarePackage = firmwarePackage;
+  }
+
+  getFirmwarePackage(): string{
+    return this.firmwarePackage;
+  }
+
+  constructor(deviceId: number, deviceMac: string, firmwarePackage: string) {
+    this.deviceId = deviceId;
+    this.deviceMac = deviceMac;
+    this.firmwarePackage = firmwarePackage;
+  }
+
+  toList(): Array<Object | null> {
+    let arr: Array<Object | null> = new Array<Object | null>();
+    if (this.deviceId === undefined || this.deviceId === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.deviceId);
+    }
+    if (this.deviceMac === undefined || this.deviceMac === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.deviceMac);
+    }
+    if (this.firmwarePackage === undefined || this.firmwarePackage === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.firmwarePackage);
+    }
+    return arr;
+  }
+
+  static fromList(arr: Object[]): TTUpgradeElectricMeterByPackageParam {
+    let deviceIdObject: Object = arr[0];
+    const deviceId: number = deviceIdObject as number;
+    let deviceMacObject: Object = arr[1];
+    const deviceMac: string = deviceMacObject as string;
+    let firmwarePackageObject: Object = arr[2];
+    const firmwarePackage: string = firmwarePackageObject as string;
+    return new TTUpgradeElectricMeterByPackageParam(deviceId, deviceMac, firmwarePackage);
+  }
+}
+
+/*
+*  [TTEventChannelApi.upgradeKeypad] 订阅前写入。
+* 
+*  [lockData] / [slotNumber] / [featureValue] 可选，缺省按空串 / 0 处理。
+* 
+*  Generated class from Pigeon that represents data sent in messages.
+*/
+export class TTUpgradeKeypadParam {
+  private clientId: string;
+
+  public setClientId(clientId: string): void {
+    this.clientId = clientId;
+  }
+
+  getClientId(): string{
+    return this.clientId;
+  }
+
+  private accessToken: string;
+
+  public setAccessToken(accessToken: string): void {
+    this.accessToken = accessToken;
+  }
+
+  getAccessToken(): string{
+    return this.accessToken;
+  }
+
+  private deviceId: number;
+
+  public setDeviceId(deviceId: number): void {
+    this.deviceId = deviceId;
+  }
+
+  getDeviceId(): number{
+    return this.deviceId;
+  }
+
+  private deviceMac: string;
+
+  public setDeviceMac(deviceMac: string): void {
+    this.deviceMac = deviceMac;
+  }
+
+  getDeviceMac(): string{
+    return this.deviceMac;
+  }
+
+  private lockData?: string;
+
+  public setLockData(lockData: string | undefined): void {
+    this.lockData = lockData;
+  }
+
+  getLockData(): string | undefined{
+    return this.lockData;
+  }
+
+  private slotNumber?: number;
+
+  public setSlotNumber(slotNumber: number | undefined): void {
+    this.slotNumber = slotNumber;
+  }
+
+  getSlotNumber(): number | undefined{
+    return this.slotNumber;
+  }
+
+  private featureValue?: string;
+
+  public setFeatureValue(featureValue: string | undefined): void {
+    this.featureValue = featureValue;
+  }
+
+  getFeatureValue(): string | undefined{
+    return this.featureValue;
+  }
+
+  constructor(clientId: string, accessToken: string, deviceId: number, deviceMac: string, lockData?: string, slotNumber?: number, featureValue?: string) {
+    this.clientId = clientId;
+    this.accessToken = accessToken;
+    this.deviceId = deviceId;
+    this.deviceMac = deviceMac;
+    this.lockData = lockData;
+    this.slotNumber = slotNumber;
+    this.featureValue = featureValue;
+  }
+
+  toList(): Array<Object | null> {
+    let arr: Array<Object | null> = new Array<Object | null>();
+    if (this.clientId === undefined || this.clientId === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.clientId);
+    }
+    if (this.accessToken === undefined || this.accessToken === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.accessToken);
+    }
+    if (this.deviceId === undefined || this.deviceId === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.deviceId);
+    }
+    if (this.deviceMac === undefined || this.deviceMac === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.deviceMac);
+    }
+    if (this.lockData === undefined || this.lockData === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.lockData);
+    }
+    if (this.slotNumber === undefined || this.slotNumber === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.slotNumber);
+    }
+    if (this.featureValue === undefined || this.featureValue === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.featureValue);
+    }
+    return arr;
+  }
+
+  static fromList(arr: Object[]): TTUpgradeKeypadParam {
+    let clientIdObject: Object = arr[0];
+    const clientId: string = clientIdObject as string;
+    let accessTokenObject: Object = arr[1];
+    const accessToken: string = accessTokenObject as string;
+    let deviceIdObject: Object = arr[2];
+    const deviceId: number = deviceIdObject as number;
+    let deviceMacObject: Object = arr[3];
+    const deviceMac: string = deviceMacObject as string;
+    let lockData: string | undefined = undefined;
+    if (arr[4] !== null && arr[4] !== undefined) {
+      let lockDataObject: Object = arr[4];
+      lockData = lockDataObject as string | undefined;
+    }
+    let slotNumber: number | undefined = undefined;
+    if (arr[5] !== null && arr[5] !== undefined) {
+      let slotNumberObject: Object = arr[5];
+      slotNumber = slotNumberObject as number | undefined;
+    }
+    let featureValue: string | undefined = undefined;
+    if (arr[6] !== null && arr[6] !== undefined) {
+      let featureValueObject: Object = arr[6];
+      featureValue = featureValueObject as string | undefined;
+    }
+    return new TTUpgradeKeypadParam(clientId, accessToken, deviceId, deviceMac, lockData, slotNumber, featureValue);
+  }
+}
+
+/*
+*  [TTEventChannelApi.upgradeKeypadByPackage] 订阅前写入。
+* 
+*  [lockData] / [slotNumber] / [featureValue] 可选，缺省按空串 / 0 处理。
+* 
+*  Generated class from Pigeon that represents data sent in messages.
+*/
+export class TTUpgradeKeypadByPackageParam {
+  private deviceId: number;
+
+  public setDeviceId(deviceId: number): void {
+    this.deviceId = deviceId;
+  }
+
+  getDeviceId(): number{
+    return this.deviceId;
+  }
+
+  private deviceMac: string;
+
+  public setDeviceMac(deviceMac: string): void {
+    this.deviceMac = deviceMac;
+  }
+
+  getDeviceMac(): string{
+    return this.deviceMac;
+  }
+
+  private firmwarePackage: string;
+
+  public setFirmwarePackage(firmwarePackage: string): void {
+    this.firmwarePackage = firmwarePackage;
+  }
+
+  getFirmwarePackage(): string{
+    return this.firmwarePackage;
+  }
+
+  private lockData?: string;
+
+  public setLockData(lockData: string | undefined): void {
+    this.lockData = lockData;
+  }
+
+  getLockData(): string | undefined{
+    return this.lockData;
+  }
+
+  private slotNumber?: number;
+
+  public setSlotNumber(slotNumber: number | undefined): void {
+    this.slotNumber = slotNumber;
+  }
+
+  getSlotNumber(): number | undefined{
+    return this.slotNumber;
+  }
+
+  private featureValue?: string;
+
+  public setFeatureValue(featureValue: string | undefined): void {
+    this.featureValue = featureValue;
+  }
+
+  getFeatureValue(): string | undefined{
+    return this.featureValue;
+  }
+
+  constructor(deviceId: number, deviceMac: string, firmwarePackage: string, lockData?: string, slotNumber?: number, featureValue?: string) {
+    this.deviceId = deviceId;
+    this.deviceMac = deviceMac;
+    this.firmwarePackage = firmwarePackage;
+    this.lockData = lockData;
+    this.slotNumber = slotNumber;
+    this.featureValue = featureValue;
+  }
+
+  toList(): Array<Object | null> {
+    let arr: Array<Object | null> = new Array<Object | null>();
+    if (this.deviceId === undefined || this.deviceId === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.deviceId);
+    }
+    if (this.deviceMac === undefined || this.deviceMac === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.deviceMac);
+    }
+    if (this.firmwarePackage === undefined || this.firmwarePackage === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.firmwarePackage);
+    }
+    if (this.lockData === undefined || this.lockData === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.lockData);
+    }
+    if (this.slotNumber === undefined || this.slotNumber === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.slotNumber);
+    }
+    if (this.featureValue === undefined || this.featureValue === null) {
+      arr.push(null);
+    } else {
+      arr.push(this.featureValue);
+    }
+    return arr;
+  }
+
+  static fromList(arr: Object[]): TTUpgradeKeypadByPackageParam {
+    let deviceIdObject: Object = arr[0];
+    const deviceId: number = deviceIdObject as number;
+    let deviceMacObject: Object = arr[1];
+    const deviceMac: string = deviceMacObject as string;
+    let firmwarePackageObject: Object = arr[2];
+    const firmwarePackage: string = firmwarePackageObject as string;
+    let lockData: string | undefined = undefined;
+    if (arr[3] !== null && arr[3] !== undefined) {
+      let lockDataObject: Object = arr[3];
+      lockData = lockDataObject as string | undefined;
+    }
+    let slotNumber: number | undefined = undefined;
+    if (arr[4] !== null && arr[4] !== undefined) {
+      let slotNumberObject: Object = arr[4];
+      slotNumber = slotNumberObject as number | undefined;
+    }
+    let featureValue: string | undefined = undefined;
+    if (arr[5] !== null && arr[5] !== undefined) {
+      let featureValueObject: Object = arr[5];
+      featureValue = featureValueObject as string | undefined;
+    }
+    return new TTUpgradeKeypadByPackageParam(deviceId, deviceMac, firmwarePackage, lockData, slotNumber, featureValue);
+  }
+}
+
 export class PigeonCodec extends StandardMessageCodec {
   static readonly INSTANCE: PigeonCodec  = new PigeonCodec();
 
@@ -6032,90 +7118,126 @@ export class PigeonCodec extends StandardMessageCodec {
         let value: Object= super.readValue(buffer);
         return value == null ? null : TTPalmVeinErrorCode[value as number];
       }
-      case this.getByte(166):
-        return TTLockVersion.fromList(super.readValue(buffer) as Object[]);
-      case this.getByte(167):
-        return TTLockInitParams.fromList(super.readValue(buffer) as Object[]);
-      case this.getByte(168):
-        return TTGatewayInitParams.fromList(super.readValue(buffer) as Object[]);
-      case this.getByte(169):
-        return TTIpSetting.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(166): {
+        let value: Object= super.readValue(buffer);
+        return value == null ? null : TTUpgradeStatus[value as number];
+      }
+      case this.getByte(167): {
+        let value: Object= super.readValue(buffer);
+        return value == null ? null : TTUpgradePhase[value as number];
+      }
+      case this.getByte(168): {
+        let value: Object= super.readValue(buffer);
+        return value == null ? null : TTDfuType[value as number];
+      }
+      case this.getByte(169): {
+        let value: Object= super.readValue(buffer);
+        return value == null ? null : TTLockUpgradeError[value as number];
+      }
       case this.getByte(170):
-        return TTCycleModel.fromList(super.readValue(buffer) as Object[]);
+        return TTLockVersion.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(171):
-        return TTLockScanWifiEventParam.fromList(super.readValue(buffer) as Object[]);
+        return TTLockInitParams.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(172):
-        return TTLockCredentialEventParam.fromList(super.readValue(buffer) as Object[]);
+        return TTGatewayInitParams.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(173):
-        return TTKeypadCredentialEventParam.fromList(super.readValue(buffer) as Object[]);
+        return TTIpSetting.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(174):
-        return ControlLockResult.fromList(super.readValue(buffer) as Object[]);
+        return TTCycleModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(175):
-        return AutoLockingTime.fromList(super.readValue(buffer) as Object[]);
+        return TTLockScanWifiEventParam.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(176):
-        return TTWifiInfoModel.fromList(super.readValue(buffer) as Object[]);
+        return TTLockCredentialEventParam.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(177):
-        return CameraLockWifiResult.fromList(super.readValue(buffer) as Object[]);
+        return TTKeypadCredentialEventParam.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(178):
-        return TTLockSystemModel.fromList(super.readValue(buffer) as Object[]);
+        return ControlLockResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(179):
-        return AccessoryElectricQuantityResult.fromList(super.readValue(buffer) as Object[]);
+        return AutoLockingTime.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(180):
-        return TTPassageModeModel.fromList(super.readValue(buffer) as Object[]);
+        return TTWifiInfoModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(181):
-        return TTLockScanModel.fromList(super.readValue(buffer) as Object[]);
+        return CameraLockWifiResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(182):
-        return TTPasscodeModel.fromList(super.readValue(buffer) as Object[]);
+        return TTLockSystemModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(183):
-        return TTICCardModel.fromList(super.readValue(buffer) as Object[]);
+        return AccessoryElectricQuantityResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(184):
-        return TTFingerprintModel.fromList(super.readValue(buffer) as Object[]);
+        return TTPassageModeModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(185):
-        return TTPalmVeinModel.fromList(super.readValue(buffer) as Object[]);
+        return TTLockScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(186):
-        return TTQrCodeModel.fromList(super.readValue(buffer) as Object[]);
+        return TTPasscodeModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(187):
-        return TTGatewayScanModel.fromList(super.readValue(buffer) as Object[]);
+        return TTICCardModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(188):
-        return GatewayDeviceInfo.fromList(super.readValue(buffer) as Object[]);
+        return TTFingerprintModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(189):
-        return TTRemoteAccessoryScanModel.fromList(super.readValue(buffer) as Object[]);
+        return TTPalmVeinModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(190):
-        return TTStandaloneDoorSensorInitParams.fromList(super.readValue(buffer) as Object[]);
+        return TTQrCodeModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(191):
-        return TTStandaloneDoorSensorScanModel.fromList(super.readValue(buffer) as Object[]);
+        return TTGatewayScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(192):
-        return TTStandaloneDoorSensorInfo.fromList(super.readValue(buffer) as Object[]);
+        return GatewayDeviceInfo.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(193):
-        return TTMeterScanModel.fromList(super.readValue(buffer) as Object[]);
+        return TTRemoteAccessoryScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(194):
-        return TTWaterMeterInitResult.fromList(super.readValue(buffer) as Object[]);
+        return TTStandaloneDoorSensorInitParams.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(195):
-        return TTElectricMeterInitResult.fromList(super.readValue(buffer) as Object[]);
+        return TTStandaloneDoorSensorScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(196):
-        return TTWifiScanResult.fromList(super.readValue(buffer) as Object[]);
+        return TTStandaloneDoorSensorInfo.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(197):
-        return TTWifiScanEntry.fromList(super.readValue(buffer) as Object[]);
+        return TTMeterScanModel.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(198):
-        return RemoteKeypadInitResult.fromList(super.readValue(buffer) as Object[]);
+        return TTWaterMeterInitResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(199):
-        return MultifunctionalKeypadInitResult.fromList(super.readValue(buffer) as Object[]);
+        return TTElectricMeterInitResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(200):
-        return WaterMeterDeviceInfo.fromList(super.readValue(buffer) as Object[]);
+        return TTWifiScanResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(201):
-        return ElectricMeterDeviceInfo.fromList(super.readValue(buffer) as Object[]);
+        return TTWifiScanEntry.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(202):
-        return TTWaterMeterInitParam.fromList(super.readValue(buffer) as Object[]);
+        return RemoteKeypadInitResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(203):
-        return TTElectricMeterInitParam.fromList(super.readValue(buffer) as Object[]);
+        return MultifunctionalKeypadInitResult.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(204):
-        return AddCardEvent.fromList(super.readValue(buffer) as Object[]);
+        return WaterMeterDeviceInfo.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(205):
-        return AddFingerprintEvent.fromList(super.readValue(buffer) as Object[]);
+        return ElectricMeterDeviceInfo.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(206):
-        return AddFaceEvent.fromList(super.readValue(buffer) as Object[]);
+        return TTWaterMeterInitParam.fromList(super.readValue(buffer) as Object[]);
       case this.getByte(207):
+        return TTElectricMeterInitParam.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(208):
+        return AddCardEvent.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(209):
+        return AddFingerprintEvent.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(210):
+        return AddFaceEvent.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(211):
         return AddPalmVeinEvent.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(212):
+        return TTUpgradeEvent.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(213):
+        return TTUpgradeLockParam.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(214):
+        return TTUpgradeGatewayParam.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(215):
+        return TTUpgradeGatewayByPackageParam.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(216):
+        return TTUpgradeWaterMeterParam.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(217):
+        return TTUpgradeWaterMeterByPackageParam.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(218):
+        return TTUpgradeElectricMeterParam.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(219):
+        return TTUpgradeElectricMeterByPackageParam.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(220):
+        return TTUpgradeKeypadParam.fromList(super.readValue(buffer) as Object[]);
+      case this.getByte(221):
+        return TTUpgradeKeypadByPackageParam.fromList(super.readValue(buffer) as Object[]);
       default:
         return super.readValueOfType(type, buffer);
     }
@@ -6233,132 +7355,174 @@ export class PigeonCodec extends StandardMessageCodec {
     } else if (value instanceof TTPalmVeinErrorCodeEnum) {
       stream.writeUint8(this.getByte(165));
       this.writeValue(stream, value == null ? null : TTPalmVeinErrorCode[value.index as string]);
-    } else if (value instanceof TTLockVersion) {
+    } else if (value instanceof TTUpgradeStatusEnum) {
       stream.writeUint8(this.getByte(166));
+      this.writeValue(stream, value == null ? null : TTUpgradeStatus[value.index as string]);
+    } else if (value instanceof TTUpgradePhaseEnum) {
+      stream.writeUint8(this.getByte(167));
+      this.writeValue(stream, value == null ? null : TTUpgradePhase[value.index as string]);
+    } else if (value instanceof TTDfuTypeEnum) {
+      stream.writeUint8(this.getByte(168));
+      this.writeValue(stream, value == null ? null : TTDfuType[value.index as string]);
+    } else if (value instanceof TTLockUpgradeErrorEnum) {
+      stream.writeUint8(this.getByte(169));
+      this.writeValue(stream, value == null ? null : TTLockUpgradeError[value.index as string]);
+    } else if (value instanceof TTLockVersion) {
+      stream.writeUint8(this.getByte(170));
       this.writeValue(stream, (value as TTLockVersion).toList());
     } else if (value instanceof TTLockInitParams) {
-      stream.writeUint8(this.getByte(167));
+      stream.writeUint8(this.getByte(171));
       this.writeValue(stream, (value as TTLockInitParams).toList());
     } else if (value instanceof TTGatewayInitParams) {
-      stream.writeUint8(this.getByte(168));
+      stream.writeUint8(this.getByte(172));
       this.writeValue(stream, (value as TTGatewayInitParams).toList());
     } else if (value instanceof TTIpSetting) {
-      stream.writeUint8(this.getByte(169));
+      stream.writeUint8(this.getByte(173));
       this.writeValue(stream, (value as TTIpSetting).toList());
     } else if (value instanceof TTCycleModel) {
-      stream.writeUint8(this.getByte(170));
+      stream.writeUint8(this.getByte(174));
       this.writeValue(stream, (value as TTCycleModel).toList());
     } else if (value instanceof TTLockScanWifiEventParam) {
-      stream.writeUint8(this.getByte(171));
+      stream.writeUint8(this.getByte(175));
       this.writeValue(stream, (value as TTLockScanWifiEventParam).toList());
     } else if (value instanceof TTLockCredentialEventParam) {
-      stream.writeUint8(this.getByte(172));
+      stream.writeUint8(this.getByte(176));
       this.writeValue(stream, (value as TTLockCredentialEventParam).toList());
     } else if (value instanceof TTKeypadCredentialEventParam) {
-      stream.writeUint8(this.getByte(173));
+      stream.writeUint8(this.getByte(177));
       this.writeValue(stream, (value as TTKeypadCredentialEventParam).toList());
     } else if (value instanceof ControlLockResult) {
-      stream.writeUint8(this.getByte(174));
+      stream.writeUint8(this.getByte(178));
       this.writeValue(stream, (value as ControlLockResult).toList());
     } else if (value instanceof AutoLockingTime) {
-      stream.writeUint8(this.getByte(175));
+      stream.writeUint8(this.getByte(179));
       this.writeValue(stream, (value as AutoLockingTime).toList());
     } else if (value instanceof TTWifiInfoModel) {
-      stream.writeUint8(this.getByte(176));
+      stream.writeUint8(this.getByte(180));
       this.writeValue(stream, (value as TTWifiInfoModel).toList());
     } else if (value instanceof CameraLockWifiResult) {
-      stream.writeUint8(this.getByte(177));
+      stream.writeUint8(this.getByte(181));
       this.writeValue(stream, (value as CameraLockWifiResult).toList());
     } else if (value instanceof TTLockSystemModel) {
-      stream.writeUint8(this.getByte(178));
+      stream.writeUint8(this.getByte(182));
       this.writeValue(stream, (value as TTLockSystemModel).toList());
     } else if (value instanceof AccessoryElectricQuantityResult) {
-      stream.writeUint8(this.getByte(179));
+      stream.writeUint8(this.getByte(183));
       this.writeValue(stream, (value as AccessoryElectricQuantityResult).toList());
     } else if (value instanceof TTPassageModeModel) {
-      stream.writeUint8(this.getByte(180));
+      stream.writeUint8(this.getByte(184));
       this.writeValue(stream, (value as TTPassageModeModel).toList());
     } else if (value instanceof TTLockScanModel) {
-      stream.writeUint8(this.getByte(181));
+      stream.writeUint8(this.getByte(185));
       this.writeValue(stream, (value as TTLockScanModel).toList());
     } else if (value instanceof TTPasscodeModel) {
-      stream.writeUint8(this.getByte(182));
+      stream.writeUint8(this.getByte(186));
       this.writeValue(stream, (value as TTPasscodeModel).toList());
     } else if (value instanceof TTICCardModel) {
-      stream.writeUint8(this.getByte(183));
+      stream.writeUint8(this.getByte(187));
       this.writeValue(stream, (value as TTICCardModel).toList());
     } else if (value instanceof TTFingerprintModel) {
-      stream.writeUint8(this.getByte(184));
+      stream.writeUint8(this.getByte(188));
       this.writeValue(stream, (value as TTFingerprintModel).toList());
     } else if (value instanceof TTPalmVeinModel) {
-      stream.writeUint8(this.getByte(185));
+      stream.writeUint8(this.getByte(189));
       this.writeValue(stream, (value as TTPalmVeinModel).toList());
     } else if (value instanceof TTQrCodeModel) {
-      stream.writeUint8(this.getByte(186));
+      stream.writeUint8(this.getByte(190));
       this.writeValue(stream, (value as TTQrCodeModel).toList());
     } else if (value instanceof TTGatewayScanModel) {
-      stream.writeUint8(this.getByte(187));
+      stream.writeUint8(this.getByte(191));
       this.writeValue(stream, (value as TTGatewayScanModel).toList());
     } else if (value instanceof GatewayDeviceInfo) {
-      stream.writeUint8(this.getByte(188));
+      stream.writeUint8(this.getByte(192));
       this.writeValue(stream, (value as GatewayDeviceInfo).toList());
     } else if (value instanceof TTRemoteAccessoryScanModel) {
-      stream.writeUint8(this.getByte(189));
+      stream.writeUint8(this.getByte(193));
       this.writeValue(stream, (value as TTRemoteAccessoryScanModel).toList());
     } else if (value instanceof TTStandaloneDoorSensorInitParams) {
-      stream.writeUint8(this.getByte(190));
+      stream.writeUint8(this.getByte(194));
       this.writeValue(stream, (value as TTStandaloneDoorSensorInitParams).toList());
     } else if (value instanceof TTStandaloneDoorSensorScanModel) {
-      stream.writeUint8(this.getByte(191));
+      stream.writeUint8(this.getByte(195));
       this.writeValue(stream, (value as TTStandaloneDoorSensorScanModel).toList());
     } else if (value instanceof TTStandaloneDoorSensorInfo) {
-      stream.writeUint8(this.getByte(192));
+      stream.writeUint8(this.getByte(196));
       this.writeValue(stream, (value as TTStandaloneDoorSensorInfo).toList());
     } else if (value instanceof TTMeterScanModel) {
-      stream.writeUint8(this.getByte(193));
+      stream.writeUint8(this.getByte(197));
       this.writeValue(stream, (value as TTMeterScanModel).toList());
     } else if (value instanceof TTWaterMeterInitResult) {
-      stream.writeUint8(this.getByte(194));
+      stream.writeUint8(this.getByte(198));
       this.writeValue(stream, (value as TTWaterMeterInitResult).toList());
     } else if (value instanceof TTElectricMeterInitResult) {
-      stream.writeUint8(this.getByte(195));
+      stream.writeUint8(this.getByte(199));
       this.writeValue(stream, (value as TTElectricMeterInitResult).toList());
     } else if (value instanceof TTWifiScanResult) {
-      stream.writeUint8(this.getByte(196));
+      stream.writeUint8(this.getByte(200));
       this.writeValue(stream, (value as TTWifiScanResult).toList());
     } else if (value instanceof TTWifiScanEntry) {
-      stream.writeUint8(this.getByte(197));
+      stream.writeUint8(this.getByte(201));
       this.writeValue(stream, (value as TTWifiScanEntry).toList());
     } else if (value instanceof RemoteKeypadInitResult) {
-      stream.writeUint8(this.getByte(198));
+      stream.writeUint8(this.getByte(202));
       this.writeValue(stream, (value as RemoteKeypadInitResult).toList());
     } else if (value instanceof MultifunctionalKeypadInitResult) {
-      stream.writeUint8(this.getByte(199));
+      stream.writeUint8(this.getByte(203));
       this.writeValue(stream, (value as MultifunctionalKeypadInitResult).toList());
     } else if (value instanceof WaterMeterDeviceInfo) {
-      stream.writeUint8(this.getByte(200));
+      stream.writeUint8(this.getByte(204));
       this.writeValue(stream, (value as WaterMeterDeviceInfo).toList());
     } else if (value instanceof ElectricMeterDeviceInfo) {
-      stream.writeUint8(this.getByte(201));
+      stream.writeUint8(this.getByte(205));
       this.writeValue(stream, (value as ElectricMeterDeviceInfo).toList());
     } else if (value instanceof TTWaterMeterInitParam) {
-      stream.writeUint8(this.getByte(202));
+      stream.writeUint8(this.getByte(206));
       this.writeValue(stream, (value as TTWaterMeterInitParam).toList());
     } else if (value instanceof TTElectricMeterInitParam) {
-      stream.writeUint8(this.getByte(203));
+      stream.writeUint8(this.getByte(207));
       this.writeValue(stream, (value as TTElectricMeterInitParam).toList());
     } else if (value instanceof AddCardEvent) {
-      stream.writeUint8(this.getByte(204));
+      stream.writeUint8(this.getByte(208));
       this.writeValue(stream, (value as AddCardEvent).toList());
     } else if (value instanceof AddFingerprintEvent) {
-      stream.writeUint8(this.getByte(205));
+      stream.writeUint8(this.getByte(209));
       this.writeValue(stream, (value as AddFingerprintEvent).toList());
     } else if (value instanceof AddFaceEvent) {
-      stream.writeUint8(this.getByte(206));
+      stream.writeUint8(this.getByte(210));
       this.writeValue(stream, (value as AddFaceEvent).toList());
     } else if (value instanceof AddPalmVeinEvent) {
-      stream.writeUint8(this.getByte(207));
+      stream.writeUint8(this.getByte(211));
       this.writeValue(stream, (value as AddPalmVeinEvent).toList());
+    } else if (value instanceof TTUpgradeEvent) {
+      stream.writeUint8(this.getByte(212));
+      this.writeValue(stream, (value as TTUpgradeEvent).toList());
+    } else if (value instanceof TTUpgradeLockParam) {
+      stream.writeUint8(this.getByte(213));
+      this.writeValue(stream, (value as TTUpgradeLockParam).toList());
+    } else if (value instanceof TTUpgradeGatewayParam) {
+      stream.writeUint8(this.getByte(214));
+      this.writeValue(stream, (value as TTUpgradeGatewayParam).toList());
+    } else if (value instanceof TTUpgradeGatewayByPackageParam) {
+      stream.writeUint8(this.getByte(215));
+      this.writeValue(stream, (value as TTUpgradeGatewayByPackageParam).toList());
+    } else if (value instanceof TTUpgradeWaterMeterParam) {
+      stream.writeUint8(this.getByte(216));
+      this.writeValue(stream, (value as TTUpgradeWaterMeterParam).toList());
+    } else if (value instanceof TTUpgradeWaterMeterByPackageParam) {
+      stream.writeUint8(this.getByte(217));
+      this.writeValue(stream, (value as TTUpgradeWaterMeterByPackageParam).toList());
+    } else if (value instanceof TTUpgradeElectricMeterParam) {
+      stream.writeUint8(this.getByte(218));
+      this.writeValue(stream, (value as TTUpgradeElectricMeterParam).toList());
+    } else if (value instanceof TTUpgradeElectricMeterByPackageParam) {
+      stream.writeUint8(this.getByte(219));
+      this.writeValue(stream, (value as TTUpgradeElectricMeterByPackageParam).toList());
+    } else if (value instanceof TTUpgradeKeypadParam) {
+      stream.writeUint8(this.getByte(220));
+      this.writeValue(stream, (value as TTUpgradeKeypadParam).toList());
+    } else if (value instanceof TTUpgradeKeypadByPackageParam) {
+      stream.writeUint8(this.getByte(221));
+      this.writeValue(stream, (value as TTUpgradeKeypadByPackageParam).toList());
     } else {
       super.writeValue(stream, value);
     }
@@ -12921,6 +14085,481 @@ export abstract class TTAccessoryHostApi {
     }
   }
 }
+/*
+*  固件升级参数槽与停止。
+* 
+*  订阅 [TTEventChannelApi] 对应升级流之前调用 `setUpgrade*Param`。
+*  停止方法只结束本路升级，不得 abort 其他设备的 DFU。
+* 
+*  Generated abstract class from Pigeon that represents a handler of messages from Flutter.
+*/
+export abstract class TTUpgradeHostApi {
+  /*
+  *  订阅 [TTEventChannelApi.upgradeLock] 前调用。
+  * 
+  *  [param] 锁固件包升级参数。
+  */
+  abstract setUpgradeLockParam(param: TTUpgradeLockParam ): void;
+  /*
+  *  订阅 [TTEventChannelApi.upgradeGateway] 前调用。
+  * 
+  *  [param] 网关网络 DFU 参数。
+  */
+  abstract setUpgradeGatewayParam(param: TTUpgradeGatewayParam ): void;
+  /*
+  *  订阅 [TTEventChannelApi.upgradeGatewayByPackage] 前调用。
+  * 
+  *  [param] 网关固件包升级参数。
+  */
+  abstract setUpgradeGatewayByPackageParam(param: TTUpgradeGatewayByPackageParam ): void;
+  /*
+  *  订阅 [TTEventChannelApi.upgradeWaterMeter] 前调用。
+  * 
+  *  [param] 水表网络升级参数。
+  */
+  abstract setUpgradeWaterMeterParam(param: TTUpgradeWaterMeterParam ): void;
+  /*
+  *  订阅 [TTEventChannelApi.upgradeWaterMeterByPackage] 前调用。
+  * 
+  *  调用方须已对该水表调用过 [TTAccessoryHostApi.waterMeterSetClientParam]。
+  * 
+  *  [param] 水表固件包升级参数。
+  */
+  abstract setUpgradeWaterMeterByPackageParam(param: TTUpgradeWaterMeterByPackageParam ): void;
+  /*
+  *  订阅 [TTEventChannelApi.upgradeElectricMeter] 前调用。
+  * 
+  *  [param] 电表网络升级参数。
+  */
+  abstract setUpgradeElectricMeterParam(param: TTUpgradeElectricMeterParam ): void;
+  /*
+  *  订阅 [TTEventChannelApi.upgradeElectricMeterByPackage] 前调用。
+  * 
+  *  调用方须已对该电表调用过 [TTAccessoryHostApi.electricMeterSetClientParam]。
+  * 
+  *  [param] 电表固件包升级参数。
+  */
+  abstract setUpgradeElectricMeterByPackageParam(param: TTUpgradeElectricMeterByPackageParam ): void;
+  /*
+  *  订阅 [TTEventChannelApi.upgradeKeypad] 前调用。
+  * 
+  *  [param] 键盘网络升级参数。
+  */
+  abstract setUpgradeKeypadParam(param: TTUpgradeKeypadParam ): void;
+  /*
+  *  订阅 [TTEventChannelApi.upgradeKeypadByPackage] 前调用。
+  * 
+  *  [param] 键盘固件包升级参数。
+  */
+  abstract setUpgradeKeypadByPackageParam(param: TTUpgradeKeypadByPackageParam ): void;
+  /* 停止锁升级。*/
+  abstract stopUpgradeLock(): void;
+  /* 停止网关升级（网络 DFU 与固件包共用）。*/
+  abstract stopUpgradeGateway(): void;
+  /* 停止水表升级。不得 abort 锁或网关 DFU。*/
+  abstract stopUpgradeWaterMeter(): void;
+  /* 停止电表升级。不得 abort 锁或网关 DFU。*/
+  abstract stopUpgradeElectricMeter(): void;
+  /* 停止键盘升级。不得 abort 锁或网关 DFU。*/
+  abstract stopUpgradeKeypad(): void;
+  /** The codec used by TTUpgradeHostApi. */
+  static getCodec(): MessageCodec<Object>{
+    return PigeonCodec.INSTANCE;
+  }
+  /*Sets up an instance of `TTUpgradeHostApi` to handle messages through the `binaryMessenger`.*/
+  static setup(binaryMessenger: BinaryMessenger, api: TTUpgradeHostApi | null, messageChannelSuffix: string = ''): void {
+    const separatedMessageChannelSuffix: string = messageChannelSuffix !== '' ? '.' + messageChannelSuffix : '';
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.setUpgradeLockParam' + separatedMessageChannelSuffix, TTUpgradeHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              if (!(Array.isArray(message))) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected List.')));
+                  return;
+              }
+              let args: Array<Object> = message as Array<Object>;
+              if (args.length < 1) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected at least 1 argument(s).')));
+                  return;
+              }
+              let res: Array<Object | null> = [];
+              try {
+                api!.setUpgradeLockParam(args[0] as TTUpgradeLockParam);
+                res.push(null);
+              }
+ catch (error) {
+                let wrappedError: Array<Object | null> = wrapError(error);
+                res = wrappedError;
+              }
+              reply.reply(res);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.setUpgradeGatewayParam' + separatedMessageChannelSuffix, TTUpgradeHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              if (!(Array.isArray(message))) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected List.')));
+                  return;
+              }
+              let args: Array<Object> = message as Array<Object>;
+              if (args.length < 1) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected at least 1 argument(s).')));
+                  return;
+              }
+              let res: Array<Object | null> = [];
+              try {
+                api!.setUpgradeGatewayParam(args[0] as TTUpgradeGatewayParam);
+                res.push(null);
+              }
+ catch (error) {
+                let wrappedError: Array<Object | null> = wrapError(error);
+                res = wrappedError;
+              }
+              reply.reply(res);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.setUpgradeGatewayByPackageParam' + separatedMessageChannelSuffix, TTUpgradeHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              if (!(Array.isArray(message))) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected List.')));
+                  return;
+              }
+              let args: Array<Object> = message as Array<Object>;
+              if (args.length < 1) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected at least 1 argument(s).')));
+                  return;
+              }
+              let res: Array<Object | null> = [];
+              try {
+                api!.setUpgradeGatewayByPackageParam(args[0] as TTUpgradeGatewayByPackageParam);
+                res.push(null);
+              }
+ catch (error) {
+                let wrappedError: Array<Object | null> = wrapError(error);
+                res = wrappedError;
+              }
+              reply.reply(res);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.setUpgradeWaterMeterParam' + separatedMessageChannelSuffix, TTUpgradeHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              if (!(Array.isArray(message))) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected List.')));
+                  return;
+              }
+              let args: Array<Object> = message as Array<Object>;
+              if (args.length < 1) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected at least 1 argument(s).')));
+                  return;
+              }
+              let res: Array<Object | null> = [];
+              try {
+                api!.setUpgradeWaterMeterParam(args[0] as TTUpgradeWaterMeterParam);
+                res.push(null);
+              }
+ catch (error) {
+                let wrappedError: Array<Object | null> = wrapError(error);
+                res = wrappedError;
+              }
+              reply.reply(res);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.setUpgradeWaterMeterByPackageParam' + separatedMessageChannelSuffix, TTUpgradeHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              if (!(Array.isArray(message))) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected List.')));
+                  return;
+              }
+              let args: Array<Object> = message as Array<Object>;
+              if (args.length < 1) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected at least 1 argument(s).')));
+                  return;
+              }
+              let res: Array<Object | null> = [];
+              try {
+                api!.setUpgradeWaterMeterByPackageParam(args[0] as TTUpgradeWaterMeterByPackageParam);
+                res.push(null);
+              }
+ catch (error) {
+                let wrappedError: Array<Object | null> = wrapError(error);
+                res = wrappedError;
+              }
+              reply.reply(res);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.setUpgradeElectricMeterParam' + separatedMessageChannelSuffix, TTUpgradeHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              if (!(Array.isArray(message))) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected List.')));
+                  return;
+              }
+              let args: Array<Object> = message as Array<Object>;
+              if (args.length < 1) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected at least 1 argument(s).')));
+                  return;
+              }
+              let res: Array<Object | null> = [];
+              try {
+                api!.setUpgradeElectricMeterParam(args[0] as TTUpgradeElectricMeterParam);
+                res.push(null);
+              }
+ catch (error) {
+                let wrappedError: Array<Object | null> = wrapError(error);
+                res = wrappedError;
+              }
+              reply.reply(res);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.setUpgradeElectricMeterByPackageParam' + separatedMessageChannelSuffix, TTUpgradeHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              if (!(Array.isArray(message))) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected List.')));
+                  return;
+              }
+              let args: Array<Object> = message as Array<Object>;
+              if (args.length < 1) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected at least 1 argument(s).')));
+                  return;
+              }
+              let res: Array<Object | null> = [];
+              try {
+                api!.setUpgradeElectricMeterByPackageParam(args[0] as TTUpgradeElectricMeterByPackageParam);
+                res.push(null);
+              }
+ catch (error) {
+                let wrappedError: Array<Object | null> = wrapError(error);
+                res = wrappedError;
+              }
+              reply.reply(res);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.setUpgradeKeypadParam' + separatedMessageChannelSuffix, TTUpgradeHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              if (!(Array.isArray(message))) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected List.')));
+                  return;
+              }
+              let args: Array<Object> = message as Array<Object>;
+              if (args.length < 1) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected at least 1 argument(s).')));
+                  return;
+              }
+              let res: Array<Object | null> = [];
+              try {
+                api!.setUpgradeKeypadParam(args[0] as TTUpgradeKeypadParam);
+                res.push(null);
+              }
+ catch (error) {
+                let wrappedError: Array<Object | null> = wrapError(error);
+                res = wrappedError;
+              }
+              reply.reply(res);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.setUpgradeKeypadByPackageParam' + separatedMessageChannelSuffix, TTUpgradeHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              if (!(Array.isArray(message))) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected List.')));
+                  return;
+              }
+              let args: Array<Object> = message as Array<Object>;
+              if (args.length < 1) {
+                  reply.reply(wrapError(new Error('Invalid Pigeon message: expected at least 1 argument(s).')));
+                  return;
+              }
+              let res: Array<Object | null> = [];
+              try {
+                api!.setUpgradeKeypadByPackageParam(args[0] as TTUpgradeKeypadByPackageParam);
+                res.push(null);
+              }
+ catch (error) {
+                let wrappedError: Array<Object | null> = wrapError(error);
+                res = wrappedError;
+              }
+              reply.reply(res);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.stopUpgradeLock' + separatedMessageChannelSuffix, TTUpgradeHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let res: Array<Object | null> = [];
+              try {
+                api!.stopUpgradeLock();
+                res.push(null);
+              }
+ catch (error) {
+                let wrappedError: Array<Object | null> = wrapError(error);
+                res = wrappedError;
+              }
+              reply.reply(res);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.stopUpgradeGateway' + separatedMessageChannelSuffix, TTUpgradeHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let res: Array<Object | null> = [];
+              try {
+                api!.stopUpgradeGateway();
+                res.push(null);
+              }
+ catch (error) {
+                let wrappedError: Array<Object | null> = wrapError(error);
+                res = wrappedError;
+              }
+              reply.reply(res);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.stopUpgradeWaterMeter' + separatedMessageChannelSuffix, TTUpgradeHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let res: Array<Object | null> = [];
+              try {
+                api!.stopUpgradeWaterMeter();
+                res.push(null);
+              }
+ catch (error) {
+                let wrappedError: Array<Object | null> = wrapError(error);
+                res = wrappedError;
+              }
+              reply.reply(res);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.stopUpgradeElectricMeter' + separatedMessageChannelSuffix, TTUpgradeHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let res: Array<Object | null> = [];
+              try {
+                api!.stopUpgradeElectricMeter();
+                res.push(null);
+              }
+ catch (error) {
+                let wrappedError: Array<Object | null> = wrapError(error);
+                res = wrappedError;
+              }
+              reply.reply(res);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+    {
+      let channel: BasicMessageChannel<Object> =
+          new BasicMessageChannel(
+              binaryMessenger, 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.stopUpgradeKeypad' + separatedMessageChannelSuffix, TTUpgradeHostApi.getCodec());
+      if (api != null) {
+        channel.setMessageHandler({
+            onMessage(message: Object ,reply: Reply<Object> ) {
+              let res: Array<Object | null> = [];
+              try {
+                api!.stopUpgradeKeypad();
+                res.push(null);
+              }
+ catch (error) {
+                let wrappedError: Array<Object | null> = wrapError(error);
+                res = wrappedError;
+              }
+              reply.reply(res);
+            } });
+      } else {
+        channel.setMessageHandler(null);
+      }
+    }
+  }
+}
 
 /**
  * Internal [StreamHandler] that delegates to a [PigeonEventChannelWrapper].
@@ -12973,7 +14612,7 @@ export class PigeonEventSink<T> {
 *  持续事件流接口。
 * 
 *  订阅任一流方法前，须通过对应 [TTLockHostApi] / [TTGatewayHostApi] /
-*  [TTAccessoryHostApi] 的 `set*Param` 方法写入上下文参数。
+*  [TTAccessoryHostApi] / [TTUpgradeHostApi] 的 `set*Param` 方法写入上下文参数。
 */
 export abstract class LockScanLockStreamHandler implements PigeonEventChannelWrapper<TTLockScanModel> {
   static register(binaryMessenger: BinaryMessenger, streamHandler: LockScanLockStreamHandler, instanceName: string = ''): void {
@@ -13288,6 +14927,186 @@ export abstract class AccessoryElectricMeterStartScanStreamHandler implements Pi
   }
 
   onListen(args: Object, sink: PigeonEventSink<TTMeterScanModel>): void {
+  }
+
+  onCancel(args: Object): void {
+  }
+}
+
+
+export abstract class UpgradeLockStreamHandler implements PigeonEventChannelWrapper<TTUpgradeEvent> {
+  static register(binaryMessenger: BinaryMessenger, streamHandler: UpgradeLockStreamHandler, instanceName: string = ''): void {
+    let channelName: string = 'dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.upgradeLock';
+    if (instanceName !== '') {
+      channelName += '.' + instanceName;
+    }
+    const internalStreamHandler: PigeonStreamHandler<TTUpgradeEvent> =
+        new PigeonStreamHandler<TTUpgradeEvent>(streamHandler);
+    const channel: EventChannel = new EventChannel(binaryMessenger, channelName, PigeonMethodChannelCodec);
+    channel.setStreamHandler(internalStreamHandler);
+  }
+
+  onListen(args: Object, sink: PigeonEventSink<TTUpgradeEvent>): void {
+  }
+
+  onCancel(args: Object): void {
+  }
+}
+
+
+export abstract class UpgradeGatewayStreamHandler implements PigeonEventChannelWrapper<TTUpgradeEvent> {
+  static register(binaryMessenger: BinaryMessenger, streamHandler: UpgradeGatewayStreamHandler, instanceName: string = ''): void {
+    let channelName: string = 'dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.upgradeGateway';
+    if (instanceName !== '') {
+      channelName += '.' + instanceName;
+    }
+    const internalStreamHandler: PigeonStreamHandler<TTUpgradeEvent> =
+        new PigeonStreamHandler<TTUpgradeEvent>(streamHandler);
+    const channel: EventChannel = new EventChannel(binaryMessenger, channelName, PigeonMethodChannelCodec);
+    channel.setStreamHandler(internalStreamHandler);
+  }
+
+  onListen(args: Object, sink: PigeonEventSink<TTUpgradeEvent>): void {
+  }
+
+  onCancel(args: Object): void {
+  }
+}
+
+
+export abstract class UpgradeGatewayByPackageStreamHandler implements PigeonEventChannelWrapper<TTUpgradeEvent> {
+  static register(binaryMessenger: BinaryMessenger, streamHandler: UpgradeGatewayByPackageStreamHandler, instanceName: string = ''): void {
+    let channelName: string = 'dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.upgradeGatewayByPackage';
+    if (instanceName !== '') {
+      channelName += '.' + instanceName;
+    }
+    const internalStreamHandler: PigeonStreamHandler<TTUpgradeEvent> =
+        new PigeonStreamHandler<TTUpgradeEvent>(streamHandler);
+    const channel: EventChannel = new EventChannel(binaryMessenger, channelName, PigeonMethodChannelCodec);
+    channel.setStreamHandler(internalStreamHandler);
+  }
+
+  onListen(args: Object, sink: PigeonEventSink<TTUpgradeEvent>): void {
+  }
+
+  onCancel(args: Object): void {
+  }
+}
+
+
+export abstract class UpgradeWaterMeterStreamHandler implements PigeonEventChannelWrapper<TTUpgradeEvent> {
+  static register(binaryMessenger: BinaryMessenger, streamHandler: UpgradeWaterMeterStreamHandler, instanceName: string = ''): void {
+    let channelName: string = 'dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.upgradeWaterMeter';
+    if (instanceName !== '') {
+      channelName += '.' + instanceName;
+    }
+    const internalStreamHandler: PigeonStreamHandler<TTUpgradeEvent> =
+        new PigeonStreamHandler<TTUpgradeEvent>(streamHandler);
+    const channel: EventChannel = new EventChannel(binaryMessenger, channelName, PigeonMethodChannelCodec);
+    channel.setStreamHandler(internalStreamHandler);
+  }
+
+  onListen(args: Object, sink: PigeonEventSink<TTUpgradeEvent>): void {
+  }
+
+  onCancel(args: Object): void {
+  }
+}
+
+
+export abstract class UpgradeWaterMeterByPackageStreamHandler implements PigeonEventChannelWrapper<TTUpgradeEvent> {
+  static register(binaryMessenger: BinaryMessenger, streamHandler: UpgradeWaterMeterByPackageStreamHandler, instanceName: string = ''): void {
+    let channelName: string = 'dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.upgradeWaterMeterByPackage';
+    if (instanceName !== '') {
+      channelName += '.' + instanceName;
+    }
+    const internalStreamHandler: PigeonStreamHandler<TTUpgradeEvent> =
+        new PigeonStreamHandler<TTUpgradeEvent>(streamHandler);
+    const channel: EventChannel = new EventChannel(binaryMessenger, channelName, PigeonMethodChannelCodec);
+    channel.setStreamHandler(internalStreamHandler);
+  }
+
+  onListen(args: Object, sink: PigeonEventSink<TTUpgradeEvent>): void {
+  }
+
+  onCancel(args: Object): void {
+  }
+}
+
+
+export abstract class UpgradeElectricMeterStreamHandler implements PigeonEventChannelWrapper<TTUpgradeEvent> {
+  static register(binaryMessenger: BinaryMessenger, streamHandler: UpgradeElectricMeterStreamHandler, instanceName: string = ''): void {
+    let channelName: string = 'dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.upgradeElectricMeter';
+    if (instanceName !== '') {
+      channelName += '.' + instanceName;
+    }
+    const internalStreamHandler: PigeonStreamHandler<TTUpgradeEvent> =
+        new PigeonStreamHandler<TTUpgradeEvent>(streamHandler);
+    const channel: EventChannel = new EventChannel(binaryMessenger, channelName, PigeonMethodChannelCodec);
+    channel.setStreamHandler(internalStreamHandler);
+  }
+
+  onListen(args: Object, sink: PigeonEventSink<TTUpgradeEvent>): void {
+  }
+
+  onCancel(args: Object): void {
+  }
+}
+
+
+export abstract class UpgradeElectricMeterByPackageStreamHandler implements PigeonEventChannelWrapper<TTUpgradeEvent> {
+  static register(binaryMessenger: BinaryMessenger, streamHandler: UpgradeElectricMeterByPackageStreamHandler, instanceName: string = ''): void {
+    let channelName: string = 'dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.upgradeElectricMeterByPackage';
+    if (instanceName !== '') {
+      channelName += '.' + instanceName;
+    }
+    const internalStreamHandler: PigeonStreamHandler<TTUpgradeEvent> =
+        new PigeonStreamHandler<TTUpgradeEvent>(streamHandler);
+    const channel: EventChannel = new EventChannel(binaryMessenger, channelName, PigeonMethodChannelCodec);
+    channel.setStreamHandler(internalStreamHandler);
+  }
+
+  onListen(args: Object, sink: PigeonEventSink<TTUpgradeEvent>): void {
+  }
+
+  onCancel(args: Object): void {
+  }
+}
+
+
+export abstract class UpgradeKeypadStreamHandler implements PigeonEventChannelWrapper<TTUpgradeEvent> {
+  static register(binaryMessenger: BinaryMessenger, streamHandler: UpgradeKeypadStreamHandler, instanceName: string = ''): void {
+    let channelName: string = 'dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.upgradeKeypad';
+    if (instanceName !== '') {
+      channelName += '.' + instanceName;
+    }
+    const internalStreamHandler: PigeonStreamHandler<TTUpgradeEvent> =
+        new PigeonStreamHandler<TTUpgradeEvent>(streamHandler);
+    const channel: EventChannel = new EventChannel(binaryMessenger, channelName, PigeonMethodChannelCodec);
+    channel.setStreamHandler(internalStreamHandler);
+  }
+
+  onListen(args: Object, sink: PigeonEventSink<TTUpgradeEvent>): void {
+  }
+
+  onCancel(args: Object): void {
+  }
+}
+
+
+export abstract class UpgradeKeypadByPackageStreamHandler implements PigeonEventChannelWrapper<TTUpgradeEvent> {
+  static register(binaryMessenger: BinaryMessenger, streamHandler: UpgradeKeypadByPackageStreamHandler, instanceName: string = ''): void {
+    let channelName: string = 'dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.upgradeKeypadByPackage';
+    if (instanceName !== '') {
+      channelName += '.' + instanceName;
+    }
+    const internalStreamHandler: PigeonStreamHandler<TTUpgradeEvent> =
+        new PigeonStreamHandler<TTUpgradeEvent>(streamHandler);
+    const channel: EventChannel = new EventChannel(binaryMessenger, channelName, PigeonMethodChannelCodec);
+    channel.setStreamHandler(internalStreamHandler);
+  }
+
+  onListen(args: Object, sink: PigeonEventSink<TTUpgradeEvent>): void {
   }
 
   onCancel(args: Object): void {

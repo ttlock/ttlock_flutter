@@ -952,6 +952,58 @@ enum TTPalmVeinErrorCode {
   palmBack,
 }
 
+/// 升级进度状态。按名称映射，禁止用 iOS `UpgradeOpration` raw 值当下标。
+enum TTUpgradeStatus {
+  /// 准备中。
+  preparing,
+  /// 升级中。
+  upgrading,
+  /// 恢复中。
+  recovering,
+}
+
+/// 升级流阶段。`success` 对应完成，不是 [TTUpgradeStatus]。
+enum TTUpgradePhase {
+  /// 进度更新，见 [TTUpgradeEvent.status] / [TTUpgradeEvent.progress]。
+  progress,
+  /// 升级成功。锁升级时 [TTUpgradeEvent.lockData] 可能有值。
+  success,
+}
+
+/// 网关网络 DFU 类型。
+enum TTDfuType {
+  /// 网络升级。
+  net,
+  /// 蓝牙升级。
+  bluetooth,
+}
+
+/// 升级错误码。`success` 仅为占位，对齐旧 ordinal，业务失败不用。
+enum TTLockUpgradeError {
+  /// 占位成功，业务失败不用。
+  success,
+  /// 外设蓝牙关闭。
+  peripheralPoweredOff,
+  /// 连接超时。
+  connectTimeout,
+  /// 网络失败。
+  netFail,
+  /// 无需升级。
+  noNeedUpgrade,
+  /// 未知升级版本。
+  unknownUpgradeVersion,
+  /// 进入升级状态失败。
+  enterUpgradeState,
+  /// 锁升级失败。
+  upgradeLockFail,
+  /// 准备阶段错误。
+  preparingError,
+  /// 读取特征值失败。
+  getSpecialValueError,
+  /// 升级失败。
+  upgradeFail,
+}
+
 /// 锁版本信息。
 class TTLockVersion {
   TTLockVersion({
@@ -2436,8 +2488,7 @@ class TTRemoteAccessoryScanModel {
 
   /// BLE 连接地址。
   ///
-  /// R2 遥控器初始化连接须使用此字段，不可用 [mac] 替代；
-  /// R1 / 键盘 / 门磁等可与 [mac] 相同，或为空（回退使用 [mac]）。
+  /// R2 遥控器初始化连接须使用此字段替代[mac]，其他设备不使用此字段；
   String? connectAddress;
 
   /// 蓝牙信号强度。
@@ -3587,6 +3638,620 @@ class AddPalmVeinEvent {
   int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
 }
 
+/// 固件升级进度事件。
+class TTUpgradeEvent {
+  TTUpgradeEvent({
+    required this.phase,
+    this.status,
+    this.progress,
+    this.lockData,
+  });
+
+  /// 流阶段。
+  TTUpgradePhase phase;
+
+  /// 进度状态。仅 [TTUpgradePhase.progress] 时有值。
+  TTUpgradeStatus? status;
+
+  /// 进度百分比，0–100。
+  int? progress;
+
+  /// 锁升级成功后刷新得到的锁凭证。仅锁升级 success 时有值。
+  String? lockData;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      phase,
+      status,
+      progress,
+      lockData,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static TTUpgradeEvent decode(Object result) {
+    result as List<Object?>;
+    return TTUpgradeEvent(
+      phase: result[0]! as TTUpgradePhase,
+      status: result[1] as TTUpgradeStatus?,
+      progress: result[2] as int?,
+      lockData: result[3] as String?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! TTUpgradeEvent || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(phase, other.phase) && _deepEquals(status, other.status) && _deepEquals(progress, other.progress) && _deepEquals(lockData, other.lockData);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+/// [TTEventChannelApi.upgradeLock] 订阅前通过 [TTUpgradeHostApi.setUpgradeLockParam] 写入。
+class TTUpgradeLockParam {
+  TTUpgradeLockParam({
+    required this.lockMac,
+    required this.lockData,
+    required this.firmwarePackage,
+  });
+
+  /// 锁蓝牙 MAC 地址。
+  String lockMac;
+
+  /// 锁凭证。
+  String lockData;
+
+  /// 固件包，不透明字符串（通常为服务端下发的 Base64），不是本地文件路径。
+  String firmwarePackage;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      lockMac,
+      lockData,
+      firmwarePackage,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static TTUpgradeLockParam decode(Object result) {
+    result as List<Object?>;
+    return TTUpgradeLockParam(
+      lockMac: result[0]! as String,
+      lockData: result[1]! as String,
+      firmwarePackage: result[2]! as String,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! TTUpgradeLockParam || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(lockMac, other.lockMac) && _deepEquals(lockData, other.lockData) && _deepEquals(firmwarePackage, other.firmwarePackage);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+/// [TTEventChannelApi.upgradeGateway] 订阅前通过 [TTUpgradeHostApi.setUpgradeGatewayParam] 写入。
+class TTUpgradeGatewayParam {
+  TTUpgradeGatewayParam({
+    required this.dfuType,
+    required this.clientId,
+    required this.accessToken,
+    required this.gatewayId,
+    required this.gatewayMac,
+  });
+
+  /// 网关 DFU 类型。
+  TTDfuType dfuType;
+
+  /// 开放平台 clientId。
+  String clientId;
+
+  /// 访问令牌。
+  String accessToken;
+
+  /// 网关 ID。
+  int gatewayId;
+
+  /// 网关 MAC 地址。
+  String gatewayMac;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      dfuType,
+      clientId,
+      accessToken,
+      gatewayId,
+      gatewayMac,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static TTUpgradeGatewayParam decode(Object result) {
+    result as List<Object?>;
+    return TTUpgradeGatewayParam(
+      dfuType: result[0]! as TTDfuType,
+      clientId: result[1]! as String,
+      accessToken: result[2]! as String,
+      gatewayId: result[3]! as int,
+      gatewayMac: result[4]! as String,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! TTUpgradeGatewayParam || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(dfuType, other.dfuType) && _deepEquals(clientId, other.clientId) && _deepEquals(accessToken, other.accessToken) && _deepEquals(gatewayId, other.gatewayId) && _deepEquals(gatewayMac, other.gatewayMac);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+/// [TTEventChannelApi.upgradeGatewayByPackage] 订阅前写入。
+class TTUpgradeGatewayByPackageParam {
+  TTUpgradeGatewayByPackageParam({
+    required this.firmwarePackage,
+    required this.gatewayMac,
+  });
+
+  /// 固件包，不透明字符串（通常为服务端下发的 Base64），不是本地文件路径。
+  String firmwarePackage;
+
+  /// 网关 MAC 地址。
+  String gatewayMac;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      firmwarePackage,
+      gatewayMac,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static TTUpgradeGatewayByPackageParam decode(Object result) {
+    result as List<Object?>;
+    return TTUpgradeGatewayByPackageParam(
+      firmwarePackage: result[0]! as String,
+      gatewayMac: result[1]! as String,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! TTUpgradeGatewayByPackageParam || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(firmwarePackage, other.firmwarePackage) && _deepEquals(gatewayMac, other.gatewayMac);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+/// [TTEventChannelApi.upgradeWaterMeter] 订阅前写入。
+class TTUpgradeWaterMeterParam {
+  TTUpgradeWaterMeterParam({
+    required this.clientId,
+    required this.accessToken,
+    required this.deviceId,
+    required this.deviceMac,
+  });
+
+  /// 开放平台 clientId。
+  String clientId;
+
+  /// 访问令牌。
+  String accessToken;
+
+  /// 水表设备 ID。
+  int deviceId;
+
+  /// 水表 MAC 地址。
+  String deviceMac;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      clientId,
+      accessToken,
+      deviceId,
+      deviceMac,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static TTUpgradeWaterMeterParam decode(Object result) {
+    result as List<Object?>;
+    return TTUpgradeWaterMeterParam(
+      clientId: result[0]! as String,
+      accessToken: result[1]! as String,
+      deviceId: result[2]! as int,
+      deviceMac: result[3]! as String,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! TTUpgradeWaterMeterParam || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(clientId, other.clientId) && _deepEquals(accessToken, other.accessToken) && _deepEquals(deviceId, other.deviceId) && _deepEquals(deviceMac, other.deviceMac);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+/// [TTEventChannelApi.upgradeWaterMeterByPackage] 订阅前写入。
+///
+/// 调用方须已对该水表调用过 [TTAccessoryHostApi.waterMeterSetClientParam]。
+class TTUpgradeWaterMeterByPackageParam {
+  TTUpgradeWaterMeterByPackageParam({
+    required this.deviceId,
+    required this.deviceMac,
+    required this.firmwarePackage,
+  });
+
+  /// 水表设备 ID。
+  int deviceId;
+
+  /// 水表 MAC 地址。
+  String deviceMac;
+
+  /// 固件包，不透明字符串（通常为服务端下发的 Base64），不是本地文件路径。
+  String firmwarePackage;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      deviceId,
+      deviceMac,
+      firmwarePackage,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static TTUpgradeWaterMeterByPackageParam decode(Object result) {
+    result as List<Object?>;
+    return TTUpgradeWaterMeterByPackageParam(
+      deviceId: result[0]! as int,
+      deviceMac: result[1]! as String,
+      firmwarePackage: result[2]! as String,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! TTUpgradeWaterMeterByPackageParam || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(deviceId, other.deviceId) && _deepEquals(deviceMac, other.deviceMac) && _deepEquals(firmwarePackage, other.firmwarePackage);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+/// [TTEventChannelApi.upgradeElectricMeter] 订阅前写入。
+class TTUpgradeElectricMeterParam {
+  TTUpgradeElectricMeterParam({
+    required this.clientId,
+    required this.accessToken,
+    required this.deviceId,
+    required this.deviceMac,
+  });
+
+  /// 开放平台 clientId。
+  String clientId;
+
+  /// 访问令牌。
+  String accessToken;
+
+  /// 电表设备 ID。
+  int deviceId;
+
+  /// 电表 MAC 地址。
+  String deviceMac;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      clientId,
+      accessToken,
+      deviceId,
+      deviceMac,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static TTUpgradeElectricMeterParam decode(Object result) {
+    result as List<Object?>;
+    return TTUpgradeElectricMeterParam(
+      clientId: result[0]! as String,
+      accessToken: result[1]! as String,
+      deviceId: result[2]! as int,
+      deviceMac: result[3]! as String,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! TTUpgradeElectricMeterParam || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(clientId, other.clientId) && _deepEquals(accessToken, other.accessToken) && _deepEquals(deviceId, other.deviceId) && _deepEquals(deviceMac, other.deviceMac);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+/// [TTEventChannelApi.upgradeElectricMeterByPackage] 订阅前写入。
+///
+/// 调用方须已对该电表调用过 [TTAccessoryHostApi.electricMeterSetClientParam]。
+class TTUpgradeElectricMeterByPackageParam {
+  TTUpgradeElectricMeterByPackageParam({
+    required this.deviceId,
+    required this.deviceMac,
+    required this.firmwarePackage,
+  });
+
+  /// 电表设备 ID。
+  int deviceId;
+
+  /// 电表 MAC 地址。
+  String deviceMac;
+
+  /// 固件包，不透明字符串（通常为服务端下发的 Base64），不是本地文件路径。
+  String firmwarePackage;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      deviceId,
+      deviceMac,
+      firmwarePackage,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static TTUpgradeElectricMeterByPackageParam decode(Object result) {
+    result as List<Object?>;
+    return TTUpgradeElectricMeterByPackageParam(
+      deviceId: result[0]! as int,
+      deviceMac: result[1]! as String,
+      firmwarePackage: result[2]! as String,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! TTUpgradeElectricMeterByPackageParam || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(deviceId, other.deviceId) && _deepEquals(deviceMac, other.deviceMac) && _deepEquals(firmwarePackage, other.firmwarePackage);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+/// [TTEventChannelApi.upgradeKeypad] 订阅前写入。
+///
+/// [lockData] / [slotNumber] / [featureValue] 可选，缺省按空串 / 0 处理。
+class TTUpgradeKeypadParam {
+  TTUpgradeKeypadParam({
+    required this.clientId,
+    required this.accessToken,
+    required this.deviceId,
+    required this.deviceMac,
+    this.lockData,
+    this.slotNumber,
+    this.featureValue,
+  });
+
+  /// 开放平台 clientId。
+  String clientId;
+
+  /// 访问令牌。
+  String accessToken;
+
+  /// 键盘设备 ID。
+  int deviceId;
+
+  /// 键盘 MAC 地址。
+  String deviceMac;
+
+  /// 关联锁凭证。缺省空串。
+  String? lockData;
+
+  /// 槽位号。缺省 0。
+  int? slotNumber;
+
+  /// 特征值。缺省空串。
+  String? featureValue;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      clientId,
+      accessToken,
+      deviceId,
+      deviceMac,
+      lockData,
+      slotNumber,
+      featureValue,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static TTUpgradeKeypadParam decode(Object result) {
+    result as List<Object?>;
+    return TTUpgradeKeypadParam(
+      clientId: result[0]! as String,
+      accessToken: result[1]! as String,
+      deviceId: result[2]! as int,
+      deviceMac: result[3]! as String,
+      lockData: result[4] as String?,
+      slotNumber: result[5] as int?,
+      featureValue: result[6] as String?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! TTUpgradeKeypadParam || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(clientId, other.clientId) && _deepEquals(accessToken, other.accessToken) && _deepEquals(deviceId, other.deviceId) && _deepEquals(deviceMac, other.deviceMac) && _deepEquals(lockData, other.lockData) && _deepEquals(slotNumber, other.slotNumber) && _deepEquals(featureValue, other.featureValue);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+/// [TTEventChannelApi.upgradeKeypadByPackage] 订阅前写入。
+///
+/// [lockData] / [slotNumber] / [featureValue] 可选，缺省按空串 / 0 处理。
+class TTUpgradeKeypadByPackageParam {
+  TTUpgradeKeypadByPackageParam({
+    required this.deviceId,
+    required this.deviceMac,
+    required this.firmwarePackage,
+    this.lockData,
+    this.slotNumber,
+    this.featureValue,
+  });
+
+  /// 键盘设备 ID。
+  int deviceId;
+
+  /// 键盘 MAC 地址。
+  String deviceMac;
+
+  /// 固件包，不透明字符串（通常为服务端下发的 Base64），不是本地文件路径。
+  String firmwarePackage;
+
+  /// 关联锁凭证。缺省空串。
+  String? lockData;
+
+  /// 槽位号。缺省 0。
+  int? slotNumber;
+
+  /// 特征值。缺省空串。
+  String? featureValue;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      deviceId,
+      deviceMac,
+      firmwarePackage,
+      lockData,
+      slotNumber,
+      featureValue,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static TTUpgradeKeypadByPackageParam decode(Object result) {
+    result as List<Object?>;
+    return TTUpgradeKeypadByPackageParam(
+      deviceId: result[0]! as int,
+      deviceMac: result[1]! as String,
+      firmwarePackage: result[2]! as String,
+      lockData: result[3] as String?,
+      slotNumber: result[4] as int?,
+      featureValue: result[5] as String?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! TTUpgradeKeypadByPackageParam || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(deviceId, other.deviceId) && _deepEquals(deviceMac, other.deviceMac) && _deepEquals(firmwarePackage, other.firmwarePackage) && _deepEquals(lockData, other.lockData) && _deepEquals(slotNumber, other.slotNumber) && _deepEquals(featureValue, other.featureValue);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
 
 class _PigeonCodec extends StandardMessageCodec {
   const _PigeonCodec();
@@ -3706,131 +4371,173 @@ class _PigeonCodec extends StandardMessageCodec {
     }    else if (value is TTPalmVeinErrorCode) {
       buffer.putUint8(165);
       writeValue(buffer, value.index);
-    }    else if (value is TTLockVersion) {
+    }    else if (value is TTUpgradeStatus) {
       buffer.putUint8(166);
-      writeValue(buffer, value.encode());
-    }    else if (value is TTLockInitParams) {
+      writeValue(buffer, value.index);
+    }    else if (value is TTUpgradePhase) {
       buffer.putUint8(167);
-      writeValue(buffer, value.encode());
-    }    else if (value is TTGatewayInitParams) {
+      writeValue(buffer, value.index);
+    }    else if (value is TTDfuType) {
       buffer.putUint8(168);
-      writeValue(buffer, value.encode());
-    }    else if (value is TTIpSetting) {
+      writeValue(buffer, value.index);
+    }    else if (value is TTLockUpgradeError) {
       buffer.putUint8(169);
-      writeValue(buffer, value.encode());
-    }    else if (value is TTCycleModel) {
+      writeValue(buffer, value.index);
+    }    else if (value is TTLockVersion) {
       buffer.putUint8(170);
       writeValue(buffer, value.encode());
-    }    else if (value is TTLockScanWifiEventParam) {
+    }    else if (value is TTLockInitParams) {
       buffer.putUint8(171);
       writeValue(buffer, value.encode());
-    }    else if (value is TTLockCredentialEventParam) {
+    }    else if (value is TTGatewayInitParams) {
       buffer.putUint8(172);
       writeValue(buffer, value.encode());
-    }    else if (value is TTKeypadCredentialEventParam) {
+    }    else if (value is TTIpSetting) {
       buffer.putUint8(173);
       writeValue(buffer, value.encode());
-    }    else if (value is ControlLockResult) {
+    }    else if (value is TTCycleModel) {
       buffer.putUint8(174);
       writeValue(buffer, value.encode());
-    }    else if (value is AutoLockingTime) {
+    }    else if (value is TTLockScanWifiEventParam) {
       buffer.putUint8(175);
       writeValue(buffer, value.encode());
-    }    else if (value is TTWifiInfoModel) {
+    }    else if (value is TTLockCredentialEventParam) {
       buffer.putUint8(176);
       writeValue(buffer, value.encode());
-    }    else if (value is CameraLockWifiResult) {
+    }    else if (value is TTKeypadCredentialEventParam) {
       buffer.putUint8(177);
       writeValue(buffer, value.encode());
-    }    else if (value is TTLockSystemModel) {
+    }    else if (value is ControlLockResult) {
       buffer.putUint8(178);
       writeValue(buffer, value.encode());
-    }    else if (value is AccessoryElectricQuantityResult) {
+    }    else if (value is AutoLockingTime) {
       buffer.putUint8(179);
       writeValue(buffer, value.encode());
-    }    else if (value is TTPassageModeModel) {
+    }    else if (value is TTWifiInfoModel) {
       buffer.putUint8(180);
       writeValue(buffer, value.encode());
-    }    else if (value is TTLockScanModel) {
+    }    else if (value is CameraLockWifiResult) {
       buffer.putUint8(181);
       writeValue(buffer, value.encode());
-    }    else if (value is TTPasscodeModel) {
+    }    else if (value is TTLockSystemModel) {
       buffer.putUint8(182);
       writeValue(buffer, value.encode());
-    }    else if (value is TTICCardModel) {
+    }    else if (value is AccessoryElectricQuantityResult) {
       buffer.putUint8(183);
       writeValue(buffer, value.encode());
-    }    else if (value is TTFingerprintModel) {
+    }    else if (value is TTPassageModeModel) {
       buffer.putUint8(184);
       writeValue(buffer, value.encode());
-    }    else if (value is TTPalmVeinModel) {
+    }    else if (value is TTLockScanModel) {
       buffer.putUint8(185);
       writeValue(buffer, value.encode());
-    }    else if (value is TTQrCodeModel) {
+    }    else if (value is TTPasscodeModel) {
       buffer.putUint8(186);
       writeValue(buffer, value.encode());
-    }    else if (value is TTGatewayScanModel) {
+    }    else if (value is TTICCardModel) {
       buffer.putUint8(187);
       writeValue(buffer, value.encode());
-    }    else if (value is GatewayDeviceInfo) {
+    }    else if (value is TTFingerprintModel) {
       buffer.putUint8(188);
       writeValue(buffer, value.encode());
-    }    else if (value is TTRemoteAccessoryScanModel) {
+    }    else if (value is TTPalmVeinModel) {
       buffer.putUint8(189);
       writeValue(buffer, value.encode());
-    }    else if (value is TTStandaloneDoorSensorInitParams) {
+    }    else if (value is TTQrCodeModel) {
       buffer.putUint8(190);
       writeValue(buffer, value.encode());
-    }    else if (value is TTStandaloneDoorSensorScanModel) {
+    }    else if (value is TTGatewayScanModel) {
       buffer.putUint8(191);
       writeValue(buffer, value.encode());
-    }    else if (value is TTStandaloneDoorSensorInfo) {
+    }    else if (value is GatewayDeviceInfo) {
       buffer.putUint8(192);
       writeValue(buffer, value.encode());
-    }    else if (value is TTMeterScanModel) {
+    }    else if (value is TTRemoteAccessoryScanModel) {
       buffer.putUint8(193);
       writeValue(buffer, value.encode());
-    }    else if (value is TTWaterMeterInitResult) {
+    }    else if (value is TTStandaloneDoorSensorInitParams) {
       buffer.putUint8(194);
       writeValue(buffer, value.encode());
-    }    else if (value is TTElectricMeterInitResult) {
+    }    else if (value is TTStandaloneDoorSensorScanModel) {
       buffer.putUint8(195);
       writeValue(buffer, value.encode());
-    }    else if (value is TTWifiScanResult) {
+    }    else if (value is TTStandaloneDoorSensorInfo) {
       buffer.putUint8(196);
       writeValue(buffer, value.encode());
-    }    else if (value is TTWifiScanEntry) {
+    }    else if (value is TTMeterScanModel) {
       buffer.putUint8(197);
       writeValue(buffer, value.encode());
-    }    else if (value is RemoteKeypadInitResult) {
+    }    else if (value is TTWaterMeterInitResult) {
       buffer.putUint8(198);
       writeValue(buffer, value.encode());
-    }    else if (value is MultifunctionalKeypadInitResult) {
+    }    else if (value is TTElectricMeterInitResult) {
       buffer.putUint8(199);
       writeValue(buffer, value.encode());
-    }    else if (value is WaterMeterDeviceInfo) {
+    }    else if (value is TTWifiScanResult) {
       buffer.putUint8(200);
       writeValue(buffer, value.encode());
-    }    else if (value is ElectricMeterDeviceInfo) {
+    }    else if (value is TTWifiScanEntry) {
       buffer.putUint8(201);
       writeValue(buffer, value.encode());
-    }    else if (value is TTWaterMeterInitParam) {
+    }    else if (value is RemoteKeypadInitResult) {
       buffer.putUint8(202);
       writeValue(buffer, value.encode());
-    }    else if (value is TTElectricMeterInitParam) {
+    }    else if (value is MultifunctionalKeypadInitResult) {
       buffer.putUint8(203);
       writeValue(buffer, value.encode());
-    }    else if (value is AddCardEvent) {
+    }    else if (value is WaterMeterDeviceInfo) {
       buffer.putUint8(204);
       writeValue(buffer, value.encode());
-    }    else if (value is AddFingerprintEvent) {
+    }    else if (value is ElectricMeterDeviceInfo) {
       buffer.putUint8(205);
       writeValue(buffer, value.encode());
-    }    else if (value is AddFaceEvent) {
+    }    else if (value is TTWaterMeterInitParam) {
       buffer.putUint8(206);
       writeValue(buffer, value.encode());
-    }    else if (value is AddPalmVeinEvent) {
+    }    else if (value is TTElectricMeterInitParam) {
       buffer.putUint8(207);
+      writeValue(buffer, value.encode());
+    }    else if (value is AddCardEvent) {
+      buffer.putUint8(208);
+      writeValue(buffer, value.encode());
+    }    else if (value is AddFingerprintEvent) {
+      buffer.putUint8(209);
+      writeValue(buffer, value.encode());
+    }    else if (value is AddFaceEvent) {
+      buffer.putUint8(210);
+      writeValue(buffer, value.encode());
+    }    else if (value is AddPalmVeinEvent) {
+      buffer.putUint8(211);
+      writeValue(buffer, value.encode());
+    }    else if (value is TTUpgradeEvent) {
+      buffer.putUint8(212);
+      writeValue(buffer, value.encode());
+    }    else if (value is TTUpgradeLockParam) {
+      buffer.putUint8(213);
+      writeValue(buffer, value.encode());
+    }    else if (value is TTUpgradeGatewayParam) {
+      buffer.putUint8(214);
+      writeValue(buffer, value.encode());
+    }    else if (value is TTUpgradeGatewayByPackageParam) {
+      buffer.putUint8(215);
+      writeValue(buffer, value.encode());
+    }    else if (value is TTUpgradeWaterMeterParam) {
+      buffer.putUint8(216);
+      writeValue(buffer, value.encode());
+    }    else if (value is TTUpgradeWaterMeterByPackageParam) {
+      buffer.putUint8(217);
+      writeValue(buffer, value.encode());
+    }    else if (value is TTUpgradeElectricMeterParam) {
+      buffer.putUint8(218);
+      writeValue(buffer, value.encode());
+    }    else if (value is TTUpgradeElectricMeterByPackageParam) {
+      buffer.putUint8(219);
+      writeValue(buffer, value.encode());
+    }    else if (value is TTUpgradeKeypadParam) {
+      buffer.putUint8(220);
+      writeValue(buffer, value.encode());
+    }    else if (value is TTUpgradeKeypadByPackageParam) {
+      buffer.putUint8(221);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -3952,89 +4659,121 @@ class _PigeonCodec extends StandardMessageCodec {
         final value = readValue(buffer) as int?;
         return value == null ? null : TTPalmVeinErrorCode.values[value];
       case 166:
-        return TTLockVersion.decode(readValue(buffer)!);
+        final value = readValue(buffer) as int?;
+        return value == null ? null : TTUpgradeStatus.values[value];
       case 167:
-        return TTLockInitParams.decode(readValue(buffer)!);
+        final value = readValue(buffer) as int?;
+        return value == null ? null : TTUpgradePhase.values[value];
       case 168:
-        return TTGatewayInitParams.decode(readValue(buffer)!);
+        final value = readValue(buffer) as int?;
+        return value == null ? null : TTDfuType.values[value];
       case 169:
-        return TTIpSetting.decode(readValue(buffer)!);
+        final value = readValue(buffer) as int?;
+        return value == null ? null : TTLockUpgradeError.values[value];
       case 170:
-        return TTCycleModel.decode(readValue(buffer)!);
+        return TTLockVersion.decode(readValue(buffer)!);
       case 171:
-        return TTLockScanWifiEventParam.decode(readValue(buffer)!);
+        return TTLockInitParams.decode(readValue(buffer)!);
       case 172:
-        return TTLockCredentialEventParam.decode(readValue(buffer)!);
+        return TTGatewayInitParams.decode(readValue(buffer)!);
       case 173:
-        return TTKeypadCredentialEventParam.decode(readValue(buffer)!);
+        return TTIpSetting.decode(readValue(buffer)!);
       case 174:
-        return ControlLockResult.decode(readValue(buffer)!);
+        return TTCycleModel.decode(readValue(buffer)!);
       case 175:
-        return AutoLockingTime.decode(readValue(buffer)!);
+        return TTLockScanWifiEventParam.decode(readValue(buffer)!);
       case 176:
-        return TTWifiInfoModel.decode(readValue(buffer)!);
+        return TTLockCredentialEventParam.decode(readValue(buffer)!);
       case 177:
-        return CameraLockWifiResult.decode(readValue(buffer)!);
+        return TTKeypadCredentialEventParam.decode(readValue(buffer)!);
       case 178:
-        return TTLockSystemModel.decode(readValue(buffer)!);
+        return ControlLockResult.decode(readValue(buffer)!);
       case 179:
-        return AccessoryElectricQuantityResult.decode(readValue(buffer)!);
+        return AutoLockingTime.decode(readValue(buffer)!);
       case 180:
-        return TTPassageModeModel.decode(readValue(buffer)!);
+        return TTWifiInfoModel.decode(readValue(buffer)!);
       case 181:
-        return TTLockScanModel.decode(readValue(buffer)!);
+        return CameraLockWifiResult.decode(readValue(buffer)!);
       case 182:
-        return TTPasscodeModel.decode(readValue(buffer)!);
+        return TTLockSystemModel.decode(readValue(buffer)!);
       case 183:
-        return TTICCardModel.decode(readValue(buffer)!);
+        return AccessoryElectricQuantityResult.decode(readValue(buffer)!);
       case 184:
-        return TTFingerprintModel.decode(readValue(buffer)!);
+        return TTPassageModeModel.decode(readValue(buffer)!);
       case 185:
-        return TTPalmVeinModel.decode(readValue(buffer)!);
+        return TTLockScanModel.decode(readValue(buffer)!);
       case 186:
-        return TTQrCodeModel.decode(readValue(buffer)!);
+        return TTPasscodeModel.decode(readValue(buffer)!);
       case 187:
-        return TTGatewayScanModel.decode(readValue(buffer)!);
+        return TTICCardModel.decode(readValue(buffer)!);
       case 188:
-        return GatewayDeviceInfo.decode(readValue(buffer)!);
+        return TTFingerprintModel.decode(readValue(buffer)!);
       case 189:
-        return TTRemoteAccessoryScanModel.decode(readValue(buffer)!);
+        return TTPalmVeinModel.decode(readValue(buffer)!);
       case 190:
-        return TTStandaloneDoorSensorInitParams.decode(readValue(buffer)!);
+        return TTQrCodeModel.decode(readValue(buffer)!);
       case 191:
-        return TTStandaloneDoorSensorScanModel.decode(readValue(buffer)!);
+        return TTGatewayScanModel.decode(readValue(buffer)!);
       case 192:
-        return TTStandaloneDoorSensorInfo.decode(readValue(buffer)!);
+        return GatewayDeviceInfo.decode(readValue(buffer)!);
       case 193:
-        return TTMeterScanModel.decode(readValue(buffer)!);
+        return TTRemoteAccessoryScanModel.decode(readValue(buffer)!);
       case 194:
-        return TTWaterMeterInitResult.decode(readValue(buffer)!);
+        return TTStandaloneDoorSensorInitParams.decode(readValue(buffer)!);
       case 195:
-        return TTElectricMeterInitResult.decode(readValue(buffer)!);
+        return TTStandaloneDoorSensorScanModel.decode(readValue(buffer)!);
       case 196:
-        return TTWifiScanResult.decode(readValue(buffer)!);
+        return TTStandaloneDoorSensorInfo.decode(readValue(buffer)!);
       case 197:
-        return TTWifiScanEntry.decode(readValue(buffer)!);
+        return TTMeterScanModel.decode(readValue(buffer)!);
       case 198:
-        return RemoteKeypadInitResult.decode(readValue(buffer)!);
+        return TTWaterMeterInitResult.decode(readValue(buffer)!);
       case 199:
-        return MultifunctionalKeypadInitResult.decode(readValue(buffer)!);
+        return TTElectricMeterInitResult.decode(readValue(buffer)!);
       case 200:
-        return WaterMeterDeviceInfo.decode(readValue(buffer)!);
+        return TTWifiScanResult.decode(readValue(buffer)!);
       case 201:
-        return ElectricMeterDeviceInfo.decode(readValue(buffer)!);
+        return TTWifiScanEntry.decode(readValue(buffer)!);
       case 202:
-        return TTWaterMeterInitParam.decode(readValue(buffer)!);
+        return RemoteKeypadInitResult.decode(readValue(buffer)!);
       case 203:
-        return TTElectricMeterInitParam.decode(readValue(buffer)!);
+        return MultifunctionalKeypadInitResult.decode(readValue(buffer)!);
       case 204:
-        return AddCardEvent.decode(readValue(buffer)!);
+        return WaterMeterDeviceInfo.decode(readValue(buffer)!);
       case 205:
-        return AddFingerprintEvent.decode(readValue(buffer)!);
+        return ElectricMeterDeviceInfo.decode(readValue(buffer)!);
       case 206:
-        return AddFaceEvent.decode(readValue(buffer)!);
+        return TTWaterMeterInitParam.decode(readValue(buffer)!);
       case 207:
+        return TTElectricMeterInitParam.decode(readValue(buffer)!);
+      case 208:
+        return AddCardEvent.decode(readValue(buffer)!);
+      case 209:
+        return AddFingerprintEvent.decode(readValue(buffer)!);
+      case 210:
+        return AddFaceEvent.decode(readValue(buffer)!);
+      case 211:
         return AddPalmVeinEvent.decode(readValue(buffer)!);
+      case 212:
+        return TTUpgradeEvent.decode(readValue(buffer)!);
+      case 213:
+        return TTUpgradeLockParam.decode(readValue(buffer)!);
+      case 214:
+        return TTUpgradeGatewayParam.decode(readValue(buffer)!);
+      case 215:
+        return TTUpgradeGatewayByPackageParam.decode(readValue(buffer)!);
+      case 216:
+        return TTUpgradeWaterMeterParam.decode(readValue(buffer)!);
+      case 217:
+        return TTUpgradeWaterMeterByPackageParam.decode(readValue(buffer)!);
+      case 218:
+        return TTUpgradeElectricMeterParam.decode(readValue(buffer)!);
+      case 219:
+        return TTUpgradeElectricMeterByPackageParam.decode(readValue(buffer)!);
+      case 220:
+        return TTUpgradeKeypadParam.decode(readValue(buffer)!);
+      case 221:
+        return TTUpgradeKeypadByPackageParam.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }
@@ -7544,10 +8283,316 @@ class TTAccessoryHostApi {
   }
 }
 
+/// 固件升级参数槽与停止。
+///
+/// 订阅 [TTEventChannelApi] 对应升级流之前调用 `setUpgrade*Param`。
+/// 停止方法只结束本路升级，不得 abort 其他设备的 DFU。
+class TTUpgradeHostApi {
+  /// Constructor for [TTUpgradeHostApi].  The [binaryMessenger] named argument is
+  /// available for dependency injection.  If it is left null, the default
+  /// BinaryMessenger will be used which routes to the host platform.
+  TTUpgradeHostApi({BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
+      : pigeonVar_binaryMessenger = binaryMessenger,
+        pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+  final BinaryMessenger? pigeonVar_binaryMessenger;
+
+  static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
+
+  final String pigeonVar_messageChannelSuffix;
+
+  /// 订阅 [TTEventChannelApi.upgradeLock] 前调用。
+  ///
+  /// [param] 锁固件包升级参数。
+  Future<void> setUpgradeLockParam(TTUpgradeLockParam param) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.setUpgradeLockParam$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[param]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  /// 订阅 [TTEventChannelApi.upgradeGateway] 前调用。
+  ///
+  /// [param] 网关网络 DFU 参数。
+  Future<void> setUpgradeGatewayParam(TTUpgradeGatewayParam param) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.setUpgradeGatewayParam$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[param]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  /// 订阅 [TTEventChannelApi.upgradeGatewayByPackage] 前调用。
+  ///
+  /// [param] 网关固件包升级参数。
+  Future<void> setUpgradeGatewayByPackageParam(TTUpgradeGatewayByPackageParam param) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.setUpgradeGatewayByPackageParam$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[param]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  /// 订阅 [TTEventChannelApi.upgradeWaterMeter] 前调用。
+  ///
+  /// [param] 水表网络升级参数。
+  Future<void> setUpgradeWaterMeterParam(TTUpgradeWaterMeterParam param) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.setUpgradeWaterMeterParam$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[param]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  /// 订阅 [TTEventChannelApi.upgradeWaterMeterByPackage] 前调用。
+  ///
+  /// 调用方须已对该水表调用过 [TTAccessoryHostApi.waterMeterSetClientParam]。
+  ///
+  /// [param] 水表固件包升级参数。
+  Future<void> setUpgradeWaterMeterByPackageParam(TTUpgradeWaterMeterByPackageParam param) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.setUpgradeWaterMeterByPackageParam$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[param]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  /// 订阅 [TTEventChannelApi.upgradeElectricMeter] 前调用。
+  ///
+  /// [param] 电表网络升级参数。
+  Future<void> setUpgradeElectricMeterParam(TTUpgradeElectricMeterParam param) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.setUpgradeElectricMeterParam$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[param]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  /// 订阅 [TTEventChannelApi.upgradeElectricMeterByPackage] 前调用。
+  ///
+  /// 调用方须已对该电表调用过 [TTAccessoryHostApi.electricMeterSetClientParam]。
+  ///
+  /// [param] 电表固件包升级参数。
+  Future<void> setUpgradeElectricMeterByPackageParam(TTUpgradeElectricMeterByPackageParam param) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.setUpgradeElectricMeterByPackageParam$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[param]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  /// 订阅 [TTEventChannelApi.upgradeKeypad] 前调用。
+  ///
+  /// [param] 键盘网络升级参数。
+  Future<void> setUpgradeKeypadParam(TTUpgradeKeypadParam param) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.setUpgradeKeypadParam$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[param]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  /// 订阅 [TTEventChannelApi.upgradeKeypadByPackage] 前调用。
+  ///
+  /// [param] 键盘固件包升级参数。
+  Future<void> setUpgradeKeypadByPackageParam(TTUpgradeKeypadByPackageParam param) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.setUpgradeKeypadByPackageParam$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[param]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  /// 停止锁升级。
+  Future<void> stopUpgradeLock() async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.stopUpgradeLock$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  /// 停止网关升级（网络 DFU 与固件包共用）。
+  Future<void> stopUpgradeGateway() async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.stopUpgradeGateway$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  /// 停止水表升级。不得 abort 锁或网关 DFU。
+  Future<void> stopUpgradeWaterMeter() async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.stopUpgradeWaterMeter$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  /// 停止电表升级。不得 abort 锁或网关 DFU。
+  Future<void> stopUpgradeElectricMeter() async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.stopUpgradeElectricMeter$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
+  /// 停止键盘升级。不得 abort 锁或网关 DFU。
+  Future<void> stopUpgradeKeypad() async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.ttlock_flutter.TTUpgradeHostApi.stopUpgradeKeypad$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+}
+
 /// 持续事件流接口。
 ///
 /// 订阅任一流方法前，须通过对应 [TTLockHostApi] / [TTGatewayHostApi] /
-/// [TTAccessoryHostApi] 的 `set*Param` 方法写入上下文参数。
+/// [TTAccessoryHostApi] / [TTUpgradeHostApi] 的 `set*Param` 方法写入上下文参数。
 Stream<TTLockScanModel> lockScanLock( {String instanceName = ''}) {
   if (instanceName.isNotEmpty) {
     instanceName = '.$instanceName';
@@ -7721,6 +8766,105 @@ Stream<TTMeterScanModel> accessoryElectricMeterStartScan( {String instanceName =
       EventChannel('dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.accessoryElectricMeterStartScan$instanceName', pigeonMethodCodec);
   return accessoryElectricMeterStartScanChannel.receiveBroadcastStream().map((dynamic event) {
     return event as TTMeterScanModel;
+  });
+}
+    
+Stream<TTUpgradeEvent> upgradeLock( {String instanceName = ''}) {
+  if (instanceName.isNotEmpty) {
+    instanceName = '.$instanceName';
+  }
+  final EventChannel upgradeLockChannel =
+      EventChannel('dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.upgradeLock$instanceName', pigeonMethodCodec);
+  return upgradeLockChannel.receiveBroadcastStream().map((dynamic event) {
+    return event as TTUpgradeEvent;
+  });
+}
+    
+Stream<TTUpgradeEvent> upgradeGateway( {String instanceName = ''}) {
+  if (instanceName.isNotEmpty) {
+    instanceName = '.$instanceName';
+  }
+  final EventChannel upgradeGatewayChannel =
+      EventChannel('dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.upgradeGateway$instanceName', pigeonMethodCodec);
+  return upgradeGatewayChannel.receiveBroadcastStream().map((dynamic event) {
+    return event as TTUpgradeEvent;
+  });
+}
+    
+Stream<TTUpgradeEvent> upgradeGatewayByPackage( {String instanceName = ''}) {
+  if (instanceName.isNotEmpty) {
+    instanceName = '.$instanceName';
+  }
+  final EventChannel upgradeGatewayByPackageChannel =
+      EventChannel('dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.upgradeGatewayByPackage$instanceName', pigeonMethodCodec);
+  return upgradeGatewayByPackageChannel.receiveBroadcastStream().map((dynamic event) {
+    return event as TTUpgradeEvent;
+  });
+}
+    
+Stream<TTUpgradeEvent> upgradeWaterMeter( {String instanceName = ''}) {
+  if (instanceName.isNotEmpty) {
+    instanceName = '.$instanceName';
+  }
+  final EventChannel upgradeWaterMeterChannel =
+      EventChannel('dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.upgradeWaterMeter$instanceName', pigeonMethodCodec);
+  return upgradeWaterMeterChannel.receiveBroadcastStream().map((dynamic event) {
+    return event as TTUpgradeEvent;
+  });
+}
+    
+Stream<TTUpgradeEvent> upgradeWaterMeterByPackage( {String instanceName = ''}) {
+  if (instanceName.isNotEmpty) {
+    instanceName = '.$instanceName';
+  }
+  final EventChannel upgradeWaterMeterByPackageChannel =
+      EventChannel('dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.upgradeWaterMeterByPackage$instanceName', pigeonMethodCodec);
+  return upgradeWaterMeterByPackageChannel.receiveBroadcastStream().map((dynamic event) {
+    return event as TTUpgradeEvent;
+  });
+}
+    
+Stream<TTUpgradeEvent> upgradeElectricMeter( {String instanceName = ''}) {
+  if (instanceName.isNotEmpty) {
+    instanceName = '.$instanceName';
+  }
+  final EventChannel upgradeElectricMeterChannel =
+      EventChannel('dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.upgradeElectricMeter$instanceName', pigeonMethodCodec);
+  return upgradeElectricMeterChannel.receiveBroadcastStream().map((dynamic event) {
+    return event as TTUpgradeEvent;
+  });
+}
+    
+Stream<TTUpgradeEvent> upgradeElectricMeterByPackage( {String instanceName = ''}) {
+  if (instanceName.isNotEmpty) {
+    instanceName = '.$instanceName';
+  }
+  final EventChannel upgradeElectricMeterByPackageChannel =
+      EventChannel('dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.upgradeElectricMeterByPackage$instanceName', pigeonMethodCodec);
+  return upgradeElectricMeterByPackageChannel.receiveBroadcastStream().map((dynamic event) {
+    return event as TTUpgradeEvent;
+  });
+}
+    
+Stream<TTUpgradeEvent> upgradeKeypad( {String instanceName = ''}) {
+  if (instanceName.isNotEmpty) {
+    instanceName = '.$instanceName';
+  }
+  final EventChannel upgradeKeypadChannel =
+      EventChannel('dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.upgradeKeypad$instanceName', pigeonMethodCodec);
+  return upgradeKeypadChannel.receiveBroadcastStream().map((dynamic event) {
+    return event as TTUpgradeEvent;
+  });
+}
+    
+Stream<TTUpgradeEvent> upgradeKeypadByPackage( {String instanceName = ''}) {
+  if (instanceName.isNotEmpty) {
+    instanceName = '.$instanceName';
+  }
+  final EventChannel upgradeKeypadByPackageChannel =
+      EventChannel('dev.flutter.pigeon.ttlock_flutter.TTEventChannelApi.upgradeKeypadByPackage$instanceName', pigeonMethodCodec);
+  return upgradeKeypadByPackageChannel.receiveBroadcastStream().map((dynamic event) {
+    return event as TTUpgradeEvent;
   });
 }
     
