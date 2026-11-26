@@ -1,6 +1,7 @@
 /// TTLock Flutter Plugin (On-Premise).
 ///
-/// 基于 Pigeon 的 Future/Stream API。通过 [TTLock.lock]、[TTLock.gateway] 及各类配件入口访问。
+/// 基于 Pigeon 的 Future/Stream API。通过 [TTLock.lock]、[TTLock.gateway]、
+/// [TTLock.upgrade] 及各类配件入口访问。
 ///
 /// ```dart
 /// final subscription = TTLock.lock.lockScanLock().listen((model) {
@@ -24,8 +25,10 @@ export 'package:ttlock_flutter/src/tt_gateway_api.dart';
 export 'package:ttlock_flutter/src/tt_lock_api.dart';
 export 'package:ttlock_flutter/src/tt_remote_key_api.dart';
 export 'package:ttlock_flutter/src/tt_remote_keypad_api.dart';
+export 'package:ttlock_flutter/src/tt_upgrade_api.dart';
 export 'package:ttlock_flutter/src/tt_water_meter_api.dart';
-export 'package:ttlock_flutter_platform_interface/pigeon/messages.g.dart' hide TTLockHostApi, TTAccessoryHostApi, TTGatewayHostApi;
+export 'package:ttlock_flutter_platform_interface/pigeon/messages.g.dart'
+    hide TTLockHostApi, TTAccessoryHostApi, TTGatewayHostApi, TTUpgradeHostApi;
 
 export 'package:ttlock_flutter/errors/errors.dart';
 
@@ -38,6 +41,7 @@ import 'package:ttlock_flutter/src/tt_gateway_api.dart';
 import 'package:ttlock_flutter/src/tt_lock_api.dart';
 import 'package:ttlock_flutter/src/tt_remote_key_api.dart';
 import 'package:ttlock_flutter/src/tt_remote_keypad_api.dart';
+import 'package:ttlock_flutter/src/tt_upgrade_api.dart';
 import 'package:ttlock_flutter/src/tt_water_meter_api.dart';
 
 /// 插件入口：单例访问各 [TT*Api]。
@@ -54,6 +58,7 @@ class TTLock {
   static TTDoorSensorApi? _doorSensor;
   static TTWaterMeterApi? _waterMeter;
   static TTElectricMeterApi? _electricMeter;
+  static TTUpgradeApi? _upgrade;
 
   /// 锁（扫描、初始化、开锁、密码/卡/指纹等）。
   static TTLockApi get lock => _lock ??= TTLockApi(
@@ -97,6 +102,12 @@ class TTLock {
         messageChannelSuffix: _messageChannelSuffix,
       );
 
+  /// 固件升级（锁、网关、水电表、键盘）。进度流无默认 45s 超时。
+  static TTUpgradeApi get upgrade => _upgrade ??= TTUpgradeApi(
+        binaryMessenger: _binaryMessenger,
+        messageChannelSuffix: _messageChannelSuffix,
+      );
+
   /// 设置默认 [BinaryMessenger] / 通道后缀（如测试环境），并清空已缓存的 API 实例。
   static void configurePigeon({
     BinaryMessenger? binaryMessenger,
@@ -117,6 +128,7 @@ class TTLock {
     _doorSensor = null;
     _waterMeter = null;
     _electricMeter = null;
+    _upgrade = null;
   }
 
   /// 注册蓝牙门卫；传 null / 不注册 → 所有调用直接放行（向后兼容）。
@@ -144,6 +156,7 @@ class TTLock {
     TTDoorSensorApi? doorSensorApi,
     TTWaterMeterApi? waterMeterApi,
     TTElectricMeterApi? electricMeterApi,
+    TTUpgradeApi? upgradeApi,
   }) {
     if (lockApi != null) _lock = lockApi;
     if (gatewayApi != null) _gateway = gatewayApi;
@@ -152,5 +165,6 @@ class TTLock {
     if (doorSensorApi != null) _doorSensor = doorSensorApi;
     if (waterMeterApi != null) _waterMeter = waterMeterApi;
     if (electricMeterApi != null) _electricMeter = electricMeterApi;
+    if (upgradeApi != null) _upgrade = upgradeApi;
   }
 }

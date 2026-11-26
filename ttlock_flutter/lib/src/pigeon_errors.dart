@@ -237,6 +237,59 @@ Stream<T> mapMultifunctionalKeypadStreamErrors<T>(Stream<T> stream) =>
 Stream<T> mapStandaloneDoorSensorStreamErrors<T>(Stream<T> stream) =>
     _mapStreamErrors(stream, throwStandaloneDoorSensorError);
 
+/// 升级流 / setParam / stop 上的 [PlatformException] → [TTUpgradeException]。
+///
+/// `message` 含 `notImplemented` 或 `code == unsupported` 时抛
+/// [TTUpgradeNotImplementedException]。`success` 仅占位，不当作业务失败码。
+Never throwUpgradeError(PlatformException e) {
+  final msg = e.message ?? '';
+  if (msg == 'notImplemented' ||
+      msg.contains('notImplemented') ||
+      e.code == 'unsupported') {
+    throw TTUpgradeNotImplementedException(msg);
+  }
+  if (e.code == 'channel-error' || e.code == 'null-error') {
+    throw TTUpgradeException(TTLockUpgradeError.upgradeFail, msg);
+  }
+  final i = int.tryParse(e.code);
+  if (i != null &&
+      i >= 0 &&
+      i < TTLockUpgradeError.values.length &&
+      TTLockUpgradeError.values[i] != TTLockUpgradeError.success) {
+    throw TTUpgradeException(TTLockUpgradeError.values[i], msg);
+  }
+  throw TTUpgradeException(TTLockUpgradeError.upgradeFail, msg);
+}
+
+/// 升级 EventChannel 上的 [PlatformException] → [TTUpgradeException]。
+///
+/// 不套 [BleTimeout]。进度流可以长于默认 45s。
+Stream<T> mapUpgradeStreamErrors<T>(Stream<T> stream) =>
+    _mapStreamErrors(stream, throwUpgradeError);
+
+/// `setUpgrade*Param` / `stopUpgrade*` 的短超时入口。
+///
+/// 使用 [BleTimeout.resolve]（默认 45s）。不要把该超时套到升级进度流上。
+/// [op] 非空时先走蓝牙门卫；进度流通常在外层单独 [runBleGate]。
+Future<T> runUpgradeApi<T>(
+  Future<T> Function() fn, {
+  required String method,
+  TTBleOperation? op,
+  Duration? timeout,
+}) async {
+  if (op != null) {
+    await runBleGate(op);
+  }
+  final effective = BleTimeout.resolve(callTimeout: timeout, method: method);
+  try {
+    final future = fn();
+    if (effective == null) return await future;
+    return await future.timeout(effective);
+  } on PlatformException catch (e) {
+    throwUpgradeError(e);
+  }
+}
+
 /// 键盘录入类 EventChannel：原生可能回调锁错误或键盘错误（见 [runMultifunctionalKeypadInit]）。
 Never throwKeypadCredentialStreamError(PlatformException e) {
   final i = int.tryParse(e.code);
