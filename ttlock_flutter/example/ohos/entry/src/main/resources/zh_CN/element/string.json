@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "模块描述"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "flutterdemo"
+    },
+    {
+      "name": "bluetooth_reason",
+      "value": "用于扫描并连接通通锁蓝牙设备。"
+    },
+    {
+      "name": "location_reason",
+      "value": "用于蓝牙设备发现及网关 Wi-Fi 配网。"
+    },
+    {
+      "name": "camera_reason",
+      "value": "用于拍摄人脸照片并录入门锁。"
+    }
+  ]
+}

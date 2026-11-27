@@ -44,7 +44,7 @@ TTLock.upgrade.upgradeLockByPackage(
 
 ## 示例
 
-示例应用为独立仓库 `ttlock_flutter_demo`，以 Git submodule 挂在 `example/`：
+示例应用在包内 `example/`（开放平台 Demo，包名 `ttlock_flutter_demo`），随本仓库维护，非独立发布：
 
 ```bash
 cd example

@@ -1,0 +1,57 @@
+{
+  "app": {
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "storeFile": "/Users/chuyi/StudioProjects/ttlock_flutter_demo/ohos/sciener.p12",
+          "storePassword": "0000004B4FB1A93EAB3D407B8BBBC2C6B8C32EE6FB60FD4B0C0ADF0AEEC3294BEFB22C70909834B4EE2A3E29A9D635F3B87BD694FA358D47CE673974DE3A973F6E03E75C91E454BBEC1EC2A5E9A9BF321474D9E9013E9DE0725989",
+          "keyAlias": "sciener",
+          "keyPassword": "0000004B6377C9FD7A00FCFE9B5FFA0460D66B00FB529F57A3390F14E0CC979D3F5D352747479209B95110116AFDF9C558C08E480914BBE7D9C3CED76A2ED8D6B45C21504FAD14D9A40D9A21395FEAFEDF47CF11E52559DDF41F35",
+          "signAlg": "SHA256withECDSA",
+          "profile": "/Users/chuyi/StudioProjects/ttlock_flutter_demo/ohos/FlutterSDKDemo_pgyer.p7b",
+          "certpath": "/Users/chuyi/StudioProjects/ttlock_flutter_demo/ohos/sciener_release.cer"
+        }
+      }
+    ],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "compatibleSdkVersion": "5.1.0(18)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "useNormalizedOHMUrl": true
+          }
+        }
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug"
+      },
+      {
+        "name": "profile"
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+# 本地 monorepo 开发：覆盖 ttlock_flutter 的 git 子包为 path，
+# 与 ../pubspec_overrides.yaml 对齐。
+# 本目录为 ttlock_flutter 包内 example（非独立仓库）。
+dependency_overrides:
+  ttlock_flutter_platform_interface:
+    path: ../../ttlock_flutter_platform_interface
+  ttlock_flutter_android:
+    path: ../../ttlock_flutter_android
+  ttlock_flutter_ios:
+    path: ../../ttlock_flutter_ios
+  ttlock_flutter_ohos:
+    path: ../../ttlock_flutter_ohos

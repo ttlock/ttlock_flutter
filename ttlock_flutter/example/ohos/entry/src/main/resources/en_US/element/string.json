@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "module description"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "flutterdemo"
+    },
+    {
+      "name": "bluetooth_reason",
+      "value": "Used to scan and connect TTLock Bluetooth devices."
+    },
+    {
+      "name": "location_reason",
+      "value": "Used for Bluetooth device discovery and gateway Wi-Fi configuration."
+    },
+    {
+      "name": "camera_reason",
+      "value": "Used to take photos for face enrollment on the lock."
+    }
+  ]
+}

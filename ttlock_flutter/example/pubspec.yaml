@@ -1,0 +1,72 @@
+name: ttlock_flutter_demo
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  crypto: ^3.0.6
+  cupertino_icons: ^1.0.8
+  device_info_plus: ^11.5.0
+  dio: ^5.7.0
+  flutter:
+    sdk: flutter
+  flutter_easyloading: ^4.0.2
+  flutter_hooks: ^0.21.3+1
+  flutter_localizations:
+    sdk: flutter
+  fpdart: ^1.1.1
+  freezed_annotation: ^3.1.0
+  go_router: ^17.2.3
+  go_router_builder: ^4.1.1
+  go_transitions: ^0.8.3
+  hooks_riverpod: ^3.0.3
+  image_picker: ^1.2.2
+  intl: ^0.20.2
+  json_annotation: ^4.9.0
+  logger: ^2.5.0
+  # <4.9.1：4.9.1 将 logError 改为 4 个位置参数，与现有 *.g.dart 不兼容；
+  # 4.9.2+ 新增 Parser.DartMappable，与 retrofit_generator <10.2 约束配套
+  retrofit: ">=4.4.1 <4.9.1"
+  riverpod_annotation: ^3.0.3
+    # Flutter 3.35.8-ohos：官方 shared_preferences 的鸿蒙适配
+  # 参考 https://gitcode.com/CPF-Flutter/docs/blob/main/ThirdpartyLibrarites.md
+  # TAG: shared_preferences-v2.5.4-ohos-1.0.1（配套 Flutter >=3.35）
+  shared_preferences:
+    git:
+      url: https://gitcode.com/CPF-Flutter/flutter_packages.git
+      path: packages/shared_preferences/shared_preferences
+      ref: shared_preferences-v2.5.4-ohos-1.0.1
+  # Flutter 3.35.8-ohos：permission_handler 鸿蒙适配
+  # TAG 对照见 https://gitcode.com/CPF-Flutter/flutter_permission_handler
+  permission_handler:
+    git:
+      url: https://gitcode.com/CPF-Flutter/flutter_permission_handler.git
+      path: permission_handler
+      ref: 12.0.1-ohos-1.0.0
+  ttlock_flutter:
+    path: ../
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  build_runner: ^2.4.13
+  # <10.2：10.2.0 生成 4 参 logError（需 retrofit≥4.9.1）；10.2.1+ 引用 Parser.DartMappable（需 retrofit≥4.9.2）
+  retrofit_generator: ">=10.0.0 <10.2.0"
+  freezed: ^3.2.3
+  json_serializable: ^6.8.0
+  riverpod_generator: ^3.0.3
+  custom_lint: ^0.8.0
+  riverpod_lint: ^3.0.3
+  mocktail: ^1.0.4
+  http_mock_adapter: ^0.6.1
+
+flutter:
+  generate: true
+  uses-material-design: true
+  assets:
+    - assets/

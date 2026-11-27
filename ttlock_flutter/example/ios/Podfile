@@ -1,0 +1,70 @@
+# Uncomment this line to define a global platform for your project
+# platform :ios, '13.0'
+
+# CocoaPods analytics sends network stats synchronously affecting flutter build latency.
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+project 'Runner', {
+  'Debug' => :debug,
+  'Profile' => :release,
+  'Release' => :release,
+}
+
+def flutter_root
+  generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
+  unless File.exist?(generated_xcode_build_settings_path)
+    raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
+  end
+
+  File.foreach(generated_xcode_build_settings_path) do |line|
+    matches = line.match(/FLUTTER_ROOT\=(.*)/)
+    return matches[1].strip if matches
+  end
+  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
+end
+
+require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
+
+flutter_ios_podfile_setup
+
+target 'Runner' do
+  use_frameworks!
+
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+  target 'RunnerTests' do
+    inherit! :search_paths
+  end
+end
+
+# permission_handler_apple 的每个权限策略都由预处理宏开关，见其
+# PermissionHandlerEnums.h：所有 PERMISSION_* 的默认值都是 0。宏未开启时，
+# 对应的 Strategy 会退化为 UnknownPermissionStrategy —— 它的
+# requestPermission: 无条件返回 permanentlyDenied，checkPermissionStatus:
+# 无条件返回 denied，既不读系统真实状态也不弹窗。
+# 因此这里必须显式开启本项目用到的权限，且只开启 Info.plist 里已声明
+# usage description 的权限，否则请求时会直接被系统 terminate。
+BLE_PERMISSION_DEFINITIONS = [
+  '$(inherited)',
+  # dart: PermissionGroup.bluetooth
+  # Info.plist: NSBluetoothAlwaysUsageDescription / NSBluetoothPeripheralUsageDescription
+  'PERMISSION_BLUETOOTH=1',
+  # dart: PermissionGroup.locationWhenInUse
+  # Info.plist: NSLocationWhenInUseUsageDescription
+  # 注意：只开 WHENINUSE，不要开 PERMISSION_LOCATION / PERMISSION_LOCATION_ALWAYS，
+  # 本项目未声明 NSLocationAlwaysAndWhenInUseUsageDescription。
+  'PERMISSION_LOCATION_WHENINUSE=1',
+].freeze
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_ios_build_settings(target)
+
+    next unless target.name.start_with?('permission_handler_apple')
+
+    target.build_configurations.each do |config|
+      definitions = config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] || []
+      config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] =
+        (definitions + BLE_PERMISSION_DEFINITIONS).uniq
+    end
+  end
+end
